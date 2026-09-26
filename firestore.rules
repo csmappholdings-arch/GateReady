@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // User Profile Document
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      // Trips Subcollection
+      match /trips/{tripId} {
+        allow list, get: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(tripId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: false;
+    }
+  }
+}

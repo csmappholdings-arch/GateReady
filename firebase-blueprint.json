@@ -1,0 +1,124 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile metadata, account details, and subscription tier",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique Firebase Auth UID of the user"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Full display name of the user"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Profile picture URL from Google Account"
+        },
+        "subscriptionTier": {
+          "type": "string",
+          "enum": ["FREE", "PRO"],
+          "description": "Active tier: FREE (1 traveler, max 1 of each bag type up to 3 total) or PRO (unlimited travelers and bags)"
+        },
+        "subscriptionBillingCycle": {
+          "type": "string",
+          "enum": ["monthly", "yearly"],
+          "description": "Billing cadence chosen by the subscriber"
+        },
+        "isSubscribed": {
+          "type": "boolean",
+          "description": "Flag indicating if user has active paid subscription"
+        },
+        "subscriptionExpiresAt": {
+          "type": "string",
+          "description": "ISO timestamp for next renewal or subscription expiration"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last profile sync"
+        }
+      },
+      "required": ["userId"]
+    },
+    "Trip": {
+      "title": "Trip",
+      "description": "Packing trip containing luggage bags, packed items, travelers, and gate checklists",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the trip"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the trip owner"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display title of the trip"
+        },
+        "travelType": {
+          "type": "string",
+          "description": "Transportation mode (PLANE, TRAIN, CAR, CRUISE, BUS)"
+        },
+        "companyName": {
+          "type": "string",
+          "description": "Carrier or airline name"
+        },
+        "seatClassOrCarSize": {
+          "type": "string",
+          "description": "Seating tier, fare class, or vehicle class"
+        },
+        "departureDate": {
+          "type": "string",
+          "description": "Planned travel departure date"
+        },
+        "departureTime": {
+          "type": "string",
+          "description": "Planned travel departure time in HH:mm"
+        },
+        "departureCountdownEnabled": {
+          "type": "boolean",
+          "description": "Flag indicating if live departure countdown timer is enabled"
+        },
+        "departureReminders": {
+          "type": "array",
+          "description": "Smart pre-trip milestones and day-of critical travel reminders"
+        },
+        "familyMembers": {
+          "type": "array",
+          "description": "List of travelers traveling together on this journey"
+        },
+        "bags": {
+          "type": "array",
+          "description": "Bags assigned to travelers with packing items and weight thresholds"
+        },
+        "gateChecklist": {
+          "type": "array",
+          "description": "Pre-departure and gate clearance checks"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of the last modification"
+        }
+      },
+      "required": ["id", "userId", "name", "travelType"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Private user account profile document containing user preferences and subscription status"
+    },
+    "/users/{userId}/trips/{tripId}": {
+      "schema": "Trip",
+      "description": "Travel trips, luggage configurations, and packing checklists owned by the user"
+    }
+  }
+}
