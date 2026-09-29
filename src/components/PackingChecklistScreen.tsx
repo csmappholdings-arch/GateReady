@@ -5,6 +5,7 @@ import { Trip, BagType, WeightUnit, Bag } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
 import { DepartureCountdownCard } from './DepartureCountdownCard';
 import { exportTripToPDF } from '../utils/pdfExport';
+import { EditBagDialog } from './EditBagDialog';
 import { 
   Plus, 
   Trash2, 
@@ -24,24 +25,36 @@ import {
   ChevronDown,
   UserCheck,
   Edit2,
+  Edit3,
   UserPlus,
   ArrowRight,
   Crown,
-  FileDown
+  FileDown,
+  X,
+  FolderCheck,
+  RotateCcw,
+  QrCode,
+  Lock
 } from 'lucide-react';
+import { PackingPresetsModal } from './PackingPresetsModal';
+import { RouteIntelBanner } from './RouteIntelBanner';
+import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
+import { LuggageQrTagModal } from './LuggageQrTagModal';
 
 interface PackingChecklistScreenProps {
   trip: Trip;
   onOpenAddItem: (bagId: string) => void;
   onOpenAddBag: () => void;
   onNavigateToAllowances?: () => void;
+  onNavigateToBags?: () => void;
 }
 
 export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
   trip,
   onOpenAddItem,
   onOpenAddBag,
-  onNavigateToAllowances
+  onNavigateToAllowances,
+  onNavigateToBags
 }) => {
   const {
     selectedBagId,
@@ -53,16 +66,21 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
     updateItemPacker,
     addItemToBag,
     removeBagFromTrip,
+    renameBag,
     activePackerFilter,
     setActivePackerFilter,
     addFamilyMember,
     removeFamilyMember,
     renameFamilyMember,
-    addBagToTrip
+    addBagToTrip,
+    updateTripDetails,
+    resetAllPacked
   } = usePacking();
 
   const { isPro, canAddTraveler, canAddBag, openPaywall } = useSubscription();
 
+  const [showPresetsModal, setShowPresetsModal] = useState(false);
+  const [showLuggageQrModal, setShowLuggageQrModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'unpacked' | 'packed'>('all');
   const [packerDropdownOpen, setPackerDropdownOpen] = useState(false);
@@ -71,6 +89,11 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
   const [editingTravelerName, setEditingTravelerName] = useState<string | null>(null);
   const [editNameInput, setEditNameInput] = useState('');
   const [showOnlyPersonItems, setShowOnlyPersonItems] = useState(true);
+
+  // Bag rename & edit state
+  const [isEditingBagName, setIsEditingBagName] = useState(false);
+  const [editBagNameInput, setEditBagNameInput] = useState('');
+  const [bagToEdit, setBagToEdit] = useState<Bag | null>(null);
 
   const packerDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -639,36 +662,57 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                   const bagTotal = bagItemsForView.length;
 
                   return (
-                    <button
+                    <div
                       key={bag.id}
-                      onClick={() => setSelectedBagId(bag.id)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium shrink-0 transition-all border cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition-all border ${
                         isSelected
                           ? 'bg-purple-600 border-purple-600 text-white shadow-sm'
                           : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-800'
                       }`}
                     >
-                      <div className={isSelected ? 'text-white' : ''}>{getBagIcon(bag.type)}</div>
-                      <div className="text-left">
-                        <div className="flex items-center gap-1.5">
-                          <p className="font-bold leading-tight truncate max-w-[120px]">{bag.label}</p>
-                          {bag.assignedTo && (
-                            <span
-                              className={`text-[9px] font-bold px-1.5 py-0.2 rounded-md ${
-                                isSelected
-                                  ? 'bg-white/20 text-white'
-                                  : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                              }`}
-                            >
-                              {bag.assignedTo.split(' ')[0]}
-                            </span>
-                          )}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBagId(bag.id)}
+                        className="flex items-center gap-2 text-left cursor-pointer"
+                      >
+                        <div className={isSelected ? 'text-white' : ''}>{getBagIcon(bag.type)}</div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-bold leading-tight truncate max-w-[120px]">{bag.label}</p>
+                            {bag.assignedTo && (
+                              <span
+                                className={`text-[9px] font-bold px-1.5 py-0.2 rounded-md ${
+                                  isSelected
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                                }`}
+                              >
+                                {bag.assignedTo.split(' ')[0]}
+                              </span>
+                            )}
+                          </div>
+                          <p className={`text-[10px] ${isSelected ? 'text-purple-100' : 'text-slate-400 dark:text-slate-500'}`}>
+                            {getBagTypeBadge(bag.type)} · {bagPacked}/{bagTotal}
+                          </p>
                         </div>
-                        <p className={`text-[10px] ${isSelected ? 'text-purple-100' : 'text-slate-400 dark:text-slate-500'}`}>
-                          {getBagTypeBadge(bag.type)} · {bagPacked}/{bagTotal}
-                        </p>
-                      </div>
-                    </button>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBagToEdit(bag);
+                        }}
+                        className={`p-1 rounded-md transition-colors cursor-pointer ${
+                          isSelected
+                            ? 'text-purple-200 hover:text-white hover:bg-purple-700'
+                            : 'text-slate-400 hover:text-purple-600 hover:bg-purple-100/60 dark:hover:bg-slate-700'
+                        }`}
+                        title={`Edit name of "${bag.label}"`}
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                    </div>
                   );
                 })
               )}
@@ -687,6 +731,20 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                   </span>
                 )}
               </button>
+
+              {/* Manage Bags in Dedicated Tab */}
+              {onNavigateToBags && (
+                <button
+                  type="button"
+                  onClick={onNavigateToBags}
+                  className="h-10 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 dark:hover:bg-purple-950/60 flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer shadow-2xs"
+                  title="Open dedicated Bags manager tab"
+                >
+                  <Luggage className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                  <span>All Bags ({trip.bags.length})</span>
+                  <ArrowRight className="w-3 h-3 text-purple-400" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -730,8 +788,55 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
 
       {/* Main Checklist Body */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 space-y-4 w-full">
+        {/* Recommended Route Intel Bar: Power Converter Brick, Local Currency, Tipping */}
+        <RouteIntelBanner trip={trip} />
+
+        {/* Destination Weather & Clothing Packing Advisor */}
+        <DestinationWeatherAdvisor trip={trip} />
+
         {/* Interactive Live Departure Countdown & Smart Reminders (Pro exclusive) */}
         <DepartureCountdownCard trip={trip} />
+
+        {/* Return Flight Repack Banner (When in return trip mode) */}
+        {trip.isReturnRepackMode && (
+          <div className="rounded-2xl bg-gradient-to-r from-purple-100 via-indigo-100 to-purple-50 dark:from-purple-950/70 dark:via-indigo-950/50 dark:to-slate-900 border border-purple-300 dark:border-purple-800 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <RotateCcw className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                    Return Flight & Hotel Checkout Repack Mode
+                  </h3>
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-purple-600 text-white px-2 py-0.2 rounded-md">
+                    Return Active
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                  All items are assigned to their exact bags & compartments from flight #1. Check off each item as you pack your hotel room so no chargers or passports are left behind.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+              <button
+                type="button"
+                onClick={() => resetAllPacked(trip.id)}
+                className="h-8 px-3 rounded-xl bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold hover:bg-purple-50 cursor-pointer shadow-2xs"
+              >
+                Reset Checkboxes
+              </button>
+              <button
+                type="button"
+                onClick={() => updateTripDetails(trip.id, { isReturnRepackMode: false })}
+                className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold cursor-pointer shadow-2xs"
+              >
+                Done Repacking
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Active Traveler Filter Banner (if filtering by specific person) */}
         {activePackerFilter !== 'ALL' && (
@@ -773,19 +878,73 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                   {getBagIcon(currentBag.type)}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                      {currentBag.label}
-                    </h2>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-                      {getBagTypeBadge(currentBag.type)}
-                    </span>
-                    {currentBag.assignedTo && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                        Assigned to: {currentBag.assignedTo}
+                  {isEditingBagName ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (editBagNameInput.trim()) {
+                          renameBag(trip.id, currentBag.id, editBagNameInput.trim());
+                          setIsEditingBagName(false);
+                        }
+                      }}
+                      className="flex items-center gap-1.5"
+                    >
+                      <input
+                        type="text"
+                        required
+                        autoFocus
+                        value={editBagNameInput}
+                        onChange={(e) => setEditBagNameInput(e.target.value)}
+                        placeholder="Bag label / name"
+                        className="h-8 px-2.5 text-xs font-bold rounded-lg border border-purple-400 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"
+                      />
+                      <button
+                        type="submit"
+                        className="h-8 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                        title="Save bag name"
+                      >
+                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>Save</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingBagName(false)}
+                        className="h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setBagToEdit(currentBag)}
+                        className="text-base font-bold text-slate-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer text-left"
+                        title="Click to edit or rename this baggage"
+                      >
+                        {currentBag.label}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setBagToEdit(currentBag)}
+                        className="h-7 px-2.5 rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-xs font-semibold flex items-center gap-1 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors cursor-pointer shadow-2xs"
+                        title="Edit name, type or weight of this bag"
+                      >
+                        <Edit3 className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                        <span>Edit / Rename</span>
+                      </button>
+
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                        {getBagTypeBadge(currentBag.type)}
                       </span>
-                    )}
-                  </div>
+                      {currentBag.assignedTo && (
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                          Assigned to: {currentBag.assignedTo}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <p className="text-xs text-slate-500 mt-0.5">
                     {currentBag.items.filter((i) => i.isPacked).length} of {currentBag.items.length} items packed
                   </p>
@@ -842,11 +1001,64 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                   </span>
                 </div>
               )}
+
+              {/* Souvenir Buffer Warning Bar */}
+              {weightPercentage >= 75 && !isOverweight && (
+                <div className="flex items-center justify-between p-3 mt-3 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/70 text-xs text-amber-950 dark:text-amber-200 animate-in fade-in">
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                    <div>
+                      <span className="font-extrabold text-amber-900 dark:text-amber-300">
+                        Souvenir & Return Buffer Alert ({weightPercentage.toFixed(0)}% full):
+                      </span>
+                      <p className="text-[11px] text-amber-800/90 dark:text-amber-200/90 mt-0.5">
+                        You're nearing the {typicalLimitDisplay} {unitLabel} maximum! Frequent flyers recommend leaving 15%–20% weight and volume free so you have room for souvenirs, conference materials, and hotel gifts on the way back.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Empty Bags State (If trip has no bags configured) */}
+        {!currentBag && (
+          <div className="rounded-3xl border border-dashed border-purple-200 dark:border-purple-800 bg-white/70 dark:bg-slate-900/60 p-8 text-center shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-300 flex items-center justify-center mx-auto mb-3">
+              <Luggage className="w-7 h-7" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              No Luggage Added Yet
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto mb-5 leading-relaxed">
+              Add a Personal Item (backpack, purse), Carry-On Bag, or Checked Suitcase to track items, check airline limits, and calculate bag weight.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <button
+                onClick={() => addBagToTrip(trip.id, 'PERSONAL', 'Backpack / Personal Item')}
+                className="h-10 px-4 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-semibold hover:bg-purple-100 transition-colors cursor-pointer"
+              >
+                + Add Personal Item
+              </button>
+              <button
+                onClick={() => addBagToTrip(trip.id, 'CARRY_ON', 'Main Carry-On')}
+                className="h-10 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md shadow-purple-600/25 transition-all cursor-pointer"
+              >
+                + Add Carry-On Bag
+              </button>
+              <button
+                onClick={() => addBagToTrip(trip.id, 'CHECKED', 'Checked Suitcase')}
+                className="h-10 px-4 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-semibold hover:bg-purple-100 transition-colors cursor-pointer"
+              >
+                + Add Checked Bag
+              </button>
             </div>
           </div>
         )}
 
         {/* Search & Filter Bar */}
+        {currentBag && (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-purple-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -876,6 +1088,46 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
               ))}
             </div>
 
+            {/* Presets & Templates Button */}
+            <button
+              onClick={() => {
+                if (!isPro) {
+                  openPaywall("Upgrade to Gate Ready Pro to load pre-built frequent traveler packing kits and custom bag templates.");
+                  return;
+                }
+                setShowPresetsModal(true);
+              }}
+              className="h-10 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+              title="Load pre-built frequent traveler packing kits or save this bag as a custom preset (Pro)"
+            >
+              <FolderCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="hidden sm:inline">Presets</span>
+              <span className="sm:hidden">Presets</span>
+              {!isPro && <Crown className="w-3 h-3 fill-amber-400 text-amber-500" />}
+            </button>
+
+            {/* Emergency Luggage QR Tag Generator */}
+            <button
+              onClick={() => {
+                if (!isPro) {
+                  openPaywall("Upgrade to Gate Ready Pro to generate privacy-safe emergency luggage QR tags and recovery claim cards.");
+                  return;
+                }
+                setShowLuggageQrModal(true);
+              }}
+              className="h-10 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800"
+              title="Generate privacy-safe emergency luggage QR tag and recovery claim card (Pro)"
+            >
+              <QrCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span className="hidden sm:inline">QR Bag Tag</span>
+              <span className="sm:hidden">QR Tag</span>
+              {!isPro && (
+                <span className="inline-flex items-center gap-0.5 bg-amber-400 text-purple-950 font-black text-[9px] px-1.5 py-0.2 rounded shadow-2xs">
+                  <Lock className="w-2.5 h-2.5" /> PRO
+                </span>
+              )}
+            </button>
+
             {/* PDF Export Button (Pro feature) */}
             <button
               onClick={handleExportPDF}
@@ -897,6 +1149,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             </button>
           </div>
         </div>
+        )}
 
         {/* Items List */}
         {currentBag && (
@@ -1097,6 +1350,36 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             )}
           </button>
         </div>
+      )}
+
+      {/* Edit Baggage Dialog */}
+      <EditBagDialog
+        isOpen={bagToEdit !== null}
+        onClose={() => setBagToEdit(null)}
+        bag={bagToEdit}
+        tripId={trip.id}
+        familyMembers={familyMembers}
+        weightUnit={weightUnit}
+      />
+
+      {/* Frequent Traveler Presets Modal */}
+      {showPresetsModal && currentBag && (
+        <PackingPresetsModal
+          isOpen={showPresetsModal}
+          onClose={() => setShowPresetsModal(false)}
+          trip={trip}
+          targetBag={currentBag}
+        />
+      )}
+
+      {/* Emergency Luggage Recovery QR Tag Modal */}
+      {showLuggageQrModal && currentBag && (
+        <LuggageQrTagModal
+          isOpen={showLuggageQrModal}
+          onClose={() => setShowLuggageQrModal(false)}
+          trip={trip}
+          bag={currentBag}
+        />
       )}
     </div>
   );

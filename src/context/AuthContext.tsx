@@ -1,11 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, signInWithGoogle as fbSignInWithGoogle, signOutUser } from '../lib/firebase';
+import { 
+  auth, 
+  signInWithGoogle as fbSignInWithGoogle, 
+  signUpWithEmail as fbSignUpWithEmail,
+  signInWithEmail as fbSignInWithEmail,
+  resetPassword as fbResetPassword,
+  signOutUser 
+} from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
+  signInWithEmail: (email: string, pass: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   error: string | null;
   clearError: () => void;
@@ -36,11 +46,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fbSignInWithGoogle();
     } catch (err: any) {
-      console.error('Sign-in failed:', err);
+      console.error('Google sign-in failed:', err);
       // Don't show error if user simply closed the popup
       if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message || 'Failed to sign in with Google');
       }
+      throw err;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, pass: string, name?: string) => {
+    setError(null);
+    try {
+      await fbSignUpWithEmail(email, pass, name);
+    } catch (err: any) {
+      console.error('Email sign-up failed:', err);
+      let msg = err.message || 'Failed to create account';
+      if (err.code === 'auth/email-already-in-use') {
+        msg = 'An account with this email already exists. Try signing in instead.';
+      } else if (err.code === 'auth/weak-password') {
+        msg = 'Password is too weak. Please use at least 6 characters.';
+      } else if (err.code === 'auth/invalid-email') {
+        msg = 'Please enter a valid email address.';
+      }
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
+  const signInWithEmail = async (email: string, pass: string) => {
+    setError(null);
+    try {
+      await fbSignInWithEmail(email, pass);
+    } catch (err: any) {
+      console.error('Email sign-in failed:', err);
+      let msg = err.message || 'Failed to sign in';
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        msg = 'Incorrect email or password. Please verify your credentials.';
+      } else if (err.code === 'auth/too-many-requests') {
+        msg = 'Too many failed login attempts. Please reset your password or try again later.';
+      }
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    setError(null);
+    try {
+      await fbResetPassword(email);
+    } catch (err: any) {
+      console.error('Password reset failed:', err);
+      let msg = err.message || 'Failed to send password reset email';
+      if (err.code === 'auth/user-not-found') {
+        msg = 'No account found with this email address.';
+      }
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -57,7 +119,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut, error, clearError }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      signIn, 
+      signUpWithEmail, 
+      signInWithEmail, 
+      resetPassword, 
+      signOut, 
+      error, 
+      clearError 
+    }}>
       {children}
     </AuthContext.Provider>
   );

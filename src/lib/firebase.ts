@@ -5,7 +5,11 @@ import {
   signInWithPopup, 
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  User 
+  User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -72,6 +76,31 @@ export async function signInWithGoogle(): Promise<User> {
   return user;
 }
 
+export async function signUpWithEmail(email: string, pass: string, name?: string): Promise<User> {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+  const user = userCredential.user;
+  if (name && name.trim()) {
+    try {
+      await updateProfile(user, { displayName: name.trim() });
+    } catch (e) {
+      console.warn('Could not set displayName on signup:', e);
+    }
+  }
+  await syncUserProfile(user);
+  return user;
+}
+
+export async function signInWithEmail(email: string, pass: string): Promise<User> {
+  const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+  const user = userCredential.user;
+  await syncUserProfile(user);
+  return user;
+}
+
+export async function resetPassword(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email);
+}
+
 export async function signOutUser(): Promise<void> {
   await firebaseSignOut(auth);
 }
@@ -103,8 +132,13 @@ export function subscribeToUserTrips(
     const cloudTrips: Trip[] = [];
     snapshot.forEach((d) => {
       const data = d.data();
+      const tripId = data.id || d.id;
+      // Filter out any legacy preset demo trips
+      if (tripId === 'trip-nyc-delta' || tripId === 'trip-1' || tripId === 'trip-orlando' || data.name === 'New York Fall Flight') {
+        return;
+      }
       cloudTrips.push({
-        id: data.id || d.id,
+        id: tripId,
         name: data.name,
         travelType: data.travelType,
         companyName: data.companyName || '',
@@ -115,6 +149,10 @@ export function subscribeToUserTrips(
         departureReminders: data.departureReminders || [],
         familyMembers: data.familyMembers || [],
         bags: data.bags || [],
+        aircraftType: data.aircraftType || '',
+        isReturnRepackMode: data.isReturnRepackMode ?? false,
+        returnTripDate: data.returnTripDate || '',
+        souvenirBufferEnabled: data.souvenirBufferEnabled ?? true,
         gateChecklist: data.gateChecklist || []
       });
     });
@@ -142,6 +180,10 @@ export async function saveTripToCloud(userId: string, trip: Trip): Promise<void>
       departureReminders: trip.departureReminders || [],
       familyMembers: trip.familyMembers || [],
       bags: trip.bags || [],
+      aircraftType: trip.aircraftType || '',
+      isReturnRepackMode: trip.isReturnRepackMode ?? false,
+      returnTripDate: trip.returnTripDate || '',
+      souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
       gateChecklist: trip.gateChecklist || [],
       updatedAt: new Date().toISOString()
     }, { merge: true });

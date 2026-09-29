@@ -10,14 +10,19 @@ import {
   ShieldCheck, 
   CreditCard,
   Zap,
-  ArrowRight
+  ArrowRight,
+  Key
 } from 'lucide-react';
 
 export const SubscriptionModal: React.FC = () => {
-  const { isPaywallOpen, closePaywall, upgradeToPro, paywallReason, isPro, tier } = useSubscription();
+  const { isPaywallOpen, closePaywall, upgradeToPro, paywallReason, isPro, tier, applyLicenseKey } = useSubscription();
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  const [showLicenseEntry, setShowLicenseEntry] = useState(false);
+  const [licenseInput, setLicenseInput] = useState('');
+  const [licenseError, setLicenseError] = useState('');
 
   if (!isPaywallOpen) return null;
 
@@ -172,6 +177,20 @@ export const SubscriptionModal: React.FC = () => {
                 </div>
                 <div>
                   <span className="font-bold text-slate-900 dark:text-white">
+                    Round-Trip & Return Tracking:
+                  </span>
+                  <span className="text-slate-600 dark:text-slate-400 ml-1">
+                    Track return flights, return dates/times, 2-way baggage allowances, and departure day countdowns.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-white">
                     Unlimited Travelers:
                   </span>
                   <span className="text-slate-600 dark:text-slate-400 ml-1">
@@ -189,7 +208,35 @@ export const SubscriptionModal: React.FC = () => {
                     Unlimited Bags & Multiples:
                   </span>
                   <span className="text-slate-600 dark:text-slate-400 ml-1">
-                    Free is limited to 1 of each bag (max 3 total). Pro unlocks multiple checked bags, carry-ons, and personal items.
+                    Free is limited to 2 bags total. Pro unlocks unlimited checked bags, carry-ons, and personal items.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    Aircraft Cabin & Plugs Intel:
+                  </span>
+                  <span className="text-slate-600 dark:text-slate-400 ml-1">
+                    In-seat AC power outlet specs, USB-A/C ports, and overhead bin clearance risks for 20+ commercial aircraft.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    Travel Intel & Checklists:
+                  </span>
+                  <span className="text-slate-600 dark:text-slate-400 ml-1">
+                    Destination weather climate advisories, cash vs card & digital payment estimator, and pre-departure checklists.
                   </span>
                 </div>
               </div>
@@ -218,6 +265,34 @@ export const SubscriptionModal: React.FC = () => {
                   </span>
                   <span className="text-slate-600 dark:text-slate-400 ml-1">
                     Live ticking countdown to travel with critical alerts for foreign cash pickup, passports, and home security.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    Emergency Luggage QR Tags & Recovery Cards:
+                  </span>
+                  <span className="text-slate-600 dark:text-slate-400 ml-1">
+                    Generate privacy-safe luggage tags (protecting home addresses) and airline baggage claim sheets.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    Pre-Built Packing Presets & Custom Bag Kits:
+                  </span>
+                  <span className="text-slate-600 dark:text-slate-400 ml-1">
+                    Instant 1-click packing bundles (Business Tech, Beach Resort, Ski Trip, Toddler) and custom reusable bag templates.
                   </span>
                 </div>
               </div>
@@ -296,6 +371,85 @@ export const SubscriptionModal: React.FC = () => {
               </span>
               <span>•</span>
               <span>14-day Money Back</span>
+            </div>
+
+            {/* Manual or Testing License Code redemption */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
+              {!showLicenseEntry ? (
+                <button
+                  type="button"
+                  onClick={() => setShowLicenseEntry(true)}
+                  className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                >
+                  <Key className="w-3 h-3" />
+                  <span>Have a backup or testing license key?</span>
+                </button>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const res = applyLicenseKey(licenseInput);
+                    if (res.success) {
+                      setPaymentSuccess(true);
+                      setTimeout(() => {
+                        setPaymentSuccess(false);
+                        closePaywall();
+                      }, 1200);
+                    } else {
+                      setLicenseError(res.message);
+                    }
+                  }}
+                  className="p-3 rounded-2xl bg-purple-50/60 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 space-y-2 text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                      <Key className="w-3.5 h-3.5 text-purple-600" />
+                      <span>Enter Pro License Key</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowLicenseEntry(false);
+                        setLicenseError('');
+                      }}
+                      className="text-[10px] text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      required
+                      autoFocus
+                      value={licenseInput}
+                      onChange={(e) => {
+                        setLicenseInput(e.target.value);
+                        setLicenseError('');
+                      }}
+                      placeholder="e.g. GR-Test-2026-1"
+                      className="flex-1 h-9 px-3 text-xs uppercase font-bold tracking-wider rounded-xl border border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                    />
+                    <button
+                      type="submit"
+                      className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-bold text-xs shadow-xs cursor-pointer transition-all"
+                    >
+                      Activate
+                    </button>
+                  </div>
+
+                  {licenseError && (
+                    <p className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">
+                      {licenseError}
+                    </p>
+                  )}
+
+                  <p className="text-[10px] text-slate-400">
+                    Testing keys: <span className="font-bold text-purple-700 dark:text-purple-300">GR-Test-2026-1</span> to <span className="font-bold text-purple-700 dark:text-purple-300">GR-Test-2026-5</span>
+                  </p>
+                </form>
+              )}
             </div>
           </div>
         </div>

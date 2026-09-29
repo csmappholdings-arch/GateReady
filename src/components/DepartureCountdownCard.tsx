@@ -19,7 +19,8 @@ import {
   Lock, 
   X,
   Edit3,
-  Bell
+  Bell,
+  RotateCcw
 } from 'lucide-react';
 
 interface DepartureCountdownCardProps {
@@ -32,8 +33,26 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
     updateDepartureSchedule, 
     toggleDepartureReminder, 
     addCustomReminder, 
-    removeDepartureReminder 
+    removeDepartureReminder,
+    updateTripDetails,
+    resetAllPacked
   } = usePacking();
+
+  const handleToggleReturnTrip = () => {
+    if (!isPro) {
+      openPaywall("Return Trip Repack Mode is a Pro feature. It preserves all your packed items from flight #1 and gives you a fresh repack checklist so nothing gets left behind in your hotel room.");
+      return;
+    }
+    const nextMode = !trip.isReturnRepackMode;
+    if (nextMode) {
+      if (confirm("Switch to Return Trip Repack Mode? All your items will remain assigned to the same bags and compartments, and checkboxes will be reset so you can check items off as you pack your hotel room.")) {
+        updateTripDetails(trip.id, { isReturnRepackMode: true });
+        resetAllPacked(trip.id);
+      }
+    } else {
+      updateTripDetails(trip.id, { isReturnRepackMode: false });
+    }
+  };
 
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
   const [dateInput, setDateInput] = useState(trip.departureDate || new Date().toISOString().split('T')[0]);
@@ -139,6 +158,44 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
     setNewReminderTitle('');
     setShowAddReminderModal(false);
   };
+
+  // Auto-hide entire section content with blank info and show minimized Pro Required banner if user is not Pro
+  if (!isPro) {
+    return (
+      <div className="rounded-2xl border border-purple-200/90 dark:border-purple-900/60 bg-gradient-to-r from-purple-50/90 via-fuchsia-50/40 to-amber-50/70 dark:from-slate-900 dark:via-purple-950/30 dark:to-slate-900 p-3.5 sm:p-4 shadow-2xs mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-800">
+            <Lock className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-slate-900 dark:text-white">
+                Departure Countdown Clock & Travel Day Alerts
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs shrink-0">
+                <Crown className="w-2.5 h-2.5 fill-white" /> Pro Required
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              Live ticking countdown to travel time and critical day-of alerts (foreign cash pickup, passports & home security).
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() =>
+            openPaywall(
+              "The Departure Countdown Clock & Day-of Alerts (passports, foreign cash, and home security) are exclusive to Gate Ready Pro."
+            )
+          }
+          className="h-8.5 px-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-purple-600/30 shrink-0 cursor-pointer active:scale-95 transition-all"
+        >
+          <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+          <span>Unlock with Pro</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-3xl bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/60 shadow-sm overflow-hidden mb-6 transition-all">
@@ -255,14 +312,29 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
             {/* Countdown Digital Gauge */}
             {timeLeft.isPast ? (
-              <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center">
-                <Sparkles className="w-8 h-8 text-emerald-600 mx-auto mb-2 animate-bounce" />
-                <h4 className="text-lg font-black text-emerald-900 dark:text-emerald-200">
-                  Ready for Gate Clearance!
+              <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center space-y-2">
+                <Sparkles className="w-7 h-7 text-emerald-600 mx-auto animate-bounce" />
+                <h4 className="text-base font-black text-emerald-900 dark:text-emerald-200">
+                  {trip.isReturnRepackMode ? 'Return Repack in Progress' : 'Outbound Departure Reached!'}
                 </h4>
-                <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
-                  Your trip departure time has arrived. Have your boarding pass and photo ID handy!
+                <p className="text-xs text-emerald-700 dark:text-emerald-400">
+                  {trip.isReturnRepackMode 
+                    ? 'Packing to head home: All item baggage placements are preserved from flight #1.'
+                    : 'Your departure time has arrived! Ready for the return trip?'}
                 </p>
+
+                <button
+                  type="button"
+                  onClick={handleToggleReturnTrip}
+                  className={`mt-2 w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                    trip.isReturnRepackMode
+                      ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                      : 'bg-purple-600 hover:bg-purple-700 text-white'
+                  }`}
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>{trip.isReturnRepackMode ? 'Exit Return Repack Mode' : 'Start Return Flight Repack (Pro)'}</span>
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-4 gap-2 text-center">

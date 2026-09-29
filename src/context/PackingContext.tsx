@@ -32,8 +32,18 @@ interface PackingContextType {
     type: TravelType,
     company: string,
     seatOrSize: string,
-    bagConfig: Array<{ type: BagType; label: string; assignedTo?: string }>,
-    familyMembers?: string[]
+    bagConfig?: Array<{ type: BagType; label: string; assignedTo?: string }>,
+    familyMembers?: string[],
+    extraDetails?: {
+      originCity?: string;
+      destinationCity?: string;
+      destinationCountry?: string;
+      departureDate?: string;
+      departureTime?: string;
+      returnTripDate?: string;
+      returnTripTime?: string;
+      aircraftType?: string;
+    }
   ) => Trip;
   deleteTrip: (tripId: string) => void;
   addItemToBag: (
@@ -48,6 +58,21 @@ interface PackingContextType {
   removeItem: (tripId: string, bagId: string, itemId: string) => void;
   updateItemQuantity: (tripId: string, bagId: string, itemId: string, quantity: number) => void;
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
+  updateTripDetails: (
+    tripId: string,
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags'>>
+  ) => void;
+  updateLuggageTag: (
+    tripId: string,
+    bagId: string,
+    tagInfo: Partial<import('../types/travel').LuggageTagInfo>
+  ) => void;
+  renameBag: (tripId: string, bagId: string, newLabel: string) => void;
+  updateBag: (
+    tripId: string,
+    bagId: string,
+    updates: Partial<Pick<Bag, 'label' | 'type' | 'assignedTo' | 'maxWeightLimitLbs'>>
+  ) => void;
   addBagToTrip: (tripId: string, type: BagType, label: string, assignedTo?: string) => void;
   removeBagFromTrip: (tripId: string, bagId: string) => void;
   addFamilyMember: (tripId: string, memberName: string) => void;
@@ -74,7 +99,7 @@ interface PackingContextType {
 
 const PackingContext = createContext<PackingContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'gateready_trips_data_v1';
+const STORAGE_KEY = 'gateready_trips_data_v2';
 const UNIT_KEY = 'gateready_weight_unit';
 const THEME_KEY = 'gateready_dark_mode';
 
@@ -83,17 +108,31 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [trips, setTrips] = useState<Trip[]>(() => {
     try {
+      // Clear out any old legacy preset keys
+      localStorage.removeItem('gateready_trips_data_v1');
+      localStorage.removeItem('gateready_seed_trips');
+      localStorage.removeItem('gateready_seed_initialized');
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          // Strictly filter out any old demo preset trips
+          const filtered = parsed.filter(
+            (t: Trip) =>
+              t.id !== 'trip-nyc-delta' &&
+              t.id !== 'trip-1' &&
+              t.id !== 'trip-orlando' &&
+              !t.name.includes('Delta') &&
+              !t.name.includes('New York Fall')
+          );
+          if (filtered.length > 0) return filtered;
         }
       }
     } catch {
       // Fallback
     }
-    return initialTrips;
+    return [];
   });
 
   const [currentTripId, setCurrentTripId] = useState<string>(() => {
@@ -115,22 +154,25 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return 'LBS';
   });
 
+  // Light mode by default unless user explicitly chose dark
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(THEME_KEY);
       if (saved !== null) return saved === 'true';
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return false; // Default to Light Mode
     } catch {
       return false;
     }
   });
 
-  // Keep dark class on html document root
+  // Keep dark class on html document root and body
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
     }
     try {
       localStorage.setItem(THEME_KEY, String(isDarkMode));
@@ -285,15 +327,33 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     type: TravelType,
     company: string,
     seatOrSize: string,
-    bagConfig: Array<{ type: BagType; label: string; assignedTo?: string }>,
-    familyMembers?: string[]
+    bagConfig?: Array<{ type: BagType; label: string; assignedTo?: string }>,
+    familyMembers?: string[],
+    extraDetails?: {
+      originCity?: string;
+      destinationCity?: string;
+      destinationCountry?: string;
+      departureDate?: string;
+      departureTime?: string;
+      returnTripDate?: string;
+      returnTripTime?: string;
+      aircraftType?: string;
+    }
   ): Trip => {
     const newTripId = 'trip-' + Date.now();
     const resolvedFamily = familyMembers && familyMembers.length > 0 
       ? familyMembers 
       : ['Traveler 1'];
 
-    const newBags: Bag[] = bagConfig.map((cfg, idx) => ({
+    // Provide default carry-on bag if bag setup was skipped
+    const resolvedBagConfig = bagConfig && bagConfig.length > 0
+      ? bagConfig
+      : [
+          { type: 'CARRY_ON' as BagType, label: 'Carry-On Roller', assignedTo: resolvedFamily[0] },
+          { type: 'PERSONAL' as BagType, label: 'Personal Backpack', assignedTo: resolvedFamily[0] }
+        ];
+
+    const newBags: Bag[] = resolvedBagConfig.map((cfg, idx) => ({
       id: `bag-${Date.now()}-${idx}`,
       type: cfg.type,
       label: cfg.label || `${cfg.type} Bag`,
@@ -312,12 +372,18 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const newTrip: Trip = {
       id: newTripId,
-      name: name.trim(),
-      travelType: type,
+      name: name.trim() || 'My Upcoming Trip',
+      travelType: type || 'PLANE',
       companyName: company.trim(),
       seatClassOrCarSize: seatOrSize.trim(),
-      departureDate: new Date().toISOString().split('T')[0],
-      departureTime: '09:00',
+      originCity: extraDetails?.originCity?.trim() || '',
+      destinationCity: extraDetails?.destinationCity?.trim() || '',
+      destinationCountry: extraDetails?.destinationCountry?.trim() || '',
+      aircraftType: extraDetails?.aircraftType?.trim() || '',
+      departureDate: extraDetails?.departureDate || new Date().toISOString().split('T')[0],
+      departureTime: extraDetails?.departureTime || '09:00',
+      returnTripDate: extraDetails?.returnTripDate || '',
+      returnTripTime: extraDetails?.returnTripTime || '',
       departureCountdownEnabled: true,
       departureReminders: getDefaultDepartureReminders(),
       familyMembers: resolvedFamily,
@@ -341,10 +407,13 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const remaining = prev.filter((t) => t.id !== tripId);
       if (remaining.length > 0) {
         if (currentTripId === tripId) {
-          setCurrentTripId(remaining[0].id);
+          const nextTrip = remaining[0];
+          setCurrentTripId(nextTrip.id);
+          setSelectedBagId(nextTrip.bags[0]?.id || null);
         }
       } else {
         setCurrentTripId('');
+        setSelectedBagId(null);
       }
       return remaining;
     });
@@ -621,6 +690,137 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
   };
 
+  const updateTripDetails = (
+    tripId: string,
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags'>>
+  ) => {
+    let updatedTripToSave: Trip | null = null;
+
+    setTrips((prev) =>
+      prev.map((trip) => {
+        if (trip.id !== tripId) return trip;
+        const updated = {
+          ...trip,
+          ...(details.name !== undefined ? { name: details.name.trim() } : {}),
+          ...(details.companyName !== undefined ? { companyName: details.companyName.trim() } : {}),
+          ...(details.seatClassOrCarSize !== undefined ? { seatClassOrCarSize: details.seatClassOrCarSize.trim() } : {}),
+          ...(details.travelType !== undefined ? { travelType: details.travelType } : {}),
+          ...(details.originCity !== undefined ? { originCity: details.originCity.trim() } : {}),
+          ...(details.destinationCity !== undefined ? { destinationCity: details.destinationCity.trim() } : {}),
+          ...(details.destinationCountry !== undefined ? { destinationCountry: details.destinationCountry.trim() } : {}),
+          ...(details.departureDate !== undefined ? { departureDate: details.departureDate } : {}),
+          ...(details.departureTime !== undefined ? { departureTime: details.departureTime } : {}),
+          ...(details.aircraftType !== undefined ? { aircraftType: details.aircraftType.trim() } : {}),
+          ...(details.isReturnRepackMode !== undefined ? { isReturnRepackMode: details.isReturnRepackMode } : {}),
+          ...(details.returnTripDate !== undefined ? { returnTripDate: details.returnTripDate } : {}),
+          ...(details.returnTripTime !== undefined ? { returnTripTime: details.returnTripTime } : {}),
+          ...(details.souvenirBufferEnabled !== undefined ? { souvenirBufferEnabled: details.souvenirBufferEnabled } : {}),
+          ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {})
+        };
+        updatedTripToSave = updated;
+        return updated;
+      })
+    );
+
+    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+  };
+
+  const updateLuggageTag = (
+    tripId: string,
+    bagId: string,
+    tagInfo: Partial<import('../types/travel').LuggageTagInfo>
+  ) => {
+    let updatedTripToSave: Trip | null = null;
+
+    setTrips((prev) =>
+      prev.map((trip) => {
+        if (trip.id !== tripId) return trip;
+        const existingTags = trip.luggageTags || {};
+        const currentTag = existingTags[bagId] || {
+          bagId,
+          travelerName: trip.familyMembers?.[0] || 'Traveler',
+          phoneNumber: '',
+          email: '',
+          flightNumber: trip.companyName || '',
+          rewardOffered: true
+        };
+
+        const updatedTag: import('../types/travel').LuggageTagInfo = {
+          ...currentTag,
+          ...tagInfo,
+          bagId,
+          updatedAt: new Date().toISOString()
+        };
+
+        const updatedTrip = {
+          ...trip,
+          luggageTags: {
+            ...existingTags,
+            [bagId]: updatedTag
+          }
+        };
+
+        updatedTripToSave = updatedTrip;
+        return updatedTrip;
+      })
+    );
+
+    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+  };
+
+  const renameBag = (tripId: string, bagId: string, newLabel: string) => {
+    const trimmed = newLabel.trim();
+    if (!trimmed) return;
+    let updatedTripToSave: Trip | null = null;
+
+    setTrips((prev) =>
+      prev.map((trip) => {
+        if (trip.id !== tripId) return trip;
+        const updated = {
+          ...trip,
+          bags: trip.bags.map((b) =>
+            b.id === bagId ? { ...b, label: trimmed } : b
+          )
+        };
+        updatedTripToSave = updated;
+        return updated;
+      })
+    );
+
+    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+  };
+
+  const updateBag = (
+    tripId: string,
+    bagId: string,
+    updates: Partial<Pick<Bag, 'label' | 'type' | 'assignedTo' | 'maxWeightLimitLbs'>>
+  ) => {
+    let updatedTripToSave: Trip | null = null;
+
+    setTrips((prev) =>
+      prev.map((trip) => {
+        if (trip.id !== tripId) return trip;
+        const updated = {
+          ...trip,
+          bags: trip.bags.map((b) => {
+            if (b.id !== bagId) return b;
+            return {
+              ...b,
+              ...(updates.label !== undefined ? { label: updates.label.trim() } : {}),
+              ...(updates.type !== undefined ? { type: updates.type } : {}),
+              ...(updates.assignedTo !== undefined ? { assignedTo: updates.assignedTo } : {}),
+              ...(updates.maxWeightLimitLbs !== undefined ? { maxWeightLimitLbs: updates.maxWeightLimitLbs } : {})
+            };
+          })
+        };
+        updatedTripToSave = updated;
+        return updated;
+      })
+    );
+
+    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+  };
+
   const removeBagFromTrip = (tripId: string, bagId: string) => {
     let updatedTripToSave: Trip | null = null;
 
@@ -822,6 +1022,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         removeItem,
         updateItemQuantity,
         updateItemPacker,
+        updateTripDetails,
+        updateLuggageTag,
+        renameBag,
+        updateBag,
         addBagToTrip,
         removeBagFromTrip,
         addFamilyMember,
