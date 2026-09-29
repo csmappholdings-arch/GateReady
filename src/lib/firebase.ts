@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { 
   getAuth, 
   GoogleAuthProvider, 
+  GithubAuthProvider,
   signInWithPopup, 
   signOut as firebaseSignOut,
   onAuthStateChanged,
@@ -25,15 +26,15 @@ import {
 import { Trip } from '../types/travel';
 
 export const firebaseConfig = {
-  projectId: "evocative-ranger-0smzh",
-  appId: "1:463979773556:web:e744b145ce240f26415b21",
-  apiKey: "AIzaSyAgzao6GfmdxLdiFnEVzvJk-LocnPdYZic",
-  authDomain: "evocative-ranger-0smzh.firebaseapp.com",
-  firestoreDatabaseId: "ai-studio-gateready-2f760ff4-8d7a-48b4-97ad-6aca2b4c6665",
-  storageBucket: "evocative-ranger-0smzh.firebasestorage.app",
-  messagingSenderId: "463979773556",
-  measurementId: "",
-  oAuthClientId: "463979773556-f3h2r4ta81qp8hq0cf3tj58b7i6o26lp.apps.googleusercontent.com",
+  projectId: "gate-ready-prod",
+  appId: "1:552388040767:web:949defa48893b1f734808a",
+  apiKey: "AIzaSyBb4IgPnw9iHN7bMb16ZT9-E4zGf3ZZOuY",
+  authDomain: "gate-ready-prod.firebaseapp.com",
+  firestoreDatabaseId: "(default)",
+  storageBucket: "gate-ready-prod.firebasestorage.app",
+  messagingSenderId: "552388040767",
+  measurementId: "G-YXZC4N8L1T",
+  oAuthClientId: "",
   recaptchaSiteKey: ""
 };
 
@@ -47,8 +48,10 @@ googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-// Initialize Cloud Firestore (using the provisioned database ID)
-export const db = firebaseConfig.firestoreDatabaseId 
+export const githubProvider = new GithubAuthProvider();
+
+// Initialize Cloud Firestore (using default database for gate-ready-prod)
+export const db = (firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)')
   ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
   : getFirestore(app);
 
@@ -70,6 +73,14 @@ testConnection();
 // Auth Helpers
 export async function signInWithGoogle(): Promise<User> {
   const result = await signInWithPopup(auth, googleProvider);
+  const user = result.user;
+  // Upsert user profile to Firestore
+  await syncUserProfile(user);
+  return user;
+}
+
+export async function signInWithGithub(): Promise<User> {
+  const result = await signInWithPopup(auth, githubProvider);
   const user = result.user;
   // Upsert user profile to Firestore
   await syncUserProfile(user);

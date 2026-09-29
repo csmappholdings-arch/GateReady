@@ -3,6 +3,7 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import { 
   auth, 
   signInWithGoogle as fbSignInWithGoogle, 
+  signInWithGithub as fbSignInWithGithub,
   signUpWithEmail as fbSignUpWithEmail,
   signInWithEmail as fbSignInWithEmail,
   resetPassword as fbResetPassword,
@@ -13,6 +14,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  signInWithGithub: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -41,16 +43,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  const handleAuthError = (err: any, providerName: string) => {
+    console.error(`${providerName} sign-in failed:`, err);
+    if (err.code === 'auth/popup-closed-by-user') {
+      return;
+    }
+    if (err.code === 'auth/unauthorized-domain') {
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'your Cloudflare domain';
+      setError(`Domain Not Authorized: "${currentHost}" is not listed in your Firebase Authorized Domains. To fix: Open Firebase Console → Authentication → Settings → Authorized Domains → Add "${currentHost}".`);
+      return;
+    }
+    if (err.code === 'auth/operation-not-allowed') {
+      setError(`${providerName} is not enabled in Firebase. Go to Firebase Console → Authentication → Sign-in method and enable ${providerName}.`);
+      return;
+    }
+    setError(err.message || `Failed to sign in with ${providerName}`);
+  };
+
   const signIn = async () => {
     setError(null);
     try {
       await fbSignInWithGoogle();
     } catch (err: any) {
-      console.error('Google sign-in failed:', err);
-      // Don't show error if user simply closed the popup
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Failed to sign in with Google');
-      }
+      handleAuthError(err, 'Google');
+      throw err;
+    }
+  };
+
+  const signInWithGithub = async () => {
+    setError(null);
+    try {
+      await fbSignInWithGithub();
+    } catch (err: any) {
+      handleAuthError(err, 'GitHub');
       throw err;
     }
   };
@@ -123,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user, 
       loading, 
       signIn, 
+      signInWithGithub,
       signUpWithEmail, 
       signInWithEmail, 
       resetPassword, 
