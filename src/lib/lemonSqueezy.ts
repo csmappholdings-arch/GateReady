@@ -1,7 +1,13 @@
 import { BillingCycle } from '../context/SubscriptionContext';
 import { User } from 'firebase/auth';
 
-// Lemon Squeezy Variant IDs provided by the user
+// Lemon Squeezy Checkout Slugs for csmappholdings store:
+// Monthly sub ($4.99): 89bfc2fa-082e-4a8f-b05b-0836cd1908d0
+// Yearly sub ($39.99):  883b4d49-1b9e-4a84-a53a-8c3eeb2738b0
+export const LEMON_MONTHLY_SLUG = '89bfc2fa-082e-4a8f-b05b-0836cd1908d0';
+export const LEMON_YEARLY_SLUG = '883b4d49-1b9e-4a84-a53a-8c3eeb2738b0';
+
+// Numeric variant IDs (for internal/webhook references)
 export const LEMON_MONTHLY_VARIANT_ID = '2185992';
 export const LEMON_YEARLY_VARIANT_ID = '2186010';
 
@@ -12,7 +18,7 @@ export const LEMON_MONTHLY_URL_KEY = 'gateready_lemon_monthly_url';
 export const LEMON_YEARLY_URL_KEY = 'gateready_lemon_yearly_url';
 
 // Direct checkout URL provided by user
-export const DIRECT_CHECKOUT_URL = 'https://csmappholdings.lemonsqueezy.com/checkout/buy/89bfc2fa-082e-4a8f-b05b-0836cd1908d0';
+export const DIRECT_CHECKOUT_URL = `https://${DEFAULT_STORE_SLUG}.lemonsqueezy.com/checkout/buy/${LEMON_MONTHLY_SLUG}`;
 
 declare global {
   interface Window {
@@ -42,20 +48,32 @@ export function setLemonStoreSlug(slug: string): void {
 }
 
 export function buildLemonCheckoutUrl(cycle: BillingCycle, user: User | null): string {
-  const variantId = cycle === 'yearly' ? LEMON_YEARLY_VARIANT_ID : LEMON_MONTHLY_VARIANT_ID;
+  const checkoutSlug = cycle === 'yearly' ? LEMON_YEARLY_SLUG : LEMON_MONTHLY_SLUG;
   
   // Check if custom URL was saved
   let customUrl = typeof window !== 'undefined' 
     ? (cycle === 'yearly' ? localStorage.getItem(LEMON_YEARLY_URL_KEY) : localStorage.getItem(LEMON_MONTHLY_URL_KEY))
     : '';
 
+  // Clean out stale/broken test URLs that contained the raw integer IDs
+  if (customUrl && (customUrl.includes('2186010') || customUrl.includes('2185992'))) {
+    customUrl = '';
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(cycle === 'yearly' ? LEMON_YEARLY_URL_KEY : LEMON_MONTHLY_URL_KEY);
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
   const storeSlug = getLemonStoreSlug() || DEFAULT_STORE_SLUG;
   let baseUrl = '';
 
   if (customUrl && customUrl.trim()) {
     baseUrl = customUrl.trim();
-  } else if (variantId) {
-    baseUrl = `https://${storeSlug}.lemonsqueezy.com/checkout/buy/${variantId}`;
+  } else if (checkoutSlug) {
+    baseUrl = `https://${storeSlug}.lemonsqueezy.com/checkout/buy/${checkoutSlug}`;
   } else {
     baseUrl = DIRECT_CHECKOUT_URL;
   }
@@ -127,12 +145,15 @@ export function openLemonCheckout({
     }
   }
 
-  // Fallback: Open in new tab reliably
+  // Fallback: Trigger anchor navigation
   try {
-    const newWindow = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-    if (!newWindow) {
-      window.location.href = checkoutUrl;
-    }
+    const link = document.createElement('a');
+    link.href = checkoutUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   } catch {
     window.location.href = checkoutUrl;
   }
