@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { BagType, Trip } from '../types/travel';
@@ -34,6 +35,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
   const [assignedTo, setAssignedTo] = useState<string>(familyMembers[0] || 'Traveler 1');
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +67,15 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
     if (type === 'CHECKED') setLabel(`${assignedTo.split(' ')[0]}'s Suitcase`);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 min-h-screen cursor-pointer"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col"
+        className="w-full max-w-sm my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col relative z-[100000] cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-purple-50 dark:border-purple-950/60 flex items-center justify-between">
@@ -201,6 +208,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

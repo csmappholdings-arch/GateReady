@@ -369,6 +369,27 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             );
           })}
         </div>
+
+        {trip.bags.length === 0 && (
+          <div className="rounded-3xl border-2 border-dashed border-purple-200 dark:border-purple-850 p-8 text-center bg-purple-50/40 dark:bg-purple-950/20 my-2">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-300 mb-3 shadow-xs">
+              <Luggage className="w-6 h-6" />
+            </div>
+            <h3 className="font-extrabold text-slate-800 dark:text-white text-base">
+              No bags added to this trip yet
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5 max-w-sm mx-auto">
+              Add a carry-on roller, personal backpack, or checked suitcase to start packing and checking airline weight limits.
+            </p>
+            <button
+              onClick={handleOpenAddBagSafe}
+              className="h-10 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-md shadow-purple-600/25 active:scale-95 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Your First Bag</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ============================================================== */}

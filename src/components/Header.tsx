@@ -41,9 +41,10 @@ interface HeaderProps {
   onOpenAddTrip: () => void;
   onOpenAddBag: () => void;
   onOpenTour?: () => void;
+  onOpenAccountSync?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpenAccountSync }) => {
   const {
     trips,
     currentTrip,
@@ -243,7 +244,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour }) => 
               </button>
             ) : (
               <button
-                onClick={() => setAccountSyncModalOpen(true)}
+                onClick={() => {
+                  if (onOpenAccountSync) {
+                    onOpenAccountSync();
+                  } else {
+                    setAccountSyncModalOpen(true);
+                  }
+                }}
                 disabled={authLoading}
                 className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-slate-800 dark:text-slate-100 text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
                 title="Sign in with Google or Email to sync trips across devices"
@@ -363,8 +370,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour }) => 
                       <Cloud className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                       Cloud Firestore Sync
                     </span>
-                    <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                      {cloudSyncStatus === 'syncing' ? 'Syncing...' : 'Real-Time Connected'}
+                    <span className={`text-[11px] font-bold ${
+                      cloudSyncStatus === 'synced' ? 'text-emerald-600 dark:text-emerald-400' :
+                      cloudSyncStatus === 'syncing' ? 'text-purple-600 dark:text-purple-400' :
+                      'text-rose-600 dark:text-rose-400'
+                    }`}>
+                      {cloudSyncStatus === 'synced' && 'Real-Time Connected'}
+                      {cloudSyncStatus === 'syncing' && 'Syncing...'}
+                      {cloudSyncStatus === 'offline' && 'Offline / Check Rules'}
+                      {cloudSyncStatus === 'guest' && 'Local Only'}
                     </span>
                   </div>
 

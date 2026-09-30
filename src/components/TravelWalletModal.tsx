@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { useAuth } from '../context/AuthContext';
 import { LoyaltyAccount, LoyaltyCategory } from '../types/travel';
@@ -43,6 +44,7 @@ export const TravelWalletModal: React.FC = () => {
   const [formTraveler, setFormTraveler] = useState('');
 
   if (!isWalletModalOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
@@ -101,9 +103,9 @@ export const TravelWalletModal: React.FC = () => {
     ? accounts
     : accounts.filter(a => a.category === activeFilter);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-purple-100 dark:border-purple-900/60 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-150 min-h-screen">
+      <div className="w-full max-w-2xl my-auto bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-purple-100 dark:border-purple-900/60 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150 relative z-[100000]">
         
         {/* Header */}
         <div className="flex items-start justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -359,6 +361,7 @@ export const TravelWalletModal: React.FC = () => {
           <span>Tip: Tap "Copy" during airline check-in to paste right into boarding passes</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

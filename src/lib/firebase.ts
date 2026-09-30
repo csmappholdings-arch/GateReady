@@ -154,6 +154,9 @@ export function subscribeToUserTrips(
         travelType: data.travelType,
         companyName: data.companyName || '',
         seatClassOrCarSize: data.seatClassOrCarSize || '',
+        originCity: data.originCity || '',
+        destinationCity: data.destinationCity || '',
+        destinationCountry: data.destinationCountry || '',
         departureDate: data.departureDate || '',
         departureTime: data.departureTime || '',
         departureCountdownEnabled: data.departureCountdownEnabled ?? false,
@@ -163,8 +166,10 @@ export function subscribeToUserTrips(
         aircraftType: data.aircraftType || '',
         isReturnRepackMode: data.isReturnRepackMode ?? false,
         returnTripDate: data.returnTripDate || '',
+        returnTripTime: data.returnTripTime || '',
         souvenirBufferEnabled: data.souvenirBufferEnabled ?? true,
-        gateChecklist: data.gateChecklist || []
+        gateChecklist: data.gateChecklist || [],
+        luggageTags: data.luggageTags || {}
       });
     });
     onSuccess(cloudTrips);
@@ -185,6 +190,9 @@ export async function saveTripToCloud(userId: string, trip: Trip): Promise<void>
       travelType: trip.travelType,
       companyName: trip.companyName || '',
       seatClassOrCarSize: trip.seatClassOrCarSize || '',
+      originCity: trip.originCity || '',
+      destinationCity: trip.destinationCity || '',
+      destinationCountry: trip.destinationCountry || '',
       departureDate: trip.departureDate || '',
       departureTime: trip.departureTime || '',
       departureCountdownEnabled: trip.departureCountdownEnabled ?? false,
@@ -194,8 +202,10 @@ export async function saveTripToCloud(userId: string, trip: Trip): Promise<void>
       aircraftType: trip.aircraftType || '',
       isReturnRepackMode: trip.isReturnRepackMode ?? false,
       returnTripDate: trip.returnTripDate || '',
+      returnTripTime: trip.returnTripTime || '',
       souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
       gateChecklist: trip.gateChecklist || [],
+      luggageTags: trip.luggageTags || {},
       updatedAt: new Date().toISOString()
     }, { merge: true });
   } catch (err) {
@@ -228,13 +238,22 @@ export async function syncLocalTripsToCloud(userId: string, localTrips: Trip[]):
         travelType: trip.travelType,
         companyName: trip.companyName || '',
         seatClassOrCarSize: trip.seatClassOrCarSize || '',
+        originCity: trip.originCity || '',
+        destinationCity: trip.destinationCity || '',
+        destinationCountry: trip.destinationCountry || '',
         departureDate: trip.departureDate || '',
         departureTime: trip.departureTime || '',
         departureCountdownEnabled: trip.departureCountdownEnabled ?? false,
         departureReminders: trip.departureReminders || [],
         familyMembers: trip.familyMembers || [],
         bags: trip.bags || [],
+        aircraftType: trip.aircraftType || '',
+        isReturnRepackMode: trip.isReturnRepackMode ?? false,
+        returnTripDate: trip.returnTripDate || '',
+        returnTripTime: trip.returnTripTime || '',
+        souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
         gateChecklist: trip.gateChecklist || [],
+        luggageTags: trip.luggageTags || {},
         updatedAt: new Date().toISOString()
       }, { merge: true });
     }

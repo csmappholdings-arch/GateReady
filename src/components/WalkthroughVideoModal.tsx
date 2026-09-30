@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Play, 
   Pause, 
@@ -169,6 +170,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
   }, [isOpen]);
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const handleNext = () => {
     if (currentStepIndex < WALKTHROUGH_STEPS.length - 1) {
@@ -198,15 +200,15 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
     setIsPlaying(true);
   };
 
-  return (
+  return createPortal(
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 cursor-pointer"
+      className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200 cursor-pointer min-h-screen"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div 
-        className="w-full max-w-4xl bg-slate-900 text-white rounded-3xl shadow-2xl border border-purple-500/30 overflow-hidden flex flex-col max-h-[95vh] cursor-default"
+        className="w-full max-w-4xl my-auto bg-slate-900 text-white rounded-3xl shadow-2xl border border-purple-500/30 overflow-hidden flex flex-col max-h-[95vh] cursor-default relative z-[100000]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Video Player Bar */}
@@ -515,6 +517,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

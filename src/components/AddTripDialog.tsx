@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
@@ -373,15 +374,18 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose })
     }
   };
 
-  return (
+  if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200 cursor-pointer"
+      className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 cursor-pointer min-h-screen"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
-        className={`w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col cursor-default transition-all duration-200 ${
+        className={`w-full my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col cursor-default transition-all duration-200 relative z-[100000] ${
           isExpanded 
             ? 'max-w-4xl h-[95vh] text-sm' 
             : 'max-w-xl max-h-[92vh] text-xs'
@@ -1236,6 +1240,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose })
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

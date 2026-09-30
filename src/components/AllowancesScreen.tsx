@@ -65,7 +65,7 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
       {/* ============================================================== */}
       {/* TOP DEDICATED SECTION: LIQUID ALLOWANCES IN CARRY-ON (USER REQUIREMENT) */}
       {/* ============================================================== */}
-      <section className="rounded-3xl bg-linear-to-br from-purple-900 via-purple-950 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-purple-500/20 relative overflow-hidden">
+      <section className="rounded-3xl bg-gradient-to-br from-purple-900 via-purple-950 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-purple-500/20 relative overflow-hidden">
         <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none flex items-center justify-end pr-6">
           <Droplets className="w-56 h-56 text-purple-300" />
         </div>

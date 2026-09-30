@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import QRCode from 'qrcode';
 import { Trip, Bag, LuggageTagInfo } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
@@ -113,18 +114,19 @@ END:VCARD`;
   }, [isOpen, qrPayload]);
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   // Gated strictly to Gate Ready Pro
   if (!isPro) {
-    return (
+    return createPortal(
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer"
+        className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150 cursor-pointer min-h-screen"
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
       >
         <div 
-          className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800 overflow-hidden cursor-default animate-in zoom-in-95 duration-150"
+          className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800 overflow-hidden cursor-default animate-in zoom-in-95 duration-150 relative z-[100000]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -196,7 +198,8 @@ END:VCARD`;
             </div>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 
@@ -242,10 +245,15 @@ ${rewardOffered ? '★ REWARD OFFERED FOR SAFE RETURN' : ''}`;
     window.print();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/65 backdrop-blur-xs animate-in fade-in duration-200">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 min-h-screen cursor-pointer"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-purple-100 dark:border-purple-900/60 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+        className="w-full max-w-2xl my-auto bg-white dark:bg-slate-900 rounded-3xl border border-purple-100 dark:border-purple-900/60 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] relative z-[100000] cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -487,6 +495,7 @@ ${rewardOffered ? '★ REWARD OFFERED FOR SAFE RETURN' : ''}`;
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

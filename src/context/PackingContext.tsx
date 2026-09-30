@@ -234,7 +234,25 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setLastSyncedAt(new Date());
           }
         } else {
+          // Cloud has trips. Check if current device has any locally created trips that aren't in the cloud yet
+          const localToSync = tripsRef.current;
+          const missingInCloud = localToSync.filter(
+            (lt) => !cloudTrips.some((ct) => ct.id === lt.id)
+          );
+
+          if (missingInCloud.length > 0) {
+            try {
+              await syncLocalTripsToCloud(user.uid, missingInCloud);
+            } catch (err) {
+              console.warn('Syncing missing local trips to cloud error:', err);
+            }
+          }
+
           setTrips(cloudTrips);
+          setCurrentTripId((prev) => {
+            if (prev && cloudTrips.some((t) => t.id === prev)) return prev;
+            return cloudTrips[0]?.id || '';
+          });
           setCloudSyncStatus('synced');
           setLastSyncedAt(new Date());
         }

@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSubscription, BillingCycle } from '../context/SubscriptionContext';
+import { useAuth } from '../context/AuthContext';
+import { openLemonCheckout, buildLemonCheckoutUrl } from '../lib/lemonSqueezy';
 import { 
   Crown, 
   Check, 
@@ -11,11 +14,13 @@ import {
   CreditCard,
   Zap,
   ArrowRight,
-  Key
+  Key,
+  ExternalLink
 } from 'lucide-react';
 
 export const SubscriptionModal: React.FC = () => {
   const { isPaywallOpen, closePaywall, upgradeToPro, paywallReason, isPro, tier, applyLicenseKey } = useSubscription();
+  const { user } = useAuth();
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -24,26 +29,49 @@ export const SubscriptionModal: React.FC = () => {
   const [licenseInput, setLicenseInput] = useState('');
   const [licenseError, setLicenseError] = useState('');
 
+  // Re-initialize Lemon.js when paywall opens
+  useEffect(() => {
+    if (isPaywallOpen && typeof window !== 'undefined' && window.createLemonSqueezy) {
+      window.createLemonSqueezy();
+    }
+  }, [isPaywallOpen]);
+
   if (!isPaywallOpen) return null;
 
-  const handleSubscribe = async () => {
+  const currentCheckoutUrl = buildLemonCheckoutUrl(selectedCycle, user);
+
+  const handleSubscribe = () => {
     setIsProcessing(true);
-    // Simulate swift payment processing
-    setTimeout(async () => {
-      await upgradeToPro(selectedCycle);
+
+    openLemonCheckout({
+      cycle: selectedCycle,
+      user: user,
+      onSuccess: async () => {
+        await upgradeToPro(selectedCycle);
+        setIsProcessing(false);
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          setPaymentSuccess(false);
+          closePaywall();
+        }, 1500);
+      },
+      onClose: () => {
+        setIsProcessing(false);
+      }
+    });
+
+    // Provide a timeout fallback reset if popup or redirect took over
+    setTimeout(() => {
       setIsProcessing(false);
-      setPaymentSuccess(true);
-      setTimeout(() => {
-        setPaymentSuccess(false);
-        closePaywall();
-      }, 1400);
-    }, 800);
+    }, 4000);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 min-h-screen">
       <div 
-        className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
+        className="w-full max-w-lg my-auto rounded-3xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150 relative z-[100000]"
         role="dialog"
         aria-modal="true"
       >
@@ -335,42 +363,67 @@ export const SubscriptionModal: React.FC = () => {
                 <span>Subscription Activated! Welcome to Pro</span>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={handleSubscribe}
-                disabled={isProcessing}
-                className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-98 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer disabled:opacity-75"
-              >
-                {isProcessing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Activating Subscription...</span>
-                  </div>
-                ) : (
-                  <>
-                    <Crown className="w-4 h-4 fill-amber-300 text-amber-300" />
-                    <span>
-                      Subscribe for {selectedCycle === 'yearly' ? '$39.99 / Year' : '$4.99 / Month'}
-                    </span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+              <div className="space-y-2">
+                <a
+                  href={currentCheckoutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    if (typeof window !== 'undefined' && window.LemonSqueezy?.Url?.Open) {
+                      e.preventDefault();
+                      handleSubscribe();
+                    }
+                  }}
+                  className="lemonsqueezy-button w-full h-12 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-98 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer text-center no-underline"
+                >
+                  {isProcessing ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Opening Lemon Squeezy Checkout...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Crown className="w-4 h-4 fill-amber-300 text-amber-300" />
+                      <span>
+                        Subscribe for {selectedCycle === 'yearly' ? '$39.99 / Year' : '$4.99 / Month'}
+                      </span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </a>
+
+                <div className="text-center">
+                  <a
+                    href={currentCheckoutUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] text-purple-600 dark:text-purple-400 hover:underline"
+                  >
+                    <span>Click here to open checkout in a new window</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
             )}
 
             {/* Trust and Guarantee badges */}
-            <div className="flex items-center justify-center gap-4 text-[10px] text-slate-400">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                Cancel Anytime
-              </span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <CreditCard className="w-3.5 h-3.5 text-purple-500" />
-                Secure Checkout
-              </span>
-              <span>•</span>
-              <span>14-day Money Back</span>
+            <div className="space-y-1.5 text-center">
+              <div className="flex items-center justify-center gap-4 text-[10px] text-slate-400">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  Cancel Anytime
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <CreditCard className="w-3.5 h-3.5 text-purple-500" />
+                  Cards, Apple Pay, Google Pay & PayPal
+                </span>
+                <span>•</span>
+                <span>14-day Guarantee</span>
+              </div>
+              <p className="text-[10px] text-slate-400">
+                Processed securely via <strong>Lemon Squeezy</strong>
+              </p>
             </div>
 
             {/* Manual or Testing License Code redemption */}
@@ -454,6 +507,7 @@ export const SubscriptionModal: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

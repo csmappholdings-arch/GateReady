@@ -17,6 +17,7 @@ import { AddItemDialog } from './components/AddItemDialog';
 import { AddBagDialog } from './components/AddBagDialog';
 import { TripBanner } from './components/TripBanner';
 import { WalkthroughVideoModal } from './components/WalkthroughVideoModal';
+import { AccountSyncModal } from './components/AccountSyncModal';
 import { 
   CheckCircle2, 
   Info, 
@@ -32,7 +33,7 @@ import {
 } from 'lucide-react';
 
 function PackingAppContent() {
-  const { currentTrip, selectedBagId, setSelectedBagId } = usePacking();
+  const { currentTrip, selectedBagId, setSelectedBagId, addTrip } = usePacking();
   const { isPro } = useSubscription();
 
   const [currentScreen, setCurrentScreen] = useState<'Bags' | 'Checklist' | 'CabinIntel' | 'Allowances' | 'GateReady'>('Bags');
@@ -41,6 +42,7 @@ function PackingAppContent() {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddBagModal, setShowAddBagModal] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
 
   const handleOpenAddTrip = () => {
@@ -67,10 +69,11 @@ function PackingAppContent() {
         onOpenAddTrip={handleOpenAddTrip}
         onOpenAddBag={() => setShowAddBagModal(true)}
         onOpenTour={() => setShowTourModal(true)}
+        onOpenAccountSync={() => setShowAccountModal(true)}
       />
 
       {/* Sync with Google prompt banner when signed out */}
-      <MobileSyncBanner />
+      <MobileSyncBanner onOpenAccountModal={() => setShowAccountModal(true)} />
 
       {/* Prominent Trip Information Banner with Location, Carrier, Seat Level & Dropdown */}
       <TripBanner
@@ -110,11 +113,46 @@ function PackingAppContent() {
                 <span>Watch Walkthrough Tour</span>
               </button>
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const departure = new Date();
+                departure.setDate(departure.getDate() + 7);
+                const returnDate = new Date();
+                returnDate.setDate(returnDate.getDate() + 14);
+
+                addTrip(
+                  'Paris & London Vacation',
+                  'PLANE',
+                  'Delta Air Lines',
+                  'Main Cabin',
+                  [
+                    { type: 'CARRY_ON', label: "Alex's Carry-On Roller", assignedTo: 'Alex' },
+                    { type: 'PERSONAL', label: "Alex's Tech Backpack", assignedTo: 'Alex' }
+                  ],
+                  ['Alex', 'Jordan'],
+                  {
+                    originCity: 'New York (JFK)',
+                    destinationCity: 'Paris (CDG)',
+                    departureDate: departure.toISOString().split('T')[0],
+                    departureTime: '18:30',
+                    returnTripDate: returnDate.toISOString().split('T')[0],
+                    returnTripTime: '11:15',
+                    aircraftType: 'Airbus A350-900'
+                  }
+                );
+              }}
+              className="mt-6 text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:underline flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Explore with a sample demo trip (1-click)</span>
+            </button>
           </div>
         ) : (
           <>
             {/* Prominent Navigation Tabs (Desktop & Tablet) */}
-            <div className="sticky top-0 z-30 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md pt-3 pb-2 border-b border-purple-100/80 dark:border-purple-950/60 shadow-xs">
+            <div className="hidden sm:block sticky top-16 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md pt-3 pb-2 border-b border-purple-100/80 dark:border-purple-950/60 shadow-xs">
               <div className="max-w-5xl mx-auto px-4 sm:px-6">
                 <nav
                   aria-label="Main application tabs"
@@ -358,6 +396,12 @@ function PackingAppContent() {
         isOpen={showTourModal}
         onClose={() => setShowTourModal(false)}
         onOpenTripDialog={() => setShowAddTripModal(true)}
+      />
+
+      {/* Universal Cross-Device Account Sync Modal */}
+      <AccountSyncModal
+        isOpen={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
       />
     </div>
   );

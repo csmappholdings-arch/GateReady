@@ -97,7 +97,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-24">
       {/* Gate Readiness Scorecard (Purple Theme) */}
-      <div className="rounded-3xl bg-linear-to-br from-purple-950 via-purple-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-500/20 relative overflow-hidden">
+      <div className="rounded-3xl bg-gradient-to-br from-purple-950 via-purple-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-500/20 relative overflow-hidden">
         <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-10 pointer-events-none flex items-center justify-end pr-8">
           <PlaneTakeoff className="w-64 h-64 text-white" />
         </div>

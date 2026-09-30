@@ -30,7 +30,7 @@ service cloud.firestore {
 
     // Default deny for everything else
     match /{document=**} {
-      allow read, write: false;
+      allow read, write: if false;
     }
   }
 }

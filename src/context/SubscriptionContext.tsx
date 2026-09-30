@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Bag, BagType } from '../types/travel';
+import { checkLemonRedirectSuccess } from '../lib/lemonSqueezy';
 
 export type SubscriptionTier = 'FREE' | 'PRO';
 export type BillingCycle = 'monthly' | 'yearly';
@@ -109,6 +110,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       isMounted = false;
     };
   }, [user]);
+
+  // Check for Lemon Squeezy checkout success upon page redirect
+  useEffect(() => {
+    const redirectInfo = checkLemonRedirectSuccess();
+    if (redirectInfo?.isSuccess) {
+      upgradeToPro(redirectInfo.cycle);
+    }
+  }, []);
 
   // Persist locally
   useEffect(() => {

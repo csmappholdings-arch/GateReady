@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { Bag, Trip } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
@@ -43,6 +44,7 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
   }, [bag]);
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,10 +57,15 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
   const estimatedTotalWeight = estimatedSingleWeight * quantity;
   const formattedWeight = DefaultSuggestions.formatWeight(estimatedTotalWeight, weightUnit);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 min-h-screen cursor-pointer"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col"
+        className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col relative z-[100000] cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -244,6 +251,7 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

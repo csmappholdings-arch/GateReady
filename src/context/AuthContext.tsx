@@ -46,18 +46,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleAuthError = (err: any, providerName: string) => {
     console.error(`${providerName} sign-in failed:`, err);
     if (err.code === 'auth/popup-closed-by-user') {
-      return;
+      return null;
     }
-    if (err.code === 'auth/unauthorized-domain') {
-      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'your Cloudflare domain';
-      setError(`Domain Not Authorized: "${currentHost}" is not listed in your Firebase Authorized Domains. To fix: Open Firebase Console → Authentication → Settings → Authorized Domains → Add "${currentHost}".`);
-      return;
+    if (err.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'current domain';
+      const msg = `Domain "${currentHost}" is not yet added to Firebase Authorized Domains for Google OAuth. You can use instant Email Sign-In below without any setup, or add "${currentHost}" in Firebase Console.`;
+      setError(msg);
+      const friendlyErr = new Error(msg);
+      (friendlyErr as any).code = 'auth/unauthorized-domain';
+      (friendlyErr as any).hostname = currentHost;
+      return friendlyErr;
     }
     if (err.code === 'auth/operation-not-allowed') {
-      setError(`${providerName} is not enabled in Firebase. Go to Firebase Console → Authentication → Sign-in method and enable ${providerName}.`);
-      return;
+      const msg = `${providerName} is not enabled in Firebase. Go to Firebase Console → Authentication → Sign-in method and enable ${providerName}.`;
+      setError(msg);
+      return new Error(msg);
     }
-    setError(err.message || `Failed to sign in with ${providerName}`);
+    const msg = err.message || `Failed to sign in with ${providerName}`;
+    setError(msg);
+    return err;
   };
 
   const signIn = async () => {
@@ -65,8 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fbSignInWithGoogle();
     } catch (err: any) {
-      handleAuthError(err, 'Google');
-      throw err;
+      const customErr = handleAuthError(err, 'Google');
+      throw customErr || err;
     }
   };
 

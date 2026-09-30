@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Trip, Bag } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { FREQUENT_TRAVELER_TEMPLATES, PackingTemplate } from '../data/packingTemplates';
@@ -50,6 +51,7 @@ export const PackingPresetsModal: React.FC<PackingPresetsModalProps> = ({
   const [customName, setCustomName] = useState('');
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const handleApplyTemplate = (template: PackingTemplate) => {
     template.items.forEach((item) => {
@@ -104,9 +106,17 @@ export const PackingPresetsModal: React.FC<PackingPresetsModalProps> = ({
 
   const allTemplates = [...customTemplates, ...FREQUENT_TRAVELER_TEMPLATES];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-purple-100 dark:border-purple-900/60 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-150 min-h-screen cursor-pointer"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        className="w-full max-w-2xl my-auto bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-purple-100 dark:border-purple-900/60 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150 relative z-[100000] cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header */}
         <div className="flex items-start justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -265,6 +275,7 @@ export const PackingPresetsModal: React.FC<PackingPresetsModalProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
