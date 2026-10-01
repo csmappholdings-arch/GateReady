@@ -18,6 +18,8 @@ import { AddBagDialog } from './components/AddBagDialog';
 import { TripBanner } from './components/TripBanner';
 import { WalkthroughVideoModal } from './components/WalkthroughVideoModal';
 import { AccountSyncModal } from './components/AccountSyncModal';
+import { TransitNetworkHub } from './components/TransitNetworkHub';
+import { TravelType } from './types/travel';
 import { 
   CheckCircle2, 
   Info, 
@@ -29,15 +31,21 @@ import {
   Sparkles,
   CloudSun,
   Crown,
-  Play
+  Play,
+  Plane,
+  Train,
+  Ship,
+  Car,
+  Bus
 } from 'lucide-react';
 
 function PackingAppContent() {
-  const { currentTrip, selectedBagId, setSelectedBagId, addTrip } = usePacking();
+  const { currentTrip, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip } = usePacking();
   const { isPro } = useSubscription();
 
   const [currentScreen, setCurrentScreen] = useState<'Bags' | 'Checklist' | 'CabinIntel' | 'Allowances' | 'GateReady'>('Bags');
   const [showAddTripModal, setShowAddTripModal] = useState(false);
+  const [selectedTravelTypeForAdd, setSelectedTravelTypeForAdd] = useState<TravelType | undefined>(undefined);
   const [addTripKey, setAddTripKey] = useState(0);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddBagModal, setShowAddBagModal] = useState(false);
@@ -45,7 +53,8 @@ function PackingAppContent() {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
 
-  const handleOpenAddTrip = () => {
+  const handleOpenAddTrip = (travelType?: TravelType) => {
+    setSelectedTravelTypeForAdd(travelType);
     setAddTripKey((prev) => prev + 1);
     setShowAddTripModal(true);
   };
@@ -82,73 +91,23 @@ function PackingAppContent() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full pb-20 sm:pb-12">
+      <main className="flex-1 w-full pb-20 sm:pb-12 relative overflow-hidden">
+        {/* Overall Ambient Transit Blueprint Grid & Travel Watermarks for entire main page */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10 dark:opacity-15" aria-hidden="true">
+          <div className="absolute inset-0 bg-[radial-gradient(#c084fc_1px,transparent_1px)] [background-size:32px_32px]" />
+          <Plane className="absolute top-28 -left-8 w-44 h-44 text-purple-600/30 -rotate-12" />
+          <Train className="absolute top-1/3 -right-10 w-44 h-44 text-emerald-600/30 rotate-6" />
+          <Ship className="absolute bottom-1/4 -left-10 w-48 h-48 text-cyan-600/30" />
+          <Car className="absolute bottom-24 -right-8 w-44 h-44 text-amber-600/30 -rotate-6" />
+          <Bus className="absolute top-2/3 left-1/3 w-36 h-36 text-indigo-600/20" />
+        </div>
+
         {currentTrip == null ? (
-          <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-3xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center mb-4 shadow-sm border border-purple-200 dark:border-purple-900/50">
-              <Luggage className="w-8 h-8" />
-            </div>
-            <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Ready to pack?
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-6 leading-relaxed">
-              Create your trip with custom travelers (parents, kids, toddlers) and bags to track baggage weights, carry-on liquid limits, and airline rules.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
-              <button
-                onClick={handleOpenAddTrip}
-                className="w-full sm:w-auto h-12 px-6 rounded-2xl bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span>Create Your Trip</span>
-              </button>
-
-              <button
-                onClick={() => setShowTourModal(true)}
-                className="w-full sm:w-auto h-12 px-5 rounded-2xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-slate-800 active:scale-95 text-purple-950 dark:text-purple-200 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-              >
-                <div className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0">
-                  <Play className="w-2.5 h-2.5 fill-white ml-0.5" />
-                </div>
-                <span>Watch Walkthrough Tour</span>
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                const departure = new Date();
-                departure.setDate(departure.getDate() + 7);
-                const returnDate = new Date();
-                returnDate.setDate(returnDate.getDate() + 14);
-
-                addTrip(
-                  'Paris & London Vacation',
-                  'PLANE',
-                  'Delta Air Lines',
-                  'Main Cabin',
-                  [
-                    { type: 'CARRY_ON', label: "Alex's Carry-On Roller", assignedTo: 'Alex' },
-                    { type: 'PERSONAL', label: "Alex's Tech Backpack", assignedTo: 'Alex' }
-                  ],
-                  ['Alex', 'Jordan'],
-                  {
-                    originCity: 'New York (JFK)',
-                    destinationCity: 'Paris (CDG)',
-                    departureDate: departure.toISOString().split('T')[0],
-                    departureTime: '18:30',
-                    returnTripDate: returnDate.toISOString().split('T')[0],
-                    returnTripTime: '11:15',
-                    aircraftType: 'Airbus A350-900'
-                  }
-                );
-              }}
-              className="mt-6 text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:underline flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Explore with a sample demo trip (1-click)</span>
-            </button>
-          </div>
+          <TransitNetworkHub
+            onOpenAddTrip={handleOpenAddTrip}
+            onOpenTour={() => setShowTourModal(true)}
+            onLoadDemo={loadDemoTrip}
+          />
         ) : (
           <>
             {/* Prominent Navigation Tabs (Desktop & Tablet) */}
@@ -280,98 +239,101 @@ function PackingAppContent() {
         )}
       </main>
 
-      {/* Mobile Fixed Bottom Navigation Bar (5 Prominent Tabs) */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-purple-200/80 dark:border-purple-900/80 pb-safe shadow-xl">
-        <div className="grid grid-cols-5 items-center h-16 px-1">
-          {/* Mobile Tab 1: Bags & Items */}
-          <button
-            onClick={() => setCurrentScreen('Bags')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
-              currentScreen === 'Bags'
-                ? 'text-purple-700 dark:text-purple-300 font-black'
-                : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-            }`}
-          >
-            <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Bags' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-              <Luggage className="w-4 h-4" />
-            </div>
-            <span className="text-[10px] tracking-tight mt-0.5">Bags</span>
-            {totalBags > 0 && (
-              <span className="absolute top-1 right-2 text-[9px] font-extrabold px-1 rounded-full bg-purple-600 text-white">
-                {totalBags}
-              </span>
-            )}
-          </button>
+      {/* Mobile Fixed Bottom Navigation Bar (5 Prominent Tabs) - only when a trip exists */}
+      {currentTrip != null && (
+        <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-purple-200/80 dark:border-purple-900/80 pb-safe shadow-xl">
+          <div className="grid grid-cols-5 items-center h-16 px-1">
+            {/* Mobile Tab 1: Bags & Items */}
+            <button
+              onClick={() => setCurrentScreen('Bags')}
+              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
+                currentScreen === 'Bags'
+                  ? 'text-purple-700 dark:text-purple-300 font-black'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
+              }`}
+            >
+              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Bags' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
+                <Luggage className="w-4 h-4" />
+              </div>
+              <span className="text-[10px] tracking-tight mt-0.5">Bags</span>
+              {totalBags > 0 && (
+                <span className="absolute top-1 right-2 text-[9px] font-extrabold px-1 rounded-full bg-purple-600 text-white">
+                  {totalBags}
+                </span>
+              )}
+            </button>
 
-          {/* Mobile Tab 2: Trip Intel & Checklists */}
-          <button
-            onClick={() => setCurrentScreen('Checklist')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
-              currentScreen === 'Checklist'
-                ? 'text-purple-700 dark:text-purple-300 font-black'
-                : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-            }`}
-          >
-            <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Checklist' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-              <CloudSun className="w-4 h-4 text-amber-500" />
-            </div>
-            <span className="text-[10px] tracking-tight mt-0.5">Intel</span>
-            <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
-          </button>
+            {/* Mobile Tab 2: Trip Intel & Checklists */}
+            <button
+              onClick={() => setCurrentScreen('Checklist')}
+              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
+                currentScreen === 'Checklist'
+                  ? 'text-purple-700 dark:text-purple-300 font-black'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
+              }`}
+            >
+              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Checklist' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
+                <CloudSun className="w-4 h-4 text-amber-500" />
+              </div>
+              <span className="text-[10px] tracking-tight mt-0.5">Intel</span>
+              <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
+            </button>
 
-          {/* Mobile Tab 3: Plugs & Bins */}
-          <button
-            onClick={() => setCurrentScreen('CabinIntel')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
-              currentScreen === 'CabinIntel'
-                ? 'text-purple-700 dark:text-purple-300 font-black'
-                : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-            }`}
-          >
-            <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'CabinIntel' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-              <Zap className="w-4 h-4 text-amber-500" />
-            </div>
-            <span className="text-[10px] tracking-tight mt-0.5">Plugs</span>
-            <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
-          </button>
+            {/* Mobile Tab 3: Plugs & Bins */}
+            <button
+              onClick={() => setCurrentScreen('CabinIntel')}
+              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
+                currentScreen === 'CabinIntel'
+                  ? 'text-purple-700 dark:text-purple-300 font-black'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
+              }`}
+            >
+              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'CabinIntel' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
+                <Zap className="w-4 h-4 text-amber-500" />
+              </div>
+              <span className="text-[10px] tracking-tight mt-0.5">Plugs</span>
+              <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
+            </button>
 
-          {/* Mobile Tab 4: Allowances */}
-          <button
-            onClick={() => setCurrentScreen('Allowances')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
-              currentScreen === 'Allowances'
-                ? 'text-purple-700 dark:text-purple-300 font-black'
-                : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-            }`}
-          >
-            <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Allowances' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-              <Info className="w-4 h-4" />
-            </div>
-            <span className="text-[10px] tracking-tight mt-0.5">Limits</span>
-          </button>
+            {/* Mobile Tab 4: Allowances */}
+            <button
+              onClick={() => setCurrentScreen('Allowances')}
+              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
+                currentScreen === 'Allowances'
+                  ? 'text-purple-700 dark:text-purple-300 font-black'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
+              }`}
+            >
+              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Allowances' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
+                <Info className="w-4 h-4" />
+              </div>
+              <span className="text-[10px] tracking-tight mt-0.5">Limits</span>
+            </button>
 
-          {/* Mobile Tab 5: Gate Ready */}
-          <button
-            onClick={() => setCurrentScreen('GateReady')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
-              currentScreen === 'GateReady'
-                ? 'text-purple-700 dark:text-purple-300 font-black'
-                : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-            }`}
-          >
-            <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'GateReady' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-              <PlaneTakeoff className="w-4 h-4" />
-            </div>
-            <span className="text-[10px] tracking-tight mt-0.5">Gate Ready</span>
-          </button>
-        </div>
-      </nav>
+            {/* Mobile Tab 5: Gate Ready */}
+            <button
+              onClick={() => setCurrentScreen('GateReady')}
+              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
+                currentScreen === 'GateReady'
+                  ? 'text-purple-700 dark:text-purple-300 font-black'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
+              }`}
+            >
+              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'GateReady' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
+                <PlaneTakeoff className="w-4 h-4" />
+              </div>
+              <span className="text-[10px] tracking-tight mt-0.5">Gate Ready</span>
+            </button>
+          </div>
+        </nav>
+      )}
 
       {/* Modals */}
       <AddTripDialog
         key={addTripKey}
         isOpen={showAddTripModal}
         onClose={() => setShowAddTripModal(false)}
+        initialTravelType={selectedTravelTypeForAdd}
       />
 
       {showAddItemModal && currentTrip && currentBag && (
@@ -395,7 +357,7 @@ function PackingAppContent() {
       <WalkthroughVideoModal
         isOpen={showTourModal}
         onClose={() => setShowTourModal(false)}
-        onOpenTripDialog={() => setShowAddTripModal(true)}
+        onOpenTripDialog={handleOpenAddTrip}
       />
 
       {/* Universal Cross-Device Account Sync Modal */}

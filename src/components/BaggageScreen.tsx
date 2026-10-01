@@ -585,9 +585,39 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
           {/* Packing Items List */}
           <div className="space-y-2 pt-2">
-            {filteredItems.length === 0 ? (
+            {activeBag.items.length === 0 ? (
+              <div className="p-8 text-center rounded-3xl border-2 border-dashed border-purple-200 dark:border-purple-900/60 bg-purple-50/20 dark:bg-purple-950/10 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-3">
+                  <Luggage className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  {activeBag.label} is currently empty
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xs leading-relaxed">
+                  Type an item in the bar above, tap one of the quick suggestions, or load a curated packing preset.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPresetsModal(true)}
+                    className="h-8 px-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <FolderCheck className="w-3.5 h-3.5" />
+                    <span>Browse Packing Presets</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddItemModal(true)}
+                    className="h-8 px-3.5 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-750 text-purple-950 dark:text-purple-200 font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Custom Item Details</span>
+                  </button>
+                </div>
+              </div>
+            ) : filteredItems.length === 0 ? (
               <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 text-xs">
-                No items match your filter. Use the input above to add items to {activeBag.label}.
+                No items match your search & filter. Use the input above to add items to {activeBag.label}.
               </div>
             ) : (
               filteredItems.map((item) => (

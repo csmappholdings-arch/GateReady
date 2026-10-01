@@ -28,6 +28,7 @@ export const SubscriptionModal: React.FC = () => {
   const [showLicenseEntry, setShowLicenseEntry] = useState(false);
   const [licenseInput, setLicenseInput] = useState('');
   const [licenseError, setLicenseError] = useState('');
+  const [licenseSuccessMsg, setLicenseSuccessMsg] = useState('');
 
   // Re-initialize Lemon.js when paywall opens
   useEffect(() => {
@@ -435,19 +436,22 @@ export const SubscriptionModal: React.FC = () => {
                   className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center justify-center gap-1 mx-auto cursor-pointer"
                 >
                   <Key className="w-3 h-3" />
-                  <span>Have a backup or testing license key?</span>
+                  <span>Have a Pro license key?</span>
                 </button>
               ) : (
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
+                    setLicenseError('');
+                    setLicenseSuccessMsg('');
                     const res = applyLicenseKey(licenseInput);
                     if (res.success) {
+                      setLicenseSuccessMsg(res.message);
                       setPaymentSuccess(true);
                       setTimeout(() => {
                         setPaymentSuccess(false);
                         closePaywall();
-                      }, 1200);
+                      }, 1400);
                     } else {
                       setLicenseError(res.message);
                     }
@@ -464,6 +468,7 @@ export const SubscriptionModal: React.FC = () => {
                       onClick={() => {
                         setShowLicenseEntry(false);
                         setLicenseError('');
+                        setLicenseSuccessMsg('');
                       }}
                       className="text-[10px] text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
@@ -480,8 +485,9 @@ export const SubscriptionModal: React.FC = () => {
                       onChange={(e) => {
                         setLicenseInput(e.target.value);
                         setLicenseError('');
+                        setLicenseSuccessMsg('');
                       }}
-                      placeholder="e.g. GR-Test-2026-1"
+                      placeholder="Enter license key"
                       className="flex-1 h-9 px-3 text-xs uppercase font-bold tracking-wider rounded-xl border border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
                     />
                     <button
@@ -498,9 +504,11 @@ export const SubscriptionModal: React.FC = () => {
                     </p>
                   )}
 
-                  <p className="text-[10px] text-slate-400">
-                    Testing keys: <span className="font-bold text-purple-700 dark:text-purple-300">GR-Test-2026-1</span> to <span className="font-bold text-purple-700 dark:text-purple-300">GR-Test-2026-5</span>
-                  </p>
+                  {licenseSuccessMsg && (
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                      {licenseSuccessMsg}
+                    </p>
+                  )}
                 </form>
               )}
             </div>

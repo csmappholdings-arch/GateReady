@@ -39,9 +39,10 @@ import { CarrierSearchInput } from './CarrierSearchInput';
 interface AddTripDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  initialTravelType?: TravelType;
 }
 
-export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose }) => {
+export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, initialTravelType }) => {
   const { addTrip } = usePacking();
   const { isPro, canAddTraveler, canAddBag, openPaywall } = useSubscription();
   const { user } = useAuth();
@@ -115,9 +116,20 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose })
     if (isOpen) {
       setActiveTab('flight');
       setName('');
-      setTravelType('PLANE');
+      const initialType = initialTravelType || 'PLANE';
+      setTravelType(initialType);
       setCompanyName('');
-      setSeatOrSize('Main Cabin');
+      setSeatOrSize(
+        initialType === 'CAR'
+          ? 'Mid-Size SUV / Car'
+          : initialType === 'CRUISE'
+          ? 'Balcony Stateroom'
+          : initialType === 'TRAIN'
+          ? 'Standard Coach'
+          : initialType === 'BUS'
+          ? 'Standard Reserved Seat'
+          : 'Main Cabin'
+      );
       setOriginCity('');
       setDestinationCity('');
       setDepartureDate('');
@@ -134,7 +146,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose })
         { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: defaultUser }
       ]);
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, initialTravelType]);
 
   // Keyboard Escape handler
   useEffect(() => {

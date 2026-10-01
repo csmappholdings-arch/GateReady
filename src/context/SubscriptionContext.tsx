@@ -8,13 +8,46 @@ import { checkLemonRedirectSuccess } from '../lib/lemonSqueezy';
 export type SubscriptionTier = 'FREE' | 'PRO';
 export type BillingCycle = 'monthly' | 'yearly';
 
+// Standard 10 hardcoded licenses providing exactly 1 month of access per use
 export const HARDCODED_TEST_LICENSES = [
   'GR-Test-2026-1',
   'GR-Test-2026-2',
   'GR-Test-2026-3',
   'GR-Test-2026-4',
-  'GR-Test-2026-5'
+  'GR-Test-2026-5',
+  'GR-Test-2026-6',
+  'GR-Test-2026-7',
+  'GR-Test-2026-8',
+  'GR-Test-2026-9',
+  'GR-Test-2026-10'
 ];
+
+// Permanent Master License Keys that never expire (for owner use)
+export const MASTER_LICENSE_KEYS = [
+  'GR-MASTER-LIFETIME-ACCESS',
+  'GR-MASTER-CSMAPPHOLDINGS-VIP',
+  'GR-MASTER-2026-LIFETIME'
+];
+
+export function isMasterLicense(key: string): boolean {
+  const norm = key.trim().toUpperCase().replace(/-/g, '');
+  return MASTER_LICENSE_KEYS.some((k) => k.toUpperCase().replace(/-/g, '') === norm);
+}
+
+export function findMatchingLicense(key: string): { key: string; isMaster: boolean } | null {
+  const norm = key.trim().toUpperCase().replace(/-/g, '');
+  for (const master of MASTER_LICENSE_KEYS) {
+    if (master.toUpperCase().replace(/-/g, '') === norm) {
+      return { key: master, isMaster: true };
+    }
+  }
+  for (const standard of HARDCODED_TEST_LICENSES) {
+    if (standard.toUpperCase().replace(/-/g, '') === norm) {
+      return { key: standard, isMaster: false };
+    }
+  }
+  return null;
+}
 
 interface SubscriptionContextType {
   tier: SubscriptionTier;
@@ -22,6 +55,7 @@ interface SubscriptionContextType {
   billingCycle: BillingCycle;
   subscriptionExpiresAt: string | null;
   manualLicenseKey: string | null;
+  isMasterKey: boolean;
   isPaywallOpen: boolean;
   paywallReason: string | null;
   openPaywall: (reason?: string) => void;
@@ -39,6 +73,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 const SUBSCRIPTION_STORAGE_KEY = 'gateready_subscription_tier_v1';
 const BILLING_STORAGE_KEY = 'gateready_subscription_cycle_v1';
 const LICENSE_STORAGE_KEY = 'gateready_manual_license_key_v1';
+const EXPIRY_STORAGE_KEY = 'gateready_subscription_expires_at_v1';
 
 export const MAX_FREE_TRAVELERS = 1;
 export const MAX_FREE_BAGS_TOTAL = 2;
@@ -48,18 +83,81 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const [manualLicenseKey, setManualLicenseKey] = useState<string | null>(() => {
     try {
-      return localStorage.getItem(LICENSE_STORAGE_KEY);
+      const savedKey = localStorage.getItem(LICENSE_STORAGE_KEY);
+      if (!savedKey) return null;
+
+      const match = findMatchingLicense(savedKey);
+      if (!match) {
+        localStorage.removeItem(LICENSE_STORAGE_KEY);
+        return null;
+      }
+
+      if (match.isMaster) {
+        return match.key;
+      }
+
+      // Check expiry for 1-month standard license
+      const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
+      if (savedExpiry) {
+        const expiryTime = new Date(savedExpiry).getTime();
+        if (Number.isFinite(expiryTime) && expiryTime <= Date.now()) {
+          // Expired
+          localStorage.removeItem(LICENSE_STORAGE_KEY);
+          localStorage.removeItem(EXPIRY_STORAGE_KEY);
+          localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+          return null;
+        }
+      }
+      return match.key;
     } catch {
       return null;
     }
   });
 
+  const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState<string | null>(() => {
+    try {
+      const savedKey = localStorage.getItem(LICENSE_STORAGE_KEY);
+      if (savedKey) {
+        const match = findMatchingLicense(savedKey);
+        if (match?.isMaster) return null; // Master key never expires
+      }
+      return localStorage.getItem(EXPIRY_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  });
+
+  const isMasterKey = manualLicenseKey ? isMasterLicense(manualLicenseKey) : false;
+
   const [tier, setTier] = useState<SubscriptionTier>(() => {
     try {
-      const savedLicense = localStorage.getItem(LICENSE_STORAGE_KEY);
-      if (savedLicense) return 'PRO';
+      const savedKey = localStorage.getItem(LICENSE_STORAGE_KEY);
+      if (savedKey) {
+        const match = findMatchingLicense(savedKey);
+        if (match?.isMaster) return 'PRO';
+
+        const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
+        if (savedExpiry) {
+          const expiryTime = new Date(savedExpiry).getTime();
+          if (Number.isFinite(expiryTime) && expiryTime <= Date.now()) {
+            return 'FREE';
+          }
+        }
+        return 'PRO';
+      }
+
       const saved = localStorage.getItem(SUBSCRIPTION_STORAGE_KEY);
-      if (saved === 'PRO' || saved === 'FREE') return saved;
+      if (saved === 'PRO') {
+        const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
+        if (savedExpiry) {
+          const expiryTime = new Date(savedExpiry).getTime();
+          if (Number.isFinite(expiryTime) && expiryTime <= Date.now()) {
+            return 'FREE';
+          }
+        }
+        return 'PRO';
+      }
+      if (saved === 'FREE') return 'FREE';
     } catch {
       // Ignore
     }
@@ -73,10 +171,9 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch {
       // Ignore
     }
-    return 'yearly';
+    return 'monthly';
   });
 
-  const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState<string | null>(null);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [paywallReason, setPaywallReason] = useState<string | null>(null);
 
@@ -92,11 +189,50 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (snapshot.exists()) {
           const data = snapshot.data();
           if (data.subscriptionTier === 'PRO') {
-            if (isMounted) {
+            const isMaster = Boolean(
+              data.isMasterKey || 
+              (data.manualLicenseKey && isMasterLicense(data.manualLicenseKey))
+            );
+            const expiresAt = data.subscriptionExpiresAt;
+
+            // Check if standard key expired
+            if (expiresAt && !isMaster && new Date(expiresAt).getTime() <= Date.now()) {
+              if (isMounted) {
+                setTier('FREE');
+                setManualLicenseKey(null);
+                setSubscriptionExpiresAt(null);
+                try {
+                  localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+                  localStorage.removeItem(LICENSE_STORAGE_KEY);
+                  localStorage.removeItem(EXPIRY_STORAGE_KEY);
+                } catch {
+                  // Ignore
+                }
+              }
+            } else if (isMounted) {
               setTier('PRO');
-              setBillingCycle(data.subscriptionBillingCycle || 'yearly');
-              setSubscriptionExpiresAt(data.subscriptionExpiresAt || null);
-              localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+              setBillingCycle(data.subscriptionBillingCycle || 'monthly');
+              setSubscriptionExpiresAt(isMaster ? null : (expiresAt || null));
+              if (data.manualLicenseKey) {
+                setManualLicenseKey(data.manualLicenseKey);
+                try {
+                  localStorage.setItem(LICENSE_STORAGE_KEY, data.manualLicenseKey);
+                } catch {
+                  // Ignore
+                }
+              }
+              if (expiresAt && !isMaster) {
+                try {
+                  localStorage.setItem(EXPIRY_STORAGE_KEY, expiresAt);
+                } catch {
+                  // Ignore
+                }
+              }
+              try {
+                localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+              } catch {
+                // Ignore
+              }
             }
           }
         }
@@ -110,6 +246,31 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       isMounted = false;
     };
   }, [user]);
+
+  // Periodic expiration enforcement for standard 1-month licenses
+  useEffect(() => {
+    if (!subscriptionExpiresAt || isMasterKey) return;
+
+    const checkExpiration = () => {
+      const expiryTime = new Date(subscriptionExpiresAt).getTime();
+      if (Number.isFinite(expiryTime) && expiryTime <= Date.now()) {
+        setTier('FREE');
+        setManualLicenseKey(null);
+        setSubscriptionExpiresAt(null);
+        try {
+          localStorage.removeItem(LICENSE_STORAGE_KEY);
+          localStorage.removeItem(EXPIRY_STORAGE_KEY);
+          localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+        } catch {
+          // Ignore
+        }
+      }
+    };
+
+    checkExpiration();
+    const timer = setInterval(checkExpiration, 60000);
+    return () => clearInterval(timer);
+  }, [subscriptionExpiresAt, isMasterKey]);
 
   // Check for Lemon Squeezy checkout success upon page redirect
   useEffect(() => {
@@ -140,18 +301,25 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const upgradeToPro = async (cycle: BillingCycle) => {
-    const nextYear = new Date();
+    const nextPeriod = new Date();
     if (cycle === 'yearly') {
-      nextYear.setFullYear(nextYear.getFullYear() + 1);
+      nextPeriod.setFullYear(nextPeriod.getFullYear() + 1);
     } else {
-      nextYear.setMonth(nextYear.getMonth() + 1);
+      nextPeriod.setMonth(nextPeriod.getMonth() + 1);
     }
-    const expiryStr = nextYear.toISOString();
+    const expiryStr = nextPeriod.toISOString();
 
     setTier('PRO');
     setBillingCycle(cycle);
     setSubscriptionExpiresAt(expiryStr);
     closePaywall();
+
+    try {
+      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+      localStorage.setItem(EXPIRY_STORAGE_KEY, expiryStr);
+    } catch {
+      // Ignore
+    }
 
     // Persist to Firestore if signed in
     if (user) {
@@ -161,6 +329,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
           subscriptionTier: 'PRO',
           subscriptionBillingCycle: cycle,
           isSubscribed: true,
+          isMasterKey: false,
           subscriptionExpiresAt: expiryStr,
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -173,6 +342,15 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const cancelSubscription = async () => {
     setTier('FREE');
     setSubscriptionExpiresAt(null);
+    setManualLicenseKey(null);
+
+    try {
+      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+      localStorage.removeItem(LICENSE_STORAGE_KEY);
+      localStorage.removeItem(EXPIRY_STORAGE_KEY);
+    } catch {
+      // Ignore
+    }
 
     if (user) {
       try {
@@ -180,6 +358,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         await setDoc(userRef, {
           subscriptionTier: 'FREE',
           isSubscribed: false,
+          isMasterKey: false,
+          manualLicenseKey: null,
           subscriptionExpiresAt: null,
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -195,26 +375,70 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return { success: false, message: 'Please enter a license key.' };
     }
 
-    // Normalization: test against the 5 test license keys (e.g. GR-Test-2026-1 through GR-Test-2026-5)
-    const upper = trimmed.toUpperCase();
-    const validKey = HARDCODED_TEST_LICENSES.find(
-      (k) =>
-        k.toUpperCase() === upper ||
-        k.replace(/-/g, '').toUpperCase() === upper.replace(/-/g, '')
-    );
+    const match = findMatchingLicense(trimmed);
 
-    if (!validKey) {
+    if (!match) {
       return {
         success: false,
-        message: 'Invalid license key. Testing licenses follow: GR-Test-2026-1 to GR-Test-2026-5.'
+        message: 'Invalid license key. Please check your code and try again.'
       };
     }
 
+    const validKey = match.key;
+
+    // MASTER LICENSE KEY: NEVER EXPIRES
+    if (match.isMaster) {
+      setManualLicenseKey(validKey);
+      setTier('PRO');
+      setSubscriptionExpiresAt(null);
+
+      try {
+        localStorage.setItem(LICENSE_STORAGE_KEY, validKey);
+        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+        localStorage.removeItem(EXPIRY_STORAGE_KEY);
+      } catch {
+        // Ignore
+      }
+
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        setDoc(
+          userRef,
+          {
+            subscriptionTier: 'PRO',
+            manualLicenseKey: validKey,
+            isSubscribed: true,
+            isMasterKey: true,
+            subscriptionExpiresAt: null,
+            updatedAt: new Date().toISOString()
+          },
+          { merge: true }
+        ).catch((err) => {
+          console.warn('Failed to save master license to cloud:', err);
+        });
+      }
+
+      return {
+        success: true,
+        message: 'Master license verified! Permanent Gate Ready Pro unlocked with lifetime, non-expiring access.'
+      };
+    }
+
+    // STANDARD LICENSE KEY: EXACTLY 1 MONTH OF ACCESS PER USE
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+    const expiryStr = expiryDate.toISOString();
+
     setManualLicenseKey(validKey);
     setTier('PRO');
+    setBillingCycle('monthly');
+    setSubscriptionExpiresAt(expiryStr);
+
     try {
       localStorage.setItem(LICENSE_STORAGE_KEY, validKey);
+      localStorage.setItem(EXPIRY_STORAGE_KEY, expiryStr);
       localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+      localStorage.setItem(BILLING_STORAGE_KEY, 'monthly');
     } catch {
       // Ignore
     }
@@ -225,8 +449,11 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         userRef,
         {
           subscriptionTier: 'PRO',
+          subscriptionBillingCycle: 'monthly',
           manualLicenseKey: validKey,
           isSubscribed: true,
+          isMasterKey: false,
+          subscriptionExpiresAt: expiryStr,
           updatedAt: new Date().toISOString()
         },
         { merge: true }
@@ -235,17 +462,26 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       });
     }
 
+    const formattedExpiry = expiryDate.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
     return {
       success: true,
-      message: `Pro license verified! Gate Ready Pro unlocked with key ${validKey}.`
+      message: `Pro license verified! 1 month of Gate Ready Pro activated (valid until ${formattedExpiry}).`
     };
   };
 
   const removeLicenseKey = () => {
     setManualLicenseKey(null);
     setTier('FREE');
+    setSubscriptionExpiresAt(null);
+
     try {
       localStorage.removeItem(LICENSE_STORAGE_KEY);
+      localStorage.removeItem(EXPIRY_STORAGE_KEY);
       localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
     } catch {
       // Ignore
@@ -259,6 +495,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
           subscriptionTier: 'FREE',
           manualLicenseKey: null,
           isSubscribed: false,
+          isMasterKey: false,
+          subscriptionExpiresAt: null,
           updatedAt: new Date().toISOString()
         },
         { merge: true }
@@ -322,6 +560,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         billingCycle,
         subscriptionExpiresAt,
         manualLicenseKey,
+        isMasterKey,
         isPaywallOpen,
         paywallReason,
         openPaywall,

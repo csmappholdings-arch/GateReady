@@ -1,5 +1,5 @@
 {
-  "name": "Gate Ready",
+  "name": "GateReady.ca",
   "description": "Smart travel packing checklist, luggage weight estimator, and airline baggage allowance guide.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

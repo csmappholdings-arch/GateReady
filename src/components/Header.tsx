@@ -70,6 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
     billingCycle, 
     subscriptionExpiresAt,
     manualLicenseKey,
+    isMasterKey,
     applyLicenseKey,
     removeLicenseKey
   } = useSubscription();
@@ -149,38 +150,61 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-purple-100 dark:border-purple-950/60 shadow-xs transition-colors">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-        {/* Left: App Logo & Brand Title */}
+    <header className="sticky top-0 z-40 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 backdrop-blur-md border-b border-purple-900/40 shadow-lg shadow-purple-950/30 transition-colors">
+      {/* Background blueprint circuit lines accent from branding */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <div 
+          className="absolute inset-0 opacity-15 dark:opacity-20 bg-[radial-gradient(#c084fc_1px,transparent_1px)] [background-size:20px_20px]" 
+        />
+        <div 
+          className="absolute -top-16 left-1/3 w-80 h-24 bg-fuchsia-600/20 blur-3xl" 
+        />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 relative z-10">
+        {/* Left: GateReady.ca Stadium Neon Badge matching uploaded branding */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-700 via-purple-600 to-fuchsia-500 flex items-center justify-center shadow-md shadow-purple-600/25 text-white shrink-0">
-            <svg
-              className="w-5 h-5 fill-current"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-            </svg>
+          <div className="relative group cursor-default select-none">
+            {/* Outer neon magenta/violet glow blur aura */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 rounded-2xl blur-[3px] opacity-75 group-hover:opacity-100 transition duration-300" />
+
+            {/* Stadium Capsule Badge */}
+            <div className="relative px-3 sm:px-3.5 py-1.5 rounded-2xl bg-gradient-to-r from-slate-950 via-purple-950/95 to-slate-950 border-2 border-fuchsia-400 shadow-[0_0_16px_rgba(217,70,239,0.5),inset_0_0_12px_rgba(168,85,247,0.35)] flex items-center gap-2 sm:gap-2.5">
+              {/* Metallic Purple Carry-On Suitcase with GR Monogram */}
+              <div className="relative w-6 h-7 sm:w-7 sm:h-8 rounded-md bg-gradient-to-b from-purple-700 via-indigo-950 to-slate-950 border border-purple-300/40 flex flex-col items-center justify-center shadow-inner shadow-purple-400/20 shrink-0">
+                {/* Luggage handle */}
+                <div className="absolute -top-1.5 w-2.5 sm:w-3 h-1.5 border-t-2 border-x-2 border-purple-200/90 rounded-t-xs" />
+                {/* GR Monogram */}
+                <span className="text-[9px] sm:text-[10px] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-fuchsia-100 via-purple-200 to-indigo-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                  GR
+                </span>
+                {/* Luggage rib grooves */}
+                <div className="w-3.5 sm:w-4 h-[1px] bg-purple-400/40 rounded-full mt-0.5" />
+              </div>
+
+              {/* GateReady.ca Brand Typography */}
+              <div className="flex items-baseline tracking-tight">
+                <span className="font-black text-base sm:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                  Gate<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-fuchsia-200 to-purple-200">Ready</span>
+                </span>
+                <span className="font-extrabold text-xs sm:text-sm text-fuchsia-400 ml-0.5 drop-shadow-[0_0_8px_rgba(232,121,249,0.9)]">
+                  .ca
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="min-w-0 flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-base text-slate-900 dark:text-white tracking-tight leading-none">
-                Gate Ready
+          {/* Pro / Free Plan Badge */}
+          <div className="hidden md:flex items-center">
+            {isPro ? (
+              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs border border-amber-300/40">
+                <Crown className="w-2.5 h-2.5 fill-white" /> Pro
               </span>
-              {isPro ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs">
-                  <Crown className="w-2.5 h-2.5 fill-white" /> Pro
-                </span>
-              ) : (
-                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                  Free Plan
-                </span>
-              )}
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-              Smart Travel Baggage & Packing
-            </p>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/80 bg-purple-950/70 border border-purple-800/60 px-2 py-0.5 rounded-full">
+                Free Plan
+              </span>
+            )}
           </div>
         </div>
 
@@ -190,7 +214,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
           {!isPro ? (
             <button
               onClick={() => openPaywall("Upgrade to Gate Ready Pro to unlock unlimited travelers (kids, parents, companions) and unlimited bags.")}
-              className="h-9 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-purple-600/30 active:scale-95 transition-all cursor-pointer"
+              className="h-9 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
               title="Unlock Unlimited Travelers & Bags"
             >
               <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
@@ -200,23 +224,23 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
           ) : (
             <button
               onClick={() => openPaywall()}
-              className="h-9 px-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-center gap-1 hover:bg-amber-100 transition-colors cursor-pointer"
+              className="h-9 px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-1 hover:bg-amber-900/60 transition-colors cursor-pointer shadow-xs"
               title="Gate Ready Pro Active"
             >
-              <Crown className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               <span className="hidden md:inline text-[11px]">Pro Active</span>
             </button>
           )}
 
           {/* Google Account & Cloud Sync Dropdown */}
-          <div className="relative" ref={userRef}>
+          <div className="relative z-50" ref={userRef}>
             {user ? (
               <button
                 onClick={() => {
                   setUserMenuOpen(!userMenuOpen);
                   setSettingsOpen(false);
                 }}
-                className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/60 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-200 flex items-center gap-2 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer"
+                className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-emerald-500/40 bg-emerald-950/50 text-emerald-200 flex items-center gap-2 hover:bg-emerald-900/60 transition-colors cursor-pointer"
                 title="Google Account & Cloud Sync"
               >
                 {user.photoURL ? (
@@ -232,15 +256,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                 )}
 
                 <div className="hidden lg:flex flex-col text-left">
-                  <span className="text-[11px] font-bold leading-none truncate max-w-[85px]">
+                  <span className="text-[11px] font-bold leading-none truncate max-w-[85px] text-white">
                     {user.displayName?.split(' ')[0] || 'Synced'}
                   </span>
-                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                  <span className="text-[9px] text-emerald-400 flex items-center gap-0.5 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                     Cloud Sync
                   </span>
                 </div>
-                <ChevronDown className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0 ml-0.5" />
+                <ChevronDown className="w-3 h-3 text-emerald-400 shrink-0 ml-0.5" />
               </button>
             ) : (
               <button
@@ -252,10 +276,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   }
                 }}
                 disabled={authLoading}
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-slate-800 dark:text-slate-100 text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
+                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-100 text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
                 title="Sign in with Google or Email to sync trips across devices"
               >
-                <Cloud className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                <Cloud className="w-4 h-4 text-fuchsia-400 shrink-0" />
                 <span>Sync Account</span>
               </button>
             )}
@@ -334,7 +358,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm('Cancel Gate Ready Pro subscription? You will return to the Free Plan (1 traveler, max 3 bags).')) {
+                            if (confirm('Cancel Gate Ready Pro subscription? You will return to the Free Plan (1 traveler, up to 2 bags).')) {
                               cancelSubscription();
                             }
                           }}
@@ -347,7 +371,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   ) : (
                     <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 text-xs space-y-2">
                       <p className="text-[11px] text-purple-900 dark:text-purple-200 leading-snug">
-                        Free Plan allows <strong>1 traveler</strong> and up to <strong>3 bags</strong>.
+                        Free Plan allows <strong>1 traveler</strong> and up to <strong>2 bags</strong>.
                       </p>
                       <button
                         onClick={() => {
@@ -430,7 +454,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                 setUserMenuOpen(false);
                 onOpenTour();
               }}
-              className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-200/80 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/30 text-purple-900 dark:text-purple-200 hover:bg-purple-100/70 dark:hover:bg-purple-900/40 flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-200 flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Watch Short Video Walkthrough & Tour"
               aria-label="Watch Walkthrough Video"
             >
@@ -448,27 +472,27 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
               setUserMenuOpen(false);
               openWalletModal();
             }}
-            className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-200/80 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/30 text-purple-900 dark:text-purple-200 hover:bg-purple-100/70 dark:hover:bg-purple-900/40 flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-200 flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Travel Wallet & Loyalty Numbers"
             aria-label="Travel Wallet & Loyalty Numbers"
           >
-            <CreditCard className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <CreditCard className="w-4 h-4 text-fuchsia-400" />
             <span className="hidden md:inline text-xs font-bold">Wallet</span>
             {walletAccounts.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-purple-600 text-white text-[9px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-fuchsia-600 text-white text-[9px] font-bold flex items-center justify-center">
                 {walletAccounts.length}
               </span>
             )}
           </button>
 
           {/* Settings Menu Dropdown */}
-          <div className="relative" ref={settingsRef}>
+          <div className="relative z-50" ref={settingsRef}>
             <button
               onClick={() => {
                 setSettingsOpen(!settingsOpen);
                 setUserMenuOpen(false);
               }}
-              className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-purple-200/80 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/30 text-purple-900 dark:text-purple-200 hover:bg-purple-100/60 dark:hover:bg-purple-900/40 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-200 flex items-center justify-center transition-colors cursor-pointer"
               aria-label="Settings"
             >
               <Settings className="w-4 h-4" />
@@ -481,7 +505,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                     <p className="text-xs font-bold text-slate-900 dark:text-white">
                       Preferences & Actions
                     </p>
-                    <p className="text-[11px] text-slate-400">Settings for Gate Ready</p>
+                    <p className="text-[11px] text-slate-400">Settings for GateReady.ca</p>
                   </div>
                   <button
                     type="button"
@@ -492,6 +516,23 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   >
                     <X className="w-4 h-4" />
                   </button>
+                </div>
+
+                {/* GateReady.ca Brand Blueprint Thumbnail Banner */}
+                <div className="p-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div className="relative rounded-xl overflow-hidden border border-purple-500/30 shadow-xs bg-slate-950">
+                    <img 
+                      src="/thumbnail.jpg" 
+                      alt="GateReady.ca Transit & Baggage Intel" 
+                      className="w-full h-24 object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent flex items-end p-2">
+                      <span className="text-[10px] font-bold text-white tracking-wide flex items-center gap-1.5 drop-shadow-sm">
+                        <Sparkles className="w-3 h-3 text-fuchsia-400" />
+                        <span>GateReady.ca Transit Intel</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Travel Wallet Row in Settings */}
@@ -556,7 +597,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                         {isPro ? 'Gate Ready Pro' : 'Free Plan'}
                       </p>
                       <p className="text-[10px] text-slate-400">
-                        {isPro ? 'Unlimited travelers & bags' : '1 traveler · Max 3 bags'}
+                        {isPro ? 'Unlimited travelers & bags' : '1 traveler · Up to 2 bags'}
                       </p>
                     </div>
                   </div>
@@ -585,7 +626,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                           Pro License Key
                         </p>
                         <p className="text-[10px] text-slate-400">
-                          {manualLicenseKey ? `Active: ${manualLicenseKey}` : 'Backup / testing license'}
+                          {manualLicenseKey ? `Active: ${manualLicenseKey}` : 'Redeem a Pro key'}
                         </p>
                       </div>
                     </div>
@@ -616,12 +657,19 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   {/* Active license state badge */}
                   {manualLicenseKey && (
                     <div className="mt-2 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between text-[11px] text-emerald-800 dark:text-emerald-200">
-                      <span className="flex items-center gap-1.5 font-bold">
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Key: {manualLicenseKey}</span>
-                      </span>
-                      <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-200 dark:bg-emerald-900 text-emerald-950 dark:text-emerald-100 px-1.5 py-0.2 rounded-md">
-                        Pro Active
+                      <div className="min-w-0 pr-2">
+                        <span className="flex items-center gap-1.5 font-bold truncate">
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <span className="truncate">Key: {manualLicenseKey}</span>
+                        </span>
+                        {subscriptionExpiresAt && !isMasterKey && (
+                          <span className="text-[10px] text-emerald-700/80 dark:text-emerald-300/80 ml-5 block">
+                            Expires: {new Date(subscriptionExpiresAt).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-200 dark:bg-emerald-900 text-emerald-950 dark:text-emerald-100 px-1.5 py-0.5 rounded-md shrink-0">
+                        {isMasterKey ? 'Master VIP' : '1 Month Pro'}
                       </span>
                     </div>
                   )}
@@ -652,7 +700,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                             setLicenseInput(e.target.value);
                             setLicenseFeedback(null);
                           }}
-                          placeholder="e.g. GR-Test-2026-1"
+                          placeholder="Enter license key"
                           className="flex-1 h-8 px-2.5 text-xs uppercase tracking-wider font-bold rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"
                         />
                         <button
@@ -662,10 +710,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                           Apply
                         </button>
                       </div>
-
-                      <p className="text-[10px] text-slate-400">
-                        Test pattern: <code className="text-purple-600 dark:text-purple-400 font-bold">GR-Test-2026-1</code> to <code className="text-purple-600 dark:text-purple-400 font-bold">GR-Test-2026-5</code>
-                      </p>
                     </form>
                   )}
 
@@ -789,6 +833,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
         isOpen={accountSyncModalOpen}
         onClose={() => setAccountSyncModalOpen(false)}
       />
+
+      {/* Bottom glowing neon transit rail line from branding */}
+      <div className="h-[2px] w-full bg-gradient-to-r from-purple-600 via-fuchsia-400 to-indigo-500 shadow-[0_1px_10px_rgba(217,70,239,0.7)] relative z-20" />
     </header>
   );
 };
