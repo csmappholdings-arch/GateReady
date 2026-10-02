@@ -30,6 +30,7 @@ import { EditBagDialog } from './EditBagDialog';
 import { LuggageQrTagModal } from './LuggageQrTagModal';
 import { PackingPresetsModal } from './PackingPresetsModal';
 import { AddItemDialog } from './AddItemDialog';
+import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
 
 interface BaggageScreenProps {
   trip: Trip;
@@ -72,6 +73,76 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     const found = trip.bags.find((b) => b.id === selectedBagId);
     return found || trip.bags[0];
   }, [trip.bags, selectedBagId]);
+
+  // Overweight fee avoidance radar
+  const bagWeightAnalysis = useMemo(() => {
+    return (trip.bags || []).map((b) => {
+      const totalWeightLbs = b.items.reduce(
+        (sum, item) => sum + (item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name)) * (item.quantity || 1),
+        0
+      );
+      const capLbs = b.type === 'CHECKED' ? 50 : b.type === 'CARRY_ON' ? 22 : 15;
+      const pct = Math.round((totalWeightLbs / capLbs) * 100);
+      const isOverweight = totalWeightLbs > capLbs;
+      const isNearLimit = totalWeightLbs >= capLbs * 0.85;
+      return {
+        bag: b,
+        totalWeightLbs,
+        capLbs,
+        pct,
+        isOverweight,
+        isNearLimit
+      };
+    });
+  }, [trip.bags]);
+
+  const overweightRiskBag = bagWeightAnalysis.find((b) => b.isOverweight || b.isNearLimit);
+  const lightestBag = useMemo(() => {
+    if (bagWeightAnalysis.length < 2) return null;
+    return [...bagWeightAnalysis].sort((a, b) => a.pct - b.pct)[0];
+  }, [bagWeightAnalysis]);
+
+  const [rebalanceToast, setRebalanceToast] = useState<string | null>(null);
+
+  const handleSmartRebalance = () => {
+    if (!isPro) {
+      openPaywall("Smart Bag Rebalancer is a Gate Ready Pro feature. Upgrade to automatically shift items between bags and avoid $100-$150 airline overweight penalty fees.");
+      return;
+    }
+
+    if (!overweightRiskBag || !lightestBag || overweightRiskBag.bag.id === lightestBag.bag.id) {
+      setRebalanceToast("Bags are already safely balanced!");
+      setTimeout(() => setRebalanceToast(null), 3500);
+      return;
+    }
+
+    // Find the heaviest item from the overweight risk bag
+    const candidateItems = [...overweightRiskBag.bag.items].sort((a, b) => {
+      const wA = (a.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(a.name));
+      const wB = (b.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(b.name));
+      return wB - wA;
+    });
+
+    const itemToMove = candidateItems[0];
+    if (!itemToMove) {
+      setRebalanceToast("No items found to rebalance.");
+      setTimeout(() => setRebalanceToast(null), 3000);
+      return;
+    }
+
+    removeItem(trip.id, overweightRiskBag.bag.id, itemToMove.id);
+    addItemToBag(
+      trip.id,
+      lightestBag.bag.id,
+      itemToMove.name,
+      itemToMove.location,
+      itemToMove.quantity,
+      itemToMove.packedFor
+    );
+
+    setRebalanceToast(`Rebalanced! Moved "${itemToMove.name}" to ${lightestBag.bag.label} to avoid airline penalty fees.`);
+    setTimeout(() => setRebalanceToast(null), 4000);
+  };
 
   const getBagIcon = (type: BagType) => {
     switch (type) {
@@ -276,6 +347,58 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           >
             Upgrade
           </button>
+        </div>
+      )}
+
+      {/* Destination Weather & Clothing Advisor (Quick Access on Packing Screen) */}
+      <DestinationWeatherAdvisor trip={trip} />
+
+      {/* Airline Overweight Risk Radar & Bag Rebalancer Banner */}
+      {overweightRiskBag && (
+        <div className={`p-4 rounded-3xl border-2 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md ${
+          overweightRiskBag.isOverweight
+            ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-100'
+            : 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-100'
+        }`}>
+          <div className="flex items-start gap-3">
+            <div className={`p-2 rounded-2xl shrink-0 ${overweightRiskBag.isOverweight ? 'bg-rose-600 text-white' : 'bg-amber-500 text-white'}`}>
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider">
+                  {overweightRiskBag.isOverweight ? 'High Overweight Risk ($100-$150 Airline Penalty)' : 'Airline Overweight Warning (85%+ Capacity)'}
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-white/70 dark:bg-black/40">
+                  {overweightRiskBag.bag.label}: {Math.round(overweightRiskBag.totalWeightLbs)} / {overweightRiskBag.capLbs} lbs ({overweightRiskBag.pct}%)
+                </span>
+              </div>
+              <p className="text-xs mt-0.5 opacity-90 leading-relaxed">
+                Major airlines charge steep fees for bags over limits. Shift dense items into {lightestBag?.bag.label || 'another bag'} to travel free of fees.
+              </p>
+              {rebalanceToast && (
+                <p className="text-xs font-black text-purple-700 dark:text-purple-300 mt-1.5 flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>{rebalanceToast}</span>
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <button
+              type="button"
+              onClick={handleSmartRebalance}
+              className={`h-9 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 ${
+                isPro
+                  ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                  : 'bg-amber-400 hover:bg-amber-500 text-purple-950'
+              }`}
+            >
+              <Scale className="w-4 h-4" />
+              <span>{isPro ? 'Auto-Rebalance Bags' : 'Unlock Rebalance (Pro)'}</span>
+            </button>
+          </div>
         </div>
       )}
 

@@ -32,6 +32,7 @@ import {
   Zap,
   Key,
   CreditCard,
+  Thermometer,
   X
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
@@ -51,6 +52,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
     selectTrip,
     weightUnit,
     toggleWeightUnit,
+    tempUnit,
+    toggleTempUnit,
     isDarkMode,
     setDarkMode,
     resetAllPacked,
@@ -150,14 +153,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 backdrop-blur-md border-b border-purple-900/40 shadow-lg shadow-purple-950/30 transition-colors">
+    <header className="sticky top-0 z-40 bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 dark:from-purple-700 dark:via-purple-600 dark:to-indigo-800 text-white backdrop-blur-md border-b border-purple-300/60 dark:border-purple-400/50 shadow-lg shadow-purple-600/20 transition-colors">
+      {/* Top luminous accent edge */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-fuchsia-300 via-white/80 to-purple-200 opacity-90" />
+
       {/* Background blueprint circuit lines accent from branding */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div 
-          className="absolute inset-0 opacity-15 dark:opacity-20 bg-[radial-gradient(#c084fc_1px,transparent_1px)] [background-size:20px_20px]" 
+          className="absolute inset-0 opacity-20 dark:opacity-25 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" 
         />
         <div 
-          className="absolute -top-16 left-1/3 w-80 h-24 bg-fuchsia-600/20 blur-3xl" 
+          className="absolute -top-16 left-1/3 w-96 h-28 bg-fuchsia-400/25 blur-3xl" 
         />
       </div>
 
@@ -210,6 +216,33 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
 
         {/* Center / Right: Action Buttons, Upgrade, Sync & Menus */}
         <div className="flex items-center gap-2">
+          {/* Direct Quick Unit Toggles (Temp & Weight) */}
+          <div className="flex items-center gap-0.5 bg-purple-900/40 dark:bg-purple-950/70 p-0.5 sm:p-1 rounded-xl border border-purple-300/40 dark:border-purple-600/50 shadow-inner shrink-0">
+            <button
+              type="button"
+              onClick={toggleTempUnit}
+              className={`px-1.5 sm:px-2 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1 ${
+                tempUnit === 'C'
+                  ? 'bg-purple-100 text-purple-950 shadow-xs'
+                  : 'text-purple-100 hover:bg-white/15'
+              }`}
+              title="Toggle Temperature Unit: Currently °F / °C"
+            >
+              <Thermometer className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+              <span>°{tempUnit}</span>
+            </button>
+            <div className="w-[1px] h-3.5 bg-purple-300/30" />
+            <button
+              type="button"
+              onClick={toggleWeightUnit}
+              className="px-1.5 sm:px-2 py-1 rounded-lg text-xs font-black text-purple-100 hover:bg-white/15 transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1"
+              title="Toggle Weight Unit: Currently LBS / KG"
+            >
+              <Scale className="w-3.5 h-3.5 text-purple-200 shrink-0" />
+              <span>{weightUnit}</span>
+            </button>
+          </div>
+
           {/* Pro Upgrade / Badge Button */}
           {!isPro ? (
             <button
@@ -276,11 +309,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   }
                 }}
                 disabled={authLoading}
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-100 text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
+                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
                 title="Sign in with Google or Email to sync trips across devices"
               >
-                <Cloud className="w-4 h-4 text-fuchsia-400 shrink-0" />
-                <span>Sync Account</span>
+                <Cloud className="w-4 h-4 text-fuchsia-300 shrink-0" />
+                <span className="hidden sm:inline">Sync Account</span>
+                <span className="sm:hidden text-[11px]">Sync</span>
               </button>
             )}
 
@@ -472,11 +506,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
               setUserMenuOpen(false);
               openWalletModal();
             }}
-            className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Travel Wallet & Loyalty Numbers"
             aria-label="Travel Wallet & Loyalty Numbers"
           >
-            <CreditCard className="w-4 h-4 text-fuchsia-400" />
+            <CreditCard className="w-4 h-4 text-fuchsia-300" />
             <span className="hidden md:inline text-xs font-bold">Wallet</span>
             {walletAccounts.length > 0 && (
               <span className="w-4 h-4 rounded-full bg-fuchsia-600 text-white text-[9px] font-bold flex items-center justify-center">
@@ -492,10 +526,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                 setSettingsOpen(!settingsOpen);
                 setUserMenuOpen(false);
               }}
-              className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer"
               aria-label="Settings"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4 text-white" />
             </button>
 
             {settingsOpen && (
@@ -744,6 +778,27 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                     className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors cursor-pointer"
                   >
                     {weightUnit === 'LBS' ? 'Switch to KG' : 'Switch to LBS'}
+                  </button>
+                </div>
+
+                {/* Temperature Unit Switch (°F / °C) */}
+                <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <Thermometer className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <div>
+                      <p className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                        Temperature Unit
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        Currently: {tempUnit === 'F' ? 'Fahrenheit (°F)' : 'Celsius (°C)'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={toggleTempUnit}
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors cursor-pointer"
+                  >
+                    {tempUnit === 'F' ? 'Switch to °C' : 'Switch to °F'}
                   </button>
                 </div>
 

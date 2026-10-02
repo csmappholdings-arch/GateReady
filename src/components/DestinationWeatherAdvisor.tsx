@@ -44,9 +44,8 @@ interface PackingRecommendation {
 }
 
 export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps> = ({ trip }) => {
-  const { updateTripDetails, addItemToBag, selectedBagId } = usePacking();
+  const { updateTripDetails, addItemToBag, selectedBagId, tempUnit, setTempUnit } = usePacking();
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [tempUnit, setTempUnit] = useState<'F' | 'C'>('F');
   const [isEditingDestination, setIsEditingDestination] = useState(false);
   const [destinationInput, setDestinationInput] = useState(trip.destinationCity || trip.name || 'London, UK');
   const [addedItemNames, setAddedItemNames] = useState<Set<string>>(new Set());

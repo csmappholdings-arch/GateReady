@@ -40,9 +40,10 @@ interface AddTripDialogProps {
   isOpen: boolean;
   onClose: () => void;
   initialTravelType?: TravelType;
+  initialDestinationCity?: string;
 }
 
-export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, initialTravelType }) => {
+export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, initialTravelType, initialDestinationCity }) => {
   const { addTrip } = usePacking();
   const { isPro, canAddTraveler, canAddBag, openPaywall } = useSubscription();
   const { user } = useAuth();
@@ -131,7 +132,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
           : 'Main Cabin'
       );
       setOriginCity('');
-      setDestinationCity('');
+      setDestinationCity(initialDestinationCity || '');
+      if (initialDestinationCity && !name) {
+        setName(`${initialDestinationCity.split(' ')[0]} Trip`);
+      }
       setDepartureDate('');
       setDepartureTime('');
       setReturnTripDate('');
@@ -146,7 +150,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
         { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: defaultUser }
       ]);
     }
-  }, [isOpen, user, initialTravelType]);
+  }, [isOpen, user, initialTravelType, initialDestinationCity]);
 
   // Keyboard Escape handler
   useEffect(() => {

@@ -17,6 +17,9 @@ interface PackingContextType {
   currentTrip: Trip | null;
   selectedBagId: string | null;
   weightUnit: WeightUnit;
+  tempUnit: 'F' | 'C';
+  toggleTempUnit: () => void;
+  setTempUnit: (unit: 'F' | 'C') => void;
   isDarkMode: boolean;
   activePackerFilter: string; // 'ALL' or family member name
   cloudSyncStatus: CloudSyncStatus;
@@ -61,7 +64,7 @@ interface PackingContextType {
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags'>>
   ) => void;
   updateLuggageTag: (
     tripId: string,
@@ -102,6 +105,7 @@ const PackingContext = createContext<PackingContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'gateready_trips_data_v2';
 const UNIT_KEY = 'gateready_weight_unit';
+const TEMP_UNIT_KEY = 'gateready_temp_unit_v1';
 const THEME_KEY = 'gateready_dark_mode';
 
 export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -155,6 +159,16 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return 'LBS';
   });
 
+  const [tempUnit, setTempUnit] = useState<'F' | 'C'>(() => {
+    try {
+      const saved = localStorage.getItem(TEMP_UNIT_KEY);
+      if (saved === 'C' || saved === 'F') return saved;
+    } catch {
+      // Ignore
+    }
+    return 'F';
+  });
+
   // Light mode by default unless user explicitly chose dark
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     try {
@@ -199,6 +213,15 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Ignore
     }
   }, [weightUnit]);
+
+  // Persist temperature unit
+  useEffect(() => {
+    try {
+      localStorage.setItem(TEMP_UNIT_KEY, tempUnit);
+    } catch {
+      // Ignore
+    }
+  }, [tempUnit]);
 
   // Reference to current trips to avoid dependency loops in subscription
   const tripsRef = useRef(trips);
@@ -335,6 +358,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const toggleWeightUnit = () => {
     setWeightUnit((prev) => (prev === 'LBS' ? 'KG' : 'LBS'));
+  };
+
+  const toggleTempUnit = () => {
+    setTempUnit((prev) => (prev === 'F' ? 'C' : 'F'));
   };
 
   const setDarkMode = (isDark: boolean) => {
@@ -1108,6 +1135,9 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         selectTrip,
         setSelectedBagId,
         toggleWeightUnit,
+        tempUnit,
+        toggleTempUnit,
+        setTempUnit,
         setDarkMode,
         addTrip,
         loadDemoTrip,

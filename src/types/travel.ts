@@ -84,7 +84,8 @@ export interface Trip {
   isReturnRepackMode?: boolean; // whether traveler has switched to return flight repacking
   returnTripDate?: string;
   returnTripTime?: string;
-  souvenirBufferEnabled?: boolean; // alert when bag weight exceeds 75% to leave room for souvenirs
+  souvenirBufferEnabled?: boolean; // alert when bag weight exceeds threshold to leave room for souvenirs
+  souvenirBufferLbs?: number; // reserved weight buffer in lbs (default 5.0 lbs)
   luggageTags?: Record<string, LuggageTagInfo>;
   gateChecklist?: {
     id: string;

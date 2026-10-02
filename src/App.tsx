@@ -46,6 +46,7 @@ function PackingAppContent() {
   const [currentScreen, setCurrentScreen] = useState<'Bags' | 'Checklist' | 'CabinIntel' | 'Allowances' | 'GateReady'>('Bags');
   const [showAddTripModal, setShowAddTripModal] = useState(false);
   const [selectedTravelTypeForAdd, setSelectedTravelTypeForAdd] = useState<TravelType | undefined>(undefined);
+  const [selectedDestinationForAdd, setSelectedDestinationForAdd] = useState<string | undefined>(undefined);
   const [addTripKey, setAddTripKey] = useState(0);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddBagModal, setShowAddBagModal] = useState(false);
@@ -53,8 +54,9 @@ function PackingAppContent() {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
 
-  const handleOpenAddTrip = (travelType?: TravelType) => {
+  const handleOpenAddTrip = (travelType?: TravelType, destinationCity?: string) => {
     setSelectedTravelTypeForAdd(travelType);
+    setSelectedDestinationForAdd(destinationCity);
     setAddTripKey((prev) => prev + 1);
     setShowAddTripModal(true);
   };
@@ -334,6 +336,7 @@ function PackingAppContent() {
         isOpen={showAddTripModal}
         onClose={() => setShowAddTripModal(false)}
         initialTravelType={selectedTravelTypeForAdd}
+        initialDestinationCity={selectedDestinationForAdd}
       />
 
       {showAddItemModal && currentTrip && currentBag && (
