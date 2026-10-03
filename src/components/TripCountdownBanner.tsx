@@ -50,10 +50,8 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
     }
   }, [trip.departureDate, trip.departureTime, trip.returnTripDate, isPro]);
 
-  // Live 1-second interval ticking timer for Pro users
+  // Live countdown timer calculation for all users
   useEffect(() => {
-    if (!isPro) return;
-
     const calculateTime = () => {
       const targetDateStr = activeLeg === 'departure' ? trip.departureDate : trip.returnTripDate;
       const targetTimeStr = activeLeg === 'departure' ? trip.departureTime || '09:00' : trip.returnTripTime || '17:00';
@@ -95,7 +93,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
     calculateTime();
     const interval = setInterval(calculateTime, 1000);
     return () => clearInterval(interval);
-  }, [isPro, trip.departureDate, trip.departureTime, trip.returnTripDate, trip.returnTripTime, activeLeg]);
+  }, [trip.departureDate, trip.departureTime, trip.returnTripDate, trip.returnTripTime, activeLeg]);
 
   // Pad numbers with leading zero
   const padZero = (n: number) => n.toString().padStart(2, '0');
@@ -107,74 +105,13 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
       return d.toLocaleDateString(undefined, { 
         weekday: 'short', 
         month: 'short', 
-        day: 'numeric',
+        day: 'numeric', 
         year: 'numeric'
       }) + (timeStr ? ` at ${timeStr}` : '');
     } catch {
       return dateStr;
     }
   };
-
-  // =========================================================================
-  // 1. FREE ACCOUNT: HIDDEN BEHIND "UPGRADE TO PRO" BANNER
-  // =========================================================================
-  if (!isPro) {
-    return (
-      <div className="w-full rounded-3xl bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 text-white border border-purple-500/30 shadow-xl overflow-hidden mb-3.5 p-4 sm:p-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-            <div className="w-11 h-11 rounded-2xl bg-amber-400/20 text-amber-300 flex items-center justify-center border border-amber-300/30 shrink-0">
-              <Crown className="w-5 h-5 fill-amber-300 text-amber-300" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-white">
-                  Flight Countdown Clock
-                </span>
-                <span className="bg-amber-400 text-purple-950 font-black px-2 py-0.5 rounded-md text-[10px] tracking-wider uppercase flex items-center gap-1 shadow-xs">
-                  <Lock className="w-3 h-3" /> PRO ONLY
-                </span>
-              </div>
-              <p className="text-xs text-purple-200/80 mt-1 leading-relaxed">
-                Upgrade to Pro to unlock live departure countdowns, return flight tracking, and auto-adjusting travel leg timers.
-              </p>
-
-              {/* Locked Preview Clocks */}
-              <div className="flex items-center gap-1.5 sm:gap-2 pt-2 text-purple-300/50 font-mono text-xs font-bold select-none">
-                <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 flex items-center gap-1">
-                  <Lock className="w-2.5 h-2.5 text-amber-400/80" /> -- Days
-                </span>
-                <span>:</span>
-                <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
-                  -- Hours
-                </span>
-                <span>:</span>
-                <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
-                  -- Mins
-                </span>
-                <span>:</span>
-                <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
-                  -- Secs
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="shrink-0 self-start md:self-center">
-            <button
-              type="button"
-              onClick={() => openPaywall("Flight Countdown Clock and Return Trip Tracking are exclusive to Gate Ready Pro. Upgrade to unlock real-time departure and return flight timers.")}
-              className="w-full sm:w-auto h-10 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-purple-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>Upgrade to Pro to Unlock</span>
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // =========================================================================
   // 2. PRO UNLOCKED: FULL INTERACTIVE COUNTDOWN CLOCK & DUAL-LEG TIMERS
@@ -192,9 +129,15 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
           <span className="text-xs font-black uppercase tracking-wider text-purple-200">
             Flight Countdown Clock
           </span>
-          <span className="inline-flex items-center gap-0.5 bg-purple-500/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-amber-300/30">
-            <Crown className="w-2.5 h-2.5 fill-amber-300" /> Pro Unlocked
-          </span>
+          {isPro ? (
+            <span className="inline-flex items-center gap-0.5 bg-purple-500/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-amber-300/30">
+              <Crown className="w-2.5 h-2.5 fill-amber-300" /> Pro Unlocked
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-emerald-400/30">
+              Live Ticking
+            </span>
+          )}
           {(trip.originCity || trip.destinationCity) && (
             <span className="text-[11px] text-purple-300/80 hidden sm:inline">
               · {trip.originCity || 'Origin'} ➔ {trip.destinationCity || trip.name}
