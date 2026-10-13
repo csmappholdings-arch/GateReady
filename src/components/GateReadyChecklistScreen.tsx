@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { usePacking } from '../context/PackingContext';
-import { Trip } from '../types/travel';
+import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
+import { PrintPackingListModal } from './PrintPackingListModal';
 import { 
   CheckCircle2, 
   AlertCircle, 
@@ -14,7 +15,9 @@ import {
   Plus,
   Users,
   User,
-  Droplets
+  Droplets,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface GateReadyChecklistScreenProps {
@@ -22,8 +25,19 @@ interface GateReadyChecklistScreenProps {
 }
 
 export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> = ({ trip }) => {
-  const { weightUnit, toggleGateCheckItem } = usePacking();
+  const { weightUnit, toggleGateCheckItem, toggleItemPacked } = usePacking();
   const [copied, setCopied] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [expandedBagIds, setExpandedBagIds] = useState<Record<string, boolean>>(() => 
+    Object.fromEntries(trip.bags.map(b => [b.id, true]))
+  );
+
+  const toggleBagExpanded = (bagId: string) => {
+    setExpandedBagIds(prev => ({
+      ...prev,
+      [bagId]: !prev[bagId]
+    }));
+  };
 
   // Packing statistics
   const totalItemsCount = trip.bags.reduce((sum, b) => sum + b.items.length, 0);
@@ -42,13 +56,14 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
   const overallReadyPct = Math.round((packingPct * 0.6) + (gatePct * 0.4));
   const isGateReady = overallReadyPct >= 95;
 
-  // Total weight across all bags
+  // Total weight across all bags (including empty luggage tare weights)
   const totalTripWeightLbs = trip.bags.reduce((total, bag) => {
+    const emptyLbs = getBagEmptyWeightLbs(bag);
     const bagLbs = bag.items.reduce((bSum, item) => {
       const w = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
       return bSum + w * item.quantity;
     }, 0);
-    return total + bagLbs;
+    return total + emptyLbs + bagLbs;
   }, 0);
 
   const displayTotalWeight = weightUnit === 'KG'
@@ -65,13 +80,16 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
     summary += `Packed: ${packedItemsCount}/${totalItemsCount} items (${packingPct}%)\n\n`;
 
     trip.bags.forEach((bag) => {
-      const bagWeightLbs = bag.items.reduce((sum, item) => {
+      const emptyLbs = getBagEmptyWeightLbs(bag);
+      const itemsLbs = bag.items.reduce((sum, item) => {
         const w = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
         return sum + w * item.quantity;
       }, 0);
+      const bagWeightLbs = emptyLbs + itemsLbs;
       const bagWeightStr = DefaultSuggestions.formatWeight(bagWeightLbs, weightUnit);
+      const shellStr = bag.material === 'FABRIC' ? 'Fabric' : 'Hard Shell';
 
-      summary += `📦 ${bag.label} (${bag.type}) - Owner: ${bag.assignedTo || 'Family'} - Est: ${bagWeightStr}\n`;
+      summary += `📦 ${bag.label} (${bag.type} - ${shellStr}) - Owner: ${bag.assignedTo || 'Family'} - Est: ${bagWeightStr}\n`;
       bag.items.forEach((item) => {
         const mark = item.isPacked ? '[x]' : '[ ]';
         const forWhom = item.packedFor ? ` [For: ${item.packedFor}]` : '';
@@ -91,7 +109,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
   };
 
   const handlePrint = () => {
-    window.print();
+    setShowPrintModal(true);
   };
 
   return (
@@ -239,10 +257,12 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
 
         <div className="space-y-3">
           {trip.bags.map((bag) => {
-            const bagWeightLbs = bag.items.reduce((sum, item) => {
+            const emptyLbs = getBagEmptyWeightLbs(bag);
+            const itemsLbs = bag.items.reduce((sum, item) => {
               const w = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
               return sum + w * item.quantity;
             }, 0);
+            const bagWeightLbs = emptyLbs + itemsLbs;
 
             const displayBagWeight = weightUnit === 'KG'
               ? DefaultSuggestions.convertLbsToKg(bagWeightLbs).toFixed(1) + ' kg'
@@ -299,10 +319,84 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 font-medium">
-                  <span>{bag.items.length} items packed inside</span>
-                  <span>{pct}% of limit</span>
+                <div className="flex items-center justify-between text-xs text-slate-500 mt-2 font-medium">
+                  <button
+                    type="button"
+                    onClick={() => toggleBagExpanded(bag.id)}
+                    className="text-purple-700 dark:text-purple-300 font-bold text-xs flex items-center gap-1 hover:underline cursor-pointer"
+                  >
+                    <span>{bag.items.length} items packed in this bag</span>
+                    {expandedBagIds[bag.id] ? (
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                  <span className="text-[11px] font-bold text-slate-400">{pct}% of limit</span>
                 </div>
+
+                {/* Itemized List of Packed Items in this Bag */}
+                {expandedBagIds[bag.id] && (
+                  <div className="mt-3 pt-3 border-t border-purple-100 dark:border-purple-900/40 space-y-1.5">
+                    {bag.items.length === 0 ? (
+                      <p className="text-xs text-slate-400 italic py-1">No items added to this bag yet.</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {bag.items.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => toggleItemPacked(trip.id, bag.id, item.id)}
+                            className={`flex items-center justify-between p-2 rounded-xl text-xs transition-colors cursor-pointer ${
+                              item.isPacked 
+                                ? 'bg-emerald-50/60 dark:bg-emerald-950/20 text-slate-700 dark:text-slate-300' 
+                                : 'bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 hover:bg-purple-50/80 dark:hover:bg-purple-950/30'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ${
+                                item.isPacked 
+                                  ? 'bg-emerald-600 border-emerald-600 text-white' 
+                                  : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                              }`}>
+                                {item.isPacked && <Check className="w-3 h-3 stroke-[3]" />}
+                              </div>
+                              <div className="truncate">
+                                <span className={`font-semibold ${item.isPacked ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
+                                  {item.name}
+                                </span>
+                                {item.quantity > 1 && (
+                                  <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 ml-1.5 bg-purple-100 dark:bg-purple-950 px-1.5 py-0.2 rounded">
+                                    x{item.quantity}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0 text-[11px]">
+                              {item.location && (
+                                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-purple-100/70 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-medium text-[10px]">
+                                  {item.location}
+                                </span>
+                              )}
+                              {item.packedFor && item.packedFor !== bag.assignedTo && (
+                                <span className="text-[10px] font-bold text-slate-500">
+                                  For: {item.packedFor}
+                                </span>
+                              )}
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                item.isPacked 
+                                  ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300' 
+                                  : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300'
+                              }`}>
+                                {item.isPacked ? 'Packed' : 'To Pack'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -316,7 +410,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
             Share or Export Packing Manifest
           </h4>
           <p className="text-[11px] text-slate-500 mt-0.5">
-            Copy the full checklist with travelers, weights, and locations to clipboard or print a hardcopy.
+            Print a complete hardcopy or save PDF with every bag, itemized packing list, and weight allowances.
           </p>
         </div>
 
@@ -347,6 +441,13 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
           </button>
         </div>
       </div>
+
+      {/* Full Print Packing List & Baggage Manifest Modal */}
+      <PrintPackingListModal
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        trip={trip}
+      />
     </div>
   );
 };

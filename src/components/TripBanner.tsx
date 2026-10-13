@@ -131,7 +131,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   // Active Trip Banner with full location, carrier, and level of seat details!
   return (
     <div className="w-full bg-gradient-to-r from-purple-50/90 via-white to-purple-50/60 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs transition-colors">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3">
         {/* Prominent Trip Countdown Clock Banner Above Trip Info */}
         <TripCountdownBanner
           trip={currentTrip}
@@ -139,7 +139,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         />
 
         {/* Top bar of banner: Trip dropdown selector & edit action */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-purple-100/70 dark:border-purple-900/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-purple-100/70 dark:border-purple-900/40">
           {/* Trip Selector Dropdown Trigger Button */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -156,7 +156,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-purple-500 group-hover:translate-y-0.5 transition-transform" />
                 </div>
-                <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate max-w-[240px] sm:max-w-md">
+                <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   {currentTrip.name || 'Untitled Trip'}
                 </h1>
               </div>
@@ -481,11 +481,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
           </form>
         )}
 
-        {/* The 3 Main Information Pillars: Location, Carrier, Level of Seat */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
+        {/* Condensed Information Deck: Location, Carrier, Level of Seat (No Truncate Clipping) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
           {/* 1. Trip Location Card */}
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-purple-100 dark:border-purple-900/60 shadow-2xs flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0">
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-slate-800/90 border border-purple-100 dark:border-purple-900/60 shadow-2xs flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0">
               {getTravelIcon(currentTrip.travelType)}
             </div>
             <div className="min-w-0 flex-1">
@@ -496,21 +496,21 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  currentTrip.travelType === 'CAR' ? 'Driving Route' :
                  'Airports & Route'}
               </span>
-              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate mt-0.5">
-                {currentTrip.name || 'Not specified'}
+              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
+                {currentTrip.name || 'Trip Route'}
               </p>
-              {(currentTrip.originCity || currentTrip.destinationCity) && (
-                <p className="text-[11px] text-purple-600 dark:text-purple-300 font-semibold truncate">
-                  {currentTrip.originCity || 'Origin'} → {currentTrip.destinationCity || currentTrip.name}
-                </p>
-              )}
+              <p className="text-[11px] text-purple-600 dark:text-purple-300 font-semibold leading-tight mt-0.5">
+                {(currentTrip.originCity || currentTrip.destinationCity)
+                  ? `${currentTrip.originCity || 'Origin'} ➔ ${currentTrip.destinationCity || currentTrip.name}`
+                  : 'Direct Travel Itinerary'}
+              </p>
             </div>
           </div>
 
           {/* 2. Carrier / Airline Card */}
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-purple-100 dark:border-purple-900/60 shadow-2xs flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5" />
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-slate-800/90 border border-purple-100 dark:border-purple-900/60 shadow-2xs flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0">
+              <Building2 className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
               <span className="block text-[10px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
@@ -520,16 +520,21 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  currentTrip.travelType === 'BUS' ? 'Bus Operator' :
                  'Airline / Carrier'}
               </span>
-              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate mt-0.5">
-                {currentTrip.companyName || 'Not specified'}
+              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
+                {currentTrip.companyName || 'Carrier Unspecified'}
+              </p>
+              <p className="text-[11px] text-indigo-600 dark:text-indigo-300 font-semibold leading-tight mt-0.5">
+                {currentTrip.flightNumber
+                  ? `Flight / Route #${currentTrip.flightNumber}`
+                  : 'Standard Carrier Allowances'}
               </p>
             </div>
           </div>
 
           {/* 3. Level of Seat / Cabin Class Card */}
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-purple-100 dark:border-purple-900/60 shadow-2xs flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-950 text-fuchsia-600 dark:text-fuchsia-300 flex items-center justify-center shrink-0">
-              <Armchair className="w-5 h-5" />
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-slate-800/90 border border-purple-100 dark:border-purple-900/60 shadow-2xs flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-950 text-fuchsia-600 dark:text-fuchsia-300 flex items-center justify-center shrink-0">
+              <Armchair className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
               <span className="block text-[10px] font-black uppercase tracking-wider text-fuchsia-700 dark:text-fuchsia-400">
@@ -539,15 +544,20 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  currentTrip.travelType === 'BUS' ? 'Seat Type' :
                  'Level of Seat / Class'}
               </span>
-              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate mt-0.5">
-                {currentTrip.seatClassOrCarSize || 'Not specified'}
+              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
+                {currentTrip.seatClassOrCarSize || 'Standard Main Cabin'}
+              </p>
+              <p className="text-[11px] text-fuchsia-600 dark:text-fuchsia-300 font-semibold leading-tight mt-0.5">
+                {currentTrip.aircraftType
+                  ? `Aircraft: ${currentTrip.aircraftType}`
+                  : 'Overhead Bin & In-Seat Specs'}
               </p>
             </div>
           </div>
         </div>
 
         {/* Secondary Info Line: Departure Date, Return Date, Travelers, Bags Count */}
-        <div className="flex items-center gap-4 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-2.5 pt-2 border-t border-purple-50 dark:border-purple-950/60 font-medium">
+        <div className="flex items-center gap-4 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-purple-50 dark:border-purple-950/60 font-medium">
           {currentTrip.departureDate && (
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />

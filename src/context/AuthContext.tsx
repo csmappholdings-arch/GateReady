@@ -48,6 +48,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (err.code === 'auth/popup-closed-by-user') {
       return null;
     }
+    if (err.code === 'auth/popup-blocked') {
+      const msg = `The sign-in popup was blocked by your browser. Please allow popups for this page or sign in using email and password.`;
+      setError(msg);
+      const friendlyErr = new Error(msg);
+      (friendlyErr as any).code = 'auth/popup-blocked';
+      return friendlyErr;
+    }
     if (err.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
       const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'current domain';
       const msg = `Domain "${currentHost}" is not yet added to Firebase Authorized Domains for Google OAuth. You can use instant Email Sign-In below without any setup, or add "${currentHost}" in Firebase Console.`;

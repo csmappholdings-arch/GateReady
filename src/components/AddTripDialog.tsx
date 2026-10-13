@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
-import { TravelType, BagType } from '../types/travel';
+import { TravelType, BagType, BagMaterial, getUserPresetWeightLbs } from '../types/travel';
 import { 
   X, 
   Plus, 
@@ -28,6 +28,8 @@ import {
   Briefcase, 
   CheckCircle2,
   HelpCircle,
+  Shield,
+  Layers,
   Zap,
   Maximize2,
   Minimize2,
@@ -45,7 +47,7 @@ interface AddTripDialogProps {
 
 export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, initialTravelType, initialDestinationCity }) => {
   const { addTrip } = usePacking();
-  const { isPro, canAddTraveler, canAddBag, openPaywall } = useSubscription();
+  const { isPro, tier, canAddTraveler, canAddBag, canAddTrip, openPaywall } = useSubscription();
   const { user } = useAuth();
 
   // Dialog expand/fullscreen mode (default: expanded for spacious, easy-to-read view)
@@ -92,9 +94,15 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
   const [travelerError, setTravelerError] = useState('');
 
   // Default initial bag preset: 1 Carry-on Roller + 1 Personal Backpack (2 bags max for free)
-  const [bags, setBags] = useState<Array<{ type: BagType; label: string; assignedTo?: string }>>([
-    { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: defaultTraveler },
-    { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: defaultTraveler }
+  const [bags, setBags] = useState<Array<{ 
+    type: BagType; 
+    label: string; 
+    assignedTo?: string;
+    material?: BagMaterial;
+    emptyBagWeightLbs?: number;
+  }>>([
+    { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: defaultTraveler, material: 'HARD_SHELL', emptyBagWeightLbs: getUserPresetWeightLbs('CARRY_ON', 'HARD_SHELL') },
+    { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: defaultTraveler, material: 'FABRIC', emptyBagWeightLbs: getUserPresetWeightLbs('PERSONAL', 'FABRIC') }
   ]);
 
   // Adjust default seat class / vehicle label whenever travelType changes
@@ -244,8 +252,20 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
     const primary = familyMembers[0] || 'Traveler';
     if (bundle === 'CARRY_ON_ONLY') {
       setBags([
-        { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: primary },
-        { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: primary }
+        { 
+          type: 'CARRY_ON', 
+          label: 'Carry-On Roller', 
+          assignedTo: primary,
+          material: 'HARD_SHELL',
+          emptyBagWeightLbs: getUserPresetWeightLbs('CARRY_ON', 'HARD_SHELL')
+        },
+        { 
+          type: 'PERSONAL', 
+          label: 'Personal Backpack', 
+          assignedTo: primary,
+          material: 'FABRIC',
+          emptyBagWeightLbs: getUserPresetWeightLbs('PERSONAL', 'FABRIC')
+        }
       ]);
     } else if (bundle === 'CHECKED_PLUS_CARRY') {
       // 3 Bags Bundle: Requires Pro
@@ -254,13 +274,37 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
         return;
       }
       setBags([
-        { type: 'CHECKED', label: 'Checked Suitcase (50 lbs)', assignedTo: primary },
-        { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: primary },
-        { type: 'PERSONAL', label: 'Personal Item / Backpack', assignedTo: primary }
+        { 
+          type: 'CHECKED', 
+          label: 'Checked Suitcase (50 lbs)', 
+          assignedTo: primary,
+          material: 'HARD_SHELL',
+          emptyBagWeightLbs: getUserPresetWeightLbs('CHECKED', 'HARD_SHELL')
+        },
+        { 
+          type: 'CARRY_ON', 
+          label: 'Carry-On Roller', 
+          assignedTo: primary,
+          material: 'HARD_SHELL',
+          emptyBagWeightLbs: getUserPresetWeightLbs('CARRY_ON', 'HARD_SHELL')
+        },
+        { 
+          type: 'PERSONAL', 
+          label: 'Personal Item / Backpack', 
+          assignedTo: primary,
+          material: 'FABRIC',
+          emptyBagWeightLbs: getUserPresetWeightLbs('PERSONAL', 'FABRIC')
+        }
       ]);
     } else if (bundle === 'MINIMALIST') {
       setBags([
-        { type: 'PERSONAL', label: 'Underseat Personal Backpack', assignedTo: primary }
+        { 
+          type: 'PERSONAL', 
+          label: 'Underseat Personal Backpack', 
+          assignedTo: primary,
+          material: 'FABRIC',
+          emptyBagWeightLbs: getUserPresetWeightLbs('PERSONAL', 'FABRIC')
+        }
       ]);
     }
   };
@@ -279,9 +323,18 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
         ? 'Carry-On Roller'
         : 'Checked Suitcase';
 
+    const defaultMat: BagMaterial = type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL';
+    const defaultTare = getUserPresetWeightLbs(type, defaultMat);
+
     setBags([
       ...bags,
-      { type, label: defaultLabel, assignedTo: familyMembers[0] || 'Traveler' }
+      { 
+        type, 
+        label: defaultLabel, 
+        assignedTo: familyMembers[0] || 'Traveler',
+        material: defaultMat,
+        emptyBagWeightLbs: defaultTare
+      }
     ]);
   };
 
@@ -297,7 +350,27 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
       return;
     }
 
-    setBags(bags.map((b, i) => (i === index ? { ...b, type: newType } : b)));
+    setBags(bags.map((b, i) => {
+      if (i !== index) return b;
+      const mat = b.material || (newType === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
+      return { 
+        ...b, 
+        type: newType,
+        material: mat,
+        emptyBagWeightLbs: getUserPresetWeightLbs(newType, mat)
+      };
+    }));
+  };
+
+  const handleUpdateBagMaterial = (index: number, newMat: BagMaterial) => {
+    setBags(bags.map((b, i) => {
+      if (i !== index) return b;
+      return {
+        ...b,
+        material: newMat,
+        emptyBagWeightLbs: getUserPresetWeightLbs(b.type, newMat)
+      };
+    }));
   };
 
   const handleUpdateBagLabel = (index: number, newLabel: string) => {
@@ -933,20 +1006,28 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                     <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                     <span>Who is Traveling? ({familyMembers.length})</span>
                   </div>
-                  {!isPro ? (
+                  {tier === 'FREE' ? (
                     <button
                       type="button"
-                      onClick={() => openPaywall("The Free Plan includes 1 traveler. Upgrade to Pro to pack for whole families.")}
+                      onClick={() => openPaywall("Free Plan includes 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for companions and family.")}
                       className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-200 cursor-pointer"
                     >
                       <Crown className="w-3 h-3 fill-amber-500 text-amber-500" />
                       <span>Free: 1 Traveler</span>
                     </button>
                   ) : (
-                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (tier === 'SILVER' || tier === 'GOLD') {
+                          openPaywall(tier === 'SILVER' ? 'Silver includes 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited).' : 'Gold includes 2 travelers. Upgrade to Platinum for unlimited travelers.');
+                        }
+                      }}
+                      className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full flex items-center gap-1 cursor-pointer"
+                    >
                       <Crown className="w-3 h-3 fill-purple-600 text-purple-600" />
-                      <span>Pro: Unlimited</span>
-                    </span>
+                      <span>{tier === 'PLATINUM' ? 'Platinum: Unlimited' : tier === 'GOLD' ? 'Gold: 2 Travelers' : 'Silver: 1 Traveler'}</span>
+                    </button>
                   )}
                 </div>
 
@@ -1152,7 +1233,37 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                         />
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        {/* Shell Construction Toggle */}
+                        <div className="flex items-center gap-0.5 bg-white/80 dark:bg-slate-700/80 p-0.5 rounded-xl border border-purple-200 dark:border-slate-600">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateBagMaterial(idx, 'HARD_SHELL')}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                              (bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL')) === 'HARD_SHELL'
+                                ? 'bg-purple-600 text-white shadow-2xs'
+                                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                            }`}
+                            title={`Hard Shell preset: ${getUserPresetWeightLbs(bag.type, 'HARD_SHELL')} lbs`}
+                          >
+                            <Shield className="w-2.5 h-2.5" />
+                            <span>Hard ({getUserPresetWeightLbs(bag.type, 'HARD_SHELL')}lb)</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateBagMaterial(idx, 'FABRIC')}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                              (bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL')) === 'FABRIC'
+                                ? 'bg-purple-600 text-white shadow-2xs'
+                                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                            }`}
+                            title={`Fabric preset: ${getUserPresetWeightLbs(bag.type, 'FABRIC')} lbs`}
+                          >
+                            <Layers className="w-2.5 h-2.5" />
+                            <span>Fabric ({getUserPresetWeightLbs(bag.type, 'FABRIC')}lb)</span>
+                          </button>
+                        </div>
+
                         <select
                           value={bag.assignedTo || familyMembers[0]}
                           onChange={(e) => handleUpdateBagAssignee(idx, e.target.value)}

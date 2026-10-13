@@ -67,7 +67,9 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
       onClose();
     } catch (err: any) {
       if (err.code !== 'auth/popup-closed-by-user') {
-        if (err.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
+        if (err.code === 'auth/popup-blocked') {
+          setLocalError('Sign-in popup was blocked by your browser. Please allow popups for this site, or use Email Sign-In below.');
+        } else if (err.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
           setLocalError(`Domain "${currentHostname}" needs to be authorized in Firebase Console for Google OAuth. You can use Email Sign-In below immediately without any setup!`);
         } else {
           setLocalError(err.message || 'Google sign-in failed');

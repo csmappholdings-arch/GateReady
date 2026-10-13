@@ -5,7 +5,8 @@ import { db } from '../lib/firebase';
 import { Bag, BagType } from '../types/travel';
 import { checkLemonRedirectSuccess } from '../lib/lemonSqueezy';
 
-export type SubscriptionTier = 'FREE' | 'PRO';
+export type SubscriptionTier = 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+export type PaidTier = 'SILVER' | 'GOLD' | 'PLATINUM';
 export type BillingCycle = 'monthly' | 'yearly';
 
 // Standard 10 hardcoded licenses providing exactly 1 month of access per use
@@ -60,12 +61,15 @@ interface SubscriptionContextType {
   paywallReason: string | null;
   openPaywall: (reason?: string) => void;
   closePaywall: () => void;
+  upgradeToTier: (tier: PaidTier, cycle: BillingCycle) => Promise<void>;
   upgradeToPro: (cycle: BillingCycle) => Promise<void>;
   cancelSubscription: () => Promise<void>;
   applyLicenseKey: (key: string) => { success: boolean; message: string };
   removeLicenseKey: () => void;
   canAddTraveler: (currentCount: number) => { allowed: boolean; reason?: string };
+  canAddTrip: (currentCount: number) => { allowed: boolean; reason?: string };
   canAddBag: (existingBags: Bag[], newBagType: BagType) => { allowed: boolean; reason?: string };
+  canUseCloudSync: () => boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -77,6 +81,7 @@ const EXPIRY_STORAGE_KEY = 'gateready_subscription_expires_at_v1';
 
 export const MAX_FREE_TRAVELERS = 1;
 export const MAX_FREE_BAGS_TOTAL = 2;
+export const MAX_FREE_ACTIVE_TRIPS = 1;
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -134,7 +139,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const savedKey = localStorage.getItem(LICENSE_STORAGE_KEY);
       if (savedKey) {
         const match = findMatchingLicense(savedKey);
-        if (match?.isMaster) return 'PRO';
+        if (match?.isMaster) return 'PLATINUM';
 
         const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
         if (savedExpiry) {
@@ -143,11 +148,11 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
             return 'FREE';
           }
         }
-        return 'PRO';
+        return 'PLATINUM';
       }
 
       const saved = localStorage.getItem(SUBSCRIPTION_STORAGE_KEY);
-      if (saved === 'PRO') {
+      if (saved === 'SILVER' || saved === 'GOLD' || saved === 'PLATINUM') {
         const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
         if (savedExpiry) {
           const expiryTime = new Date(savedExpiry).getTime();
@@ -155,7 +160,11 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
             return 'FREE';
           }
         }
-        return 'PRO';
+        return saved;
+      }
+      if (saved === 'PRO') {
+        // Map legacy PRO to PLATINUM
+        return 'PLATINUM';
       }
       if (saved === 'FREE') return 'FREE';
     } catch {
@@ -171,7 +180,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch {
       // Ignore
     }
-    return 'monthly';
+    return 'yearly';
   });
 
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
@@ -188,7 +197,9 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const snapshot = await getDoc(userRef);
         if (snapshot.exists()) {
           const data = snapshot.data();
-          if (data.subscriptionTier === 'PRO') {
+          const rawTier = data.subscriptionTier;
+          if (rawTier === 'SILVER' || rawTier === 'GOLD' || rawTier === 'PLATINUM' || rawTier === 'PRO') {
+            const mappedTier: PaidTier = rawTier === 'SILVER' ? 'SILVER' : rawTier === 'GOLD' ? 'GOLD' : 'PLATINUM';
             const isMaster = Boolean(
               data.isMasterKey || 
               (data.manualLicenseKey && isMasterLicense(data.manualLicenseKey))
@@ -210,8 +221,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 }
               }
             } else if (isMounted) {
-              setTier('PRO');
-              setBillingCycle(data.subscriptionBillingCycle || 'monthly');
+              setTier(mappedTier);
+              setBillingCycle(data.subscriptionBillingCycle || 'yearly');
               setSubscriptionExpiresAt(isMaster ? null : (expiresAt || null));
               if (data.manualLicenseKey) {
                 setManualLicenseKey(data.manualLicenseKey);
@@ -229,7 +240,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 }
               }
               try {
-                localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+                localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, mappedTier);
               } catch {
                 // Ignore
               }
@@ -276,7 +287,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     const redirectInfo = checkLemonRedirectSuccess();
     if (redirectInfo?.isSuccess) {
-      upgradeToPro(redirectInfo.cycle);
+      upgradeToTier(redirectInfo.tier, redirectInfo.cycle);
     }
   }, []);
 
@@ -300,7 +311,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setPaywallReason(null);
   };
 
-  const upgradeToPro = async (cycle: BillingCycle) => {
+  const upgradeToTier = async (newTier: PaidTier, cycle: BillingCycle) => {
     const nextPeriod = new Date();
     if (cycle === 'yearly') {
       nextPeriod.setFullYear(nextPeriod.getFullYear() + 1);
@@ -309,13 +320,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
     const expiryStr = nextPeriod.toISOString();
 
-    setTier('PRO');
+    setTier(newTier);
     setBillingCycle(cycle);
     setSubscriptionExpiresAt(expiryStr);
     closePaywall();
 
     try {
-      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, newTier);
+      localStorage.setItem(BILLING_STORAGE_KEY, cycle);
       localStorage.setItem(EXPIRY_STORAGE_KEY, expiryStr);
     } catch {
       // Ignore
@@ -326,7 +338,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       try {
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, {
-          subscriptionTier: 'PRO',
+          subscriptionTier: newTier,
           subscriptionBillingCycle: cycle,
           isSubscribed: true,
           isMasterKey: false,
@@ -337,6 +349,10 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         console.warn('Failed to sync subscription to Firestore:', err);
       }
     }
+  };
+
+  const upgradeToPro = async (cycle: BillingCycle) => {
+    await upgradeToTier('GOLD', cycle);
   };
 
   const cancelSubscription = async () => {
@@ -389,12 +405,12 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // MASTER LICENSE KEY: NEVER EXPIRES
     if (match.isMaster) {
       setManualLicenseKey(validKey);
-      setTier('PRO');
+      setTier('PLATINUM');
       setSubscriptionExpiresAt(null);
 
       try {
         localStorage.setItem(LICENSE_STORAGE_KEY, validKey);
-        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PLATINUM');
         localStorage.removeItem(EXPIRY_STORAGE_KEY);
       } catch {
         // Ignore
@@ -405,7 +421,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setDoc(
           userRef,
           {
-            subscriptionTier: 'PRO',
+            subscriptionTier: 'PLATINUM',
             manualLicenseKey: validKey,
             isSubscribed: true,
             isMasterKey: true,
@@ -420,7 +436,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       return {
         success: true,
-        message: 'Master license verified! Permanent Gate Ready Pro unlocked with lifetime, non-expiring access.'
+        message: 'Master license verified! Permanent Gate Ready Platinum unlocked with lifetime, non-expiring access.'
       };
     }
 
@@ -430,14 +446,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const expiryStr = expiryDate.toISOString();
 
     setManualLicenseKey(validKey);
-    setTier('PRO');
+    setTier('PLATINUM');
     setBillingCycle('monthly');
     setSubscriptionExpiresAt(expiryStr);
 
     try {
       localStorage.setItem(LICENSE_STORAGE_KEY, validKey);
       localStorage.setItem(EXPIRY_STORAGE_KEY, expiryStr);
-      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PRO');
+      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PLATINUM');
       localStorage.setItem(BILLING_STORAGE_KEY, 'monthly');
     } catch {
       // Ignore
@@ -448,7 +464,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setDoc(
         userRef,
         {
-          subscriptionTier: 'PRO',
+          subscriptionTier: 'PLATINUM',
           subscriptionBillingCycle: 'monthly',
           manualLicenseKey: validKey,
           isSubscribed: true,
@@ -470,7 +486,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     return {
       success: true,
-      message: `Pro license verified! 1 month of Gate Ready Pro activated (valid until ${formattedExpiry}).`
+      message: `Pro license verified! 1 month of Gate Ready Platinum activated (valid until ${formattedExpiry}).`
     };
   };
 
@@ -506,31 +522,83 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  // Rule 1: Free plan allows only 1 free traveler. More travelers require PRO.
+  // Rule 1: Travelers limit
+  // Free: 1 traveler
+  // Silver: 1 traveler
+  // Gold: 2 travelers
+  // Platinum: Unlimited travelers
   const canAddTraveler = (currentCount: number) => {
-    if (tier === 'PRO') {
+    if (tier === 'PLATINUM' || isMasterKey) {
       return { allowed: true };
     }
+    if (tier === 'GOLD') {
+      if (currentCount >= 2) {
+        return {
+          allowed: false,
+          reason: 'Gold plan includes up to 2 travelers. Upgrade to Platinum for unlimited travelers and family sharing.'
+        };
+      }
+      return { allowed: true };
+    }
+    if (tier === 'SILVER') {
+      if (currentCount >= 1) {
+        return {
+          allowed: false,
+          reason: 'Silver plan includes 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for companions.'
+        };
+      }
+      return { allowed: true };
+    }
+    // Free plan
     if (currentCount >= MAX_FREE_TRAVELERS) {
       return {
         allowed: false,
-        reason: `The Free Plan allows only 1 traveler. Upgrade to Gate Ready Pro to pack for multiple family members, kids, or group travelers.`
+        reason: 'Free plan allows only 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for multiple family members or kids.'
       };
     }
     return { allowed: true };
   };
 
-  // Rule 2: Free plan limits user to max 2 bags total and 1 of each bag type.
-  // Adding more than 2 bags or a duplicate bag type requires PRO subscription.
+  // Rule 2: Active trips limit
+  // Free: 1 active trip
+  // Silver: 2 active trips
+  // Gold: Unlimited
+  // Platinum: Unlimited
+  const canAddTrip = (currentCount: number) => {
+    if (tier === 'PLATINUM' || tier === 'GOLD' || isMasterKey) {
+      return { allowed: true };
+    }
+    if (tier === 'SILVER') {
+      if (currentCount >= 2) {
+        return {
+          allowed: false,
+          reason: 'Silver plan includes 2 active trips. Upgrade to Gold or Platinum for unlimited active trips.'
+        };
+      }
+      return { allowed: true };
+    }
+    // Free plan
+    if (currentCount >= MAX_FREE_ACTIVE_TRIPS) {
+      return {
+        allowed: false,
+        reason: 'Free plan allows 1 active trip. Upgrade to Silver for 2 active trips, or Gold / Platinum for unlimited active trips.'
+      };
+    }
+    return { allowed: true };
+  };
+
+  // Rule 3: Bags limit
+  // Free: 2 bags total, 1 of each type
+  // Silver, Gold, Platinum: Unlimited bags
   const canAddBag = (existingBags: Bag[], newBagType: BagType) => {
-    if (tier === 'PRO') {
+    if (tier === 'SILVER' || tier === 'GOLD' || tier === 'PLATINUM' || isMasterKey) {
       return { allowed: true };
     }
 
     if (existingBags.length >= MAX_FREE_BAGS_TOTAL) {
       return {
         allowed: false,
-        reason: `Free Plan is limited to a maximum of 2 bags total. Upgrade to Gate Ready Pro to pack 3 or more bags.`
+        reason: `Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.`
       };
     }
 
@@ -543,14 +611,21 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
           : 'Checked Bag';
       return {
         allowed: false,
-        reason: `Free Plan allows only 1 ${bagLabel} per trip (up to 2 bags total). Adding multiple bags requires a Pro subscription.`
+        reason: `Free Plan allows only 1 ${bagLabel} per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.`
       };
     }
 
     return { allowed: true };
   };
 
-  const isPro = tier === 'PRO';
+  // Rule 4: Multi-device cloud sync
+  // Free, Silver: local only
+  // Gold, Platinum: cloud sync
+  const canUseCloudSync = () => {
+    return tier === 'GOLD' || tier === 'PLATINUM' || isMasterKey;
+  };
+
+  const isPro = tier !== 'FREE';
 
   return (
     <SubscriptionContext.Provider
@@ -565,12 +640,15 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         paywallReason,
         openPaywall,
         closePaywall,
+        upgradeToTier,
         upgradeToPro,
         cancelSubscription,
         applyLicenseKey,
         removeLicenseKey,
         canAddTraveler,
-        canAddBag
+        canAddTrip,
+        canAddBag,
+        canUseCloudSync
       }}
     >
       {children}

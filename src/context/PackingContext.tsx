@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { Trip, Bag, BagType, TravelType, WeightUnit, DepartureReminder } from '../types/travel';
+import { Trip, Bag, BagType, BagMaterial, WeightUnit, DepartureReminder, getBagEmptyWeightLbs, TravelType } from '../types/travel';
 import { initialTrips } from '../data/seedTrips';
 import { getDefaultDepartureReminders } from '../data/defaultReminders';
 import { useAuth } from './AuthContext';
@@ -75,9 +75,16 @@ interface PackingContextType {
   updateBag: (
     tripId: string,
     bagId: string,
-    updates: Partial<Pick<Bag, 'label' | 'type' | 'assignedTo' | 'maxWeightLimitLbs'>>
+    updates: Partial<Pick<Bag, 'label' | 'type' | 'assignedTo' | 'maxWeightLimitLbs' | 'material' | 'emptyBagWeightLbs'>>
   ) => void;
-  addBagToTrip: (tripId: string, type: BagType, label: string, assignedTo?: string) => void;
+  addBagToTrip: (
+    tripId: string, 
+    type: BagType, 
+    label: string, 
+    assignedTo?: string, 
+    material?: BagMaterial, 
+    emptyBagWeightLbs?: number
+  ) => void;
   removeBagFromTrip: (tripId: string, bagId: string) => void;
   addFamilyMember: (tripId: string, memberName: string) => void;
   removeFamilyMember: (tripId: string, memberName: string) => void;
@@ -399,14 +406,20 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           { type: 'PERSONAL' as BagType, label: 'Personal Backpack', assignedTo: resolvedFamily[0] }
         ];
 
-    const newBags: Bag[] = resolvedBagConfig.map((cfg, idx) => ({
-      id: `bag-${Date.now()}-${idx}`,
-      type: cfg.type,
-      label: cfg.label || `${cfg.type} Bag`,
-      assignedTo: cfg.assignedTo || resolvedFamily[0] || 'Traveler 1',
-      items: [],
-      maxWeightLimitLbs: cfg.type === 'CHECKED' ? 50 : cfg.type === 'CARRY_ON' ? 22 : 15
-    }));
+    const newBags: Bag[] = resolvedBagConfig.map((cfg, idx) => {
+      const mat: BagMaterial = (cfg as any).material || (cfg.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
+      const emptyLbs: number = (cfg as any).emptyBagWeightLbs ?? getBagEmptyWeightLbs({ type: cfg.type, material: mat });
+      return {
+        id: `bag-${Date.now()}-${idx}`,
+        type: cfg.type,
+        label: cfg.label || `${cfg.type} Bag`,
+        assignedTo: cfg.assignedTo || resolvedFamily[0] || 'Traveler 1',
+        material: mat,
+        emptyBagWeightLbs: emptyLbs,
+        items: [],
+        maxWeightLimitLbs: cfg.type === 'CHECKED' ? 50 : cfg.type === 'CARRY_ON' ? 22 : 15
+      };
+    });
 
     const defaultGateChecks = [
       { id: `gc-${Date.now()}-1`, text: 'Valid Government Photo ID or Passport ready for all travelers', completed: false, required: true },
@@ -461,6 +474,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         type: 'CARRY_ON',
         label: "Alex's Carry-On Roller",
         assignedTo: 'Alex',
+        material: 'HARD_SHELL',
+        emptyBagWeightLbs: 7.0,
         maxWeightLimitLbs: 22,
         items: [
           { id: 'item-1', name: '3x T-Shirts & Polos', location: 'Main Compartment', quantity: 3, isPacked: true, customWeightLbs: 1.5, category: 'Clothing' },
@@ -477,6 +492,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         type: 'PERSONAL',
         label: "Alex's Tech Backpack",
         assignedTo: 'Alex',
+        material: 'FABRIC',
+        emptyBagWeightLbs: 1.5,
         maxWeightLimitLbs: 15,
         items: [
           { id: 'item-8', name: 'MacBook Air & 65W GaN Charger', location: 'Laptop Sleeve', quantity: 1, isPacked: true, customWeightLbs: 3.2, category: 'Electronics' },
@@ -701,14 +718,25 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
   };
 
-  const addBagToTrip = (tripId: string, type: BagType, label: string, assignedTo?: string) => {
+  const addBagToTrip = (
+    tripId: string, 
+    type: BagType, 
+    label: string, 
+    assignedTo?: string, 
+    material?: BagMaterial, 
+    emptyBagWeightLbs?: number
+  ) => {
     const trip = trips.find((t) => t.id === tripId);
     const defaultOwner = assignedTo || trip?.familyMembers?.[0] || 'Traveler 1';
+    const mat: BagMaterial = material || (type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
+    const emptyLbs: number = emptyBagWeightLbs ?? getBagEmptyWeightLbs({ type, material: mat });
     const newBag: Bag = {
       id: 'bag-' + Date.now(),
       type,
       label: label.trim() || `${type} Bag`,
       assignedTo: defaultOwner,
+      material: mat,
+      emptyBagWeightLbs: emptyLbs,
       items: [],
       maxWeightLimitLbs: type === 'CHECKED' ? 50 : type === 'CARRY_ON' ? 22 : 15
     };
@@ -914,7 +942,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateBag = (
     tripId: string,
     bagId: string,
-    updates: Partial<Pick<Bag, 'label' | 'type' | 'assignedTo' | 'maxWeightLimitLbs'>>
+    updates: Partial<Pick<Bag, 'label' | 'type' | 'assignedTo' | 'maxWeightLimitLbs' | 'material' | 'emptyBagWeightLbs'>>
   ) => {
     let updatedTripToSave: Trip | null = null;
 
@@ -930,7 +958,9 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...(updates.label !== undefined ? { label: updates.label.trim() } : {}),
               ...(updates.type !== undefined ? { type: updates.type } : {}),
               ...(updates.assignedTo !== undefined ? { assignedTo: updates.assignedTo } : {}),
-              ...(updates.maxWeightLimitLbs !== undefined ? { maxWeightLimitLbs: updates.maxWeightLimitLbs } : {})
+              ...(updates.maxWeightLimitLbs !== undefined ? { maxWeightLimitLbs: updates.maxWeightLimitLbs } : {}),
+              ...(updates.material !== undefined ? { material: updates.material } : {}),
+              ...(updates.emptyBagWeightLbs !== undefined ? { emptyBagWeightLbs: updates.emptyBagWeightLbs } : {})
             };
           })
         };

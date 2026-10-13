@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
-import { BagType, Trip } from '../types/travel';
-import { X, Backpack, Briefcase, Luggage, User, Crown, AlertTriangle } from 'lucide-react';
+import { BagType, BagMaterial, Trip, getUserPresetWeightLbs, BAG_MATERIAL_PRESETS } from '../types/travel';
+import { X, Backpack, Briefcase, Luggage, User, Crown, AlertTriangle, Shield, Layers, Scale, Check } from 'lucide-react';
 
 interface AddBagDialogProps {
   isOpen: boolean;
@@ -30,12 +30,24 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
        : 'CHECKED')
     : 'CARRY_ON';
 
+  const defaultMaterial: BagMaterial = defaultInitialType === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL';
+
   const [bagType, setBagType] = useState<BagType>(defaultInitialType);
+  const [material, setMaterial] = useState<BagMaterial>(defaultMaterial);
+  const [emptyBagWeight, setEmptyBagWeight] = useState<string>(
+    String(getUserPresetWeightLbs(defaultInitialType, defaultMaterial))
+  );
   const [label, setLabel] = useState(`${familyMembers[0].split(' ')[0]}'s ${defaultInitialType === 'PERSONAL' ? 'Backpack' : defaultInitialType === 'CARRY_ON' ? 'Carry-on' : 'Suitcase'}`);
   const [assignedTo, setAssignedTo] = useState<string>(familyMembers[0] || 'Traveler 1');
 
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
+
+  const handleSelectMaterial = (mat: BagMaterial) => {
+    setMaterial(mat);
+    const preset = getUserPresetWeightLbs(bagType, mat);
+    setEmptyBagWeight(String(preset));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +61,12 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
       return;
     }
 
-    addBagToTrip(trip.id, bagType, label, assignedTo);
+    const parsedEmpty = parseFloat(emptyBagWeight);
+    const finalEmptyLbs = !isNaN(parsedEmpty) && parsedEmpty >= 0
+      ? parsedEmpty
+      : getUserPresetWeightLbs(bagType, material);
+
+    addBagToTrip(trip.id, bagType, label, assignedTo, material, finalEmptyLbs);
     onClose();
   };
 
@@ -57,15 +74,21 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
     // If on Free plan and they already have this type, prompt paywall
     if (!isPro && trip.bags.some(b => b.type === type)) {
       onClose();
-      openPaywall(`You already have a ${type === 'PERSONAL' ? 'Personal Item' : type === 'CARRY_ON' ? 'Carry-On' : 'Checked Bag'}. The Free Plan allows 1 of each bag type (up to 3 total). Upgrade to Gate Ready Pro to pack multiple bags of the same type.`);
+      openPaywall(`You already have a ${type === 'PERSONAL' ? 'Personal Item' : type === 'CARRY_ON' ? 'Carry-On' : 'Checked Bag'}. The Free Plan allows 1 of each bag type (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack multiple bags of the same type.`);
       return;
     }
 
     setBagType(type);
+    const newPreset = getUserPresetWeightLbs(type, material);
+    setEmptyBagWeight(String(newPreset));
+
     if (type === 'PERSONAL') setLabel(`${assignedTo.split(' ')[0]}'s Backpack`);
     if (type === 'CARRY_ON') setLabel(`${assignedTo.split(' ')[0]}'s Carry-on`);
     if (type === 'CHECKED') setLabel(`${assignedTo.split(' ')[0]}'s Suitcase`);
   };
+
+  const hardPreset = getUserPresetWeightLbs(bagType, 'HARD_SHELL');
+  const fabricPreset = getUserPresetWeightLbs(bagType, 'FABRIC');
 
   return createPortal(
     <div 
@@ -75,7 +98,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
       }}
     >
       <div
-        className="w-full max-w-sm my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col relative z-[100000] cursor-default"
+        className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col relative z-[100000] cursor-default max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-purple-50 dark:border-purple-950/60 flex items-center justify-between">
@@ -133,6 +156,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
             </select>
           </div>
 
+          {/* Bag Type Selector */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-bold text-purple-900 dark:text-purple-300 uppercase tracking-wider">
@@ -158,7 +182,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
                     onClick={() => handleSelectType(type)}
                     className={`py-3 px-2 rounded-xl text-xs font-semibold flex flex-col items-center gap-1.5 border transition-all cursor-pointer relative ${
                       isSelected
-                        ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-500 text-purple-700 dark:text-purple-300'
+                        ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-500 text-purple-700 dark:text-purple-300 ring-1 ring-purple-500'
                         : alreadyExistsOnTrip
                         ? 'border-dashed border-amber-300 dark:border-amber-800 bg-amber-50/40 dark:bg-amber-950/20 text-slate-500 hover:border-amber-500'
                         : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-purple-50/30 dark:hover:bg-slate-800'
@@ -170,10 +194,101 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
                       </span>
                     )}
                     <Icon className="w-5 h-5" />
-                    <span className="text-[11px]">{typeLabel}</span>
+                    <span className="text-[11px] font-bold">{typeLabel}</span>
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Hard Shell vs Fabric Bag Construction */}
+          <div className="p-3.5 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/60 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-purple-950 dark:text-purple-200 flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-purple-600" />
+                <span>Luggage Shell Construction</span>
+              </label>
+              <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold">
+                Presets Incorporated
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleSelectMaterial('HARD_SHELL')}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  material === 'HARD_SHELL'
+                    ? 'bg-white dark:bg-slate-800 border-purple-600 text-purple-950 dark:text-white shadow-xs ring-2 ring-purple-500/20'
+                    : 'bg-white/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 hover:bg-white text-slate-700 dark:text-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black flex items-center gap-1">
+                    <Shield className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Hard Shell</span>
+                  </span>
+                  {material === 'HARD_SHELL' && (
+                    <div className="w-3.5 h-3.5 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-1 flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400">Preset Tare:</span>
+                  <span className="font-extrabold text-purple-600 dark:text-purple-400">
+                    {hardPreset} lbs
+                  </span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSelectMaterial('FABRIC')}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  material === 'FABRIC'
+                    ? 'bg-white dark:bg-slate-800 border-purple-600 text-purple-950 dark:text-white shadow-xs ring-2 ring-purple-500/20'
+                    : 'bg-white/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 hover:bg-white text-slate-700 dark:text-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black flex items-center gap-1">
+                    <Layers className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Fabric Bag</span>
+                  </span>
+                  {material === 'FABRIC' && (
+                    <div className="w-3.5 h-3.5 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-1 flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400">Preset Tare:</span>
+                  <span className="font-extrabold text-indigo-600 dark:text-indigo-400">
+                    {fabricPreset} lbs
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            {/* Custom Tare Input */}
+            <div className="pt-1 flex items-center justify-between gap-2 text-xs">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Scale className="w-3 h-3 text-purple-600" />
+                <span>Empty Suitcase Tare Weight:</span>
+              </span>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="30"
+                  value={emptyBagWeight}
+                  onChange={(e) => setEmptyBagWeight(e.target.value)}
+                  className="w-16 h-7 px-2 text-center text-xs font-black rounded-lg border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+                <span className="text-[11px] font-bold text-slate-400">lbs</span>
+              </div>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Trip, Bag, BagType } from '../types/travel';
+import { Trip, Bag, BagType, BagMaterial, getBagEmptyWeightLbs, getUserPresetWeightLbs } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { DefaultSuggestions } from '../data/suggestions';
@@ -24,13 +24,18 @@ import {
   Search,
   RotateCcw,
   Minus,
-  FileDown
+  FileDown,
+  Shield,
+  Layers,
+  Printer
 } from 'lucide-react';
 import { EditBagDialog } from './EditBagDialog';
 import { LuggageQrTagModal } from './LuggageQrTagModal';
 import { PackingPresetsModal } from './PackingPresetsModal';
+import { TarePresetsModal } from './TarePresetsModal';
 import { AddItemDialog } from './AddItemDialog';
 import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
+import { PrintPackingListModal } from './PrintPackingListModal';
 
 interface BaggageScreenProps {
   trip: Trip;
@@ -47,6 +52,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     selectedBagId, 
     setSelectedBagId, 
     addBagToTrip,
+    updateBag,
     toggleItemPacked,
     removeItem,
     updateItemQuantity,
@@ -59,7 +65,9 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   const [bagToEdit, setBagToEdit] = useState<Bag | null>(null);
   const [showQrModalForBag, setShowQrModalForBag] = useState<Bag | null>(null);
   const [showPresetsModal, setShowPresetsModal] = useState(false);
+  const [showTarePresetsModal, setShowTarePresetsModal] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Search and filter state for active bag
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,19 +82,23 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     return found || trip.bags[0];
   }, [trip.bags, selectedBagId]);
 
-  // Overweight fee avoidance radar
+  // Overweight fee avoidance radar (incorporates empty luggage tare weight + packed items)
   const bagWeightAnalysis = useMemo(() => {
     return (trip.bags || []).map((b) => {
-      const totalWeightLbs = b.items.reduce(
+      const emptyLbs = getBagEmptyWeightLbs(b);
+      const itemsLbs = b.items.reduce(
         (sum, item) => sum + (item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name)) * (item.quantity || 1),
         0
       );
+      const totalWeightLbs = emptyLbs + itemsLbs;
       const capLbs = b.type === 'CHECKED' ? 50 : b.type === 'CARRY_ON' ? 22 : 15;
       const pct = Math.round((totalWeightLbs / capLbs) * 100);
       const isOverweight = totalWeightLbs > capLbs;
       const isNearLimit = totalWeightLbs >= capLbs * 0.85;
       return {
         bag: b,
+        emptyLbs,
+        itemsLbs,
         totalWeightLbs,
         capLbs,
         pct,
@@ -106,7 +118,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
   const handleSmartRebalance = () => {
     if (!isPro) {
-      openPaywall("Smart Bag Rebalancer is a Gate Ready Pro feature. Upgrade to automatically shift items between bags and avoid $100-$150 airline overweight penalty fees.");
+      openPaywall("Smart Bag Rebalancer is a Gate Ready Pro feature. Upgrade to automatically shift items between bags and avoid steep airline overweight penalty fees.");
       return;
     }
 
@@ -199,7 +211,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   const applyLuggageBundle = (bundle: 'CARRY_ON_ONLY' | 'CHECKED_PLUS_CARRY' | 'MINIMALIST') => {
     const primary = trip.familyMembers?.[0] || 'Traveler 1';
     if (!isPro && trip.bags.length >= 2) {
-      openPaywall('Free Plan allows up to 2 bags. Upgrade to Pro to add luggage bundle presets.');
+      openPaywall('Free Plan allows up to 2 bags. Upgrade to Silver, Gold, or Platinum to add luggage bundle presets.');
       return;
     }
 
@@ -210,7 +222,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       }
     } else if (bundle === 'CHECKED_PLUS_CARRY') {
       if (!isPro) {
-        openPaywall('Checked + Carry-On bundle requires Pro to support 3 or more bags.');
+        openPaywall('Checked + Carry-On bundle requires Silver, Gold, or Platinum to support 3 or more bags.');
         return;
       }
       addBagToTrip(trip.id, 'CHECKED', 'Checked Suitcase (50 lbs)', primary);
@@ -220,8 +232,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     }
   };
 
-  // Active bag calculations
-  const activeBagWeightLbs = useMemo(() => {
+  // Active bag calculations (incorporating luggage tare weight + packed items)
+  const activeBagTareLbs = useMemo(() => {
+    if (!activeBag) return 0;
+    return getBagEmptyWeightLbs(activeBag);
+  }, [activeBag]);
+
+  const activeBagItemsWeightLbs = useMemo(() => {
     if (!activeBag) return 0;
     return activeBag.items.reduce((sum, item) => {
       const w = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
@@ -229,13 +246,40 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     }, 0);
   }, [activeBag]);
 
+  const activeBagWeightLbs = useMemo(() => {
+    return activeBagTareLbs + activeBagItemsWeightLbs;
+  }, [activeBagTareLbs, activeBagItemsWeightLbs]);
+
   const activeDisplayWeight = weightUnit === 'KG'
     ? DefaultSuggestions.convertLbsToKg(activeBagWeightLbs)
     : activeBagWeightLbs;
+  const activeDisplayTare = weightUnit === 'KG'
+    ? DefaultSuggestions.convertLbsToKg(activeBagTareLbs)
+    : activeBagTareLbs;
+  const activeDisplayItems = weightUnit === 'KG'
+    ? DefaultSuggestions.convertLbsToKg(activeBagItemsWeightLbs)
+    : activeBagItemsWeightLbs;
+
   const activeWeightCap = activeBag ? getWeightCap(activeBag.type) : 22;
   const isOverweight = activeDisplayWeight > activeWeightCap;
   const isNearLimit = activeDisplayWeight > activeWeightCap * 0.85 && !isOverweight;
   const weightPct = Math.min(Math.round((activeDisplayWeight / activeWeightCap) * 100), 150);
+
+  const handleQuickUpdateMaterial = (targetBag: Bag, newMat: BagMaterial) => {
+    const targetTare = getUserPresetWeightLbs(targetBag.type, newMat);
+    updateBag(trip.id, targetBag.id, {
+      material: newMat,
+      emptyBagWeightLbs: targetTare
+    });
+  };
+
+  const getTareDisplay = (type: BagType, mat: BagMaterial) => {
+    const lbs = getUserPresetWeightLbs(type, mat);
+    if (weightUnit === 'KG') {
+      return `${(lbs * 0.45359237).toFixed(1)} kg`;
+    }
+    return `${lbs.toFixed(1)} lbs`;
+  };
 
   // Filtered items in active bag
   const filteredItems = useMemo(() => {
@@ -302,12 +346,32 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         <div className="flex items-center gap-2 flex-wrap self-start sm:self-center">
           <button
             type="button"
+            onClick={() => setShowTarePresetsModal(true)}
+            className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            title="Configure empty luggage tare weights for Hard Shell & Fabric bags"
+          >
+            <Scale className="w-3.5 h-3.5 text-purple-600" />
+            <span>Tare Presets</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowPresetsModal(true)}
             className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
             title="Apply ready-to-go packing presets and templates"
           >
             <FolderCheck className="w-3.5 h-3.5 text-purple-600" />
             <span>Templates</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowPrintModal(true)}
+            className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            title="Print complete itemized packing list and baggage manifest"
+          >
+            <Printer className="w-3.5 h-3.5 text-purple-600" />
+            <span>Print List</span>
           </button>
 
           <button
@@ -336,13 +400,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 Free Plan: 2 Bags Included ({trip.bags.length}/2 used)
               </span>
               <p className="text-[11px] text-purple-800/80 dark:text-purple-300/80">
-                Upgrade to Pro to pack 3+ bags, multiple checked suitcases, and unlock family luggage tracking.
+                Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags and unlock multiple checked suitcases.
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => openPaywall('Upgrade to Gate Ready Pro for unlimited luggage and bags.')}
+            onClick={() => openPaywall('Upgrade to Silver, Gold, or Platinum for unlimited luggage and bags.')}
             className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs hover:from-amber-500 hover:to-amber-600"
           >
             Upgrade
@@ -367,10 +431,10 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black uppercase tracking-wider">
-                  {overweightRiskBag.isOverweight ? 'High Overweight Risk ($100-$150 Airline Penalty)' : 'Airline Overweight Warning (85%+ Capacity)'}
+                  {overweightRiskBag.isOverweight ? 'High Overweight Risk (Steep Airline Overweight Penalty)' : 'Airline Overweight Warning (85%+ Capacity)'}
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-white/70 dark:bg-black/40">
-                  {overweightRiskBag.bag.label}: {Math.round(overweightRiskBag.totalWeightLbs)} / {overweightRiskBag.capLbs} lbs ({overweightRiskBag.pct}%)
+                  {overweightRiskBag.bag.label}: {Math.round(overweightRiskBag.totalWeightLbs)} / {overweightRiskBag.capLbs} lbs ({overweightRiskBag.pct}%) · incl. {overweightRiskBag.emptyLbs.toFixed(1)} lbs {overweightRiskBag.bag.material === 'FABRIC' ? 'fabric' : 'hard shell'} bag tare
                 </span>
               </div>
               <p className="text-xs mt-0.5 opacity-90 leading-relaxed">
@@ -415,12 +479,16 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             const isSelected = activeBag?.id === bag.id;
             const bagTotal = bag.items.length;
             const bagPacked = bag.items.filter((i) => i.isPacked).length;
-            const totalWeight = bag.items.reduce(
+            const emptyLbs = getBagEmptyWeightLbs(bag);
+            const itemsWeight = bag.items.reduce(
               (sum, item) => sum + (item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name)) * (item.quantity || 1),
               0
             );
+            const totalWeight = emptyLbs + itemsWeight;
             const dispWeight = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(totalWeight) : totalWeight;
+            const dispEmpty = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(emptyLbs) : emptyLbs;
             const limit = getWeightCap(bag.type);
+            const bagMat: BagMaterial = bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
 
             return (
               <div
@@ -443,12 +511,22 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                         {getBagIcon(bag.type)}
                       </div>
                       <div>
-                        <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">
+                        <h3 className="text-sm font-black text-slate-900 dark:text-white leading-tight">
                           {bag.label}
                         </h3>
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
-                          {getBagTypeBadge(bag.type)}
-                        </span>
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                          <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                            {getBagTypeBadge(bag.type)}
+                          </span>
+                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-md flex items-center gap-0.5 ${
+                            bagMat === 'HARD_SHELL'
+                              ? 'bg-purple-100/80 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
+                              : 'bg-indigo-100/80 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300'
+                          }`}>
+                            {bagMat === 'HARD_SHELL' ? <Shield className="w-2.5 h-2.5 text-purple-600 shrink-0" /> : <Layers className="w-2.5 h-2.5 text-indigo-500 shrink-0" />}
+                            <span>{bagMat === 'HARD_SHELL' ? 'Hard' : 'Fabric'} · {dispEmpty.toFixed(1)}{weightUnit.toLowerCase()}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -460,7 +538,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                         setBagToEdit(bag);
                       }}
                       className="p-1 rounded-lg text-slate-400 hover:text-purple-600 hover:bg-purple-50 cursor-pointer"
-                      title="Edit bag name or traveler"
+                      title="Edit bag name, shell or tare weight"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
@@ -477,9 +555,14 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
                 {/* Weight & Progress */}
                 <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300">
-                    {dispWeight.toFixed(1)} / {limit} {weightUnit}
-                  </span>
+                  <div>
+                    <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300 block">
+                      {dispWeight.toFixed(1)} / {limit} {weightUnit}
+                    </span>
+                    <span className="text-[9px] text-slate-400 font-medium">
+                      incl. {dispEmpty.toFixed(1)} {weightUnit.toLowerCase()} bag
+                    </span>
+                  </div>
                   <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
                     bagPacked === bagTotal && bagTotal > 0
                       ? 'bg-emerald-100 text-emerald-700'
@@ -539,6 +622,36 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                       Packer: {activeBag.assignedTo}
                     </span>
                   )}
+
+                  {/* 1-Click Shell Switcher */}
+                  <div className="flex items-center gap-0.5 bg-purple-50/80 dark:bg-slate-800 p-0.5 rounded-xl border border-purple-200/80 dark:border-purple-900/60">
+                    <button
+                      type="button"
+                      onClick={() => handleQuickUpdateMaterial(activeBag, 'HARD_SHELL')}
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                        (activeBag.material || (activeBag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL')) === 'HARD_SHELL'
+                          ? 'bg-purple-600 text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                      }`}
+                      title={`Switch to Hard Shell (preset tare: ${getTareDisplay(activeBag.type, 'HARD_SHELL')})`}
+                    >
+                      <Shield className="w-2.5 h-2.5" />
+                      <span>Hard Shell ({getTareDisplay(activeBag.type, 'HARD_SHELL')})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickUpdateMaterial(activeBag, 'FABRIC')}
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                        (activeBag.material || (activeBag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL')) === 'FABRIC'
+                          ? 'bg-purple-600 text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                      }`}
+                      title={`Switch to Fabric Bag (preset tare: ${getTareDisplay(activeBag.type, 'FABRIC')})`}
+                    >
+                      <Layers className="w-2.5 h-2.5" />
+                      <span>Fabric ({getTareDisplay(activeBag.type, 'FABRIC')})</span>
+                    </button>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length} items packed into this bag
@@ -590,7 +703,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                 <Scale className="w-4 h-4 text-purple-600" />
-                <span>Estimated Bag Weight</span>
+                <span>Total Luggage Weight (Suitcase Tare + Contents)</span>
               </span>
               <span className="font-black text-slate-900 dark:text-white">
                 {activeDisplayWeight.toFixed(1)} {weightUnit} <span className="font-normal text-slate-400">/ {activeWeightCap} {weightUnit} limit</span>
@@ -608,6 +721,34 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 }`}
                 style={{ width: `${Math.min(weightPct, 100)}%` }}
               />
+            </div>
+
+            {/* Weight Breakdown: Tare + Items */}
+            <div className="flex items-center justify-between flex-wrap gap-2 pt-1 text-[11px] border-t border-slate-200/60 dark:border-slate-700/60">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="inline-flex items-center gap-1 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300">
+                  <Luggage className="w-3 h-3 text-purple-600" />
+                  <span>Suitcase: <strong>{activeDisplayTare.toFixed(1)} {weightUnit}</strong> ({activeBag.material === 'FABRIC' ? 'Fabric' : 'Hard Shell'})</span>
+                </span>
+                <span className="text-slate-400 font-bold">+</span>
+                <span className="inline-flex items-center gap-1 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300">
+                  <FolderCheck className="w-3 h-3 text-indigo-500" />
+                  <span>Contents: <strong>{activeDisplayItems.toFixed(1)} {weightUnit}</strong></span>
+                </span>
+                <span className="text-slate-400 font-bold">=</span>
+                <span className="inline-flex items-center gap-1 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-md font-extrabold text-purple-900 dark:text-purple-200">
+                  <span>{activeDisplayWeight.toFixed(1)} {weightUnit}</span>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setBagToEdit(activeBag)}
+                className="text-[10px] text-purple-600 dark:text-purple-400 hover:underline font-bold cursor-pointer ml-auto flex items-center gap-1"
+              >
+                <Edit3 className="w-2.5 h-2.5" />
+                <span>Adjust Empty Bag Tare</span>
+              </button>
             </div>
 
             {isOverweight && (
@@ -870,6 +1011,15 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         />
       )}
 
+      {showTarePresetsModal && (
+        <TarePresetsModal
+          isOpen={showTarePresetsModal}
+          onClose={() => setShowTarePresetsModal(false)}
+          weightUnit={weightUnit}
+          trip={trip}
+        />
+      )}
+
       {showAddItemModal && activeBag && (
         <AddItemDialog
           isOpen={showAddItemModal}
@@ -878,6 +1028,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           onClose={() => setShowAddItemModal(false)}
         />
       )}
+
+      {/* Itemized Printable Packing List & Manifest Modal */}
+      <PrintPackingListModal
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        trip={trip}
+      />
     </div>
   );
 };

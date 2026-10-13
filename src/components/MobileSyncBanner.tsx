@@ -45,7 +45,7 @@ export const MobileSyncBanner: React.FC<MobileSyncBannerProps> = ({ onOpenAccoun
                 Cloud Sync
               </span>
             </p>
-            <p className="text-[11px] text-purple-200/80 truncate">
+            <p className="text-[11px] text-purple-200/90 leading-tight">
               Sign in to back up packing checklists, baggage weights, and airline limits in real-time.
             </p>
           </div>

@@ -69,12 +69,12 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'bags',
     title: '2. Smart Luggage Scales & TSA 3-1-1 Liquids',
     tagline: 'Eliminate surprise overweight fees & security confiscations',
-    description: 'Pack bag-by-bag with real-time digital weight meters calibrated to airline caps (50 lbs / 23 kg checked, 22 lbs carry-on). Color-coded warning bars alert you before you hit overweight fee penalties, while the automated TSA 3-1-1 scanner ensures every toiletry bottle is compliant.',
+    description: 'Pack bag-by-bag with real-time digital weight meters calibrated to airline caps (50 lbs / 23 kg checked, 22 lbs carry-on). Color-coded warning bars alert you before you hit steep overweight fees, while the automated TSA 3-1-1 scanner ensures every toiletry bottle is compliant.',
     duration: 7,
     icon: Luggage,
     color: 'from-blue-600 to-indigo-600',
     features: [
-      'Live bag weight meters with headroom alerts before overweight fees trigger',
+      'Live bag weight meters with headroom alerts before steep overweight fees trigger',
       'TSA 3-1-1 liquids compliance verification (under 3.4 oz / 100 ml per bottle)',
       '1-tap luggage presets: Business, Beach Resort, Ski Trip, Toddler & Baby kits'
     ],
@@ -146,16 +146,17 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'pro_vs_free',
     title: '7. Gate Ready Pro vs Free Comparison',
-    tagline: 'Everything you need for seamless, stress-free travel',
-    description: 'Start free with essential baggage weight meters and packing checklists. When you want complete peace of mind, upgrade to Gate Ready Pro to unlock unlimited bags, interactive terminal maps with live phone radar, privacy QR tags, and aircraft power intel.',
-    duration: 7.5,
+    tagline: 'Choose the plan that fits your travel style',
+    description: 'Start free with essential luggage scales and packing checklists. Upgrade to Silver, Gold, or Platinum for unlimited bags, interactive terminal maps, privacy QR tags, multiple travelers, and multi-device cloud sync. All paid plans include a 14-day money-back guarantee.',
+    duration: 8.5,
     icon: Crown,
     color: 'from-purple-600 to-fuchsia-600',
     isPro: true,
     features: [
-      'Free: 2 bags, live weight scales, TSA 3-1-1 checker, destination climate',
-      'Pro: Unlimited bags, Terminal Maps with Phone Radar, Privacy QR Tags, Cabin Plugs',
-      'Instant activation with 30-day money-back guarantee'
+      'Free ($0): 1 traveler, 1 active trip, 2 bags, live weight scales, TSA liquids checker',
+      'Silver ($1.99/mo or $19.99/yr): 1 traveler, 2 active trips, unlimited bags & all core tools',
+      'Gold ($3.99/mo or $29.99/yr): 2 travelers, unlimited active trips, multi-device cloud sync (Most Popular)',
+      'Platinum ($4.99/mo or $39.99/yr): Unlimited travelers & family sharing'
     ],
     mockupType: 'PRO_VS_FREE'
   }
@@ -458,7 +459,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
-                  <span className="ml-2 font-mono text-[10px] text-slate-500">gateready.app</span>
+                  <span className="ml-2 font-mono text-[10px] text-slate-500">gateready.ca</span>
                 </div>
                 <span className="text-[10px] font-bold text-purple-400">Live Feature Showcase</span>
               </div>
@@ -530,7 +531,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                       <div className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full w-[85%]" />
                     </div>
                     <p className="text-[10px] text-emerald-300 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Safe weight — 7.5 lbs headroom before $100 overweight fees
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Safe weight — 7.5 lbs headroom before steep fees for overweight baggage
                     </p>
                   </div>
 
@@ -702,49 +703,88 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                 </div>
               )}
 
-              {/* 7. Dynamic Mockup: PRO_VS_FREE */}
+              {/* 7. Dynamic Mockup: PRO_VS_FREE (4-Column Comparison: Free / Silver / Gold / Platinum) */}
               {step.mockupType === 'PRO_VS_FREE' && (
                 <div className="space-y-3 animate-in fade-in duration-300">
-                  <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    {/* Free Card */}
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Free Starter</span>
-                      <p className="font-black text-white text-sm">$0 Free Forever</p>
-                      <ul className="space-y-1 text-[10px] text-slate-300 pt-1">
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400 shrink-0" /> Up to 2 Luggage Bags</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400 shrink-0" /> Live Weight Scales</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400 shrink-0" /> TSA 3-1-1 Liquid Checker</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400 shrink-0" /> Climate & Weather Forecast</li>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                    {/* 1. Free Card */}
+                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Free</span>
+                      <p className="font-black text-white text-xs">$0 Free</p>
+                      <ul className="space-y-0.5 text-[9px] text-slate-300 pt-1">
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> 1 traveler</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> 1 active trip</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> 2 bags total</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> Luggage scales</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> TSA 3-1-1 checker</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> Climate forecast</li>
                       </ul>
                     </div>
 
-                    {/* Pro Card */}
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-purple-950/80 via-slate-900 to-indigo-950/80 border-2 border-amber-400/80 space-y-1.5 shadow-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                          <Crown className="w-3 h-3 fill-amber-400" /> Pro Edition
-                        </span>
-                        <span className="text-[9px] bg-amber-400 text-purple-950 font-bold px-1.5 py-0.2 rounded">Best</span>
-                      </div>
-                      <p className="font-black text-white text-sm">$4.99 / trip or $19 / yr</p>
-                      <ul className="space-y-1 text-[10px] text-purple-200 pt-1">
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 shrink-0" /> Unlimited Bags & Scales</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 shrink-0" /> Terminal Maps & Phone Radar</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 shrink-0" /> Water Refill & Restroom GPS</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 shrink-0" /> Privacy QR Tags & PDF Exports</li>
-                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 shrink-0" /> Aircraft Seat Plugs & USB Watts</li>
+                    {/* 2. Silver Card */}
+                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                      <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider block">Silver</span>
+                      <p className="font-black text-white text-xs">$1.99<span className="text-[8px] text-slate-400 font-normal">/mo</span></p>
+                      <p className="text-[8px] text-emerald-400 font-bold">$19.99/yr · 2 mos free</p>
+                      <ul className="space-y-0.5 text-[9px] text-slate-300 pt-1">
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> 1 traveler</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> 2 active trips</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> Unlimited bags</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> Core packing tools</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> Terminal maps</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> Cabin & plugs intel</li>
                       </ul>
                     </div>
+
+                    {/* 3. Gold Card (Most Popular) */}
+                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-950/90 via-slate-900 to-amber-950/40 border-2 border-amber-400/90 space-y-1 relative shadow-lg">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider">Gold</span>
+                        <span className="text-[7px] bg-amber-400 text-purple-950 font-black px-1 py-0.2 rounded uppercase">Popular</span>
+                      </div>
+                      <p className="font-black text-white text-xs">$3.99<span className="text-[8px] text-slate-400 font-normal">/mo</span></p>
+                      <p className="text-[8px] text-emerald-400 font-bold">$29.99/yr · save 37%</p>
+                      <ul className="space-y-0.5 text-[9px] text-amber-200/90 pt-1">
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> 2 travelers</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> Unlimited trips</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> Unlimited bags</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> Cloud sync</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> All core tools</li>
+                      </ul>
+                    </div>
+
+                    {/* 4. Platinum Card */}
+                    <div className="p-2.5 rounded-xl bg-slate-900 border border-indigo-500/50 space-y-1">
+                      <span className="text-[9px] font-bold text-indigo-300 uppercase tracking-wider block">Platinum</span>
+                      <p className="font-black text-white text-xs">$4.99<span className="text-[8px] text-slate-400 font-normal">/mo</span></p>
+                      <p className="text-[8px] text-emerald-400 font-bold">$39.99/yr · save 33%</p>
+                      <ul className="space-y-0.5 text-[9px] text-slate-300 pt-1">
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Unlimited travelers</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Family sharing</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Unlimited trips</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Unlimited bags</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Cloud sync</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* 14-Day Guarantee Notice */}
+                  <div className="flex items-center justify-between px-1 text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 text-emerald-400 font-bold">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      14-day money-back guarantee
+                    </span>
+                    <span>All paid plans include instant access</span>
                   </div>
 
                   <div className="pt-1 flex items-center justify-between gap-2">
                     <button
                       type="button"
                       onClick={() => openPaywall('tour_footer')}
-                      className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-fuchsia-500 hover:from-amber-300 hover:to-fuchsia-400 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                      className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-fuchsia-500 hover:from-amber-300 hover:to-fuchsia-400 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
                     >
                       <Crown className="w-3.5 h-3.5 fill-purple-950" />
-                      <span>Unlock Gate Ready Pro</span>
+                      <span>Compare Plans & Upgrade</span>
                     </button>
                   </div>
                 </div>

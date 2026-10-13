@@ -189,25 +189,30 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
               </div>
 
               {/* GateReady.ca Brand Typography */}
-              <div className="flex items-baseline tracking-tight">
-                <span className="font-black text-base sm:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                  Gate<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-fuchsia-200 to-purple-200">Ready</span>
-                </span>
-                <span className="font-extrabold text-xs sm:text-sm text-fuchsia-400 ml-0.5 drop-shadow-[0_0_8px_rgba(232,121,249,0.9)]">
-                  .ca
+              <div className="flex flex-col">
+                <div className="flex items-baseline tracking-tight">
+                  <span className="font-black text-base sm:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                    Gate<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-fuchsia-200 to-purple-200">Ready</span>
+                  </span>
+                  <span className="font-extrabold text-xs sm:text-sm text-fuchsia-400 ml-0.5 drop-shadow-[0_0_8px_rgba(232,121,249,0.9)]">
+                    .ca
+                  </span>
+                </div>
+                <span className="hidden sm:inline text-[9px] font-bold text-purple-200/90 tracking-wider uppercase -mt-0.5">
+                  Baggage & Packing Intel
                 </span>
               </div>
             </div>
           </div>
 
           {/* Pro / Free Plan Badge */}
-          <div className="hidden md:flex items-center">
+          <div className="flex items-center">
             {isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> Pro
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/80 bg-purple-950/70 border border-purple-800/60 px-2 py-0.5 rounded-full">
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2 py-0.5 rounded-full">
                 Free Plan
               </span>
             )}
@@ -246,22 +251,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
           {/* Pro Upgrade / Badge Button */}
           {!isPro ? (
             <button
-              onClick={() => openPaywall("Upgrade to Gate Ready Pro to unlock unlimited travelers (kids, parents, companions) and unlimited bags.")}
+              onClick={() => openPaywall("Upgrade to Silver ($1.99/mo), Gold, or Platinum to unlock unlimited bags, active trips, and multi-traveler packing.")}
               className="h-9 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
-              title="Unlock Unlimited Travelers & Bags"
+              title="Upgrade GateReady Plan"
             >
               <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
               <span className="hidden sm:inline">Upgrade</span>
-              <span className="text-[10px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded-md">PRO</span>
+              <span className="text-[10px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded-md">PLANS</span>
             </button>
           ) : (
             <button
               onClick={() => openPaywall()}
               className="h-9 px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-1 hover:bg-amber-900/60 transition-colors cursor-pointer shadow-xs"
-              title="Gate Ready Pro Active"
+              title={`${tier} Plan Active`}
             >
               <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="hidden md:inline text-[11px]">Pro Active</span>
+              <span className="hidden md:inline text-[11px] font-bold">{tier} Active</span>
             </button>
           )}
 
@@ -366,7 +371,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                     </span>
                     {isPro ? (
                       <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full">
-                        PRO ({billingCycle})
+                        {tier} ({billingCycle})
                       </span>
                     ) : (
                       <span className="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
@@ -378,10 +383,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   {isPro ? (
                     <div className="p-2 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs">
                       <p className="font-semibold text-amber-950 dark:text-amber-200 text-[11px]">
-                        Unlimited Travelers & Bags Active
+                        {tier === 'SILVER'
+                          ? 'Silver: 1 Traveler · 2 Active Trips · Unlimited Bags'
+                          : tier === 'GOLD'
+                            ? 'Gold: 2 Travelers · Unlimited Trips · Cloud Sync'
+                            : 'Platinum: Unlimited Travelers & Trips · Family Sharing'}
                       </p>
                       <p className="text-[10px] text-amber-800/80 dark:text-amber-300/80 mt-0.5">
-                        {billingCycle === 'yearly' ? '$39.99/year' : '$4.99/month'} · Renews automatically
+                        {tier === 'SILVER'
+                          ? (billingCycle === 'yearly' ? '$19.99/year' : '$1.99/month')
+                          : tier === 'GOLD'
+                            ? (billingCycle === 'yearly' ? '$29.99/year' : '$3.99/month')
+                            : (billingCycle === 'yearly' ? '$39.99/year' : '$4.99/month')} · Renews automatically
                       </p>
                       <div className="mt-2 flex items-center justify-between">
                         <button
@@ -392,7 +405,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm('Cancel Gate Ready Pro subscription? You will return to the Free Plan (1 traveler, up to 2 bags).')) {
+                            if (confirm('Cancel subscription? You will return to the Free Plan (1 traveler, 1 active trip, up to 2 bags).')) {
                               cancelSubscription();
                             }
                           }}
@@ -405,17 +418,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                   ) : (
                     <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 text-xs space-y-2">
                       <p className="text-[11px] text-purple-900 dark:text-purple-200 leading-snug">
-                        Free Plan allows <strong>1 traveler</strong> and up to <strong>2 bags</strong>.
+                        Free Plan allows <strong>1 traveler</strong>, <strong>1 active trip</strong>, and up to <strong>2 bags</strong>.
                       </p>
                       <button
                         onClick={() => {
                           setUserMenuOpen(false);
-                          openPaywall("Upgrade to Gate Ready Pro to pack for your whole family with unlimited bags and travelers.");
+                          openPaywall("Upgrade to Silver ($1.99/mo), Gold ($3.99/mo), or Platinum ($4.99/mo) to unlock unlimited bags and travelers.");
                         }}
                         className="w-full h-8 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:from-purple-700 cursor-pointer"
                       >
                         <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                        <span>Unlock Pro ($4.99/mo or $39.99/yr)</span>
+                        <span>Upgrade Plan (from $1.99/mo)</span>
                       </button>
                     </div>
                   )}

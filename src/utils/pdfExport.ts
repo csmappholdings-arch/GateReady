@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import { Trip, WeightUnit } from '../types/travel';
+import { Trip, WeightUnit, getBagEmptyWeightLbs } from '../types/travel';
 
 export function exportTripToPDF(trip: Trip, weightUnit: WeightUnit = 'LBS') {
   const doc = new jsPDF({
@@ -154,9 +154,12 @@ export function exportTripToPDF(trip: Trip, weightUnit: WeightUnit = 'LBS') {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(109, 40, 217);
-    const assignedStr = bag.assignedTo ? `Assigned to: ${bag.assignedTo}` : '';
+    const assignedStr = bag.assignedTo ? `Assigned: ${bag.assignedTo}` : '';
+    const tareLbs = getBagEmptyWeightLbs(bag);
+    const tareDisp = weightUnit === 'KG' ? (tareLbs * 0.45359237).toFixed(1) : tareLbs.toFixed(1);
+    const shellStr = `${bag.material === 'FABRIC' ? 'Fabric' : 'Hard Shell'} (${tareDisp} ${weightUnit} tare)`;
     const weightStr = bag.maxWeightLimitLbs ? `Limit: ${bag.maxWeightLimitLbs} ${weightUnit}` : '';
-    const metaStr = [assignedStr, weightStr].filter(Boolean).join('  •  ');
+    const metaStr = [assignedStr, shellStr, weightStr].filter(Boolean).join('  •  ');
     doc.text(metaStr, margin + contentWidth - 3, y + 5.5, { align: 'right' });
 
     y += 11;

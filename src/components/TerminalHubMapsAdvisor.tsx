@@ -261,101 +261,99 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* 1. Header Card with Dynamic Route Indicator & Pro Offline Action */}
-      <div className="rounded-3xl border border-purple-200/80 dark:border-purple-900/80 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-purple-50 dark:border-purple-950/60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-200 dark:border-cyan-800">
-              <Compass className="w-5 h-5 text-cyan-500" />
+      <div className="rounded-3xl border border-purple-200/80 dark:border-purple-900/80 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-purple-50 dark:border-purple-950/60">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-200 dark:border-cyan-800">
+              <Compass className="w-4 h-4 text-cyan-500" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-black text-slate-900 dark:text-white">
-                  Dynamic Post-Security Terminal & Station Maps
+                <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                  Dynamic Terminal & Station Maps
                 </h2>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro Feature
+                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Explore your departure and arrival hubs. Locate water refill stations & restrooms immediately after security checks.
+                Explore departure and arrival hubs. Locate water refill & restrooms post-security.
               </p>
             </div>
           </div>
 
-          {/* Pro Offline Download Button */}
-          <button
-            type="button"
-            onClick={() => {
-              if (!isPro) {
-                openPaywall('Upgrade to Gate Ready Pro to download offline vector floorplans and live refill telemetry for all worldwide hubs.');
-              } else {
-                alert(`Offline floorplan vector bundle for ${hub.name} (${hub.code}) downloaded to your device cache!`);
-              }
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-900 dark:text-purple-200 text-xs font-bold transition-colors cursor-pointer self-start sm:self-center shrink-0"
-          >
-            <Download className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-            <span>Download Vector Floorplan</span>
-            {!isPro && (
-              <span className="text-[8px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1 py-0.2 rounded-sm ml-1">
-                PRO
-              </span>
-            )}
-          </button>
-        </div>
+          {/* Mode Sub-Tabs Moved to Top Header & Condensed */}
+          <div className="flex items-center gap-2 flex-wrap self-start lg:self-center">
+            <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMode('FLIGHT');
+                  setSelectedGate('');
+                  setSelectedPoi(null);
+                }}
+                className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                  activeMode === 'FLIGHT'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+                }`}
+              >
+                <Plane className="w-3.5 h-3.5 shrink-0" />
+                <span>Airports</span>
+              </button>
 
-        {/* 2. Mode Sub Tabs (Flights, Rail, Cruise) */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-x-auto no-scrollbar">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode('FLIGHT');
-              setSelectedGate('');
-              setSelectedPoi(null);
-            }}
-            className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition-all cursor-pointer ${
-              activeMode === 'FLIGHT'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
-            }`}
-          >
-            <Plane className="w-4 h-4 shrink-0" />
-            <span>Flights (Airports)</span>
-          </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMode('RAIL');
+                  setSelectedGate('');
+                  setSelectedPoi(null);
+                }}
+                className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                  activeMode === 'RAIL'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-emerald-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+                }`}
+              >
+                <Train className="w-3.5 h-3.5 shrink-0" />
+                <span>Rail</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode('RAIL');
-              setSelectedGate('');
-              setSelectedPoi(null);
-            }}
-            className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition-all cursor-pointer ${
-              activeMode === 'RAIL'
-                ? 'bg-emerald-600 text-white shadow-md'
-                : 'text-slate-600 dark:text-slate-300 hover:text-emerald-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
-            }`}
-          >
-            <Train className="w-4 h-4 shrink-0" />
-            <span>High-Speed Rail</span>
-          </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMode('CRUISE');
+                  setSelectedGate('');
+                  setSelectedPoi(null);
+                }}
+                className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                  activeMode === 'CRUISE'
+                    ? 'bg-cyan-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-cyan-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+                }`}
+              >
+                <Ship className="w-3.5 h-3.5 shrink-0" />
+                <span>Cruise</span>
+              </button>
+            </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode('CRUISE');
-              setSelectedGate('');
-              setSelectedPoi(null);
-            }}
-            className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition-all cursor-pointer ${
-              activeMode === 'CRUISE'
-                ? 'bg-cyan-600 text-white shadow-md'
-                : 'text-slate-600 dark:text-slate-300 hover:text-cyan-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
-            }`}
-          >
-            <Ship className="w-4 h-4 shrink-0" />
-            <span>Cruise Terminals</span>
-          </button>
+            {/* Pro Offline Download Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (!isPro) {
+                  openPaywall('Upgrade to Gate Ready Pro to download offline vector floorplans and live refill telemetry for all worldwide hubs.');
+                } else {
+                  alert(`Offline floorplan vector bundle for ${hub.name} (${hub.code}) downloaded to your device cache!`);
+                }
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-900 dark:text-purple-200 text-xs font-bold transition-colors cursor-pointer shrink-0"
+              title="Download offline floorplan"
+            >
+              <Download className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Floorplan</span>
+            </button>
+          </div>
         </div>
 
         {/* 3. DYNAMIC TRIP DEPARTURE VS ARRIVAL LOCATION SELECTOR */}

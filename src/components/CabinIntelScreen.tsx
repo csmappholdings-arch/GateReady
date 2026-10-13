@@ -80,6 +80,102 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
     }
   };
 
+  // If user is not Pro, lock down the screen
+  if (!isPro) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
+        {/* Screen Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-purple-100 dark:border-purple-950/60">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                <Zap className="w-4 h-4 text-amber-500" />
+              </div>
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Aircraft Cabin & Plugs Intel
+              </h1>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                <Crown className="w-2.5 h-2.5 fill-white" /> Pro Feature
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Overhead bin sizing, valet gate-check alerts, in-seat AC/USB power specs, and under-seat clearances for 20+ commercial aircraft.
+            </p>
+          </div>
+        </div>
+
+        {/* Lock Screen Hero Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950 border-2 border-amber-400/50 p-6 sm:p-8 text-white shadow-xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 max-w-2xl space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black uppercase tracking-wider">
+              <Crown className="w-3.5 h-3.5 fill-amber-400" />
+              <span>Gate Ready Pro Exclusive</span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Aircraft Cabin & In-Seat Plugs Intel is Locked
+            </h2>
+
+            <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed">
+              Never get caught off-guard by forced valet gate checks, oversized bags, or dead devices at 35,000 feet. Upgrade to Gate Ready Pro to unlock full aircraft power outlet and bin clearance specifications.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>In-seat 110V AC universal electrical socket specs</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>USB-A & fast-charge USB-C port availability</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Overhead bin sizing (wheels-first vs sideways)</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Valet gate-check risk ratings for Boeing & Airbus</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Under-seat clearances & power box obstruction notes</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>TSA & FAA lithium power bank battery cabin rules</span>
+              </div>
+            </div>
+
+            <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button
+                type="button"
+                onClick={() => openPaywall("Upgrade to Gate Ready Pro to unlock full Aircraft Cabin & In-Seat Plugs Intel.")}
+                className="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 transition-all"
+              >
+                <Crown className="w-4 h-4 fill-purple-950" />
+                <span>Upgrade to Pro to Unlock Cabin Intel</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Locked Teaser Preview (Obscured) */}
+        <div className="relative rounded-3xl border border-purple-200 dark:border-purple-900 bg-white dark:bg-slate-900 p-6 shadow-sm select-none pointer-events-none opacity-50 filter blur-[2px] overflow-hidden">
+          <div className="h-5 w-44 bg-slate-300 dark:bg-slate-700 rounded-md mb-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            <div className="h-14 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-14 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-14 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-14 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+          </div>
+          <div className="h-28 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-5">
       {/* Screen Header */}
@@ -109,36 +205,6 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
           </span>
         )}
       </div>
-
-      {/* Pro Badge & Feature Banner (Non-blocking) */}
-      {!isPro && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-900/40 via-indigo-950/40 to-slate-900/40 border border-purple-300/40 dark:border-purple-700/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-300/30">
-              <Crown className="w-5 h-5 fill-amber-400" />
-            </div>
-            <div>
-              <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                <span>Free Aircraft Sizing & In-Seat Power Preview</span>
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                  Full Access
-                </span>
-              </span>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Explore overhead bin measurements, in-seat AC/USB power outlets, and gate check risks for any plane.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => openPaywall("Upgrade to Gate Ready Pro for unlimited fleet sync, offline seat maps, and valet gate check risk alerts.")}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm shrink-0 self-start sm:self-auto flex items-center gap-1.5"
-          >
-            <Crown className="w-3.5 h-3.5 fill-purple-950" />
-            <span>Unlock Pro Fleet Alerts</span>
-          </button>
-        </div>
-      )}
 
       {/* Aircraft Selector Cards */}
       <div className="space-y-2">
@@ -179,7 +245,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
                 }`}
               >
                 <Plane className="w-3.5 h-3.5" />
-                <span>{ac.name.split(' ')[0]} {ac.name.split(' ')[1]}</span>
+                <span>{ac.name.split(' (')[0]}</span>
               </button>
             );
           })}

@@ -341,35 +341,171 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
     cashProfile.recommendedDailyCashUSD * tripDays * Math.max(1, trip.familyMembers?.length || 1)
   );
 
+  // If user is not Pro, lock down the screen
+  if (!isPro) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
+        {/* Screen Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-purple-100 dark:border-purple-950/60">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                <CloudSun className="w-4 h-4 text-amber-500" />
+              </div>
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Trip Intel & Travel Checklists
+              </h1>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                <Crown className="w-2.5 h-2.5 fill-white" /> Pro Feature
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Destination climate forecasts, capsule wardrobe outfit matrix, terminal & station maps, cash vs digital payment advice, and customs duty radar for {city}.
+            </p>
+          </div>
+        </div>
+
+        {/* Lock Screen Hero Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950 border-2 border-amber-400/50 p-6 sm:p-8 text-white shadow-xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 max-w-2xl space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black uppercase tracking-wider">
+              <Crown className="w-3.5 h-3.5 fill-amber-400" />
+              <span>Gate Ready Pro Exclusive</span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Trip Intel & Terminal Maps is Locked
+            </h2>
+
+            <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed">
+              Arrive at your destination prepared with live climate forecasts, interactive terminal navigation, currency customs, and jet lag recovery schedules.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Destination climate & 5-day weather packing recommendations</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>5-4-3-2-1 Capsule wardrobe outfit matrix calculator</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Interactive terminal maps for Airports, High-Speed Rail & Cruise</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Indoor gate radar, restroom & water refill station telemetry</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Physical cash vs digital payment & ATM FX markup advisor</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>International customs duty-free exemption threshold radar</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Scientific jet lag circadian sleep shift protocol</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Pre-departure travel readiness checklists</span>
+              </div>
+            </div>
+
+            <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button
+                type="button"
+                onClick={() => openPaywall("Upgrade to Gate Ready Pro to unlock full Trip Intel, Terminal Maps & Weather Forecaster.")}
+                className="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 transition-all"
+              >
+                <Crown className="w-4 h-4 fill-purple-950" />
+                <span>Upgrade to Pro to Unlock Trip Intel</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Locked Teaser Preview (Obscured) */}
+        <div className="relative rounded-3xl border border-purple-200 dark:border-purple-900 bg-white dark:bg-slate-900 p-6 shadow-sm select-none pointer-events-none opacity-50 filter blur-[2px] overflow-hidden">
+          <div className="h-5 w-44 bg-slate-300 dark:bg-slate-700 rounded-md mb-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
+            <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+          </div>
+          <div className="h-28 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
-      {/* Screen Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-purple-100 dark:border-purple-950/60">
+      {/* Screen Header with Sub-Tabs Moved to the Top */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-purple-100 dark:border-purple-950/60">
         <div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
               <CloudSun className="w-4 h-4 text-amber-500" />
             </div>
-            <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
               Trip Intel & Travel Checklists
             </h1>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">
-              Live Forecast & Intel
+            <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+              <Crown className="w-2.5 h-2.5 fill-white" /> Pro
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Destination climate forecasts, temperature switching, capsule wardrobe calculator, and pre-departure checklists.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Destination climate forecasts, capsule wardrobe calculator, terminal maps & customs radar.
           </p>
         </div>
 
-        {/* Temperature Unit Toggle (Directly Accessible & Functional) */}
-        <div className="flex items-center gap-2 self-start sm:self-center">
-          <span className="text-xs font-bold text-slate-500">Unit:</span>
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+        {/* Sub-Tab Navigation Buttons & Unit Toggle - Moved to Top of Section */}
+        <div className="flex items-center gap-2 flex-wrap self-start lg:self-center">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+            <button
+              type="button"
+              onClick={() => setIntelSubTab('PREP')}
+              className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                intelSubTab === 'PREP'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+              }`}
+            >
+              <CloudSun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Climate & Prep</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIntelSubTab('MAPS')}
+              className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                intelSubTab === 'MAPS'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span>Terminal & Station Maps</span>
+              <span className="text-[8px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1 py-0.2 rounded-sm ml-0.5 shrink-0">
+                PRO
+              </span>
+            </button>
+          </div>
+
+          {/* Temperature Unit Toggle */}
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
             <button
               type="button"
               onClick={() => setTempUnit('F')}
-              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-black rounded-lg transition-all cursor-pointer ${
                 tempUnit === 'F' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
               title="Fahrenheit (°F)"
@@ -379,7 +515,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             <button
               type="button"
               onClick={() => setTempUnit('C')}
-              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-black rounded-lg transition-all cursor-pointer ${
                 tempUnit === 'C' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
               title="Celsius (°C)"
@@ -388,38 +524,6 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Sub-Tab Navigation Bar */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
-        <button
-          type="button"
-          onClick={() => setIntelSubTab('PREP')}
-          className={`flex-1 py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition-all cursor-pointer ${
-            intelSubTab === 'PREP'
-              ? 'bg-purple-600 text-white shadow-md'
-              : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
-          }`}
-        >
-          <CloudSun className="w-4 h-4 text-amber-400" />
-          <span>Climate & Packing Prep</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setIntelSubTab('MAPS')}
-          className={`flex-1 py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition-all cursor-pointer ${
-            intelSubTab === 'MAPS'
-              ? 'bg-purple-600 text-white shadow-md'
-              : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
-          }`}
-        >
-          <Compass className="w-4 h-4 text-cyan-400" />
-          <span>Terminal & Station Maps (Flights, Rail, Cruise)</span>
-          <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-            <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
-          </span>
-        </button>
       </div>
 
       {/* Sub-Tab Content: Maps vs Climate/Checklists */}
@@ -1071,7 +1175,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
           {[
             { key: 'passport', title: 'Passport Validity > 6 Months', subtitle: 'Ensure passport has at least 6 months validity from departure date.' },
             { key: 'checkin', title: 'Airline Online Check-In (24h Before)', subtitle: 'Confirm seats, check in online, and avoid gate agent queues.' },
-            { key: 'wallet_pass', title: 'Save Boarding Pass to Apple/Google Wallet', subtitle: 'Guarantees access even with spotty airport Wi-Fi.' },
+            { key: 'wallet_pass', title: 'Save Boarding Pass to Apple/Google Wallet', subtitle: 'Ensures access even with spotty airport Wi-Fi.' },
             { key: 'bank_notify', title: 'Credit Card International Travel Notice', subtitle: 'Notify bank or confirm card has zero foreign transaction fee.' },
             { key: 'emergency_cash', title: `Withdraw Recommended Cash ($${totalRecommendedCash})`, subtitle: `Keep emergency local currency in your personal item.` },
             { key: 'offline_maps', title: 'Download Offline Maps for Destination', subtitle: 'Download offline Google Maps for navigation without cellular data.' },

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
-import { Trip, BagType, WeightUnit, Bag } from '../types/travel';
+import { Trip, BagType, WeightUnit, Bag, BagMaterial, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
 import { DepartureCountdownCard } from './DepartureCountdownCard';
 import { exportTripToPDF } from '../utils/pdfExport';
@@ -18,6 +18,8 @@ import {
   Search, 
   AlertTriangle,
   Scale,
+  Shield,
+  Layers,
   Users,
   User,
   Droplets,
@@ -77,7 +79,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
     resetAllPacked
   } = usePacking();
 
-  const { isPro, canAddTraveler, canAddBag, openPaywall } = useSubscription();
+  const { isPro, tier, canAddTraveler, canAddBag, openPaywall } = useSubscription();
 
   const [showPresetsModal, setShowPresetsModal] = useState(false);
   const [showLuggageQrModal, setShowLuggageQrModal] = useState(false);
@@ -188,8 +190,13 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
 
   const currentBag = trip.bags.find((b) => b.id === selectedBagId) || displayedBags[0] || trip.bags[0] || null;
 
-  // Calculate estimated weight for current bag
-  const totalWeightLbs = useMemo(() => {
+  // Calculate estimated weight for current bag (including empty bag tare weight)
+  const emptyTareLbs = useMemo(() => {
+    if (!currentBag) return 0;
+    return getBagEmptyWeightLbs(currentBag);
+  }, [currentBag]);
+
+  const itemsWeightLbs = useMemo(() => {
     if (!currentBag) return 0;
     return currentBag.items.reduce((sum, item) => {
       const itemWeight = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
@@ -197,9 +204,16 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
     }, 0);
   }, [currentBag]);
 
+  const totalWeightLbs = useMemo(() => {
+    return emptyTareLbs + itemsWeightLbs;
+  }, [emptyTareLbs, itemsWeightLbs]);
+
   const displayWeight = weightUnit === 'KG'
     ? DefaultSuggestions.convertLbsToKg(totalWeightLbs)
     : totalWeightLbs;
+  const displayTare = weightUnit === 'KG'
+    ? DefaultSuggestions.convertLbsToKg(emptyTareLbs)
+    : emptyTareLbs;
   const unitLabel = weightUnit === 'KG' ? 'kg' : 'lbs';
 
   const typicalLimitLbs = useMemo(() => {
@@ -313,8 +327,9 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
   };
 
   const handleOpenAddBagSafe = () => {
-    if (!isPro && trip.bags.length >= 3) {
-      openPaywall("The Free Plan is limited to a maximum of 3 bags total. Upgrade to Gate Ready Pro to pack unlimited bags.");
+    const bagCheck = canAddBag(trip.bags, 'CARRY_ON');
+    if (!bagCheck.allowed) {
+      openPaywall(bagCheck.reason);
       return;
     }
     onOpenAddBag();
@@ -322,7 +337,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
 
   const handleExportPDF = () => {
     if (!isPro) {
-      openPaywall("PDF Packing List Export is exclusive to Gate Ready Pro. Upgrade to download beautifully organized PDF lists formatted by baggage and travelers.");
+      openPaywall("PDF Packing List Export is included with Silver, Gold, and Platinum plans. Upgrade to download beautifully organized PDF lists formatted by baggage and travelers.");
       return;
     }
     exportTripToPDF(trip, weightUnit);
@@ -411,11 +426,11 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">
                       Select Traveler
                     </span>
-                    {!isPro ? (
+                    {tier === 'FREE' ? (
                       <button
                         onClick={() => {
                           setPackerDropdownOpen(false);
-                          openPaywall("The Free Plan is limited to 1 traveler. Upgrade to Gate Ready Pro to pack for your whole family.");
+                          openPaywall("Free Plan allows 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for companions and family.");
                         }}
                         className="text-[10px] text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 hover:bg-amber-200 transition-colors cursor-pointer"
                       >
@@ -425,7 +440,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     ) : (
                       <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold flex items-center gap-1">
                         <Crown className="w-2.5 h-2.5 fill-purple-600 text-purple-600" />
-                        <span>Pro: Unlimited</span>
+                        <span>{tier === 'PLATINUM' ? 'Platinum: Unlimited' : tier === 'GOLD' ? 'Gold: 2 Max' : 'Silver: 1 Traveler'}</span>
                       </span>
                     )}
                   </div>
@@ -596,15 +611,16 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     ) : (
                       <button
                         onClick={() => {
-                          if (!isPro && familyMembers.length >= 1) {
+                          const check = canAddTraveler(familyMembers.length);
+                          if (!check.allowed) {
                             setPackerDropdownOpen(false);
-                            openPaywall("The Free Plan is limited to 1 traveler. Upgrade to Gate Ready Pro to pack for multiple family members, children, or group companions.");
+                            openPaywall(check.reason);
                             return;
                           }
                           setShowAddTravelerInline(true);
                         }}
                         className={`w-full py-1.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                          !isPro && familyMembers.length >= 1
+                          !canAddTraveler(familyMembers.length).allowed
                             ? 'text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 border border-amber-200 dark:border-amber-800/60'
                             : 'text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50'
                         }`}
@@ -938,6 +954,18 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
                         {getBagTypeBadge(currentBag.type)}
                       </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
+                        (currentBag.material || 'HARD_SHELL') === 'HARD_SHELL'
+                          ? 'bg-purple-50 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                          : 'bg-indigo-50 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                      }`}>
+                        {(currentBag.material || 'HARD_SHELL') === 'HARD_SHELL' ? (
+                          <Shield className="w-2.5 h-2.5 text-purple-600" />
+                        ) : (
+                          <Layers className="w-2.5 h-2.5 text-indigo-500" />
+                        )}
+                        <span>{(currentBag.material || 'HARD_SHELL') === 'HARD_SHELL' ? 'Hard Shell' : 'Fabric'} · {displayTare.toFixed(1)} {unitLabel}</span>
+                      </span>
                       {currentBag.assignedTo && (
                         <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                           Assigned to: {currentBag.assignedTo}
@@ -963,7 +991,9 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                       / {typicalLimitDisplay.toFixed(0)} {unitLabel}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 font-medium">Estimated allowance weight</p>
+                  <p className="text-[10px] text-slate-400 font-medium">
+                    incl. {displayTare.toFixed(1)} {unitLabel} {(currentBag.material || 'HARD_SHELL') === 'FABRIC' ? 'fabric' : 'hard shell'} bag
+                  </p>
                 </div>
 
                 {trip.bags.length > 1 && (
