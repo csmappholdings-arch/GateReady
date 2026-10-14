@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Trip } from '../types/travel';
 import { useSubscription } from '../context/SubscriptionContext';
+import { computeCountdown } from '../utils/countdownUtils';
 import { 
   Clock, 
-  Lock, 
   Crown, 
   Sparkles, 
   Calendar, 
-  Edit3, 
-  ArrowRight,
   PlaneTakeoff,
   PlaneLanding,
-  CheckCircle2
+  CheckCircle2,
+  Navigation,
+  Train,
+  Car,
+  Ship,
+  Bus
 } from 'lucide-react';
 
 interface TripCountdownBannerProps {
@@ -19,89 +22,58 @@ interface TripCountdownBannerProps {
   onOpenEditSchedule: () => void;
 }
 
-interface TimeRemaining {
-  totalMs: number;
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-  isPast: boolean;
-  isToday: boolean;
-}
-
 export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
   trip,
   onOpenEditSchedule
 }) => {
-  const { isPro, openPaywall } = useSubscription();
+  const { isPro } = useSubscription();
 
-  // Active mode: 'departure' (Outbound) or 'return' (Return Trip)
+  // Active leg: 'departure' (Outbound) or 'return' (Return Leg)
   const [activeLeg, setActiveLeg] = useState<'departure' | 'return'>('departure');
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
+  const [nowTick, setNowTick] = useState<number>(Date.now());
+
+  const isFlight = !trip.travelType || trip.travelType === 'PLANE';
 
   // Auto-switch to Return countdown for Pro users if departure date/time has already passed
   useEffect(() => {
     if (!isPro || !trip.departureDate) return;
-    const depDateTime = new Date(`${trip.departureDate}T${trip.departureTime || '09:00'}:00`);
-    const now = new Date();
-    
-    if (trip.returnTripDate && depDateTime < now) {
+    const depRes = computeCountdown(trip.departureDate, trip.departureTime || '09:00');
+    if (trip.returnTripDate && depRes.isPast) {
       setActiveLeg('return');
     }
   }, [trip.departureDate, trip.departureTime, trip.returnTripDate, isPro]);
 
-  // Live countdown timer calculation for all users
+  // Live ticking interval every second
   useEffect(() => {
-    const calculateTime = () => {
-      const targetDateStr = activeLeg === 'departure' ? trip.departureDate : trip.returnTripDate;
-      const targetTimeStr = activeLeg === 'departure' ? trip.departureTime || '09:00' : trip.returnTripTime || '17:00';
-
-      if (!targetDateStr) {
-        setTimeRemaining(null);
-        return;
-      }
-
-      const target = new Date(`${targetDateStr}T${targetTimeStr}:00`);
-      if (isNaN(target.getTime())) {
-        setTimeRemaining(null);
-        return;
-      }
-
-      const now = new Date();
-      const diffMs = target.getTime() - now.getTime();
-
-      const isPast = diffMs < 0;
-      const isToday = !isPast && diffMs < 24 * 60 * 60 * 1000 && target.getDate() === now.getDate();
-
-      const absDiff = Math.abs(diffMs);
-      const days = Math.floor(absDiff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((absDiff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((absDiff / (1000 * 60)) % 60);
-      const seconds = Math.floor((absDiff / 1000) % 60);
-
-      setTimeRemaining({
-        totalMs: diffMs,
-        days,
-        hours,
-        minutes,
-        seconds,
-        isPast,
-        isToday
-      });
-    };
-
-    calculateTime();
-    const interval = setInterval(calculateTime, 1000);
+    const interval = setInterval(() => {
+      setNowTick(Date.now());
+    }, 1000);
     return () => clearInterval(interval);
-  }, [trip.departureDate, trip.departureTime, trip.returnTripDate, trip.returnTripTime, activeLeg]);
+  }, []);
 
-  // Pad numbers with leading zero
+  const targetDateStr = activeLeg === 'departure' ? trip.departureDate : trip.returnTripDate;
+  const targetTimeStr = activeLeg === 'departure' ? trip.departureTime || '09:00' : trip.returnTripTime || '17:00';
+  const hasTargetDate = Boolean(targetDateStr && targetDateStr.trim());
+
+  // Compute countdown on every render via single source of truth
+  const countdown = computeCountdown(targetDateStr, targetTimeStr);
+
   const padZero = (n: number) => n.toString().padStart(2, '0');
 
   const formatTargetDate = (dateStr?: string, timeStr?: string) => {
     if (!dateStr) return 'Not set';
     try {
-      const d = new Date(`${dateStr}T${timeStr || '09:00'}:00`);
+      const cleanDate = dateStr.trim();
+      const cleanTime = (timeStr || '09:00').trim();
+      let d: Date;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
+        const [y, m, day] = cleanDate.split('-').map(Number);
+        const [h, min] = cleanTime.split(':').map((v) => parseInt(v, 10) || 0);
+        d = new Date(y, m - 1, day, h || 0, min || 0, 0, 0);
+      } else {
+        d = new Date(`${cleanDate}T${cleanTime}:00`);
+      }
+      if (isNaN(d.getTime())) return dateStr;
       return d.toLocaleDateString(undefined, { 
         weekday: 'short', 
         month: 'short', 
@@ -113,10 +85,24 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
     }
   };
 
-  // =========================================================================
-  // 2. PRO UNLOCKED: FULL INTERACTIVE COUNTDOWN CLOCK & DUAL-LEG TIMERS
-  // =========================================================================
-  const hasTargetDate = activeLeg === 'departure' ? !!trip.departureDate : !!trip.returnTripDate;
+  const getLegIcon = (isReturn: boolean) => {
+    if (isFlight) {
+      return isReturn ? <PlaneLanding className="w-3 h-3 text-indigo-300" /> : <PlaneTakeoff className="w-3 h-3 text-amber-300" />;
+    }
+    if (trip.travelType === 'TRAIN') return <Train className="w-3 h-3 text-emerald-300" />;
+    if (trip.travelType === 'CRUISE') return <Ship className="w-3 h-3 text-cyan-300" />;
+    if (trip.travelType === 'BUS') return <Bus className="w-3 h-3 text-fuchsia-300" />;
+    if (trip.travelType === 'CAR') return <Car className="w-3 h-3 text-amber-300" />;
+    return <Navigation className="w-3 h-3 text-purple-300" />;
+  };
+
+  const outboundLabel = isFlight ? 'Outbound Flight' : 'Outbound Leg';
+  const returnLabel = isFlight ? 'Return Flight' : 'Return Leg';
+  const bannerTitle = isFlight ? 'Flight Countdown Clock' : 'Departure Countdown';
+
+  // Safeguard route display: avoid raw "T" or empty placeholders
+  const validOrigin = trip.originCity && trip.originCity.trim().length > 1 ? trip.originCity.trim() : null;
+  const validDest = trip.destinationCity && trip.destinationCity.trim().length > 1 ? trip.destinationCity.trim() : null;
 
   return (
     <div className="w-full rounded-2xl bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 text-white border border-purple-500/30 shadow-md overflow-hidden mb-2.5">
@@ -127,7 +113,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
             <Clock className="w-3 h-3 animate-pulse" />
           </div>
           <span className="text-xs font-black uppercase tracking-wider text-purple-200">
-            Flight Countdown Clock
+            {bannerTitle}
           </span>
           {isPro ? (
             <span className="inline-flex items-center gap-0.5 bg-purple-500/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-amber-300/30">
@@ -138,14 +124,19 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
               Live Ticking
             </span>
           )}
-          {(trip.originCity || trip.destinationCity) && (
+          {validOrigin && validDest && (
             <span className="text-[11px] text-purple-300/80 hidden sm:inline">
-              · {trip.originCity || 'Origin'} ➔ {trip.destinationCity || trip.name}
+              · {validOrigin} ➔ {validDest}
+            </span>
+          )}
+          {!validOrigin && validDest && (
+            <span className="text-[11px] text-purple-300/80 hidden sm:inline">
+              · To {validDest}
             </span>
           )}
         </div>
 
-        {/* Pro Dual-Leg Switcher: Outbound vs Return */}
+        {/* Dual-Leg Switcher: Outbound vs Return */}
         <div className="flex items-center gap-1 bg-white/10 dark:bg-black/40 p-0.5 rounded-lg border border-white/10">
           <button
             type="button"
@@ -156,8 +147,8 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
                 : 'text-purple-200 hover:text-white hover:bg-white/10'
             }`}
           >
-            <PlaneTakeoff className="w-3 h-3 text-amber-300" />
-            <span>Outbound Flight</span>
+            {getLegIcon(false)}
+            <span>{outboundLabel}</span>
           </button>
 
           <button
@@ -169,8 +160,8 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
                 : 'text-purple-200 hover:text-white hover:bg-white/10'
             }`}
           >
-            <PlaneLanding className="w-3 h-3 text-indigo-300" />
-            <span>Return Flight</span>
+            {getLegIcon(true)}
+            <span>{returnLabel}</span>
           </button>
         </div>
       </div>
@@ -178,21 +169,23 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
       {/* Main Countdown Display Area */}
       <div className="p-3 sm:p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Left: Digital Clock Blocks or Empty State */}
-        {!hasTargetDate ? (
+        {!hasTargetDate || !countdown.isValid ? (
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-300/30 flex items-center justify-center shrink-0">
               <Calendar className="w-5 h-5 text-amber-300" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-bold text-white">
-                {activeLeg === 'departure' ? 'No departure date scheduled' : 'No return flight date scheduled'}
+                {activeLeg === 'departure' 
+                  ? 'No departure date scheduled' 
+                  : (isFlight ? 'No return flight date scheduled' : 'No return leg date scheduled')}
               </p>
               <p className="text-[11px] text-purple-200/80 mt-0.5">
-                Set your {activeLeg === 'departure' ? 'departure' : 'return'} date and flight time to start the live countdown clock.
+                Set your {activeLeg === 'departure' ? 'departure' : 'return'} schedule to start the live countdown clock.
               </p>
             </div>
           </div>
-        ) : timeRemaining && timeRemaining.isPast ? (
+        ) : countdown.isPast ? (
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-emerald-400/20 border border-emerald-300/40 text-emerald-300 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-5 h-5" />
@@ -200,40 +193,42 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/60 px-2 py-0.2 rounded-full border border-emerald-500/40">
-                  {activeLeg === 'departure' ? 'Outbound Flight Completed' : 'Return Flight Completed'}
+                  {activeLeg === 'departure' ? `${outboundLabel} Completed` : `${returnLabel} Completed`}
                 </span>
               </div>
               <p className="text-xs sm:text-sm font-bold text-white mt-0.5">
                 {activeLeg === 'departure' 
-                  ? 'Your outbound flight has departed!' 
+                  ? (isFlight ? 'Your outbound flight has departed!' : 'Your outbound leg has departed!')
                   : 'Welcome home from your trip!'}
               </p>
               <p className="text-[11px] text-purple-200/70 mt-0.5">
-                Scheduled: {formatTargetDate(activeLeg === 'departure' ? trip.departureDate : trip.returnTripDate, activeLeg === 'departure' ? trip.departureTime : trip.returnTripTime)}
+                Scheduled: {formatTargetDate(targetDateStr, targetTimeStr)}
               </p>
             </div>
           </div>
-        ) : timeRemaining ? (
+        ) : (
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] font-extrabold text-amber-300 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 fill-amber-300" />
                 <span>
-                  {activeLeg === 'departure' ? 'Countdown to Takeoff' : 'Countdown to Return'}:
+                  {activeLeg === 'departure' 
+                    ? (isFlight ? 'Countdown to Takeoff' : 'Countdown to Departure')
+                    : (isFlight ? 'Countdown to Return Flight' : 'Countdown to Return Leg')}:
                 </span>
               </span>
               <span className="text-[10px] text-purple-300 bg-purple-900/50 px-2 py-0.2 rounded-md border border-purple-700/50">
-                {formatTargetDate(activeLeg === 'departure' ? trip.departureDate : trip.returnTripDate, activeLeg === 'departure' ? trip.departureTime : trip.returnTripTime)}
+                {formatTargetDate(targetDateStr, targetTimeStr)}
               </span>
             </div>
 
-            {/* 4 Digital Timer Blocks: Days, Hours, Minutes, Seconds */}
+            {/* 4 Digital Timer Blocks: Days, Hours, Minutes, Seconds accurately mapped */}
             <div className="flex items-center gap-1.5 sm:gap-2 pt-0.5">
               {/* Days */}
               <div className="flex flex-col items-center">
                 <div className="w-10 sm:w-12 h-9 sm:h-10 rounded-xl bg-white/10 backdrop-blur-md border border-purple-400/30 flex items-center justify-center shadow-md shadow-purple-950/40">
                   <span className="text-base sm:text-lg font-black text-white tracking-tight font-mono">
-                    {padZero(timeRemaining.days)}
+                    {padZero(countdown.days)}
                   </span>
                 </div>
                 <span className="text-[8px] uppercase tracking-wider font-extrabold text-purple-300 mt-0.5">
@@ -247,7 +242,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
               <div className="flex flex-col items-center">
                 <div className="w-10 sm:w-12 h-9 sm:h-10 rounded-xl bg-white/10 backdrop-blur-md border border-purple-400/30 flex items-center justify-center shadow-md shadow-purple-950/40">
                   <span className="text-base sm:text-lg font-black text-white tracking-tight font-mono">
-                    {padZero(timeRemaining.hours)}
+                    {padZero(countdown.hours)}
                   </span>
                 </div>
                 <span className="text-[8px] uppercase tracking-wider font-extrabold text-purple-300 mt-0.5">
@@ -261,7 +256,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
               <div className="flex flex-col items-center">
                 <div className="w-10 sm:w-12 h-9 sm:h-10 rounded-xl bg-white/10 backdrop-blur-md border border-purple-400/30 flex items-center justify-center shadow-md shadow-purple-950/40">
                   <span className="text-base sm:text-lg font-black text-white tracking-tight font-mono">
-                    {padZero(timeRemaining.minutes)}
+                    {padZero(countdown.minutes)}
                   </span>
                 </div>
                 <span className="text-[8px] uppercase tracking-wider font-extrabold text-purple-300 mt-0.5">
@@ -275,7 +270,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
               <div className="flex flex-col items-center">
                 <div className="w-10 sm:w-12 h-9 sm:h-10 rounded-xl bg-amber-400/20 backdrop-blur-md border border-amber-400/40 flex items-center justify-center shadow-md shadow-amber-950/40">
                   <span className="text-base sm:text-lg font-black text-amber-300 tracking-tight font-mono">
-                    {padZero(timeRemaining.seconds)}
+                    {padZero(countdown.seconds)}
                   </span>
                 </div>
                 <span className="text-[8px] uppercase tracking-wider font-extrabold text-amber-300 mt-0.5">
@@ -284,7 +279,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
               </div>
             </div>
           </div>
-        ) : null}
+        )}
 
         {/* Right: Quick Action to Edit Schedule */}
         <div className="flex items-center gap-2 self-start md:self-center shrink-0">
@@ -293,8 +288,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
             onClick={onOpenEditSchedule}
             className="h-9 px-3.5 rounded-xl border border-purple-400/40 bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
-            <Edit3 className="w-3.5 h-3.5 text-purple-300" />
-            <span>{hasTargetDate ? 'Edit Date & Time' : 'Set Flight Date'}</span>
+            <span>{hasTargetDate ? 'Edit Schedule' : 'Set Departure Date'}</span>
           </button>
         </div>
       </div>

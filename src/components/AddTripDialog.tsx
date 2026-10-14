@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
+import { DatePickerInput } from './DatePickerInput';
 
 interface AddTripDialogProps {
   isOpen: boolean;
@@ -400,7 +401,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
       finalFamily,
       {
         originCity: originCity.trim(),
-        destinationCity: destinationCity.trim() || tripTitle,
+        destinationCity: destinationCity.trim(),
         departureDate,
         departureTime,
         returnTripDate,
@@ -856,13 +857,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                     <Calendar className="w-3.5 h-3.5 text-purple-600" />
                     <span>Departure Date</span>
                   </label>
-                  <input
-                    type="date"
+                  <DatePickerInput
                     value={departureDate}
-                    onChange={(e) => setDepartureDate(e.target.value)}
-                    className={`w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white ${
-                      isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'
-                    }`}
+                    onChange={(val) => setDepartureDate(val)}
+                    className={isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'}
                   />
                 </div>
 
@@ -960,14 +958,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                         <Calendar className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Return Date</span>
                       </label>
-                      <input
-                        type="date"
-                        disabled={!isPro}
+                      <DatePickerInput
                         value={isPro ? returnTripDate : ''}
-                        onChange={(e) => setReturnTripDate(e.target.value)}
-                        className={`w-full rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white ${
-                          isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'
-                        }`}
+                        onChange={(val) => isPro && setReturnTripDate(val)}
+                        className={isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'}
                       />
                     </div>
 

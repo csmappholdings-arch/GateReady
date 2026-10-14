@@ -9,9 +9,24 @@ interface MobileSyncBannerProps {
 
 export const MobileSyncBanner: React.FC<MobileSyncBannerProps> = ({ onOpenAccountModal }) => {
   const { user, signIn, loading } = useAuth();
-  const { cloudSyncStatus } = usePacking();
-  const [dismissed, setDismissed] = useState(false);
+  const SYNC_BANNER_STORAGE_KEY = 'gateready_sync_banner_dismissed_v1';
+  const [dismissed, setDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(SYNC_BANNER_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [isSigningIn, setIsSigningIn] = useState(false);
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    try {
+      localStorage.setItem(SYNC_BANNER_STORAGE_KEY, 'true');
+    } catch {
+      // Ignore
+    }
+  };
 
   if (dismissed || user) {
     return null;
@@ -93,7 +108,7 @@ export const MobileSyncBanner: React.FC<MobileSyncBannerProps> = ({ onOpenAccoun
           )}
           
           <button
-            onClick={() => setDismissed(true)}
+            onClick={handleDismiss}
             className="w-7 h-7 rounded-lg text-purple-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Dismiss banner"
           >

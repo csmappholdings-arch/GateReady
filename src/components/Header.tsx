@@ -82,6 +82,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [tripMenuOpen, setTripMenuOpen] = useState(false);
   const [accountSyncModalOpen, setAccountSyncModalOpen] = useState(false);
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 
@@ -92,6 +93,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
 
   const settingsRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+  const tripMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
@@ -101,12 +103,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
       if (userRef.current && !userRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);
       }
+      if (tripMenuRef.current && !tripMenuRef.current.contains(e.target as Node)) {
+        setTripMenuOpen(false);
+      }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSettingsOpen(false);
         setUserMenuOpen(false);
+        setTripMenuOpen(false);
       }
     };
 
@@ -209,7 +215,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
           <div className="flex items-center">
             {isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs border border-amber-300/40">
-                <Crown className="w-2.5 h-2.5 fill-white" /> Pro
+                <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
               </span>
             ) : (
               <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2 py-0.5 rounded-full">
@@ -641,10 +647,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                     <Crown className={`w-4 h-4 ${isPro ? 'fill-amber-400 text-amber-500' : 'text-purple-600 dark:text-purple-400'}`} />
                     <div>
                       <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                        {isPro ? 'Gate Ready Pro' : 'Free Plan'}
+                        {isMasterKey ? 'Master VIP Pass' : tier === 'PLATINUM' ? 'Gate Ready Platinum' : tier === 'GOLD' ? 'Gate Ready Gold' : tier === 'SILVER' ? 'Gate Ready Silver' : 'Free Plan'}
                       </p>
                       <p className="text-[10px] text-slate-400">
-                        {isPro ? 'Unlimited travelers & bags' : '1 traveler · Up to 2 bags'}
+                        {tier === 'PLATINUM' || isMasterKey
+                          ? 'Unlimited travelers, bags & trips · VIP Priority'
+                          : tier === 'GOLD'
+                          ? 'Up to 6 travelers · Unlimited bags & trips · Cloud sync'
+                          : tier === 'SILVER'
+                          ? 'Up to 2 travelers · Unlimited bags · 2 active trips'
+                          : '1 traveler · Up to 2 bags · 1 active trip'}
                       </p>
                     </div>
                   </div>
@@ -716,7 +728,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
                         )}
                       </div>
                       <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-200 dark:bg-emerald-900 text-emerald-950 dark:text-emerald-100 px-1.5 py-0.5 rounded-md shrink-0">
-                        {isMasterKey ? 'Master VIP' : '1 Month Pro'}
+                        {isMasterKey ? 'Master VIP' : tier === 'PLATINUM' ? 'Platinum VIP' : tier === 'GOLD' ? 'Gold VIP' : 'Silver 1-Month'}
                       </span>
                     </div>
                   )}

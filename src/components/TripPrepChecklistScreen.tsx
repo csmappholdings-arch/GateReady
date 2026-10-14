@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { AirportCitySearchInput } from './AirportCitySearchInput';
 import { TerminalHubMapsAdvisor } from './TerminalHubMapsAdvisor';
+import { getDestinationSafetyIntel } from '../data/emergencyNumbers';
 
 interface TripPrepChecklistScreenProps {
   trip: Trip;
@@ -84,8 +85,12 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
   const { updateTripDetails, addItemToBag, selectedBagId, tempUnit, setTempUnit } = usePacking();
   const { isPro, openPaywall } = useSubscription();
 
+  const rawCity = trip.destinationCity?.trim();
+  const hasRealDestination = Boolean(rawCity && rawCity.length > 1);
+  const city = hasRealDestination ? rawCity! : '';
+
   const [intelSubTab, setIntelSubTab] = useState<'PREP' | 'MAPS'>(initialSubTab || 'PREP');
-  const [destinationInput, setDestinationInput] = useState(trip.destinationCity || trip.name || 'London, UK');
+  const [destinationInput, setDestinationInput] = useState(trip.destinationCity || '');
   const [isEditingDestination, setIsEditingDestination] = useState(false);
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
   const [tripDays, setTripDays] = useState(5);
@@ -112,10 +117,14 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
     home_security: false
   });
 
-  const city = trip.destinationCity || trip.name || 'London, UK';
+  const safetyIntel = useMemo(() => {
+    return getDestinationSafetyIntel(hasRealDestination ? city : undefined);
+  }, [city, hasRealDestination]);
 
   // 1. Weather Forecast Intel (Free for all users)
   const forecast: WeatherForecastDay[] = useMemo(() => {
+    if (!hasRealDestination) return [];
+
     const lower = city.toLowerCase();
 
     if (lower.includes('london') || lower.includes('uk') || lower.includes('seattle') || lower.includes('ireland')) {
@@ -548,7 +557,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 </span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Weather conditions & packing recommendations for <strong className="text-purple-700 dark:text-purple-300">{city}</strong>
+                {hasRealDestination ? (
+                  <>Weather conditions & packing recommendations for <strong className="text-purple-700 dark:text-purple-300">{city}</strong></>
+                ) : (
+                  <>Add a destination to see weather advice</>
+                )}
               </p>
             </div>
           </div>
@@ -615,14 +628,34 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 className="text-xs font-bold text-purple-700 dark:text-purple-300 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <MapPin className="w-3.5 h-3.5" />
-                <span>Change Destination City</span>
+                <span>{hasRealDestination ? 'Change Destination City' : 'Set Destination City'}</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* 5-Day Forecast Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        {/* 5-Day Forecast Grid or Clean Empty State */}
+        {!hasRealDestination ? (
+          <div className="p-6 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-dashed border-purple-200 dark:border-purple-800 text-center space-y-2">
+            <CloudSun className="w-8 h-8 text-purple-400 mx-auto" />
+            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              Add a destination to see weather advice
+            </h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Set your destination city to view 5-day climate forecasts, rain probability, and tailored clothing recommendations.
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsEditingDestination(true)}
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Destination City</span>
+            </button>
+          </div>
+        ) : (
+          <>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {forecast.map((day, idx) => (
             <div
               key={idx}
@@ -703,6 +736,8 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             })}
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* ============================================================== */}
@@ -1231,7 +1266,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 </span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Critical numbers and translations for <strong className="text-rose-600 dark:text-rose-300">{city}</strong>.
+                Critical verified numbers and assistance for <strong className="text-rose-600 dark:text-rose-300">{hasRealDestination ? city : 'your destination'}</strong>.
               </p>
             </div>
           </div>
@@ -1244,7 +1279,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 <PhoneCall className="w-3.5 h-3.5" /> Police Emergency
               </span>
               <span className="px-2 py-0.5 rounded-lg bg-rose-600 text-white font-black text-xs">
-                Dial 911 / 112
+                {safetyIntel.policeNumber}
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
@@ -1258,7 +1293,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 <HeartPulse className="w-3.5 h-3.5" /> Ambulance & Medical
               </span>
               <span className="px-2 py-0.5 rounded-lg bg-rose-600 text-white font-black text-xs">
-                Dial 911 / 112
+                {safetyIntel.ambulanceNumber}
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
@@ -1269,14 +1304,14 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
           <div className="p-3.5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5" /> Tourist Helpline
+                <ShieldCheck className="w-3.5 h-3.5" /> {safetyIntel.assistanceLabel}
               </span>
               <span className="text-xs font-black text-slate-800 dark:text-slate-200">
-                Dial +1-800-TRIP
+                {safetyIntel.assistanceNumber}
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-              Multi-lingual operator assistance for lost property & directions.
+              {safetyIntel.assistanceNotes}
             </p>
           </div>
         </div>

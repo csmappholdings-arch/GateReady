@@ -3,6 +3,7 @@ import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { Trip, DepartureReminder } from '../types/travel';
 import { getDefaultDepartureReminders } from '../data/defaultReminders';
+import { computeCountdown } from '../utils/countdownUtils';
 import { 
   Clock, 
   Calendar, 
@@ -83,34 +84,22 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
         return;
       }
 
-      const departureString = `${trip.departureDate}T${trip.departureTime || '09:00'}:00`;
-      const targetTime = new Date(departureString).getTime();
-      const now = new Date().getTime();
-      const difference = targetTime - now;
-
-      if (isNaN(targetTime)) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: false, totalHoursLeft: 0 });
-        return;
-      }
-
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true, totalHoursLeft: 0 });
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-      const totalHoursLeft = Math.floor(difference / (1000 * 60 * 60));
-
-      setTimeLeft({ days, hours, minutes, seconds, isPast: false, totalHoursLeft });
+      const res = computeCountdown(trip.departureDate, trip.departureTime || '09:00');
+      setTimeLeft({
+        days: res.days,
+        hours: res.hours,
+        minutes: res.minutes,
+        seconds: res.seconds,
+        isPast: res.isPast,
+        totalHoursLeft: res.totalHours
+      });
     };
 
     calculateTimeRemaining();
     const interval = setInterval(calculateTimeRemaining, 1000);
     return () => clearInterval(interval);
   }, [trip.departureDate, trip.departureTime]);
+
 
   const reminders = trip.departureReminders && trip.departureReminders.length > 0
     ? trip.departureReminders
@@ -269,7 +258,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
             <div className="w-full sm:w-auto flex-1">
               <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300 mb-1">
-                Departure Time (Local Flight/Train)
+                Departure Time (Local {!trip.travelType || trip.travelType === 'PLANE' ? 'Flight' : trip.travelType === 'TRAIN' ? 'Train' : 'Departure'})
               </label>
               <input
                 type="time"
@@ -333,7 +322,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                   }`}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span>{trip.isReturnRepackMode ? 'Exit Return Repack Mode' : 'Start Return Flight Repack (Pro)'}</span>
+                  <span>{trip.isReturnRepackMode ? 'Exit Return Repack Mode' : (!trip.travelType || trip.travelType === 'PLANE' ? 'Start Return Flight Repack (Pro)' : 'Start Return Leg Repack (Pro)')}</span>
                 </button>
               </div>
             ) : (

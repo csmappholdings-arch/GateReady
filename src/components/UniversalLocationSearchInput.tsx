@@ -57,11 +57,12 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
   // Compute live search suggestions based on travelType
   const suggestions: LocationSearchResult[] = useMemo(() => {
     if (!isOpen) return [];
+    const safeQuery = (query || '').trim();
 
     if (travelType === 'PLANE') {
-      const results = query.trim().length === 0 
+      const results = safeQuery.length === 0 
         ? searchAirportsAndCities('', 7)
-        : searchAirportsAndCities(query, 8);
+        : searchAirportsAndCities(safeQuery, 8);
 
       return results.map((a) => ({
         title: a.city,
@@ -110,9 +111,9 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
     }
 
     // CAR / ROAD TRIP: Search airports/cities database for major destinations & cities
-    const results = query.trim().length === 0
+    const results = safeQuery.length === 0
       ? searchAirportsAndCities('', 7)
-      : searchAirportsAndCities(query, 8);
+      : searchAirportsAndCities(safeQuery, 8);
 
     return results.map((a) => ({
       title: a.city,

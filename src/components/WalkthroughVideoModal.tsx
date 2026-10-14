@@ -97,7 +97,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   },
   {
     id: 'terminal_maps',
-    title: '4. [PRO] Worldwide Terminal Maps & Phone Radar',
+    title: '4. [Silver+] Worldwide Terminal Maps & Phone Radar',
     tagline: 'Post-security cold water stations, restrooms & gate wayfinding',
     description: 'Gate Ready Pro unlocks dynamic terminal schematics for major global airports, high-speed rail stations, and cruise terminals. Use your phone location beacon to calculate real-time walking distance and time to the nearest cold water refill station (saving $6+ per bottle) and restrooms along your gate path.',
     duration: 7.5,
@@ -113,7 +113,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   },
   {
     id: 'cabin',
-    title: '5. [PRO] Aircraft Cabin Intel & In-Seat Power',
+    title: '5. [Silver+] Aircraft Cabin Intel & In-Seat Power',
     tagline: 'AC power outlets, USB-C watts & overhead bin dimensions',
     description: 'Never get stuck with a dead laptop or a gate-checked roller bag. Gate Ready Pro provides seat-back electrical outlet maps (110V AC vs USB-C PD wattages) and overhead bin clearances for 20+ commercial aircraft (Boeing 787, 737 MAX, Airbus A350, A321neo) and train coach classes.',
     duration: 6.5,
@@ -129,7 +129,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   },
   {
     id: 'recovery',
-    title: '6. [PRO] Privacy QR Luggage Tags & PDF Exports',
+    title: '6. [Silver+] Privacy QR Luggage Tags & PDF Exports',
     tagline: 'Conceal home address with instant WhatsApp bag recovery',
     description: 'Gate Ready Pro issues smart privacy-safe QR luggage tags. Unlike traditional luggage tags that display your home address to onlookers, these QR tags allow airlines and good Samaritans to contact you directly via WhatsApp or encrypted phone. Export high-resolution formatted PDF lists for one-tap printing.',
     duration: 6.5,
@@ -145,7 +145,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   },
   {
     id: 'pro_vs_free',
-    title: '7. Gate Ready Pro vs Free Comparison',
+    title: '7. Plans: Free vs Silver vs Gold vs Platinum',
     tagline: 'Choose the plan that fits your travel style',
     description: 'Start free with essential luggage scales and packing checklists. Upgrade to Silver, Gold, or Platinum for unlimited bags, interactive terminal maps, privacy QR tags, multiple travelers, and multi-device cloud sync. All paid plans include a 14-day money-back guarantee.',
     duration: 8.5,
@@ -154,9 +154,9 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     isPro: true,
     features: [
       'Free ($0): 1 traveler, 1 active trip, 2 bags, live weight scales, TSA liquids checker',
-      'Silver ($1.99/mo or $19.99/yr): 1 traveler, 2 active trips, unlimited bags & all core tools',
-      'Gold ($3.99/mo or $29.99/yr): 2 travelers, unlimited active trips, multi-device cloud sync (Most Popular)',
-      'Platinum ($4.99/mo or $39.99/yr): Unlimited travelers & family sharing'
+      'Silver ($1.99/mo or $19.99/year): 1 traveler, 2 active trips, unlimited bags & all core tools',
+      'Gold ($3.99/mo or $29.99/year): 2 travelers, unlimited active trips, multi-device cloud sync (Most Popular)',
+      'Platinum ($4.99/mo or $39.99/year): Unlimited travelers & family sharing'
     ],
     mockupType: 'PRO_VS_FREE'
   }
@@ -725,7 +725,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                     <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
                       <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider block">Silver</span>
                       <p className="font-black text-white text-xs">$1.99<span className="text-[8px] text-slate-400 font-normal">/mo</span></p>
-                      <p className="text-[8px] text-emerald-400 font-bold">$19.99/yr · 2 mos free</p>
+                      <p className="text-[8px] text-emerald-400 font-bold">$19.99/year ($1.67/mo) · 2 months free</p>
                       <ul className="space-y-0.5 text-[9px] text-slate-300 pt-1">
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> 1 traveler</li>
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-purple-400 shrink-0" /> 2 active trips</li>
@@ -743,7 +743,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                         <span className="text-[7px] bg-amber-400 text-purple-950 font-black px-1 py-0.2 rounded uppercase">Popular</span>
                       </div>
                       <p className="font-black text-white text-xs">$3.99<span className="text-[8px] text-slate-400 font-normal">/mo</span></p>
-                      <p className="text-[8px] text-emerald-400 font-bold">$29.99/yr · save 37%</p>
+                      <p className="text-[8px] text-emerald-400 font-bold">$29.99/year ($2.50/mo) · save 37%</p>
                       <ul className="space-y-0.5 text-[9px] text-amber-200/90 pt-1">
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> 2 travelers</li>
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-amber-400 shrink-0" /> Unlimited trips</li>
@@ -757,7 +757,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                     <div className="p-2.5 rounded-xl bg-slate-900 border border-indigo-500/50 space-y-1">
                       <span className="text-[9px] font-bold text-indigo-300 uppercase tracking-wider block">Platinum</span>
                       <p className="font-black text-white text-xs">$4.99<span className="text-[8px] text-slate-400 font-normal">/mo</span></p>
-                      <p className="text-[8px] text-emerald-400 font-bold">$39.99/yr · save 33%</p>
+                      <p className="text-[8px] text-emerald-400 font-bold">$39.99/year ($3.33/mo) · save 33%</p>
                       <ul className="space-y-0.5 text-[9px] text-slate-300 pt-1">
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Unlimited travelers</li>
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-indigo-400 shrink-0" /> Family sharing</li>

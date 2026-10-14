@@ -260,7 +260,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               className="h-8.5 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-purple-900 dark:text-purple-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
             >
               <Edit3 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-              <span>{isEditing ? 'Close Editor' : 'Edit Trip & Flight Info'}</span>
+              <span>{isEditing ? 'Close Editor' : (!currentTrip.travelType || currentTrip.travelType === 'PLANE' ? 'Edit Trip & Flight Info' : 'Edit Trip Info')}</span>
             </button>
 
             <button
@@ -307,6 +307,47 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               </button>
             </div>
 
+            {/* Travel Mode Switcher */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300 mb-1.5">
+                Travel Mode
+              </label>
+              <div className="grid grid-cols-5 gap-1.5 p-1 bg-purple-50/70 dark:bg-purple-950/40 rounded-2xl border border-purple-200 dark:border-purple-800">
+                {[
+                  { type: 'PLANE' as TravelType, label: 'Flight', icon: Plane },
+                  { type: 'TRAIN' as TravelType, label: 'Train', icon: Train },
+                  { type: 'CAR' as TravelType, label: 'Road Trip', icon: Car },
+                  { type: 'CRUISE' as TravelType, label: 'Cruise', icon: Ship },
+                  { type: 'BUS' as TravelType, label: 'Bus', icon: Bus },
+                ].map(({ type, label, icon: Icon }) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => {
+                      setEditTravelType(type);
+                      if (type === 'CAR' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
+                        setEditSeatClass('Mid-Size SUV / Car');
+                      } else if (type === 'CRUISE' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
+                        setEditSeatClass('Balcony Stateroom');
+                      } else if (type === 'TRAIN' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
+                        setEditSeatClass('Standard Coach');
+                      } else if (type === 'BUS' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
+                        setEditSeatClass('Standard Reserved Seat');
+                      }
+                    }}
+                    className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${
+                      editTravelType === type
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="text-[11px] truncate">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300 mb-1">
@@ -324,28 +365,28 @@ export const TripBanner: React.FC<TripBannerProps> = ({
 
               <UniversalLocationSearchInput
                 label={
-                  currentTrip.travelType === 'TRAIN' ? 'Departing Train Station' :
-                  currentTrip.travelType === 'CRUISE' ? 'Departure Port' :
-                  currentTrip.travelType === 'BUS' ? 'Bus Departure Terminal' :
-                  currentTrip.travelType === 'CAR' ? 'Starting Location / City' :
+                  editTravelType === 'TRAIN' ? 'Departing Train Station' :
+                  editTravelType === 'CRUISE' ? 'Departure Port' :
+                  editTravelType === 'BUS' ? 'Bus Departure Terminal' :
+                  editTravelType === 'CAR' ? 'Starting Location / City' :
                   'Flying From (Origin Airport)'
                 }
                 iconType="origin"
-                travelType={currentTrip.travelType}
+                travelType={editTravelType}
                 value={editOriginCity}
                 onChange={(formatted) => setEditOriginCity(formatted)}
               />
 
               <UniversalLocationSearchInput
                 label={
-                  currentTrip.travelType === 'TRAIN' ? 'Arrival Train Station' :
-                  currentTrip.travelType === 'CRUISE' ? 'Destination Port' :
-                  currentTrip.travelType === 'BUS' ? 'Bus Arrival Terminal' :
-                  currentTrip.travelType === 'CAR' ? 'Destination / Stop' :
+                  editTravelType === 'TRAIN' ? 'Arrival Train Station' :
+                  editTravelType === 'CRUISE' ? 'Destination Port' :
+                  editTravelType === 'BUS' ? 'Bus Arrival Terminal' :
+                  editTravelType === 'CAR' ? 'Destination / Stop' :
                   'Destination Airport (Arrival)'
                 }
                 iconType="destination"
-                travelType={currentTrip.travelType}
+                travelType={editTravelType}
                 value={editDestinationCity}
                 onChange={(formatted) => setEditDestinationCity(formatted)}
               />
@@ -354,25 +395,25 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300 mb-1">
-                  {currentTrip.travelType === 'CAR' ? 'Vehicle Model' :
-                   currentTrip.travelType === 'TRAIN' ? 'Rail Operator' :
-                   currentTrip.travelType === 'CRUISE' ? 'Cruise Line / Ship' :
-                   currentTrip.travelType === 'BUS' ? 'Bus Operator' :
+                  {editTravelType === 'CAR' ? 'Vehicle Model' :
+                   editTravelType === 'TRAIN' ? 'Rail Operator' :
+                   editTravelType === 'CRUISE' ? 'Cruise Line / Ship' :
+                   editTravelType === 'BUS' ? 'Bus Operator' :
                    'Airline / Carrier'}
                 </label>
                 <CarrierSearchInput
                   value={editCarrier}
                   onChange={(val) => setEditCarrier(val)}
-                  travelType={currentTrip.travelType}
+                  travelType={editTravelType}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300 mb-1">
-                  {currentTrip.travelType === 'CAR' ? 'Vehicle Size / Trunk' :
-                   currentTrip.travelType === 'TRAIN' ? 'Train Coach Class' :
-                   currentTrip.travelType === 'CRUISE' ? 'Stateroom / Cabin' :
-                   currentTrip.travelType === 'BUS' ? 'Bus Seat Type' :
+                  {editTravelType === 'CAR' ? 'Vehicle Size / Trunk' :
+                   editTravelType === 'TRAIN' ? 'Train Coach Class' :
+                   editTravelType === 'CRUISE' ? 'Stateroom / Cabin' :
+                   editTravelType === 'BUS' ? 'Bus Seat Type' :
                    'Seat / Cabin Class'}
                 </label>
                 <input
@@ -500,9 +541,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                 {currentTrip.name || 'Trip Route'}
               </p>
               <p className="text-[11px] text-purple-600 dark:text-purple-300 font-semibold leading-tight mt-0.5">
-                {(currentTrip.originCity || currentTrip.destinationCity)
-                  ? `${currentTrip.originCity || 'Origin'} ➔ ${currentTrip.destinationCity || currentTrip.name}`
-                  : 'Direct Travel Itinerary'}
+                {Boolean(currentTrip.originCity?.trim() && currentTrip.originCity.trim().length > 1 && currentTrip.destinationCity?.trim() && currentTrip.destinationCity.trim().length > 1)
+                  ? `${currentTrip.originCity!.trim()} ➔ ${currentTrip.destinationCity!.trim()}`
+                  : Boolean(currentTrip.destinationCity?.trim() && currentTrip.destinationCity.trim().length > 1)
+                    ? `To ${currentTrip.destinationCity!.trim()}`
+                    : 'Direct Travel Itinerary'}
               </p>
             </div>
           </div>
@@ -550,7 +593,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               <p className="text-[11px] text-fuchsia-600 dark:text-fuchsia-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.aircraftType
                   ? `Aircraft: ${currentTrip.aircraftType}`
-                  : 'Overhead Bin & In-Seat Specs'}
+                  : currentTrip.travelType === 'PLANE'
+                    ? 'Overhead Bin & In-Seat Specs'
+                    : currentTrip.travelType === 'TRAIN'
+                      ? 'Train Coach & Seat Specs'
+                      : currentTrip.travelType === 'CRUISE'
+                        ? 'Stateroom & Baggage Specs'
+                        : currentTrip.travelType === 'CAR'
+                          ? 'Vehicle Cargo & Trunk Specs'
+                          : 'Bus Luggage & Seat Specs'}
               </p>
             </div>
           </div>

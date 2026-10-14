@@ -105,8 +105,12 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
     summary += `📋 GATEREADY.CA PACKING MANIFEST & BAGGAGE RECORD\n`;
     summary += `═══════════════════════════════════════════\n`;
     summary += `Trip: ${trip.name}\n`;
-    if (trip.originCity || trip.destinationCity) {
-      summary += `Route: ${trip.originCity || 'Origin'} ➔ ${trip.destinationCity || 'Destination'}\n`;
+    const validOrig = trip.originCity && trip.originCity.trim().length > 1 ? trip.originCity.trim() : null;
+    const validDest = trip.destinationCity && trip.destinationCity.trim().length > 1 ? trip.destinationCity.trim() : null;
+    if (validOrig && validDest) {
+      summary += `Route: ${validOrig} ➔ ${validDest}\n`;
+    } else if (validDest) {
+      summary += `Destination: ${validDest}\n`;
     }
     if (trip.companyName) {
       summary += `Carrier: ${trip.companyName} (${trip.seatClassOrCarSize || 'Standard'})\n`;
@@ -305,12 +309,17 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                 
                 {/* Route & Details */}
                 <div className="flex items-center gap-3 flex-wrap mt-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                  {(trip.originCity || trip.destinationCity) && (
+                  {Boolean(trip.originCity?.trim() && trip.originCity.trim().length > 1 && trip.destinationCity?.trim() && trip.destinationCity.trim().length > 1) ? (
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                      <span>{trip.originCity || 'Departure'} ➔ {trip.destinationCity || 'Destination'}</span>
+                      <span>{trip.originCity!.trim()} ➔ {trip.destinationCity!.trim()}</span>
                     </span>
-                  )}
+                  ) : Boolean(trip.destinationCity?.trim() && trip.destinationCity.trim().length > 1) ? (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>To {trip.destinationCity!.trim()}</span>
+                    </span>
+                  ) : null}
                   {trip.companyName && (
                     <span className="flex items-center gap-1">
                       <Plane className="w-3.5 h-3.5 text-purple-600 shrink-0" />

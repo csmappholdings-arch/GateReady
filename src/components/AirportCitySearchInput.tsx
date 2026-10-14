@@ -44,11 +44,12 @@ export const AirportCitySearchInput: React.FC<AirportCitySearchInputProps> = ({
   // Compute live search suggestions
   const suggestions = React.useMemo(() => {
     if (!isOpen) return [];
-    if (query.trim().length === 0) {
+    const safeQuery = (query || '').trim();
+    if (safeQuery.length === 0) {
       // Default top suggestions when focused
       return searchAirportsAndCities('', 7);
     }
-    return searchAirportsAndCities(query, 8);
+    return searchAirportsAndCities(safeQuery, 8);
   }, [query, isOpen]);
 
   // Close dropdown on outside click

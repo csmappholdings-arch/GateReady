@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { Bag, Trip } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
-import { X, Plus, Sparkles, Scale, MapPin, User, Users } from 'lucide-react';
+import { scanItemForLiquids } from '../utils/liquidScanner';
+import { X, Plus, Sparkles, Scale, MapPin, User, Users, Droplets, AlertTriangle } from 'lucide-react';
 
 interface AddItemDialogProps {
   isOpen: boolean;
@@ -56,6 +57,7 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
   const estimatedSingleWeight = DefaultSuggestions.getEstimatedWeightLbs(itemName || 'Item');
   const estimatedTotalWeight = estimatedSingleWeight * quantity;
   const formattedWeight = DefaultSuggestions.formatWeight(estimatedTotalWeight, weightUnit);
+  const liquidScan = scanItemForLiquids(itemName, bag.type);
 
   return createPortal(
     <div 
@@ -131,6 +133,25 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
               className="w-full h-11 px-3.5 text-xs rounded-xl border border-purple-200/80 dark:border-purple-900/60 bg-purple-50/30 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:border-purple-500 transition-colors"
             />
           </div>
+
+          {/* TSA 3-1-1 Liquid Scanner Live Feedback */}
+          {liquidScan.isLiquid && (
+            <div className={`p-2.5 rounded-xl border text-xs flex items-start gap-2 ${
+              liquidScan.status === 'NON_COMPLIANT'
+                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200'
+                : liquidScan.status === 'CHECKED_PERMITTED'
+                ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-200'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200'
+            }`}>
+              <Droplets className="w-4 h-4 shrink-0 mt-0.5 text-current" />
+              <div className="flex-1 min-w-0">
+                <span className="font-bold block">{liquidScan.badgeLabel}</span>
+                {liquidScan.alertMessage && (
+                  <p className="text-[11px] mt-0.5 leading-snug">{liquidScan.alertMessage}</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Quick Suggestions Chips */}
           {suggestions.length > 0 && (

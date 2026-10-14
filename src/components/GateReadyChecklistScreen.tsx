@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePacking } from '../context/PackingContext';
 import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
+import { computeTripWeightStatus } from '../utils/bagWeightAnalysis';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { 
   CheckCircle2, 
@@ -55,6 +56,9 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
   // Overall readiness score
   const overallReadyPct = Math.round((packingPct * 0.6) + (gatePct * 0.4));
   const isGateReady = overallReadyPct >= 95;
+
+  // Single Source of Truth Trip Weight Status & Carrier Limits
+  const tripWeightSummary = computeTripWeightStatus(trip, weightUnit);
 
   // Total weight across all bags (including empty luggage tare weights)
   const totalTripWeightLbs = trip.bags.reduce((total, bag) => {
@@ -178,10 +182,26 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
 
             <div className="bg-white/5 rounded-xl p-3 border border-white/5">
               <p className="text-[11px] text-purple-200 font-medium">Carrier Limit Status</p>
-              <p className="text-base font-bold text-emerald-400 mt-0.5">
-                Within Limits
+              <p className={`text-base font-bold mt-0.5 ${
+                tripWeightSummary.hasOverweightBag
+                  ? 'text-rose-400'
+                  : tripWeightSummary.hasNearLimitBag
+                  ? 'text-amber-300'
+                  : 'text-emerald-400'
+              }`}>
+                {tripWeightSummary.hasOverweightBag
+                  ? `Overweight (${tripWeightSummary.overweightBags.length})`
+                  : tripWeightSummary.hasNearLimitBag
+                  ? `Near Limit (${tripWeightSummary.nearLimitBags.length})`
+                  : 'Within Limits'}
               </p>
-              <p className="text-[10px] text-purple-200 mt-0.5">No overweight flags</p>
+              <p className="text-[10px] text-purple-200 mt-0.5">
+                {tripWeightSummary.hasOverweightBag
+                  ? 'Exceeds carrier luggage limit'
+                  : tripWeightSummary.hasNearLimitBag
+                  ? 'Approaching threshold'
+                  : 'No overweight flags'}
+              </p>
             </div>
           </div>
         </div>

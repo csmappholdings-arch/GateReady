@@ -47,11 +47,83 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
   const { updateTripDetails, addItemToBag, selectedBagId, tempUnit, setTempUnit } = usePacking();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isEditingDestination, setIsEditingDestination] = useState(false);
-  const [destinationInput, setDestinationInput] = useState(trip.destinationCity || trip.name || 'London, UK');
+  const [destinationInput, setDestinationInput] = useState(trip.destinationCity || '');
   const [addedItemNames, setAddedItemNames] = useState<Set<string>>(new Set());
 
-  // Determine active city
-  const city = trip.destinationCity || 'London, UK';
+  const handleSaveDestination = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (destinationInput.trim()) {
+      updateTripDetails(trip.id, { destinationCity: destinationInput.trim() });
+      setIsEditingDestination(false);
+    }
+  };
+
+  const rawCity = trip.destinationCity?.trim();
+  const hasDestination = Boolean(rawCity && rawCity.length > 1);
+  const city = hasDestination ? rawCity! : 'Destination Not Set';
+
+  if (!hasDestination) {
+    return (
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-purple-100 dark:border-purple-950/60 shadow-xs p-4 sm:p-5 mb-4 transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 border border-amber-500/20">
+              <CloudSun className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300 block">
+                Destination Weather & Clothing Advisor
+              </span>
+              <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+                Add a destination to see weather advice
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Set a destination city to view real-time 5-day climate forecasts and seasonal clothing packing advice.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            {!isEditingDestination ? (
+              <button
+                type="button"
+                onClick={() => setIsEditingDestination(true)}
+                className="h-9 px-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Destination</span>
+              </button>
+            ) : (
+              <form onSubmit={handleSaveDestination} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="e.g. London, Tokyo, Miami"
+                  value={destinationInput}
+                  onChange={(e) => setDestinationInput(e.target.value)}
+                  className="h-9 px-3 text-xs rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50/50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+                <button
+                  type="submit"
+                  className="h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold cursor-pointer"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingDestination(false)}
+                  className="h-9 px-2 rounded-xl text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Realistic seasonal weather simulation based on city heuristics
   const getSimulatedForecast = (cityName: string): WeatherForecastDay[] => {
@@ -212,14 +284,6 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
       return `${Math.round((f - 32) * 5 / 9)}°C`;
     }
     return `${f}°F`;
-  };
-
-  const handleSaveDestination = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (destinationInput.trim()) {
-      updateTripDetails(trip.id, { destinationCity: destinationInput.trim() });
-      setIsEditingDestination(false);
-    }
   };
 
   const handle1ClickPack = (item: PackingRecommendation) => {

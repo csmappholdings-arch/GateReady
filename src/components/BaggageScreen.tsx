@@ -3,6 +3,7 @@ import { Trip, Bag, BagType, BagMaterial, getBagEmptyWeightLbs, getUserPresetWei
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { DefaultSuggestions } from '../data/suggestions';
+import { scanItemForLiquids } from '../utils/liquidScanner';
 import { 
   Luggage, 
   Briefcase, 
@@ -909,11 +910,47 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                     </button>
 
                     <div className="min-w-0 flex-1">
-                      <p className={`text-xs font-bold truncate ${
-                        item.isPacked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'
-                      }`}>
-                        {item.name}
-                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className={`text-xs font-bold truncate ${
+                          item.isPacked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'
+                        }`}>
+                          {item.name}
+                        </p>
+                        {(() => {
+                          const lq = scanItemForLiquids(item.name, activeBag.type);
+                          if (!lq.isLiquid) return null;
+                          if (lq.status === 'NON_COMPLIANT') {
+                            return (
+                              <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 flex items-center gap-1 shrink-0" title={lq.alertMessage}>
+                                <AlertTriangle className="w-2.5 h-2.5" />
+                                <span>TSA 3-1-1 Alert (&gt;3.4 oz)</span>
+                              </span>
+                            );
+                          }
+                          if (lq.status === 'COMPLIANT') {
+                            return (
+                              <span className="px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-0.5 shrink-0">
+                                <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                <span>TSA Pass ({lq.capacityOz ? `${lq.capacityOz}oz` : `${lq.capacityMl}ml`})</span>
+                              </span>
+                            );
+                          }
+                          if (lq.status === 'CHECKED_PERMITTED') {
+                            return (
+                              <span className="px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex items-center gap-0.5 shrink-0">
+                                <Droplets className="w-2.5 h-2.5" />
+                                <span>Checked Liquid</span>
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-0.5 shrink-0">
+                              <Droplets className="w-2.5 h-2.5" />
+                              <span>TSA 3-1-1 (≤3.4oz)</span>
+                            </span>
+                          );
+                        })()}
+                      </div>
                       <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
                         <span>{item.location}</span>
                         {item.packedFor && <span>· For: {item.packedFor}</span>}
