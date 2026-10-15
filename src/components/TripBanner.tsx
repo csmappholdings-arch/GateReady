@@ -131,7 +131,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   // Active Trip Banner with full location, carrier, and level of seat details!
   return (
     <div className="w-full bg-gradient-to-r from-purple-50/90 via-white to-purple-50/60 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs transition-colors">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-2.5 sm:py-3">
         {/* Prominent Trip Countdown Clock Banner Above Trip Info */}
         <TripCountdownBanner
           trip={currentTrip}
@@ -608,7 +608,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         </div>
 
         {/* Secondary Info Line: Departure Date, Return Date, Travelers, Bags Count */}
-        <div className="flex items-center gap-4 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-purple-50 dark:border-purple-950/60 font-medium">
+        <div className="flex items-center justify-between gap-3 sm:gap-6 flex-wrap text-xs text-slate-600 dark:text-slate-300 mt-2.5 pt-2.5 border-t border-purple-100/80 dark:border-purple-950/60 font-medium">
           {currentTrip.departureDate && (
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />

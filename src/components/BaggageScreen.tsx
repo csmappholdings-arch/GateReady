@@ -326,25 +326,36 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 pb-24 space-y-6">
       {/* ============================================================== */}
       {/* 1. TOP HEADER: BAGS HUB & FREE/PRO BAG ALLOWANCE STATUS       */}
       {/* ============================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-purple-100 dark:border-purple-950/60">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3.5 border-b border-purple-100 dark:border-purple-950/60">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
-              <Luggage className="w-4 h-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0 shadow-2xs">
+              <Luggage className="w-4.5 h-4.5" />
             </div>
-            <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Bags & Packing Items
-            </h1>
-            <span className="text-xs font-black text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-full">
-              {trip.bags.length} {trip.bags.length === 1 ? 'Bag' : 'Bags'}
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">
+                  Luggage & Packing Inventory
+                </span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                  TSA 3-1-1 & Tare Verified
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                Bags, Suitcase Scales & Packing Manifest
+              </h1>
+            </div>
+            <span className="text-xs font-black text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2.5 py-0.5 rounded-full shrink-0">
+              {trip.bags.length} {trip.bags.length === 1 ? 'Bag Configured' : 'Bags Configured'}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Manage your personal items, carry-ons, and checked bags with TSA weight limits and packing checklists.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
+            Real-time weight meters, empty luggage tare deductions, TSA liquid regulation compliance, and airline overhead sizer auditing.
           </p>
         </div>
 
@@ -670,7 +681,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length} items packed into this bag
+                  {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length} {activeBag.items.length === 1 ? 'item packed' : 'items packed'} into this bag
                 </p>
               </div>
             </div>

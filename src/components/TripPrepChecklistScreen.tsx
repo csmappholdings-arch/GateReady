@@ -353,7 +353,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
   // If user is not Pro, lock down the screen
   if (!isPro) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 pb-24 space-y-6">
         {/* Screen Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-purple-100 dark:border-purple-950/60">
           <div>
@@ -365,7 +365,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 Trip Intel & Travel Checklists
               </h1>
               <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                <Crown className="w-2.5 h-2.5 fill-white" /> Pro Feature
+                <Crown className="w-2.5 h-2.5 fill-white" /> Silver+ Feature
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -380,7 +380,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
           <div className="relative z-10 max-w-2xl space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black uppercase tracking-wider">
               <Crown className="w-3.5 h-3.5 fill-amber-400" />
-              <span>Gate Ready Pro Exclusive</span>
+              <span>Silver+ Exclusive</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
@@ -429,11 +429,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 type="button"
-                onClick={() => openPaywall("Upgrade to Gate Ready Pro to unlock full Trip Intel, Terminal Maps & Weather Forecaster.")}
+                onClick={() => openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Trip Intel, Terminal Maps & Weather Forecaster.")}
                 className="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 transition-all"
               >
                 <Crown className="w-4 h-4 fill-purple-950" />
-                <span>Upgrade to Pro to Unlock Trip Intel</span>
+                <span>Upgrade to Silver+ to Unlock Trip Intel</span>
               </button>
             </div>
           </div>
@@ -456,7 +456,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 pb-24 space-y-6">
       {/* Screen Header with Sub-Tabs Moved to the Top */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-purple-100 dark:border-purple-950/60">
         <div>
@@ -468,7 +468,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               Trip Intel & Travel Checklists
             </h1>
             <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-              <Crown className="w-2.5 h-2.5 fill-white" /> Pro
+              <Crown className="w-2.5 h-2.5 fill-white" /> Silver+
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -856,7 +856,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 </span>
                 {!isPro && (
                   <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                    <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
+                    <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                   </span>
                 )}
               </h2>
@@ -940,11 +940,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               <Crown className="w-5 h-5 text-amber-400 shrink-0" />
               <div>
                 <p className="text-xs font-black text-white">Unlock Tipping Customs & ATM FX Traps Radar</p>
-                <p className="text-[11px] text-purple-200">See exact mandatory cash locations and contactless quirks with Gate Ready Pro.</p>
+                <p className="text-[11px] text-purple-200">See exact mandatory cash locations and contactless quirks with Silver+.</p>
               </div>
             </div>
             <button
-              onClick={() => openPaywall("Unlock Destination Payment Intelligence & ATM FX Traps with Gate Ready Pro.")}
+              onClick={() => openPaywall("Unlock Destination Payment Intelligence & ATM FX Traps with Silver+.")}
               className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs"
             >
               Upgrade
@@ -1015,7 +1015,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 </span>
                 {!isPro && (
                   <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                    <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
+                    <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                   </span>
                 )}
               </h2>
@@ -1037,7 +1037,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </p>
             </div>
             <button
-              onClick={() => openPaywall("Unlock Customs Exemption Radar with Gate Ready Pro.")}
+              onClick={() => openPaywall("Unlock Customs Exemption Radar with Silver+.")}
               className="h-8 px-3 rounded-xl bg-purple-600 text-white font-bold text-xs uppercase tracking-wider hover:bg-purple-700 cursor-pointer shrink-0"
             >
               Unlock Tracker
@@ -1105,7 +1105,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 </span>
                 {!isPro && (
                   <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                    <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
+                    <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                   </span>
                 )}
               </h2>
@@ -1132,7 +1132,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </div>
             </div>
             <button
-              onClick={() => openPaywall("Unlock Jet Lag & Circadian Rhythm Advisor with Gate Ready Pro.")}
+              onClick={() => openPaywall("Unlock Jet Lag & Circadian Rhythm Advisor with Silver+.")}
               className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs"
             >
               Upgrade

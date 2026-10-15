@@ -83,7 +83,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
   // If user is not Pro, lock down the screen
   if (!isPro) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-6">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 pb-24 space-y-6">
         {/* Screen Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-purple-100 dark:border-purple-950/60">
           <div>
@@ -95,7 +95,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
                 Aircraft Cabin & Plugs Intel
               </h1>
               <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                <Crown className="w-2.5 h-2.5 fill-white" /> Pro Feature
+                <Crown className="w-2.5 h-2.5 fill-white" /> Silver+ Feature
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -110,7 +110,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
           <div className="relative z-10 max-w-2xl space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black uppercase tracking-wider">
               <Crown className="w-3.5 h-3.5 fill-amber-400" />
-              <span>Gate Ready Pro Exclusive</span>
+              <span>Silver+ Exclusive</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
@@ -118,7 +118,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
             </h2>
 
             <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed">
-              Never get caught off-guard by forced valet gate checks, oversized bags, or dead devices at 35,000 feet. Upgrade to Gate Ready Pro to unlock full aircraft power outlet and bin clearance specifications.
+              Never get caught off-guard by forced valet gate checks, oversized bags, or dead devices at 35,000 feet. Upgrade to Silver ($1.99/mo), Gold, or Platinum to unlock full aircraft power outlet and bin clearance specifications.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
@@ -151,11 +151,11 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
             <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 type="button"
-                onClick={() => openPaywall("Upgrade to Gate Ready Pro to unlock full Aircraft Cabin & In-Seat Plugs Intel.")}
+                onClick={() => openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Aircraft Cabin & In-Seat Plugs Intel.")}
                 className="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 transition-all"
               >
                 <Crown className="w-4 h-4 fill-purple-950" />
-                <span>Upgrade to Pro to Unlock Cabin Intel</span>
+                <span>Upgrade to Silver+ to Unlock Cabin Intel</span>
               </button>
             </div>
           </div>
@@ -177,7 +177,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-5">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 pb-24 space-y-5">
       {/* Screen Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-purple-100 dark:border-purple-950/60">
         <div>
@@ -189,7 +189,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
               Aircraft & Cabin Power Intel
             </h1>
             <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs">
-              <Crown className="w-2.5 h-2.5 fill-white inline mr-1" /> Pro
+              <Crown className="w-2.5 h-2.5 fill-white inline mr-1" /> Silver+
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -425,7 +425,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
           <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 space-y-2">
             <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Frequent Flyer Pro Tips for this Aircraft</span>
+              <span>Frequent Flyer Insider Tips for this Aircraft</span>
             </h4>
             <ul className="space-y-1.5 text-xs text-amber-950 dark:text-amber-200 list-disc list-inside">
               {selectedAircraft.frequentFlyerTips.map((tip, idx) => (

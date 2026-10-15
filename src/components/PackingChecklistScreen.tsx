@@ -350,7 +350,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       {/* ============================================================== */}
       {familyMembers.length === 0 && (
         <div className="bg-gradient-to-r from-purple-900 to-indigo-950 text-white p-4 sm:p-5 border-b border-purple-500/30">
-          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
@@ -383,7 +383,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       {/* TOP BAR: TRAVELER DROPDOWN WITH % PACKED BESIDE DYNAMIC BAGS   */}
       {/* ============================================================== */}
       <div className="border-b border-purple-100 dark:border-purple-950/60 bg-white dark:bg-slate-900 sticky top-16 z-20 transition-colors shadow-2xs">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
           <div className="flex items-center gap-3 py-2.5">
             {/* Person / Traveler Dropdown */}
             <div className="relative shrink-0" ref={packerDropdownRef}>
@@ -770,7 +770,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       {/* CARRY-ON LIQUID DISCLAIMER (Always shown for carry-on luggage) */}
       {/* ============================================================== */}
       {currentBag && currentBag.type === 'CARRY_ON' && (
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 w-full">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 w-full">
           <div className="rounded-2xl border border-purple-300 dark:border-purple-800 bg-linear-to-r from-purple-50 via-fuchsia-50/40 to-white dark:from-purple-950/50 dark:via-purple-900/30 dark:to-slate-900 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
@@ -803,7 +803,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       )}
 
       {/* Main Checklist Body */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 space-y-4 w-full">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 space-y-4 w-full">
         {/* Recommended Route Intel Bar: Power Converter Brick, Local Currency, Tipping */}
         <RouteIntelBanner trip={trip} />
 

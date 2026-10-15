@@ -182,7 +182,7 @@ export const Header: React.FC<HeaderProps> = ({
         />
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 relative z-10">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6 relative z-10">
         {/* Left: GateReady.ca Stadium Neon Badge matching uploaded branding */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative group cursor-default select-none">
@@ -226,26 +226,50 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => openPaywall("You are on a 7-day Platinum trial with full access. Choose a plan to lock in uninterrupted access.")}
-                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-md border border-amber-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-amber-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
                 title="Platinum 7-Day Trial Active · Click to view plans"
               >
                 <Crown className="w-3 h-3 fill-amber-200 text-amber-200 shrink-0 animate-pulse" />
                 <span className="whitespace-nowrap">Platinum trial · {trialTimeLeftText}</span>
               </button>
             ) : isPro ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs border border-amber-300/40">
+              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
               </span>
             ) : (
-              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2 py-0.5 rounded-full">
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2.5 py-1 rounded-full">
                 Free Plan
               </span>
             )}
           </div>
         </div>
 
+        {/* Center: Spiced Aviation Intel & Live Flight Corridor Radar */}
+        <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-purple-950/70 dark:bg-slate-900/80 border border-purple-300/30 text-purple-200 shadow-inner">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          {currentTrip ? (
+            <div className="flex items-center gap-2 text-[11px] font-mono tracking-tight">
+              <span className="font-bold text-white uppercase">{currentTrip.originCity || 'Origin'}</span>
+              <span className="text-amber-300">✈</span>
+              <span className="font-bold text-white uppercase">{currentTrip.destinationCity || 'Destination'}</span>
+              <span className="text-purple-400">·</span>
+              <span className="text-purple-200 font-semibold">{currentTrip.companyName || 'Flight Radar'}</span>
+              <span className="text-purple-400">·</span>
+              <span className="text-emerald-300 font-semibold">{totalItems} Items ({packedPct}% Packed)</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2.5 text-[11px] tracking-wider uppercase font-semibold">
+              <span className="font-extrabold text-amber-300">TSA 3-1-1 VERIFIED</span>
+              <span className="text-purple-400">·</span>
+              <span className="text-purple-200">42+ AIRLINE LIMITS</span>
+              <span className="text-purple-400">·</span>
+              <span className="text-fuchsia-300 font-extrabold">CABIN TARE INTEL</span>
+            </div>
+          )}
+        </div>
+
         {/* Center / Right: Action Buttons, Upgrade, Sync & Menus */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Direct Quick Unit Toggles (Temp & Weight) */}
           <div className="flex items-center gap-0.5 bg-purple-900/40 dark:bg-purple-950/70 p-0.5 sm:p-1 rounded-xl border border-purple-300/40 dark:border-purple-600/50 shadow-inner shrink-0">
             <button

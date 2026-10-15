@@ -61,7 +61,7 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-24">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-6 space-y-6 pb-24">
       {/* ============================================================== */}
       {/* TOP DEDICATED SECTION: LIQUID ALLOWANCES IN CARRY-ON (USER REQUIREMENT) */}
       {/* ============================================================== */}
@@ -322,7 +322,7 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
         </div>
 
         {/* Allowance Cards Grid */}
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3.5">
           {selectedCategory === 'plane' && (
             <>
               {filteredAirlines.length === 0 ? (

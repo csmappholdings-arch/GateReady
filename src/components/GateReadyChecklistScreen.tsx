@@ -117,7 +117,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-24">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-6 space-y-6 pb-24">
       {/* Gate Readiness Scorecard (Purple Theme) */}
       <div className="rounded-3xl bg-gradient-to-br from-purple-950 via-purple-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-500/20 relative overflow-hidden">
         <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-10 pointer-events-none flex items-center justify-end pr-8">
@@ -345,7 +345,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                     onClick={() => toggleBagExpanded(bag.id)}
                     className="text-purple-700 dark:text-purple-300 font-bold text-xs flex items-center gap-1 hover:underline cursor-pointer"
                   >
-                    <span>{bag.items.length} items packed in this bag</span>
+                    <span>{bag.items.length === 1 ? '1 item packed' : `${bag.items.length} items packed in this bag`}</span>
                     {expandedBagIds[bag.id] ? (
                       <ChevronUp className="w-3.5 h-3.5" />
                     ) : (

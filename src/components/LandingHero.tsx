@@ -29,24 +29,40 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
   onOpenAirlineGuides
 }) => {
   return (
-    <section className="relative w-full pt-6 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-purple-950/20 via-transparent to-transparent">
-      <div className="max-w-5xl mx-auto text-center space-y-6">
+    <section className="relative w-full pt-6 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 overflow-hidden bg-gradient-to-b from-purple-950/20 via-transparent to-transparent">
+      <div className="w-full max-w-[1550px] mx-auto text-center space-y-6 sm:space-y-8">
         
-        {/* Value Proposition Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-200 text-xs font-bold shadow-xs">
-          <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-          <span>Smart Baggage & Cabin Packing Intelligence</span>
-          <span className="w-1 h-1 rounded-full bg-purple-400" />
-          <span className="text-[10px] font-black uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400">GateReady.ca</span>
+        {/* Top Aviation Corridor & Airport Intelligence Radar Ticker */}
+        <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap text-[11px] font-mono tracking-widest uppercase text-purple-700/80 dark:text-purple-300/80 bg-purple-100/60 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 px-5 py-2 rounded-full w-full max-w-5xl mx-auto shadow-2xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          <span className="font-bold text-purple-900 dark:text-purple-200">GLOBAL AIRLINE RADAR:</span>
+          <span>AIR CANADA</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span>WESTJET</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span>DELTA</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span>UNITED</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span>BRITISH AIRWAYS</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span>AIR FRANCE</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span>LUFTHANSA</span>
+          <span className="text-purple-300 dark:text-purple-600">·</span>
+          <span className="font-bold text-fuchsia-600 dark:text-fuchsia-400">42+ CARRIERS AUDITED</span>
         </div>
 
         {/* Headline & Supporting Subhead */}
-        <div className="space-y-3 max-w-3xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.12]">
-            Never pay a baggage fee again.
+        <div className="space-y-4 w-full max-w-6xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08]">
+            Never pay an overweight baggage fee again.
+            <span className="block mt-2.5 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-600 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-normal">
+              Audit suitcase tare weight, liquids & overhead limits before you arrive at the airport.
+            </span>
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Calculate exact luggage weights including empty suitcase tare, scan toiletries against TSA 3-1-1 rules, and audit 42+ airline size allowances before you arrive at the airport.
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-300 max-w-5xl mx-auto leading-relaxed">
+            GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42+ worldwide airlines.
           </p>
         </div>
 

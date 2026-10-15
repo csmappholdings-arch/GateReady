@@ -27,8 +27,8 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   const [modalType, setModalType] = useState<'privacy' | 'terms' | 'contact' | null>(null);
 
   return (
-    <footer className="w-full mt-auto border-t border-purple-100 dark:border-purple-950/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 dark:text-slate-400">
-      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <footer className="w-full mt-auto border-t border-purple-100 dark:border-purple-950/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md py-8 px-4 sm:px-6 lg:px-8 xl:px-10 text-xs text-slate-500 dark:text-slate-400">
+      <div className="w-full max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
         {/* Brand & Mission */}
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
@@ -102,7 +102,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto mt-4 pt-4 border-t border-slate-100 dark:border-slate-900 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div className="w-full max-w-[1600px] mx-auto mt-4 pt-4 border-t border-slate-100 dark:border-slate-900 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
         <span>© 2026 GateReady.ca · All rights reserved. Not affiliated with TSA, IATA, or airlines.</span>
         <span>Made for stress-free travel & no excess baggage fees.</span>
       </div>

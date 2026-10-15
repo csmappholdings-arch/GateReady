@@ -101,25 +101,25 @@ function PackingAppContent() {
       {/* Prominent Navigation Tabs (Desktop & Tablet) - Moved to TOP of section */}
       {currentTrip && (
         <div className="hidden sm:block sticky top-16 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md pt-2.5 pb-2 border-b border-purple-100/80 dark:border-purple-950/60 shadow-xs">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
             <nav
               aria-label="Main application tabs"
-              className="p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/80 shadow-md flex items-center justify-between gap-1 sm:gap-2"
+              className="p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/80 shadow-md flex items-center justify-between gap-1 sm:gap-2.5"
             >
               {/* Tab 1: Bags & Items */}
               <button
                 type="button"
                 onClick={() => setCurrentScreen('Bags')}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
                   currentScreen === 'Bags'
                     ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
                 }`}
               >
                 <Luggage className="w-4 h-4 shrink-0" />
-                <span>Bags & Items</span>
+                <span className="truncate">Luggage & Packing Manifest</span>
                 <span
-                  className={`text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full shrink-0 transition-colors ${
+                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 transition-colors ${
                     currentScreen === 'Bags'
                       ? 'bg-white/20 text-white'
                       : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
@@ -138,14 +138,14 @@ function PackingAppContent() {
                   }
                   setCurrentScreen('Checklist');
                 }}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
                   currentScreen === 'Checklist'
                     ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
                 }`}
               >
                 <CloudSun className="w-4 h-4 shrink-0 text-amber-400" />
-                <span>Trip Intel</span>
+                <span className="truncate">Airport & Trip Intel</span>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
                   <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
                 </span>
@@ -160,14 +160,14 @@ function PackingAppContent() {
                   }
                   setCurrentScreen('CabinIntel');
                 }}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
                   currentScreen === 'CabinIntel'
                     ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
                 }`}
               >
                 <Zap className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Cabin & Plugs</span>
+                <span className="truncate">Aircraft Cabin & In-Seat Power</span>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
                   <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
                 </span>
@@ -177,16 +177,16 @@ function PackingAppContent() {
               <button
                 type="button"
                 onClick={() => setCurrentScreen('Allowances')}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
                   currentScreen === 'Allowances'
                     ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
                 }`}
               >
                 <Info className="w-4 h-4 shrink-0" />
-                <span>Allowances</span>
+                <span className="truncate">42+ Airline Allowances</span>
                 <span
-                  className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md shrink-0 transition-colors ${
+                  className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 transition-colors ${
                     currentScreen === 'Allowances'
                       ? 'bg-white/20 text-white'
                       : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
@@ -200,16 +200,16 @@ function PackingAppContent() {
               <button
                 type="button"
                 onClick={() => setCurrentScreen('GateReady')}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
                   currentScreen === 'GateReady'
                     ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
                 }`}
               >
                 <PlaneTakeoff className="w-4 h-4 shrink-0" />
-                <span>Gate Ready</span>
+                <span className="truncate">Gate Clearance Checklist</span>
                 <span
-                  className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md shrink-0 transition-colors ${
+                  className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 transition-colors ${
                     isAllPacked
                       ? 'bg-emerald-500 text-white'
                       : currentScreen === 'GateReady'
