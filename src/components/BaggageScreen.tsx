@@ -28,7 +28,8 @@ import {
   FileDown,
   Shield,
   Layers,
-  Printer
+  Printer,
+  Share2
 } from 'lucide-react';
 import { EditBagDialog } from './EditBagDialog';
 import { LuggageQrTagModal } from './LuggageQrTagModal';
@@ -37,15 +38,18 @@ import { TarePresetsModal } from './TarePresetsModal';
 import { AddItemDialog } from './AddItemDialog';
 import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
 import { PrintPackingListModal } from './PrintPackingListModal';
+import { SharePackingListModal } from './SharePackingListModal';
 
 interface BaggageScreenProps {
   trip: Trip;
   onOpenAddBag: () => void;
+  onOpenReferral?: () => void;
 }
 
 export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   trip,
-  onOpenAddBag
+  onOpenAddBag,
+  onOpenReferral
 }) => {
   const { 
     weightUnit, 
@@ -69,6 +73,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   const [showTarePresetsModal, setShowTarePresetsModal] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Search and filter state for active bag
   const [searchQuery, setSearchQuery] = useState('');
@@ -373,6 +378,16 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           >
             <Printer className="w-3.5 h-3.5 text-purple-600" />
             <span>Print List</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowShareModal(true)}
+            className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            title="Share packing list link with friends & family"
+          >
+            <Share2 className="w-3.5 h-3.5 text-purple-600" />
+            <span>Share List</span>
           </button>
 
           <button
@@ -1071,6 +1086,14 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
         trip={trip}
+      />
+
+      {/* Share Packing List Modal */}
+      <SharePackingListModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        trip={trip}
+        onOpenReferral={onOpenReferral}
       />
     </div>
   );

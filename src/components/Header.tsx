@@ -33,7 +33,8 @@ import {
   Key,
   CreditCard,
   Thermometer,
-  X
+  X,
+  Gift
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
@@ -43,9 +44,15 @@ interface HeaderProps {
   onOpenAddBag: () => void;
   onOpenTour?: () => void;
   onOpenAccountSync?: () => void;
+  onOpenReferral?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpenAccountSync }) => {
+export const Header: React.FC<HeaderProps> = ({ 
+  onOpenAddTrip, 
+  onOpenTour, 
+  onOpenAccountSync,
+  onOpenReferral 
+}) => {
   const {
     trips,
     currentTrip,
@@ -75,7 +82,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
     manualLicenseKey,
     isMasterKey,
     applyLicenseKey,
-    removeLicenseKey
+    removeLicenseKey,
+    isTrialActive,
+    trialTimeLeftText
   } = useSubscription();
 
   const { accounts: walletAccounts, openWalletModal } = useTravelWallet();
@@ -211,9 +220,19 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
             </div>
           </div>
 
-          {/* Pro / Free Plan Badge */}
+          {/* Pro / Trial / Free Plan Badge */}
           <div className="flex items-center">
-            {isPro ? (
+            {isTrialActive ? (
+              <button
+                type="button"
+                onClick={() => openPaywall("You are on a 7-day Platinum trial with full access. Choose a plan to lock in uninterrupted access.")}
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-md border border-amber-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+                title="Platinum 7-Day Trial Active · Click to view plans"
+              >
+                <Crown className="w-3 h-3 fill-amber-200 text-amber-200 shrink-0 animate-pulse" />
+                <span className="whitespace-nowrap">Platinum trial · {trialTimeLeftText}</span>
+              </button>
+            ) : isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
               </span>
@@ -273,6 +292,19 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddTrip, onOpenTour, onOpe
             >
               <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               <span className="hidden md:inline text-[11px] font-bold">{tier} Active</span>
+            </button>
+          )}
+
+          {/* Referral Free Month Button */}
+          {onOpenReferral && (
+            <button
+              type="button"
+              onClick={onOpenReferral}
+              className="h-9 px-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/40 text-purple-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              title="Refer a Friend · Get 1 Month Free"
+            >
+              <Gift className="w-3.5 h-3.5 text-fuchsia-400" />
+              <span className="hidden lg:inline text-[11px]">Free Month</span>
             </button>
           )}
 

@@ -19,6 +19,12 @@ import { TripBanner } from './components/TripBanner';
 import { WalkthroughVideoModal } from './components/WalkthroughVideoModal';
 import { AccountSyncModal } from './components/AccountSyncModal';
 import { TransitNetworkHub } from './components/TransitNetworkHub';
+import { LandingHero } from './components/LandingHero';
+import { AppFooter } from './components/AppFooter';
+import { TrialNudgeBanner } from './components/TrialNudgeBanner';
+import { TrialExpiredModal } from './components/TrialExpiredModal';
+import { ReferralModal } from './components/ReferralModal';
+import { AirlineGuidesModal } from './components/AirlineGuidesModal';
 import { TravelType } from './types/travel';
 import { 
   CheckCircle2, 
@@ -47,6 +53,8 @@ function PackingAppContent() {
   const [showAddBagModal, setShowAddBagModal] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showReferralModal, setShowReferralModal] = useState(false);
+  const [showAirlineGuidesModal, setShowAirlineGuidesModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
 
   const handleOpenAddTrip = (travelType?: TravelType, destinationCity?: string) => {
@@ -75,12 +83,16 @@ function PackingAppContent() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
+      {/* 7-Day Platinum Trial Expiry Warning Banner (Days 6-7) */}
+      <TrialNudgeBanner />
+
       {/* Top App Bar with Purple Branding */}
       <Header
         onOpenAddTrip={handleOpenAddTrip}
         onOpenAddBag={() => setShowAddBagModal(true)}
         onOpenTour={() => setShowTourModal(true)}
         onOpenAccountSync={() => setShowAccountModal(true)}
+        onOpenReferral={() => setShowReferralModal(true)}
       />
 
       {/* Sync with Google prompt banner when signed out */}
@@ -227,11 +239,22 @@ function PackingAppContent() {
         </div>
 
         {currentTrip == null ? (
-          <TransitNetworkHub
-            onOpenAddTrip={handleOpenAddTrip}
-            onOpenTour={() => setShowTourModal(true)}
-            onLoadDemo={loadDemoTrip}
-          />
+          <div className="flex flex-col">
+            {/* Conversion Marketing Hero (Above the trip creator) */}
+            <LandingHero
+              onOpenAddTrip={() => handleOpenAddTrip()}
+              onLoadDemo={loadDemoTrip}
+              onOpenPricing={() => openPaywall()}
+              onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
+            />
+
+            {/* Immediately usable trip creator directly below */}
+            <TransitNetworkHub
+              onOpenAddTrip={handleOpenAddTrip}
+              onOpenTour={() => setShowTourModal(true)}
+              onLoadDemo={loadDemoTrip}
+            />
+          </div>
         ) : (
           <>
             {/* Screen Router */}
@@ -239,6 +262,7 @@ function PackingAppContent() {
               <BaggageScreen
                 trip={currentTrip}
                 onOpenAddBag={() => setShowAddBagModal(true)}
+                onOpenReferral={() => setShowReferralModal(true)}
               />
             )}
 
@@ -399,6 +423,29 @@ function PackingAppContent() {
       <AccountSyncModal
         isOpen={showAccountModal}
         onClose={() => setShowAccountModal(false)}
+      />
+
+      {/* 7-Day Platinum Trial Graceful Downgrade Modal */}
+      <TrialExpiredModal />
+
+      {/* Collaborative Referral Program Modal */}
+      <ReferralModal
+        isOpen={showReferralModal}
+        onClose={() => setShowReferralModal(false)}
+      />
+
+      {/* 42+ Airline Allowance Intel Directory Modal */}
+      <AirlineGuidesModal
+        isOpen={showAirlineGuidesModal}
+        onClose={() => setShowAirlineGuidesModal(false)}
+        onSelectAirline={(name) => handleOpenAddTrip('PLANE', name)}
+      />
+
+      {/* Conversion Marketing & Navigation Footer */}
+      <AppFooter
+        onOpenPricing={() => openPaywall()}
+        onOpenReferral={() => setShowReferralModal(true)}
+        onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
       />
     </div>
   );

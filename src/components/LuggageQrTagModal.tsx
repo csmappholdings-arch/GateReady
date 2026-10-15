@@ -116,92 +116,7 @@ END:VCARD`;
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
 
-  // Gated strictly to Gate Ready Pro
-  if (!isPro) {
-    return createPortal(
-      <div 
-        className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150 cursor-pointer min-h-screen"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <div 
-          className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800 overflow-hidden cursor-default animate-in zoom-in-95 duration-150 relative z-[100000]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="px-6 py-4 bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center border border-amber-300/30">
-                <Crown className="w-4 h-4 fill-amber-300 text-amber-300" />
-              </div>
-              <div>
-                <h3 className="text-sm font-black flex items-center gap-1.5">
-                  <span>Smart QR Luggage Tag</span>
-                  <span className="bg-amber-400 text-purple-950 text-[9px] font-black px-1.5 py-0.2 rounded">PRO ONLY</span>
-                </h3>
-                <p className="text-[10px] text-purple-200">Exclusive recovery & privacy features</p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="p-6 space-y-4">
-            <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900 flex items-start gap-3">
-              <ShieldCheck className="w-6 h-6 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
-              <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1">
-                <p className="font-bold text-slate-900 dark:text-white">Why Emergency QR Luggage Tags?</p>
-                <p>Traditional paper tags display your home address to everyone in transit—signaling an empty home. Gate Ready Pro generates privacy-safe QR tags that reveal direct phone and WhatsApp contact info for fast airline recovery.</p>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Printable physical luggage tags with scannable vCard QR code</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Airline baggage claim sheet with bag style & color identifiers</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>One-tap high-resolution PNG download for your luggage sleeve</span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-full sm:w-auto h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 cursor-pointer"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  openPaywall("Emergency QR Luggage Tag generator is a Gate Ready Pro feature. Upgrade to create and print privacy-safe recovery tags.");
-                }}
-                className="w-full sm:w-auto h-10 px-5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-purple-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Upgrade to Pro to Unlock</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>,
-      document.body
-    );
-  }
+  // For Free tier, we show a watermarked preview with Unlock with Silver CTA rather than blocking access
 
   const handleSave = () => {
     updateLuggageTag(trip.id, activeBagId, {
@@ -283,11 +198,52 @@ ${rewardOffered ? '★ REWARD OFFERED FOR SAFE RETURN' : ''}`;
           </p>
         </div>
 
+        {/* Free Plan Watermarked Preview Notice Banner */}
+        {!isPro && (
+          <div className="mx-5 sm:mx-6 mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-indigo-500/15 border-2 border-purple-400 dark:border-purple-600 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Lock className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <span>Smart QR Luggage Tag (Free Watermarked Preview)</span>
+                  <span className="text-[10px] bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-extrabold px-1.5 py-0.2 rounded">SILVER FEATURE</span>
+                </p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                  Upgrade to Silver ($1.99/mo) to unlock high-resolution printable emergency QR luggage tags without watermarks.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => openPaywall("Unlock printable emergency QR luggage tags with Silver ($1.99/mo).")}
+              className="w-full sm:w-auto h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 active:scale-95 transition-all cursor-pointer shrink-0"
+            >
+              <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+              <span>Unlock with Silver ($1.99/mo)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Content Area */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             {/* Left Column: QR Code & Printable Card */}
-            <div className="flex flex-col items-center p-5 rounded-2xl bg-purple-50/60 dark:bg-slate-800/60 border border-purple-100 dark:border-purple-900/60 text-center shadow-xs">
+            <div className="relative flex flex-col items-center p-5 rounded-2xl bg-purple-50/60 dark:bg-slate-800/60 border border-purple-100 dark:border-purple-900/60 text-center shadow-xs overflow-hidden">
+              {!isPro && (
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden z-20 select-none">
+                  <div className="transform -rotate-25 text-center p-3 rounded-2xl border-2 border-dashed border-purple-500/60 bg-white/80 dark:bg-slate-900/90 shadow-lg backdrop-blur-xs">
+                    <p className="text-sm sm:text-base font-black text-purple-700 dark:text-purple-300 tracking-wider uppercase">
+                      GATEREADY.CA PREVIEW
+                    </p>
+                    <p className="text-[10px] font-black text-purple-900 dark:text-purple-100 uppercase mt-0.5">
+                      UNLOCK WITH SILVER · $1.99/MO
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-200 inline-block mb-3">
                 <canvas ref={canvasRef} className="rounded-lg max-w-[190px] h-auto" />
               </div>
@@ -314,33 +270,47 @@ ${rewardOffered ? '★ REWARD OFFERED FOR SAFE RETURN' : ''}`;
               </div>
 
               <div className="w-full flex items-center gap-2 mt-4 pt-3 border-t border-purple-200/60 dark:border-slate-700">
-                <button
-                  type="button"
-                  onClick={handleDownload}
-                  className="flex-1 h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                  title="Download high-resolution QR PNG for your phone or printing"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-purple-50 cursor-pointer"
-                  title="Copy contact text"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-purple-50 cursor-pointer"
-                  title="Print luggage tag sheet"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Print</span>
-                </button>
+                {!isPro ? (
+                  <button
+                    type="button"
+                    onClick={() => openPaywall("Unlock printable emergency QR luggage tags with Silver ($1.99/mo).")}
+                    className="w-full h-10 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 cursor-pointer active:scale-95 transition-all"
+                    title="Unlock with Silver to download & print without watermarks"
+                  >
+                    <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                    <span>Unlock with Silver ($1.99/mo)</span>
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleDownload}
+                      className="flex-1 h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                      title="Download high-resolution QR PNG for your phone or printing"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopy}
+                      className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-purple-50 cursor-pointer"
+                      title="Copy contact text"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="h-9 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-purple-50 cursor-pointer"
+                      title="Print luggage tag sheet"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Print</span>
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* Privacy Warning */}

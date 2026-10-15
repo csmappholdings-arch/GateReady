@@ -70,6 +70,20 @@ interface SubscriptionContextType {
   canAddTrip: (currentCount: number) => { allowed: boolean; reason?: string };
   canAddBag: (existingBags: Bag[], newBagType: BagType) => { allowed: boolean; reason?: string };
   canUseCloudSync: () => boolean;
+  // 7-day Platinum trial explicit & expiring
+  isTrialActive: boolean;
+  isTrialExpired: boolean;
+  trialDaysRemaining: number;
+  trialHoursRemaining: number;
+  trialTimeLeftText: string;
+  isTrialExpiringSoon: boolean;
+  hasDismissedTrialExpiredNotice: boolean;
+  dismissTrialExpiredNotice: () => void;
+  // Collaborative referral program
+  referralCode: string;
+  referralsCount: number;
+  referralCreditsMonths: number;
+  claimReferralBonus: () => void;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -78,6 +92,12 @@ const SUBSCRIPTION_STORAGE_KEY = 'gateready_subscription_tier_v1';
 const BILLING_STORAGE_KEY = 'gateready_subscription_cycle_v1';
 const LICENSE_STORAGE_KEY = 'gateready_manual_license_key_v1';
 const EXPIRY_STORAGE_KEY = 'gateready_subscription_expires_at_v1';
+const TRIAL_STARTED_KEY = 'gateready_trial_started_at_v1';
+const TRIAL_EXPIRES_KEY = 'gateready_trial_expires_at_v1';
+const TRIAL_DISMISSED_KEY = 'gateready_trial_expired_dismissed_v1';
+const REFERRAL_CODE_KEY = 'gateready_referral_code_v1';
+const REFERRALS_COUNT_KEY = 'gateready_referrals_count_v1';
+const REFERRAL_CREDITS_KEY = 'gateready_referral_credits_months_v1';
 
 export const MAX_FREE_TRAVELERS = 1;
 export const MAX_FREE_BAGS_TOTAL = 2;
@@ -85,6 +105,45 @@ export const MAX_FREE_ACTIVE_TRIPS = 1;
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+
+  // 7-day Platinum trial state
+  const [trialExpiresAt] = useState<string | null>(() => {
+    try {
+      const saved = localStorage.getItem(TRIAL_EXPIRES_KEY);
+      if (saved) return saved;
+      // Auto-start 7-day Platinum trial for new visitors
+      const now = Date.now();
+      const expires = new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
+      localStorage.setItem(TRIAL_STARTED_KEY, new Date(now).toISOString());
+      localStorage.setItem(TRIAL_EXPIRES_KEY, expires);
+      return expires;
+    } catch {
+      return null;
+    }
+  });
+
+  const [hasDismissedTrialExpiredNotice, setHasDismissedTrialExpiredNotice] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(TRIAL_DISMISSED_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const dismissTrialExpiredNotice = () => {
+    setHasDismissedTrialExpiredNotice(true);
+    try {
+      localStorage.setItem(TRIAL_DISMISSED_KEY, 'true');
+    } catch {}
+  };
+
+  const [nowTick, setNowTick] = useState(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNowTick(Date.now());
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const [manualLicenseKey, setManualLicenseKey] = useState<string | null>(() => {
     try {
@@ -162,16 +221,89 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
         return saved;
       }
-      if (saved === 'PRO') {
-        // Map legacy PRO to PLATINUM
-        return 'PLATINUM';
-      }
       if (saved === 'FREE') return 'FREE';
+
+      // 7-day Platinum trial for new visitors
+      const trialExpires = localStorage.getItem(TRIAL_EXPIRES_KEY);
+      if (trialExpires) {
+        const diff = new Date(trialExpires).getTime() - Date.now();
+        if (diff > 0) return 'PLATINUM';
+        return 'FREE';
+      }
     } catch {
       // Ignore
     }
-    return 'FREE';
+    return 'PLATINUM';
   });
+
+  const trialDiffMs = trialExpiresAt ? Math.max(0, new Date(trialExpiresAt).getTime() - nowTick) : 0;
+  const hasPaidLicense = Boolean(
+    manualLicenseKey || 
+    subscriptionExpiresAt || 
+    tier === 'SILVER' || 
+    tier === 'GOLD' || 
+    (tier === 'PLATINUM' && isMasterKey)
+  );
+  const isTrialActive = !hasPaidLicense && tier === 'PLATINUM' && trialDiffMs > 0;
+  const isTrialExpired = !hasPaidLicense && trialExpiresAt !== null && trialDiffMs <= 0;
+  const trialDaysRemaining = Math.max(1, Math.ceil(trialDiffMs / (24 * 60 * 60 * 1000)));
+  const trialHoursRemaining = Math.max(0, Math.floor(trialDiffMs / (60 * 60 * 1000)));
+  const trialTimeLeftText = trialDiffMs > 86400000
+    ? `${trialDaysRemaining} days left`
+    : `${trialHoursRemaining}h ${Math.floor((trialDiffMs % 3600000) / 60000)}m left`;
+  const isTrialExpiringSoon = isTrialActive && trialDiffMs <= 2 * 24 * 60 * 60 * 1000;
+
+  // Referral program state
+  const [referralCode] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem(REFERRAL_CODE_KEY);
+      if (saved) return saved;
+      const code = 'GR-' + (user?.uid ? user.uid.slice(0, 6).toUpperCase() : Math.random().toString(36).substring(2, 8).toUpperCase());
+      localStorage.setItem(REFERRAL_CODE_KEY, code);
+      return code;
+    } catch {
+      return 'GR-VIP';
+    }
+  });
+
+  const [referralsCount, setReferralsCount] = useState<number>(() => {
+    try {
+      return parseInt(localStorage.getItem(REFERRALS_COUNT_KEY) || '1', 10);
+    } catch {
+      return 1;
+    }
+  });
+
+  const [referralCreditsMonths, setReferralCreditsMonths] = useState<number>(() => {
+    try {
+      return parseInt(localStorage.getItem(REFERRAL_CREDITS_KEY) || '1', 10);
+    } catch {
+      return 1;
+    }
+  });
+
+  const claimReferralBonus = () => {
+    setReferralsCount((prev) => {
+      const next = prev + 1;
+      try { localStorage.setItem(REFERRALS_COUNT_KEY, String(next)); } catch {}
+      return next;
+    });
+    setReferralCreditsMonths((prev) => {
+      const next = prev + 1;
+      try { localStorage.setItem(REFERRAL_CREDITS_KEY, String(next)); } catch {}
+      return next;
+    });
+  };
+
+  // Automatically downgrade to FREE if 7-day trial expires
+  useEffect(() => {
+    if (isTrialExpired && tier === 'PLATINUM' && !hasPaidLicense) {
+      setTier('FREE');
+      try {
+        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+      } catch {}
+    }
+  }, [isTrialExpired, tier, hasPaidLicense]);
 
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(() => {
     try {
@@ -648,7 +780,19 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         canAddTraveler,
         canAddTrip,
         canAddBag,
-        canUseCloudSync
+        canUseCloudSync,
+        isTrialActive,
+        isTrialExpired,
+        trialDaysRemaining,
+        trialHoursRemaining,
+        trialTimeLeftText,
+        isTrialExpiringSoon,
+        hasDismissedTrialExpiredNotice,
+        dismissTrialExpiredNotice,
+        referralCode,
+        referralsCount,
+        referralCreditsMonths,
+        claimReferralBonus
       }}
     >
       {children}

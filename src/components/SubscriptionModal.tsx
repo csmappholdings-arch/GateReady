@@ -182,6 +182,9 @@ export const SubscriptionModal: React.FC = () => {
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
                     Free forever starter plan
                   </p>
+                  <div className="mt-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                    Good for 1 occasional solo flight
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
@@ -259,6 +262,9 @@ export const SubscriptionModal: React.FC = () => {
                       Billed monthly · Cancel anytime
                     </p>
                   )}
+                  <div className="mt-1 px-2 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/60 text-[10px] text-purple-900 dark:text-purple-200 font-bold leading-tight">
+                    ~$0.38/trip · Less than 1/35th of one overweight bag fee
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
@@ -317,11 +323,11 @@ export const SubscriptionModal: React.FC = () => {
               </div>
             </div>
 
-            {/* COLUMN 3: GOLD (MOST POPULAR) */}
-            <div className={`rounded-2xl border-2 p-4 flex flex-col justify-between transition-all relative shadow-xl ${
+            {/* COLUMN 3: GOLD (MOST POPULAR - VISUAL DEFAULT CHOICE) */}
+            <div className={`rounded-2xl border-2 p-4 flex flex-col justify-between transition-all relative shadow-2xl ring-4 ring-amber-400/50 border-amber-500 scale-[1.02] z-10 ${
               tier === 'GOLD'
-                ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-950/20'
-                : 'border-amber-400 dark:border-amber-500 bg-gradient-to-b from-amber-500/5 via-white to-amber-500/5 dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900'
+                ? 'bg-amber-50/50 dark:bg-amber-950/30'
+                : 'bg-gradient-to-b from-amber-500/10 via-white to-amber-500/10 dark:from-amber-950/30 dark:via-slate-900 dark:to-slate-900'
             }`}>
               {/* Highlight Badge */}
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -332,7 +338,7 @@ export const SubscriptionModal: React.FC = () => {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2 mt-1">
+                <div className="flex items-center justify-between mb-1 mt-1">
                   <span className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
                     Gold
                   </span>
@@ -342,6 +348,10 @@ export const SubscriptionModal: React.FC = () => {
                     </span>
                   )}
                 </div>
+
+                <p className="text-[11px] font-bold text-amber-700 dark:text-amber-300 mb-2">
+                  Best value for couples &amp; families
+                </p>
 
                 <div className="mb-3">
                   <div className="flex items-baseline gap-1">
@@ -361,6 +371,9 @@ export const SubscriptionModal: React.FC = () => {
                       Billed monthly · Cancel anytime
                     </p>
                   )}
+                  <div className="mt-1.5 px-2.5 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 text-[10px] text-amber-950 dark:text-amber-200 font-extrabold leading-tight">
+                    ~$0.25 per family trip · Less than the cost of one overweight-bag fee per year
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
@@ -451,6 +464,9 @@ export const SubscriptionModal: React.FC = () => {
                       Billed monthly · Cancel anytime
                     </p>
                   )}
+                  <div className="mt-1 px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-900/60 text-[10px] text-indigo-900 dark:text-indigo-200 font-bold leading-tight">
+                    ~$0.33/trip · Total group &amp; family travel peace of mind
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">

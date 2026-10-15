@@ -23,8 +23,12 @@ import {
   Filter, 
   Scale,
   Sparkles,
-  Droplets
+  Droplets,
+  Crown,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
+import { useSubscription } from '../context/SubscriptionContext';
 
 interface PrintPackingListModalProps {
   isOpen: boolean;
@@ -38,6 +42,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
   trip
 }) => {
   const { weightUnit } = usePacking();
+  const { isPro, openPaywall } = useSubscription();
 
   const [filterStatus, setFilterStatus] = useState<'all' | 'packed' | 'unpacked'>('all');
   const [selectedTraveler, setSelectedTraveler] = useState<string>('all');
@@ -192,14 +197,26 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
               )}
             </button>
 
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all cursor-pointer"
-            >
-              <Printer className="w-4 h-4 stroke-[2.5]" />
-              <span>Print / Save PDF</span>
-            </button>
+            {!isPro ? (
+              <button
+                type="button"
+                onClick={() => openPaywall("Unlock unwatermarked printable PDF packing manifests with Silver ($1.99/mo).")}
+                className="h-9 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition-all cursor-pointer border border-amber-300/40"
+                title="Unlock with Silver to print unwatermarked PDF"
+              >
+                <Crown className="w-4 h-4 fill-white" />
+                <span>Unlock with Silver ($1.99/mo)</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all cursor-pointer"
+              >
+                <Printer className="w-4 h-4 stroke-[2.5]" />
+                <span>Print / Save PDF</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -291,8 +308,50 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
           </div>
         </div>
 
+        {/* Free Tier Watermarked Preview Banner */}
+        {!isPro && (
+          <div className="no-print mx-5 sm:mx-6 mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-indigo-500/15 border-2 border-purple-400 dark:border-purple-600 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Lock className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <span>Printable PDF Packing Manifest (Free Watermarked Preview)</span>
+                  <span className="text-[10px] bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-extrabold px-1.5 py-0.2 rounded">SILVER FEATURE</span>
+                </p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                  Upgrade to Silver ($1.99/mo) to unlock clean, unwatermarked PDF manifests and unwatermarked luggage tags.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => openPaywall("Unlock unwatermarked printable PDF packing manifests with Silver ($1.99/mo).")}
+              className="w-full sm:w-auto h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 active:scale-95 transition-all cursor-pointer shrink-0"
+            >
+              <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+              <span>Unlock with Silver ($1.99/mo)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Printable Document Content (Scrollable on screen, expands in print) */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950">
+        <div className="relative p-6 sm:p-8 overflow-y-auto space-y-6 flex-1 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950">
+          {/* Watermark Diagonal Overlay on Free Preview */}
+          {!isPro && (
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden z-20 select-none">
+              <div className="transform -rotate-25 text-center p-6 sm:p-10 rounded-3xl border-4 border-dashed border-purple-500/40 bg-purple-500/5 backdrop-blur-[1px]">
+                <p className="text-2xl sm:text-4xl md:text-5xl font-black text-purple-600/25 dark:text-purple-400/25 tracking-widest uppercase">
+                  GATEREADY.CA PREVIEW
+                </p>
+                <p className="text-sm sm:text-xl font-black text-purple-700/35 dark:text-purple-300/35 uppercase tracking-wider mt-2">
+                  UNLOCK WITH SILVER · $1.99/MO
+                </p>
+              </div>
+            </div>
+          )}
           {/* Printable Manifest Header */}
           <div className="border-b-2 border-purple-600 pb-5">
             <div className="flex items-start justify-between gap-4">
