@@ -128,7 +128,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
               <div>
                 <p className="font-bold text-amber-900 dark:text-amber-200">Bag Limit Reached</p>
                 <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-0.5">
-                  Free plan is limited to 3 bags total. Adding more bags requires Gate Ready Pro.
+                  Free plan is limited to 2 bags total. Adding more bags requires Silver, Gold, or Platinum.
                 </p>
               </div>
             </div>
@@ -190,7 +190,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
                   >
                     {alreadyExistsOnTrip && (
                       <span className="absolute -top-1.5 -right-1 bg-amber-500 text-white text-[8px] font-black px-1.5 rounded-full flex items-center gap-0.5">
-                        <Crown className="w-2 h-2 fill-white" /> Pro
+                        <Crown className="w-2 h-2 fill-white" /> Silver+
                       </span>
                     )}
                     <Icon className="w-5 h-5" />

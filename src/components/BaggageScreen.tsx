@@ -124,7 +124,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
   const handleSmartRebalance = () => {
     if (!isPro) {
-      openPaywall("Smart Bag Rebalancer is a Gate Ready Pro feature. Upgrade to automatically shift items between bags and avoid steep airline overweight penalty fees.");
+      openPaywall("Smart Bag Rebalancer is a Silver+ feature. Upgrade to automatically shift items between bags and avoid steep airline overweight penalty fees.");
       return;
     }
 
@@ -188,18 +188,19 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     }
   };
 
-  const getWeightCap = (type: BagType): number => {
-    if (weightUnit === 'LBS') {
-      return type === 'CHECKED' ? 50 : type === 'CARRY_ON' ? 22 : 15;
+  const getBagWeightCap = (bag: Bag): number => {
+    const rawLimitLbs = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
+    if (weightUnit === 'KG') {
+      return Math.round(rawLimitLbs * 0.45359237);
     }
-    return type === 'CHECKED' ? 23 : type === 'CARRY_ON' ? 10 : 7;
+    return rawLimitLbs;
   };
 
   // Safe Add Bag check (strictly limits Free to 2 bags)
   const handleOpenAddBagSafe = () => {
     const bagCheck = canAddBag(trip.bags, 'CHECKED');
     if (!bagCheck.allowed) {
-      openPaywall(bagCheck.reason || 'Free Plan is limited to 2 bags. Upgrade to Gate Ready Pro for unlimited bags.');
+      openPaywall(bagCheck.reason || 'Free Plan is limited to 2 bags. Upgrade to Silver, Gold, or Platinum for unlimited bags.');
       return;
     }
     onOpenAddBag();
@@ -207,7 +208,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
   const handleOpenQrTagSafe = (bag: Bag) => {
     if (!isPro) {
-      openPaywall("Emergency QR Luggage Tag generator is a Gate Ready Pro feature. Upgrade to create and print privacy-safe recovery tags.");
+      openPaywall("Emergency QR Luggage Tag generator is a Silver+ feature. Upgrade to create and print privacy-safe recovery tags.");
       return;
     }
     setShowQrModalForBag(bag);
@@ -266,7 +267,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     ? DefaultSuggestions.convertLbsToKg(activeBagItemsWeightLbs)
     : activeBagItemsWeightLbs;
 
-  const activeWeightCap = activeBag ? getWeightCap(activeBag.type) : 22;
+  const activeWeightCap = activeBag ? getBagWeightCap(activeBag) : (weightUnit === 'KG' ? 10 : 22);
   const isOverweight = activeDisplayWeight > activeWeightCap;
   const isNearLimit = activeDisplayWeight > activeWeightCap * 0.85 && !isOverweight;
   const weightPct = Math.min(Math.round((activeDisplayWeight / activeWeightCap) * 100), 150);
@@ -487,7 +488,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               }`}
             >
               <Scale className="w-4 h-4" />
-              <span>{isPro ? 'Auto-Rebalance Bags' : 'Unlock Rebalance (Pro)'}</span>
+              <span>{isPro ? 'Auto-Rebalance Bags' : 'Unlock Rebalance (Silver+)'}</span>
             </button>
           </div>
         </div>
@@ -514,7 +515,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             const totalWeight = emptyLbs + itemsWeight;
             const dispWeight = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(totalWeight) : totalWeight;
             const dispEmpty = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(emptyLbs) : emptyLbs;
-            const limit = getWeightCap(bag.type);
+            const limit = getBagWeightCap(bag);
             const bagMat: BagMaterial = bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
 
             return (
@@ -692,13 +693,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 type="button"
                 onClick={() => handleOpenQrTagSafe(activeBag)}
                 className="h-8 px-3 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                title={isPro ? "Generate printable emergency QR luggage tag" : "Emergency QR Luggage Tag (Pro Only)"}
+                title={isPro ? "Generate printable emergency QR luggage tag" : "Emergency QR Luggage Tag (Silver+)"}
               >
                 <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>QR Tag</span>
                 {!isPro && (
                   <span className="inline-flex items-center gap-0.5 bg-amber-400 text-purple-950 font-black text-[9px] px-1.5 py-0.2 rounded shadow-2xs">
-                    <Lock className="w-2.5 h-2.5" /> PRO
+                    <Lock className="w-2.5 h-2.5" /> SILVER+
                   </span>
                 )}
               </button>

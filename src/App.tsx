@@ -58,13 +58,15 @@ function PackingAppContent() {
   const [targetBagId, setTargetBagId] = useState<string>('');
 
   const handleOpenAddTrip = (travelType?: TravelType, destinationCity?: string) => {
+    const safeTravelType = typeof travelType === 'string' ? travelType : undefined;
+    const safeDest = typeof destinationCity === 'string' ? destinationCity : undefined;
     const tripCheck = canAddTrip(trips.length);
     if (!tripCheck.allowed) {
       openPaywall(tripCheck.reason);
       return;
     }
-    setSelectedTravelTypeForAdd(travelType);
-    setSelectedDestinationForAdd(destinationCity);
+    setSelectedTravelTypeForAdd(safeTravelType);
+    setSelectedDestinationForAdd(safeDest);
     setAddTripKey((prev) => prev + 1);
     setShowAddTripModal(true);
   };
@@ -134,7 +136,7 @@ function PackingAppContent() {
                 type="button"
                 onClick={() => {
                   if (!isPro) {
-                    openPaywall("Upgrade to Gate Ready Pro to unlock full Trip Intel & Terminal Maps.");
+                    openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Trip Intel & Terminal Maps.");
                   }
                   setCurrentScreen('Checklist');
                 }}
@@ -147,16 +149,16 @@ function PackingAppContent() {
                 <CloudSun className="w-4 h-4 shrink-0 text-amber-400" />
                 <span className="truncate">Airport & Trip Intel</span>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
+                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                 </span>
               </button>
 
-              {/* Tab 3: Cabin & Plugs (Pro) */}
+              {/* Tab 3: Cabin & Plugs (Silver+) */}
               <button
                 type="button"
                 onClick={() => {
                   if (!isPro) {
-                    openPaywall("Upgrade to Gate Ready Pro to unlock Aircraft Cabin & In-Seat Plugs Intel.");
+                    openPaywall("Upgrade to Silver, Gold, or Platinum to unlock Aircraft Cabin & In-Seat Plugs Intel.");
                   }
                   setCurrentScreen('CabinIntel');
                 }}
@@ -169,7 +171,7 @@ function PackingAppContent() {
                 <Zap className="w-4 h-4 text-amber-400 shrink-0" />
                 <span className="truncate">Aircraft Cabin & In-Seat Power</span>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
+                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                 </span>
               </button>
 
@@ -315,7 +317,7 @@ function PackingAppContent() {
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Gate Ready Pro to unlock full Trip Intel & Terminal Maps.");
+                  openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Trip Intel & Terminal Maps.");
                 }
                 setCurrentScreen('Checklist');
               }}
@@ -336,7 +338,7 @@ function PackingAppContent() {
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Gate Ready Pro to unlock Aircraft Cabin & In-Seat Plugs Intel.");
+                  openPaywall("Upgrade to Silver, Gold, or Platinum to unlock Aircraft Cabin & In-Seat Plugs Intel.");
                 }
                 setCurrentScreen('CabinIntel');
               }}

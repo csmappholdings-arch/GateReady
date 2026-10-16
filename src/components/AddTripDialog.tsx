@@ -269,9 +269,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
         }
       ]);
     } else if (bundle === 'CHECKED_PLUS_CARRY') {
-      // 3 Bags Bundle: Requires Pro
+      // 3 Bags Bundle: Requires Silver+
       if (!isPro) {
-        openPaywall('Packing 3 or more bags (Checked + Carry-On + Personal Item) is a Gate Ready Pro feature. The Free plan includes 2 bags maximum.');
+        openPaywall('Packing 3 or more bags (Checked + Carry-On + Personal Item) is a Silver+ feature. The Free plan includes 2 bags maximum.');
         return;
       }
       setBags([
@@ -632,7 +632,6 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
-                    if (!destinationCity) setDestinationCity(e.target.value);
                   }}
                   placeholder="e.g. Tokyo Vacation, London Eurostar Trip, Alaska Cruise 2026"
                   className={`w-full rounded-xl border border-purple-200/80 dark:border-purple-900/60 bg-purple-50/30 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:border-purple-500 ${
@@ -650,7 +649,6 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                       type="button"
                       onClick={() => {
                         setName(tripIdea);
-                        if (!destinationCity) setDestinationCity(tripIdea.replace(' Family Trip', '').replace(' Weekend', '').replace(' Getaway', ''));
                       }}
                       className="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-200/80 dark:border-purple-900/60 shrink-0 transition-colors cursor-pointer"
                     >
@@ -894,7 +892,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                           Round-Trip & Return Tracking
                         </span>
                         <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                          {!isPro && <Lock className="w-2.5 h-2.5" />} PRO
+                          {!isPro && <Lock className="w-2.5 h-2.5" />} SILVER+
                         </span>
                       </div>
                       <p className="text-[10px] text-indigo-700/80 dark:text-indigo-300/80">
@@ -906,11 +904,11 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                   {!isPro ? (
                     <button
                       type="button"
-                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Gate Ready Pro feature. Track return flights, 2-way weight limits, and return day departure alerts.")}
+                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Track return flights, 2-way weight limits, and return day departure alerts.")}
                       className="h-7 px-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-[10px] flex items-center justify-center gap-1 shadow-xs cursor-pointer active:scale-95 transition-all shrink-0 self-start sm:self-auto"
                     >
                       <Lock className="w-3 h-3" />
-                      <span>Unlock with Pro</span>
+                      <span>Unlock with Silver+</span>
                     </button>
                   ) : (
                     <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
@@ -924,7 +922,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                   <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-indigo-100 dark:border-indigo-900/50 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
                     <p className="font-bold text-indigo-900 dark:text-indigo-300 flex items-center gap-1 text-[10.5px]">
                       <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
-                      <span>Included with Gate Ready Pro Subscription:</span>
+                      <span>Included with Silver, Gold & Platinum Plans:</span>
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-slate-600 dark:text-slate-400">
                       <span className="flex items-center gap-1">✓ Round-trip schedules & return countdowns</span>
@@ -941,13 +939,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                 <div className="relative">
                   {!isPro && (
                     <div 
-                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Gate Ready Pro feature. Upgrade to Pro to track your return journey.")}
+                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Upgrade to track your return journey.")}
                       className="absolute inset-0 z-10 bg-slate-900/5 dark:bg-slate-950/20 backdrop-blur-[1px] rounded-xl flex items-center justify-center cursor-pointer group"
-                      title="Click to unlock return schedule with Pro"
+                      title="Click to unlock return schedule with Silver+"
                     >
                       <div className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-md border border-purple-200 dark:border-purple-800 text-[11px] font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1.5 group-hover:scale-105 transition-transform">
                         <Lock className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Return Date Locked (Pro Feature) — Tap to Upgrade</span>
+                        <span>Return Date Locked (Silver+ Feature) — Tap to Upgrade</span>
                       </div>
                     </div>
                   )}
@@ -1141,7 +1139,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                       <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
                       <span>Checked + Carry</span>
                       <span className="text-[9px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded flex items-center gap-0.5 ml-auto">
-                        <Lock className="w-2.5 h-2.5" /> PRO (3 bags)
+                        <Lock className="w-2.5 h-2.5" /> Silver+ (3 bags)
                       </span>
                     </p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
@@ -1178,11 +1176,11 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
                     {!isPro ? (
                       <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
-                        <span>Free Limit: 2 Bags Max (3+ Requires Pro)</span>
+                        <span>Free Limit: 2 Bags Max (3+ Requires Silver+)</span>
                       </span>
                     ) : (
                       <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
-                        Pro: Unlimited Bags
+                        Silver+: Unlimited Bags
                       </span>
                     )}
                   </div>

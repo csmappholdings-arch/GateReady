@@ -738,10 +738,10 @@ export const Header: React.FC<HeaderProps> = ({
                       <Key className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                       <div>
                         <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                          Pro License Key
+                          Silver+ License Key
                         </p>
                         <p className="text-[10px] text-slate-400">
-                          {manualLicenseKey ? `Active: ${manualLicenseKey}` : 'Redeem a Pro key'}
+                          {manualLicenseKey ? `Active: ${manualLicenseKey}` : 'Redeem a Silver+ key'}
                         </p>
                       </div>
                     </div>

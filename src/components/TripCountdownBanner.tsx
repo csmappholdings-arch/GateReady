@@ -32,7 +32,11 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
   const [activeLeg, setActiveLeg] = useState<'departure' | 'return'>('departure');
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
-  const isFlight = !trip.travelType || trip.travelType === 'PLANE';
+  const isCar = trip.travelType === 'CAR' || (Boolean(trip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(trip.seatClassOrCarSize || ''));
+  const isTrain = trip.travelType === 'TRAIN' || (Boolean(trip.seatClassOrCarSize) && /train|rail|coach/i.test(trip.seatClassOrCarSize || ''));
+  const isCruise = trip.travelType === 'CRUISE' || (Boolean(trip.seatClassOrCarSize) && /cruise|stateroom|ship|cabin|porthole/i.test(trip.seatClassOrCarSize || ''));
+  const isBus = trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || ''));
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !isCar && !isTrain && !isCruise && !isBus;
 
   // Auto-switch to Return countdown for Pro users if departure date/time has already passed
   useEffect(() => {
@@ -117,7 +121,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
           </span>
           {isPro ? (
             <span className="inline-flex items-center gap-0.5 bg-purple-500/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-amber-300/30">
-              <Crown className="w-2.5 h-2.5 fill-amber-300" /> Pro Unlocked
+              <Crown className="w-2.5 h-2.5 fill-amber-300" /> Silver+ Unlocked
             </span>
           ) : (
             <span className="inline-flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-emerald-400/30">

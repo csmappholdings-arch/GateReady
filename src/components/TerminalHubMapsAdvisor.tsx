@@ -273,7 +273,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
                   Dynamic Terminal & Station Maps
                 </h2>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Pro
+                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">

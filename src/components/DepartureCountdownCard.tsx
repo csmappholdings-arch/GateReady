@@ -162,7 +162,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                 Departure Countdown Clock & Travel Day Alerts
               </span>
               <span className="text-[9px] font-black uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs shrink-0">
-                <Crown className="w-2.5 h-2.5 fill-white" /> Pro Required
+                <Crown className="w-2.5 h-2.5 fill-white" /> Silver+ Required
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
@@ -174,13 +174,13 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
         <button
           onClick={() =>
             openPaywall(
-              "The Departure Countdown Clock & Day-of Alerts (passports, foreign cash, and home security) are exclusive to Gate Ready Pro."
+              "The Departure Countdown Clock & Day-of Alerts (passports, foreign cash, and home security) are exclusive to Silver+ plans."
             )
           }
           className="h-8.5 px-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-purple-600/30 shrink-0 cursor-pointer active:scale-95 transition-all"
         >
           <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-          <span>Unlock with Pro</span>
+          <span>Unlock with Silver+</span>
         </button>
       </div>
     );
@@ -188,7 +188,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
   return (
     <div className="rounded-3xl bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/60 shadow-sm overflow-hidden mb-6 transition-all">
-      {/* Top Banner / Pro Header */}
+      {/* Top Banner / Silver+ Header */}
       <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-4 sm:p-5 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-amber-300 shrink-0 border border-white/15">
@@ -201,14 +201,14 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
               </h3>
               {isPro ? (
                 <span className="text-[10px] bg-gradient-to-r from-amber-400 to-amber-500 text-purple-950 font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> PRO
+                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> SILVER+
                 </span>
               ) : (
                 <button
-                  onClick={() => openPaywall("Gate Ready Pro includes the interactive Departure Countdown Clock, smart day-of alerts for passports and cash, and PDF packing exports.")}
+                  onClick={() => openPaywall("Silver+ includes the interactive Departure Countdown Clock, smart day-of alerts for passports and cash, and PDF packing exports.")}
                   className="text-[10px] bg-amber-400/25 border border-amber-300/40 text-amber-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-400/40 transition-colors cursor-pointer"
                 >
-                  <Crown className="w-2.5 h-2.5 fill-amber-300" /> Pro Feature
+                  <Crown className="w-2.5 h-2.5 fill-amber-300" /> Silver+ Feature
                 </button>
               )}
             </div>
@@ -322,7 +322,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                   }`}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span>{trip.isReturnRepackMode ? 'Exit Return Repack Mode' : (!trip.travelType || trip.travelType === 'PLANE' ? 'Start Return Flight Repack (Pro)' : 'Start Return Leg Repack (Pro)')}</span>
+                  <span>{trip.isReturnRepackMode ? 'Exit Return Repack Mode' : (!trip.travelType || trip.travelType === 'PLANE' ? 'Start Return Flight Repack (Silver+)' : 'Start Return Leg Repack (Silver+)')}</span>
                 </button>
               </div>
             ) : (
@@ -377,11 +377,11 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                 <div className="flex items-center gap-2">
                   <Crown className="w-4 h-4 fill-amber-500 text-amber-500 shrink-0" />
                   <span className="text-xs font-semibold text-amber-950 dark:text-amber-200">
-                    Pro Departure Tracking
+                    Silver+ Departure Tracking
                   </span>
                 </div>
                 <button
-                  onClick={() => openPaywall("Upgrade to Gate Ready Pro to activate live departure countdown timers and day-of packing reminders.")}
+                  onClick={() => openPaywall("Upgrade to Silver, Gold, or Platinum to activate live departure countdown timers and day-of packing reminders.")}
                   className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-all cursor-pointer shrink-0"
                 >
                   Unlock

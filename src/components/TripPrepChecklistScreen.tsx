@@ -89,6 +89,12 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
   const hasRealDestination = Boolean(rawCity && rawCity.length > 1);
   const city = hasRealDestination ? rawCity! : '';
 
+  const isCar = trip.travelType === 'CAR' || (Boolean(trip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(trip.seatClassOrCarSize || ''));
+  const isTrain = trip.travelType === 'TRAIN' || (Boolean(trip.seatClassOrCarSize) && /train|rail|coach/i.test(trip.seatClassOrCarSize || ''));
+  const isCruise = trip.travelType === 'CRUISE' || (Boolean(trip.seatClassOrCarSize) && /cruise|stateroom|ship|cabin|porthole/i.test(trip.seatClassOrCarSize || ''));
+  const isBus = trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || ''));
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !isCar && !isTrain && !isCruise && !isBus;
+
   const [intelSubTab, setIntelSubTab] = useState<'PREP' | 'MAPS'>(initialSubTab || 'PREP');
   const [destinationInput, setDestinationInput] = useState(trip.destinationCity || '');
   const [isEditingDestination, setIsEditingDestination] = useState(false);
@@ -504,7 +510,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               <Compass className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
               <span>Terminal & Station Maps</span>
               <span className="text-[8px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1 py-0.2 rounded-sm ml-0.5 shrink-0">
-                PRO
+                SILVER+
               </span>
             </button>
           </div>
@@ -1099,9 +1105,9 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             </div>
             <div>
               <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Jet Lag & Circadian Rhythm Advisor</span>
+                <span>{isFlight ? 'Jet Lag & Circadian Rhythm Advisor' : isCar ? 'Driver Fatigue & Rest Stop Advisor' : 'Travel Rest & Fatigue Advisor'}</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                  Circadian Sync
+                  {isFlight ? 'Circadian Sync' : isCar ? 'Driver Safety' : 'Rest Sync'}
                 </span>
                 {!isPro && (
                   <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
@@ -1110,7 +1116,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 )}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Shift your sleep schedule and beat time zone fatigue before touching down in <strong className="text-indigo-600 dark:text-indigo-300">{city}</strong>.
+                {isFlight 
+                  ? `Shift your sleep schedule and beat time zone fatigue before touching down in ${city}.`
+                  : isCar
+                    ? `Plan restful driving breaks and beat fatigue on your road journey to ${city}.`
+                    : `Plan restful transit breaks and stay refreshed on your trip to ${city}.`}
               </p>
             </div>
           </div>
@@ -1127,12 +1137,18 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-amber-400 shrink-0" />
               <div>
-                <p className="text-xs font-black text-white">Circadian Sleep & Caffeine Windows</p>
-                <p className="text-[11px] text-purple-200">Avoid fatigue on arrival in {city} with our scientific sleep shift protocol.</p>
+                <p className="text-xs font-black text-white">
+                  {isFlight ? 'Circadian Sleep & Caffeine Windows' : isCar ? 'Driver Rest & Caffeine Windows' : 'Travel Rest & Caffeine Windows'}
+                </p>
+                <p className="text-[11px] text-purple-200">
+                  {isFlight 
+                    ? `Avoid fatigue on arrival in ${city} with our scientific sleep shift protocol.`
+                    : `Avoid driver fatigue on the road to ${city} with our optimal rest break schedule.`}
+                </p>
               </div>
             </div>
             <button
-              onClick={() => openPaywall("Unlock Jet Lag & Circadian Rhythm Advisor with Silver+.")}
+              onClick={() => openPaywall(`Unlock ${isFlight ? 'Jet Lag & Circadian Rhythm' : isCar ? 'Driver Fatigue & Rest Stop' : 'Travel Rest & Fatigue'} Advisor with Silver+.`)}
               className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs"
             >
               Upgrade
@@ -1209,8 +1225,16 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
         <div className="space-y-2.5">
           {[
             { key: 'passport', title: 'Passport Validity > 6 Months', subtitle: 'Ensure passport has at least 6 months validity from departure date.' },
-            { key: 'checkin', title: 'Airline Online Check-In (24h Before)', subtitle: 'Confirm seats, check in online, and avoid gate agent queues.' },
-            { key: 'wallet_pass', title: 'Save Boarding Pass to Apple/Google Wallet', subtitle: 'Ensures access even with spotty airport Wi-Fi.' },
+            { 
+              key: 'checkin', 
+              title: isFlight ? 'Airline Online Check-In (24h Before)' : isCar ? 'Vehicle Safety & Route Inspection' : isTrain ? 'Rail E-Ticket & Seat Check-In' : isCruise ? 'Cruise Terminal Online Check-In' : 'Bus Ticket & Departure Check-In', 
+              subtitle: isFlight ? 'Confirm seats, check in online, and avoid gate agent queues.' : isCar ? 'Check tire pressure, fluid levels, and GPS toll route.' : isTrain ? 'Confirm carriage, platform, and seat assignment.' : isCruise ? 'Complete safety manifest and print luggage tags.' : 'Confirm departure bay and luggage stowage limits.' 
+            },
+            { 
+              key: 'wallet_pass', 
+              title: isFlight ? 'Save Boarding Pass to Apple/Google Wallet' : isCar ? 'Save Driver & Route Documents to Phone' : isTrain ? 'Save Rail E-Ticket to Apple/Google Wallet' : isCruise ? 'Save Port Boarding Pass to Phone' : 'Save Bus Pass to Apple/Google Wallet', 
+              subtitle: isFlight ? 'Ensures access even with spotty airport Wi-Fi.' : isCar ? 'Keep license, vehicle registration, and roadside assistance handy.' : isTrain ? 'Ensures offline access during underground and mountain transit.' : isCruise ? 'Fast-track through port terminal security lines.' : 'Quick access when boarding bus line.' 
+            },
             { key: 'bank_notify', title: 'Credit Card International Travel Notice', subtitle: 'Notify bank or confirm card has zero foreign transaction fee.' },
             { key: 'emergency_cash', title: `Withdraw Recommended Cash ($${totalRecommendedCash})`, subtitle: `Keep emergency local currency in your personal item.` },
             { key: 'offline_maps', title: 'Download Offline Maps for Destination', subtitle: 'Download offline Google Maps for navigation without cellular data.' },

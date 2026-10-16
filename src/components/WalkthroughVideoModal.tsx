@@ -99,7 +99,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'terminal_maps',
     title: '4. [Silver+] Worldwide Terminal Maps & Phone Radar',
     tagline: 'Post-security cold water stations, restrooms & gate wayfinding',
-    description: 'Gate Ready Pro unlocks dynamic terminal schematics for major global airports, high-speed rail stations, and cruise terminals. Use your phone location beacon to calculate real-time walking distance and time to the nearest cold water refill station (saving $6+ per bottle) and restrooms along your gate path.',
+    description: 'Gate Ready Silver+ unlocks dynamic terminal schematics for major global airports, high-speed rail stations, and cruise terminals. Use your phone location beacon to calculate real-time walking distance and time to the nearest cold water refill station (saving $6+ per bottle) and restrooms along your gate path.',
     duration: 7.5,
     icon: Compass,
     color: 'from-cyan-600 to-blue-600',
@@ -115,7 +115,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'cabin',
     title: '5. [Silver+] Aircraft Cabin Intel & In-Seat Power',
     tagline: 'AC power outlets, USB-C watts & overhead bin dimensions',
-    description: 'Never get stuck with a dead laptop or a gate-checked roller bag. Gate Ready Pro provides seat-back electrical outlet maps (110V AC vs USB-C PD wattages) and overhead bin clearances for 20+ commercial aircraft (Boeing 787, 737 MAX, Airbus A350, A321neo) and train coach classes.',
+    description: 'Never get stuck with a dead laptop or a gate-checked roller bag. Gate Ready Silver+ provides seat-back electrical outlet maps (110V AC vs USB-C PD wattages) and overhead bin clearances for 20+ commercial aircraft (Boeing 787, 737 MAX, Airbus A350, A321neo) and train coach classes.',
     duration: 6.5,
     icon: Zap,
     color: 'from-violet-600 to-purple-600',
@@ -131,7 +131,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'recovery',
     title: '6. [Silver+] Privacy QR Luggage Tags & PDF Exports',
     tagline: 'Conceal home address with instant WhatsApp bag recovery',
-    description: 'Gate Ready Pro issues smart privacy-safe QR luggage tags. Unlike traditional luggage tags that display your home address to onlookers, these QR tags allow airlines and good Samaritans to contact you directly via WhatsApp or encrypted phone. Export high-resolution formatted PDF lists for one-tap printing.',
+    description: 'Gate Ready Silver+ issues smart privacy-safe QR luggage tags. Unlike traditional luggage tags that display your home address to onlookers, these QR tags allow airlines and good Samaritans to contact you directly via WhatsApp or encrypted phone. Export high-resolution formatted PDF lists for one-tap printing.',
     duration: 6.5,
     icon: QrCode,
     color: 'from-emerald-600 to-teal-600',
@@ -314,7 +314,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                 </span>
                 {step.isPro && (
                   <span className="text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-purple-950 px-2 py-0.2 rounded-full flex items-center gap-1 shadow-sm">
-                    <Crown className="w-3 h-3 fill-purple-950" /> Pro Feature
+                    <Crown className="w-3 h-3 fill-purple-950" /> Silver+ Feature
                   </span>
                 )}
               </h3>
@@ -437,7 +437,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-xs text-amber-200">
                   <Crown className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Pro feature included in all Gate Ready Pro plans</span>
+                  <span>Silver+ feature included in Silver, Gold & Platinum plans</span>
                 </div>
                 <button
                   type="button"
@@ -508,7 +508,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                     </div>
                     <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
                       <span className="text-[10px] text-slate-400">Luggage Allowance</span>
-                      <p className="font-bold text-emerald-400 mt-0.5">2 Free Bags + Unlimited (Pro)</p>
+                      <p className="font-bold text-emerald-400 mt-0.5">2 Free Bags + Unlimited (Silver+)</p>
                     </div>
                   </div>
                 </div>
@@ -586,7 +586,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                       </div>
                     </div>
                     <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-400/30 flex items-center gap-1">
-                      <Crown className="w-3 h-3 text-amber-400" /> Pro Feature
+                      <Crown className="w-3 h-3 text-amber-400" /> Silver+ Feature
                     </span>
                   </div>
 

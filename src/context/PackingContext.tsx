@@ -429,10 +429,22 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       { id: `gc-${Date.now()}-5`, text: 'Kids / Family formula and medications declared at security', completed: false, required: false }
     ];
 
+    const deducedType: TravelType = (type && ['PLANE', 'TRAIN', 'CAR', 'CRUISE', 'BUS'].includes(type))
+      ? type
+      : /car|suv|sedan|truck|van|overland/i.test(seatOrSize || '')
+        ? 'CAR'
+        : /train|rail|coach/i.test(seatOrSize || '')
+          ? 'TRAIN'
+          : /cruise|stateroom|ship|cabin|porthole/i.test(seatOrSize || '')
+            ? 'CRUISE'
+            : /bus/i.test(seatOrSize || '')
+              ? 'BUS'
+              : 'PLANE';
+
     const newTrip: Trip = {
       id: newTripId,
       name: name.trim() || 'My Upcoming Trip',
-      travelType: type || 'PLANE',
+      travelType: deducedType,
       companyName: company.trim(),
       seatClassOrCarSize: seatOrSize.trim(),
       originCity: extraDetails?.originCity?.trim() || '',

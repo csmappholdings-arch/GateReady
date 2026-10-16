@@ -128,6 +128,12 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     return null;
   }
 
+  const isCar = currentTrip.travelType === 'CAR' || (Boolean(currentTrip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(currentTrip.seatClassOrCarSize || ''));
+  const isTrain = currentTrip.travelType === 'TRAIN' || (Boolean(currentTrip.seatClassOrCarSize) && /train|rail|coach/i.test(currentTrip.seatClassOrCarSize || ''));
+  const isCruise = currentTrip.travelType === 'CRUISE' || (Boolean(currentTrip.seatClassOrCarSize) && /cruise|stateroom|ship|cabin|porthole/i.test(currentTrip.seatClassOrCarSize || ''));
+  const isBus = currentTrip.travelType === 'BUS' || (Boolean(currentTrip.seatClassOrCarSize) && /bus/i.test(currentTrip.seatClassOrCarSize || ''));
+  const isFlight = (currentTrip.travelType === 'PLANE' || !currentTrip.travelType) && !isCar && !isTrain && !isCruise && !isBus;
+
   // Active Trip Banner with full location, carrier, and level of seat details!
   return (
     <div className="w-full bg-gradient-to-r from-purple-50/90 via-white to-purple-50/60 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs transition-colors">
@@ -260,7 +266,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               className="h-8.5 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-purple-900 dark:text-purple-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
             >
               <Edit3 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-              <span>{isEditing ? 'Close Editor' : (!currentTrip.travelType || currentTrip.travelType === 'PLANE' ? 'Edit Trip & Flight Info' : 'Edit Trip Info')}</span>
+              <span>{isEditing ? 'Close Editor' : isFlight ? 'Edit Trip & Flight Info' : 'Edit Trip Info'}</span>
             </button>
 
             <button
@@ -273,7 +279,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </button>
 
             <button
-              onClick={onOpenAddTrip}
+              onClick={() => onOpenAddTrip()}
               className="h-8.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm shadow-purple-600/20 active:scale-95"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -461,18 +467,18 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                     <span>Return Date</span>
                   </label>
                   <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                    {!isPro && <Lock className="w-2 h-2" />} Pro
+                    {!isPro && <Lock className="w-2 h-2" />} Silver+
                   </span>
                 </div>
                 {!isPro ? (
                   <div
-                    onClick={() => openPaywall("Round-Trip & Return Date tracking is a Gate Ready Pro feature. Upgrade to Pro to track your return journey.")}
+                    onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Upgrade to track your return journey.")}
                     className="w-full h-10 px-3 text-xs rounded-xl border border-indigo-200 dark:border-indigo-700 bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-between cursor-pointer hover:bg-indigo-100 transition-colors"
-                    title="Click to unlock return schedule with Pro"
+                    title="Click to unlock return schedule with Silver+"
                   >
                     <span className="flex items-center gap-1.5 font-semibold text-[11px]">
                       <Lock className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Locked (Pro Feature)</span>
+                      <span>Locked (Silver+ Feature)</span>
                     </span>
                     <span className="text-[9px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded shadow-2xs">
                       Upgrade
@@ -531,10 +537,10 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <span className="block text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-400">
-                {currentTrip.travelType === 'TRAIN' ? 'Station & Route' :
-                 currentTrip.travelType === 'CRUISE' ? 'Ports & Cruise' :
-                 currentTrip.travelType === 'BUS' ? 'Terminal & Bus' :
-                 currentTrip.travelType === 'CAR' ? 'Driving Route' :
+                {isTrain ? 'Station & Route' :
+                 isCruise ? 'Ports & Cruise' :
+                 isBus ? 'Terminal & Bus' :
+                 isCar ? 'Driving Route' :
                  'Airports & Route'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
@@ -557,19 +563,21 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <span className="block text-[10px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
-                {currentTrip.travelType === 'CAR' ? 'Vehicle / Rental' :
-                 currentTrip.travelType === 'TRAIN' ? 'Rail Operator' :
-                 currentTrip.travelType === 'CRUISE' ? 'Cruise Line / Ship' :
-                 currentTrip.travelType === 'BUS' ? 'Bus Operator' :
+                {isCar ? 'Vehicle / Rental' :
+                 isTrain ? 'Rail Operator' :
+                 isCruise ? 'Cruise Line / Ship' :
+                 isBus ? 'Bus Operator' :
                  'Airline / Carrier'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
-                {currentTrip.companyName || 'Carrier Unspecified'}
+                {currentTrip.companyName || (isCar ? 'Personal / Rental Vehicle' : 'Carrier Unspecified')}
               </p>
               <p className="text-[11px] text-indigo-600 dark:text-indigo-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.flightNumber
                   ? `Flight / Route #${currentTrip.flightNumber}`
-                  : 'Standard Carrier Allowances'}
+                  : isCar
+                    ? 'Highway & Road Navigation'
+                    : 'Standard Carrier Allowances'}
               </p>
             </div>
           </div>
@@ -581,25 +589,25 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <span className="block text-[10px] font-black uppercase tracking-wider text-fuchsia-700 dark:text-fuchsia-400">
-                {currentTrip.travelType === 'CAR' ? 'Vehicle Size / Cargo' :
-                 currentTrip.travelType === 'CRUISE' ? 'Stateroom / Cabin' :
-                 currentTrip.travelType === 'TRAIN' ? 'Class of Service' :
-                 currentTrip.travelType === 'BUS' ? 'Seat Type' :
+                {isCar ? 'Vehicle Size / Cargo' :
+                 isCruise ? 'Stateroom / Cabin' :
+                 isTrain ? 'Class of Service' :
+                 isBus ? 'Seat Type' :
                  'Level of Seat / Class'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
-                {currentTrip.seatClassOrCarSize || 'Standard Main Cabin'}
+                {currentTrip.seatClassOrCarSize || (isCar ? 'Mid-Size SUV / Car' : 'Standard Main Cabin')}
               </p>
               <p className="text-[11px] text-fuchsia-600 dark:text-fuchsia-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.aircraftType
                   ? `Aircraft: ${currentTrip.aircraftType}`
-                  : currentTrip.travelType === 'PLANE'
+                  : isFlight
                     ? 'Overhead Bin & In-Seat Specs'
-                    : currentTrip.travelType === 'TRAIN'
+                    : isTrain
                       ? 'Train Coach & Seat Specs'
-                      : currentTrip.travelType === 'CRUISE'
+                      : isCruise
                         ? 'Stateroom & Baggage Specs'
-                        : currentTrip.travelType === 'CAR'
+                        : isCar
                           ? 'Vehicle Cargo & Trunk Specs'
                           : 'Bus Luggage & Seat Specs'}
               </p>

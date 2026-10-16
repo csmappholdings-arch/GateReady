@@ -628,7 +628,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                         {!isPro && familyMembers.length >= 1 ? (
                           <>
                             <Crown className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                            <span>Add Traveler (Pro Required)</span>
+                            <span>Add Traveler (Gold+)</span>
                           </>
                         ) : (
                           <>
@@ -1122,13 +1122,13 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Gate Ready Pro to load pre-built frequent traveler packing kits and custom bag templates.");
+                  openPaywall("Upgrade to Silver, Gold, or Platinum to load pre-built frequent traveler packing kits and custom bag templates.");
                   return;
                 }
                 setShowPresetsModal(true);
               }}
               className="h-10 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800"
-              title="Load pre-built frequent traveler packing kits or save this bag as a custom preset (Pro)"
+              title="Load pre-built frequent traveler packing kits or save this bag as a custom preset (Silver+)"
             >
               <FolderCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               <span className="hidden sm:inline">Presets</span>
@@ -1140,25 +1140,25 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Gate Ready Pro to generate privacy-safe emergency luggage QR tags and recovery claim cards.");
+                  openPaywall("Upgrade to Silver, Gold, or Platinum to generate privacy-safe emergency luggage QR tags and recovery claim cards.");
                   return;
                 }
                 setShowLuggageQrModal(true);
               }}
               className="h-10 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800"
-              title="Generate privacy-safe emergency luggage QR tag and recovery claim card (Pro)"
+              title="Generate privacy-safe emergency luggage QR tag and recovery claim card (Silver+)"
             >
               <QrCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span className="hidden sm:inline">QR Bag Tag</span>
               <span className="sm:hidden">QR Tag</span>
               {!isPro && (
                 <span className="inline-flex items-center gap-0.5 bg-amber-400 text-purple-950 font-black text-[9px] px-1.5 py-0.2 rounded shadow-2xs">
-                  <Lock className="w-2.5 h-2.5" /> PRO
+                  <Lock className="w-2.5 h-2.5" /> SILVER+
                 </span>
               )}
             </button>
 
-            {/* PDF Export Button (Pro feature) */}
+            {/* PDF Export Button (Silver+ feature) */}
             <button
               onClick={handleExportPDF}
               className={`h-10 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border ${
@@ -1173,7 +1173,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
               <span className="sm:hidden">PDF</span>
               {!isPro && (
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-500 text-white px-1.5 py-0.2 rounded-md flex items-center gap-0.5">
-                  <Crown className="w-2.5 h-2.5 fill-white" /> Pro
+                  <Crown className="w-2.5 h-2.5 fill-white" /> Silver+
                 </span>
               )}
             </button>
