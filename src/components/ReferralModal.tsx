@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSubscription } from '../context/SubscriptionContext';
+import { useAuth } from '../context/AuthContext';
 import { 
   X, 
   Gift, 
@@ -12,15 +13,19 @@ import {
   Award, 
   ArrowRight,
   Zap,
-  Crown
+  Crown,
+  Lock,
+  UserCheck
 } from 'lucide-react';
 
 interface ReferralModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenAccountSync?: () => void;
 }
 
-export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose }) => {
+export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, onOpenAccountSync }) => {
+  const { user } = useAuth();
   const { 
     referralCode, 
     referralsCount, 
@@ -94,127 +99,188 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose })
           </p>
         </div>
 
-        {/* Live Referral Stats */}
+        {/* Content Area */}
         <div className="p-5 sm:p-6 space-y-4 text-xs">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/60 text-center">
-              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
-                Friends Referred
-              </span>
-              <span className="text-2xl font-black text-purple-700 dark:text-purple-300 mt-0.5 block">
-                {referralsCount}
-              </span>
-              <span className="text-[10px] text-purple-600/80 dark:text-purple-400/80 font-medium">
-                Active connections
-              </span>
-            </div>
+          {!user ? (
+            /* Account Required State (Feature 3: codes issued only to signed-in accounts) */
+            <div className="space-y-4 text-center py-2">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-purple-600 dark:text-purple-300 shadow-sm">
+                <Lock className="w-7 h-7" />
+              </div>
 
-            <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60 text-center">
-              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
-                Free Months Earned
-              </span>
-              <span className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5 block">
-                {referralCreditsMonths} mo
-              </span>
-              <span className="text-[10px] text-amber-700 dark:text-amber-300 font-bold">
-                Auto-applied to billing
-              </span>
-            </div>
-          </div>
+              <div>
+                <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                  Create a Free Account to Get Your Code
+                </h4>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
+                  Referral codes are tied directly to your GateReady account so we can track every friend who signs up and automatically apply free months of Silver to your billing.
+                </p>
+              </div>
 
-          {/* Referral Code & Link Box */}
-          <div className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                Your Exclusive Referral Code
-              </label>
-              <div className="flex items-center gap-2">
-                <span className="flex-1 h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-black text-sm text-purple-700 dark:text-purple-300 flex items-center">
-                  {referralCode}
-                </span>
+              <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/60 text-left space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+                  <p className="text-slate-700 dark:text-slate-200">
+                    <strong className="text-slate-900 dark:text-white font-bold">Your friends get 1 month free</strong> of GateReady Silver ($1.99 value) automatically.
+                  </p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Gift className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+                  <p className="text-slate-700 dark:text-slate-200">
+                    <strong className="text-slate-900 dark:text-white font-bold">You earn 1 month free</strong> credited to your account for every friend who subscribes.
+                  </p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+                  <p className="text-slate-700 dark:text-slate-200">
+                    <strong className="text-slate-900 dark:text-white font-bold">100% Free Forever</strong> to create an account — no credit card needed.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2">
                 <button
                   type="button"
-                  onClick={handleCopyCode}
-                  className="h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer"
+                  onClick={() => {
+                    onClose();
+                    if (onOpenAccountSync) {
+                      onOpenAccountSync();
+                    }
+                  }}
+                  className="w-full h-11 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-md shadow-purple-600/30 active:scale-98 transition-all cursor-pointer"
                 >
-                  {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedCode ? 'Copied' : 'Copy'}</span>
+                  <UserCheck className="w-4 h-4" />
+                  <span>Create Free Account / Sign In</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
+          ) : (
+            /* Signed In User: Full Persistent Referral Code and Stats Panel */
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/60 text-center">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                    Friends Referred
+                  </span>
+                  <span className="text-2xl font-black text-purple-700 dark:text-purple-300 mt-0.5 block">
+                    {referralsCount}
+                  </span>
+                  <span className="text-[10px] text-purple-600/80 dark:text-purple-400/80 font-medium">
+                    Active connections
+                  </span>
+                </div>
 
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                Direct Referral Link
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={referralUrl}
-                  className="flex-1 h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-700 dark:text-slate-300 select-all truncate"
-                />
+                <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60 text-center">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                    Free Months Earned
+                  </span>
+                  <span className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5 block">
+                    {referralCreditsMonths} mo
+                  </span>
+                  <span className="text-[10px] text-amber-700 dark:text-amber-300 font-bold">
+                    Auto-applied to billing
+                  </span>
+                </div>
+              </div>
+
+              {/* Referral Code & Link Box */}
+              <div className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                    Your Exclusive Referral Code
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="flex-1 h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-black text-sm text-purple-700 dark:text-purple-300 flex items-center">
+                      {referralCode || 'Generating...'}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={!referralCode}
+                      onClick={handleCopyCode}
+                      className="h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedCode ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                    Direct Referral Link
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={referralUrl}
+                      className="flex-1 h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-700 dark:text-slate-300 select-all truncate"
+                    />
+                    <button
+                      type="button"
+                      disabled={!referralCode}
+                      onClick={handleCopyLink}
+                      className="h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedLink ? 'Copied' : 'Copy Link'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* How It Works */}
+              <div className="space-y-2 pt-1 text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                <p className="font-bold text-slate-900 dark:text-white">
+                  How the automatic referral credit works:
+                </p>
+                <div className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </span>
+                  <span>Send your link or packing list to a friend traveling with you.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </span>
+                  <span>They receive a free month of Silver ($1.99 value) automatically when they start.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </span>
+                  <span>When they continue or upgrade, you get a 1-month credit applied automatically to your next invoice.</span>
+                </div>
+              </div>
+
+              {/* Interactive Instant Test Simulator */}
+              <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-left">
+                  <p className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    <span>Test Referral Tracking (Live Simulator)</span>
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                    Simulate a friend using your code and subscribing to verify the live credit calculation.
+                  </p>
+                </div>
                 <button
                   type="button"
-                  onClick={handleCopyLink}
-                  className="h-9 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer"
+                  onClick={handleSimulateReferral}
+                  className="h-8 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer shrink-0"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedLink ? 'Copied' : 'Copy Link'}</span>
+                  <span>Simulate Referral (+1 Mo)</span>
                 </button>
               </div>
-            </div>
-          </div>
 
-          {/* How It Works */}
-          <div className="space-y-2 pt-1 text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
-            <p className="font-bold text-slate-900 dark:text-white">
-              How the automatic referral credit works:
-            </p>
-            <div className="flex items-start gap-2">
-              <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                1
-              </span>
-              <span>Send your link or packing list to a friend traveling with you.</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                2
-              </span>
-              <span>They receive a free month of Silver ($1.99 value) automatically when they start.</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                3
-              </span>
-              <span>When they continue or upgrade, you get a 1-month credit applied automatically to your next invoice.</span>
-            </div>
-          </div>
-
-          {/* Interactive Instant Test Simulator */}
-          <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="text-left">
-              <p className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span>Test Referral Tracking (Live Simulator)</span>
-              </p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                Simulate a friend using your code and subscribing to verify the live credit calculation.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleSimulateReferral}
-              className="h-8 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer shrink-0"
-            >
-              <span>Simulate Referral (+1 Mo)</span>
-            </button>
-          </div>
-
-          {simulatedSuccess && (
-            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 text-emerald-800 dark:text-emerald-300 text-xs font-bold text-center animate-in fade-in duration-200">
-              🎉 Simulated referral verified! +1 friend and +1 month of subscription credit added.
-            </div>
+              {simulatedSuccess && (
+                <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 text-emerald-800 dark:text-emerald-300 text-xs font-bold text-center animate-in fade-in duration-200">
+                  🎉 Simulated referral verified! +1 friend and +1 month of subscription credit added.
+                </div>
+              )}
+            </>
           )}
         </div>
 

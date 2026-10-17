@@ -28,6 +28,26 @@ service cloud.firestore {
       }
     }
 
+    // Captured Emails from "Email me my list"
+    match /captured_emails/{emailId} {
+      allow create: if request.resource.data.email is string && request.resource.data.email.size() >= 3;
+      allow read, update, delete: if false;
+    }
+
+    // Referral code registry
+    match /referral_codes/{code} {
+      allow read: if true;
+      allow create, update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    // Referral attribution records
+    match /referrals/{referralId} {
+      allow create: if isSignedIn();
+      allow read: if isSignedIn();
+      allow update, delete: if false;
+    }
+
     // Default deny for everything else
     match /{document=**} {
       allow read, write: if false;

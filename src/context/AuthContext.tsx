@@ -13,7 +13,7 @@ import {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: () => Promise<void>;
+  signIn: () => Promise<{ user: User; isNewUser: boolean }>;
   signInWithGithub: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
@@ -77,7 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async () => {
     setError(null);
     try {
-      await fbSignInWithGoogle();
+      const res = await fbSignInWithGoogle();
+      return res;
     } catch (err: any) {
       const customErr = handleAuthError(err, 'Google');
       throw customErr || err;

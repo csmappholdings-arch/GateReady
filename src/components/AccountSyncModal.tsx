@@ -20,13 +20,15 @@ import {
   ExternalLink,
   ShieldAlert
 } from 'lucide-react';
+import { trackAccountCreated } from '../lib/firebase';
 
 interface AccountSyncModalProps {
   isOpen: boolean;
   onClose: () => void;
+  origin?: 'save_gate' | 'header' | 'referral';
 }
 
-export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onClose }) => {
+export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onClose, origin }) => {
   const { user, signIn, signInWithGithub, signUpWithEmail, signInWithEmail, resetPassword, error, clearError } = useAuth();
 
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
@@ -58,12 +60,23 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
 
+  const getEffectiveOrigin = (): 'save_gate' | 'header' | 'referral' => {
+    if (origin) return origin;
+    try {
+      if (localStorage.getItem('gateready_referred_by_code')) return 'referral';
+    } catch {}
+    return 'header';
+  };
+
   const handleGoogleSignIn = async () => {
     setLocalError(null);
     clearError();
     setIsLoading(true);
     try {
-      await signIn();
+      const res = await signIn();
+      if (res?.isNewUser) {
+        trackAccountCreated('google', getEffectiveOrigin());
+      }
       onClose();
     } catch (err: any) {
       if (err.code !== 'auth/popup-closed-by-user') {
@@ -128,6 +141,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
     try {
       if (mode === 'signup') {
         await signUpWithEmail(email, password, displayName);
+        trackAccountCreated('email', getEffectiveOrigin());
       } else {
         await signInWithEmail(email, password);
       }

@@ -26,9 +26,15 @@ import {
   Droplets,
   Crown,
   Lock,
-  ArrowRight
+  ArrowRight,
+  Mail,
+  Send,
+  Loader2
 } from 'lucide-react';
 import { useSubscription } from '../context/SubscriptionContext';
+import { useAuth } from '../context/AuthContext';
+import { AccountSyncModal } from './AccountSyncModal';
+import { recordCapturedEmail } from '../lib/firebase';
 
 interface PrintPackingListModalProps {
   isOpen: boolean;
@@ -43,11 +49,27 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
 }) => {
   const { weightUnit } = usePacking();
   const { isPro, openPaywall } = useSubscription();
+  const { user } = useAuth();
 
   const [filterStatus, setFilterStatus] = useState<'all' | 'packed' | 'unpacked'>('all');
   const [selectedTraveler, setSelectedTraveler] = useState<string>('all');
   const [selectedBagId, setSelectedBagId] = useState<string>('all');
   const [copied, setCopied] = useState(false);
+
+  // Feature 2: Email me my list state
+  const [isEmailOpen, setIsEmailOpen] = useState(false);
+  const [emailInput, setEmailInput] = useState(() => user?.email || '');
+  const [isSending, setIsSending] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [showAccountModal, setShowAccountModal] = useState(false);
+
+  // Sync email input if user signs in
+  React.useEffect(() => {
+    if (user?.email && !emailInput) {
+      setEmailInput(user.email);
+    }
+  }, [user?.email]);
 
   const familyMembers = trip.familyMembers && trip.familyMembers.length > 0 
     ? trip.familyMembers 
@@ -105,7 +127,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
     window.print();
   };
 
-  const handleCopy = () => {
+  const generateManifestText = (): string => {
     let summary = `═══════════════════════════════════════════\n`;
     summary += `📋 GATEREADY.CA PACKING MANIFEST & BAGGAGE RECORD\n`;
     summary += `═══════════════════════════════════════════\n`;
@@ -145,9 +167,121 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
       summary += `\n`;
     });
 
+    summary += `\nGateReady.ca • Calibrated luggage tare weights, TSA limits & transit manifests\n`;
+    return summary;
+  };
+
+  const generateManifestHtml = (): string => {
+    const validOrig = trip.originCity && trip.originCity.trim().length > 1 ? trip.originCity.trim() : null;
+    const validDest = trip.destinationCity && trip.destinationCity.trim().length > 1 ? trip.destinationCity.trim() : null;
+    const routeText = validOrig && validDest ? `${validOrig} &rarr; ${validDest}` : validDest || 'Trip';
+
+    let bagsHtml = '';
+    filteredBags.forEach((b) => {
+      let itemsListHtml = '';
+      if (b.filteredItems.length === 0) {
+        itemsListHtml = '<li style="color:#64748b;font-style:italic;">No matching items</li>';
+      } else {
+        b.filteredItems.forEach((it) => {
+          const checkIcon = it.isPacked ? '<span style="color:#10b981;font-weight:bold;">&#10003;</span>' : '<span style="color:#94a3b8;">&#9633;</span>';
+          const qtyText = it.quantity > 1 ? ` <strong>(&times;${it.quantity})</strong>` : '';
+          const forText = it.packedFor && it.packedFor !== b.assignedTo ? ` <span style="color:#6366f1;font-size:11px;">[For: ${it.packedFor}]</span>` : '';
+          const locText = it.location ? ` <span style="color:#64748b;font-size:11px;">(${it.location})</span>` : '';
+          itemsListHtml += `<li style="padding:4px 0;border-bottom:1px solid #f1f5f9;list-style:none;">${checkIcon} ${it.name}${qtyText}${forText}${locText}</li>`;
+        });
+      }
+
+      bagsHtml += `
+        <div style="margin-bottom:16px;background:#f8fafc;padding:12px 16px;border-radius:12px;border:1px solid #e2e8f0;">
+          <h3 style="margin:0 0 6px 0;color:#1e1b4b;font-size:15px;font-weight:bold;">🎒 ${b.label} <span style="font-size:12px;color:#64748b;font-weight:normal;">(${b.type})</span></h3>
+          ${b.assignedTo ? `<p style="margin:0 0 8px 0;font-size:12px;color:#475569;"><strong>Assigned:</strong> ${b.assignedTo}</p>` : ''}
+          <ul style="margin:0;padding:0;">${itemsListHtml}</ul>
+        </div>
+      `;
+    });
+
+    return `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;color:#0f172a;line-height:1.5;">
+        <div style="background:linear-gradient(135deg,#581c87,#312e81);color:#ffffff;padding:24px;border-radius:16px 16px 0 0;text-align:center;">
+          <span style="background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">GateReady.ca Packing List</span>
+          <h1 style="margin:12px 0 4px 0;font-size:24px;color:#ffffff;font-weight:900;">${trip.name}</h1>
+          <p style="margin:0;font-size:14px;color:#e9d5ff;">${routeText} ${trip.departureDate ? `&bull; ${trip.departureDate}` : ''}</p>
+        </div>
+
+        <div style="padding:20px;background:#ffffff;border:1px solid #e2e8f0;border-top:none;">
+          <div style="display:flex;gap:12px;background:#f1f5f9;padding:12px;border-radius:10px;margin-bottom:20px;font-size:12px;">
+            <div><strong>Luggage:</strong> ${trip.bags.length} bags</div>
+            <div><strong>Total Weight:</strong> ${displayTotalWeight}</div>
+            <div><strong>Progress:</strong> ${packedItemsCount}/${totalItemsCount} packed (${packingPct}%)</div>
+          </div>
+
+          <h2 style="font-size:16px;color:#1e1b4b;margin:0 0 12px 0;font-weight:800;">Luggage & Item Manifest</h2>
+          ${bagsHtml}
+        </div>
+
+        <div style="padding:16px;background:#f8fafc;border-radius:0 0 16px 16px;border:1px solid #e2e8f0;border-top:none;text-align:center;font-size:11px;color:#64748b;">
+          <p style="margin:0 0 6px 0;">Generated with <strong>GateReady.ca</strong> &bull; Calibrated luggage tare weights, TSA limits & transit manifests.</p>
+          <p style="margin:0;">Access your full packing list on any device at <a href="https://gateready.ca" style="color:#7c3aed;text-decoration:none;font-weight:bold;">gateready.ca</a></p>
+        </div>
+      </div>
+    `;
+  };
+
+  const handleCopy = () => {
+    const summary = generateManifestText();
     navigator.clipboard.writeText(summary);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleSendEmail = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSendError(null);
+
+    const cleanEmail = emailInput.trim();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setSendError('Please enter a valid email address.');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const formattedText = generateManifestText();
+      const formattedHtml = generateManifestHtml();
+
+      const response = await fetch('/api/send-packing-list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: cleanEmail,
+          tripName: trip.name,
+          formattedText,
+          formattedHtml
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to dispatch email.');
+      }
+
+      // Record captured email in Firestore for future product updates
+      await recordCapturedEmail({
+        email: cleanEmail,
+        tripName: trip.name,
+        totalItems: totalItemsCount,
+        source: 'print_manifest'
+      });
+
+      setSendSuccess(true);
+    } catch (err: any) {
+      console.error('Email send failed:', err);
+      setSendError(err.message || 'Could not send packing list email. Please check your address.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return createPortal(
@@ -177,7 +311,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-center">
+          <div className="flex items-center gap-2 self-end sm:self-center flex-wrap">
             <button
               type="button"
               onClick={handleCopy}
@@ -195,6 +329,22 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                   <span>Copy Text</span>
                 </>
               )}
+            </button>
+
+            {/* Feature 2: Email me my list button */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsEmailOpen((prev) => !prev);
+                setSendError(null);
+              }}
+              className={`h-9 px-3.5 rounded-xl border border-white/20 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                isEmailOpen ? 'bg-white/25 text-white shadow-xs' : 'hover:bg-white/10'
+              }`}
+              title="Email me my list"
+            >
+              <Mail className="w-3.5 h-3.5 text-purple-200" />
+              <span>Email me my list</span>
             </button>
 
             {!isPro ? (
@@ -228,6 +378,92 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Feature 2: Email me my list interactive drawer (Hidden when printed) */}
+        {isEmailOpen && (
+          <div className="no-print bg-purple-950/90 dark:bg-slate-950 border-b border-purple-800/80 p-4 sm:px-6 text-white animate-in slide-in-from-top-2 duration-150">
+            {!sendSuccess ? (
+              <form onSubmit={handleSendEmail} className="max-w-xl space-y-2.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="relative flex-1">
+                    <Mail className="w-4 h-4 text-purple-300 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      placeholder="Enter your email to receive your packing list"
+                      disabled={isSending}
+                      required
+                      className="w-full h-10 pl-9 pr-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-purple-200/60 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/15"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className="h-10 px-5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 active:scale-95 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-purple-900/40 cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    {isSending ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Send My List</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {sendError && (
+                  <p className="text-xs text-rose-300 font-semibold">
+                    {sendError}
+                  </p>
+                )}
+
+                <p className="text-[11px] text-purple-200/80 leading-relaxed">
+                  🔒 You'll only receive your packing list and occasional product updates. Unsubscribe anytime with 1 click.
+                </p>
+              </form>
+            ) : (
+              <div className="max-w-xl space-y-2 py-1">
+                <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs sm:text-sm">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>Your list is on its way to {emailInput}!</span>
+                </div>
+
+                {/* Soft upsell line for anonymous visitors */}
+                {!user && (
+                  <div className="p-3 rounded-xl bg-white/10 border border-white/15 text-xs text-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span>Want it saved forever too?</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowAccountModal(true)}
+                      className="px-3 py-1 rounded-lg bg-white text-purple-900 font-black text-xs hover:bg-purple-100 transition-colors cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
+                    >
+                      Create a free account
+                    </button>
+                  </div>
+                )}
+
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSendSuccess(false);
+                      setSendError(null);
+                    }}
+                    className="text-[11px] text-purple-300 hover:text-white underline cursor-pointer"
+                  >
+                    Send to another email
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Interactive Filter Toolbar (Hidden when printed) */}
         <div className="no-print p-3 sm:px-6 bg-slate-50 dark:bg-slate-800/60 border-b border-purple-100 dark:border-purple-950/60 flex flex-wrap items-center justify-between gap-2.5 text-xs">
@@ -617,6 +853,14 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
           </div>
         </div>
       </div>
+
+      {showAccountModal && (
+        <AccountSyncModal
+          isOpen={showAccountModal}
+          onClose={() => setShowAccountModal(false)}
+          origin="save_gate"
+        />
+      )}
     </div>,
     document.body
   );

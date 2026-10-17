@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { SubscriptionProvider, useSubscription } from './context/SubscriptionContext';
 import { PackingProvider, usePacking } from './context/PackingContext';
 import { Header } from './components/Header';
+import { SaveGateModal } from './components/SaveGateModal';
 import { MobileSyncBanner } from './components/MobileSyncBanner';
 import { SubscriptionModal } from './components/SubscriptionModal';
 import { BaggageScreen } from './components/BaggageScreen';
@@ -43,6 +44,7 @@ import {
 function PackingAppContent() {
   const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip } = usePacking();
   const { isPro, canAddTrip, openPaywall } = useSubscription();
+  const { user } = useAuth();
 
   const [currentScreen, setCurrentScreen] = useState<'Bags' | 'Checklist' | 'CabinIntel' | 'Allowances' | 'GateReady'>('Bags');
   const [showAddTripModal, setShowAddTripModal] = useState(false);
@@ -53,9 +55,115 @@ function PackingAppContent() {
   const [showAddBagModal, setShowAddBagModal] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [accountModalOrigin, setAccountModalOrigin] = useState<'save_gate' | 'header' | 'referral'>('header');
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showAirlineGuidesModal, setShowAirlineGuidesModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
+
+  // Feature 1: Save Gate state
+  const [showSaveGateModal, setShowSaveGateModal] = useState(false);
+
+  // Track separate browser visits in localStorage
+  useEffect(() => {
+    const SESSION_VISIT_KEY = 'gateready_session_visit_counted';
+    const VISIT_COUNT_KEY = 'gateready_visit_count';
+    try {
+      if (!sessionStorage.getItem(SESSION_VISIT_KEY)) {
+        sessionStorage.setItem(SESSION_VISIT_KEY, 'true');
+        const currentVisits = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0', 10);
+        localStorage.setItem(VISIT_COUNT_KEY, String(currentVisits + 1));
+      }
+    } catch {}
+  }, []);
+
+  // Feature 3: Catch anonymous referral parameter from landing URL (?ref=... or ?referral=...)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const refCode = params.get('ref') || params.get('referral');
+      if (refCode && refCode.trim()) {
+        localStorage.setItem('gateready_referred_by_code', refCode.trim().toUpperCase());
+      }
+    } catch {}
+  }, []);
+
+  // Feature 1: Trigger Save Gate when anonymous user finishes building a trip (trip created with at least 1 bag with at least 1 packed item)
+  useEffect(() => {
+    // Never show to users who already have an account
+    if (user) {
+      setShowSaveGateModal(false);
+      return;
+    }
+
+    // Must have a trip with at least one bag containing at least one packed item
+    const hasTripWithPackedItem = Boolean(
+      currentTrip &&
+      currentTrip.bags &&
+      currentTrip.bags.length > 0 &&
+      currentTrip.bags.some((b) => b.items && b.items.some((i) => i.isPacked))
+    );
+
+    if (!hasTripWithPackedItem) return;
+
+    // Do not show again in that browser session if already dismissed
+    const SESSION_DISMISSED_KEY = 'gateready_save_gate_session_dismissed';
+    try {
+      if (sessionStorage.getItem(SESSION_DISMISSED_KEY) === 'true') {
+        return;
+      }
+    } catch {}
+
+    const DISMISSED_COUNT_KEY = 'gateready_save_gate_dismissed_count';
+    const VISIT_COUNT_KEY = 'gateready_visit_count';
+    const VISIT_3_SHOWN_KEY = 'gateready_save_gate_visit_3_shown';
+
+    let dismissedCount = 0;
+    let visitCount = 1;
+    let visit3Shown = false;
+
+    try {
+      dismissedCount = parseInt(localStorage.getItem(DISMISSED_COUNT_KEY) || '0', 10);
+      visitCount = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '1', 10);
+      visit3Shown = localStorage.getItem(VISIT_3_SHOWN_KEY) === 'true';
+    } catch {}
+
+    // First time an anonymous visitor finishes building a trip: show one-time dialog
+    if (dismissedCount === 0) {
+      setShowSaveGateModal(true);
+      return;
+    }
+
+    // Also show it on their 3rd separate visit if they dismissed it and still have no account
+    if (dismissedCount === 1 && visitCount >= 3 && !visit3Shown) {
+      setShowSaveGateModal(true);
+      return;
+    }
+
+    // After that, stop asking and rely on the header button
+  }, [user, currentTrip]);
+
+  const handleDismissSaveGate = () => {
+    setShowSaveGateModal(false);
+    try {
+      sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
+      const DISMISSED_COUNT_KEY = 'gateready_save_gate_dismissed_count';
+      const current = parseInt(localStorage.getItem(DISMISSED_COUNT_KEY) || '0', 10);
+      localStorage.setItem(DISMISSED_COUNT_KEY, String(current + 1));
+      const visitCount = parseInt(localStorage.getItem('gateready_visit_count') || '1', 10);
+      if (visitCount >= 3) {
+        localStorage.setItem('gateready_save_gate_visit_3_shown', 'true');
+      }
+    } catch {}
+  };
+
+  const handleSaveFromSaveGate = () => {
+    setShowSaveGateModal(false);
+    try {
+      sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
+    } catch {}
+    setAccountModalOrigin('save_gate');
+    setShowAccountModal(true);
+  };
 
   const handleOpenAddTrip = (travelType?: TravelType, destinationCity?: string) => {
     const safeTravelType = typeof travelType === 'string' ? travelType : undefined;
@@ -93,12 +201,18 @@ function PackingAppContent() {
         onOpenAddTrip={handleOpenAddTrip}
         onOpenAddBag={() => setShowAddBagModal(true)}
         onOpenTour={() => setShowTourModal(true)}
-        onOpenAccountSync={() => setShowAccountModal(true)}
+        onOpenAccountSync={() => {
+          setAccountModalOrigin('header');
+          setShowAccountModal(true);
+        }}
         onOpenReferral={() => setShowReferralModal(true)}
       />
 
       {/* Sync with Google prompt banner when signed out */}
-      <MobileSyncBanner onOpenAccountModal={() => setShowAccountModal(true)} />
+      <MobileSyncBanner onOpenAccountModal={() => {
+        setAccountModalOrigin('header');
+        setShowAccountModal(true);
+      }} />
 
       {/* Prominent Navigation Tabs (Desktop & Tablet) - Moved to TOP of section */}
       {currentTrip && (
@@ -425,6 +539,15 @@ function PackingAppContent() {
       <AccountSyncModal
         isOpen={showAccountModal}
         onClose={() => setShowAccountModal(false)}
+        origin={accountModalOrigin}
+      />
+
+      {/* Feature 1: First-run & 3rd Visit Save Gate Modal */}
+      <SaveGateModal
+        isOpen={showSaveGateModal}
+        trip={currentTrip}
+        onSave={handleSaveFromSaveGate}
+        onDismiss={handleDismissSaveGate}
       />
 
       {/* 7-Day Platinum Trial Graceful Downgrade Modal */}
@@ -434,6 +557,10 @@ function PackingAppContent() {
       <ReferralModal
         isOpen={showReferralModal}
         onClose={() => setShowReferralModal(false)}
+        onOpenAccountSync={() => {
+          setAccountModalOrigin('referral');
+          setShowAccountModal(true);
+        }}
       />
 
       {/* 42+ Airline Allowance Intel Directory Modal */}

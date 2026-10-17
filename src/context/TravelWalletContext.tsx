@@ -50,13 +50,43 @@ export const TravelWalletProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
-        if (Array.isArray(data.travelWallet)) {
-          setAccounts(data.travelWallet);
+        const cloudWallet: LoyaltyAccount[] = Array.isArray(data.travelWallet) ? data.travelWallet : [];
+
+        // Read current local accounts from storage to avoid losing offline entries
+        let currentLocal: LoyaltyAccount[] = [];
+        try {
+          const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+          if (raw) currentLocal = JSON.parse(raw);
+        } catch {}
+
+        const missingInCloud = currentLocal.filter(
+          (la) => !cloudWallet.some((ca) => ca.id === la.id)
+        );
+
+        if (missingInCloud.length > 0) {
+          const merged = [...cloudWallet, ...missingInCloud];
+          setAccounts(merged);
           try {
-            localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(data.travelWallet));
-          } catch {
-            // Ignore
-          }
+            localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(merged));
+          } catch {}
+          setDoc(userRef, { travelWallet: merged, updatedAt: new Date().toISOString() }, { merge: true })
+            .catch((err) => console.warn('Failed to merge local wallet to cloud:', err));
+        } else {
+          setAccounts(cloudWallet);
+          try {
+            localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(cloudWallet));
+          } catch {}
+        }
+      } else {
+        // Document doesn't exist yet, push local accounts if any
+        let currentLocal: LoyaltyAccount[] = [];
+        try {
+          const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+          if (raw) currentLocal = JSON.parse(raw);
+        } catch {}
+        if (currentLocal.length > 0) {
+          setDoc(userRef, { travelWallet: currentLocal, updatedAt: new Date().toISOString() }, { merge: true })
+            .catch((err) => console.warn('Failed to push local wallet to cloud:', err));
         }
       }
       setSyncStatus('synced');

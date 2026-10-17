@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { doc, getDoc, setDoc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
+import { db, getOrCreateAccountReferralCode } from '../lib/firebase';
 import { Bag, BagType } from '../types/travel';
 import { checkLemonRedirectSuccess } from '../lib/lemonSqueezy';
 
@@ -253,46 +253,78 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     : `${trialHoursRemaining}h ${Math.floor((trialDiffMs % 3600000) / 60000)}m left`;
   const isTrialExpiringSoon = isTrialActive && trialDiffMs <= 2 * 24 * 60 * 60 * 1000;
 
-  // Referral program state
-  const [referralCode] = useState<string>(() => {
+  // Referral program state (Feature 3: tied strictly to authenticated accounts)
+  const [referralCode, setReferralCode] = useState<string>(() => {
     try {
       const saved = localStorage.getItem(REFERRAL_CODE_KEY);
-      if (saved) return saved;
-      const code = 'GR-' + (user?.uid ? user.uid.slice(0, 6).toUpperCase() : Math.random().toString(36).substring(2, 8).toUpperCase());
-      localStorage.setItem(REFERRAL_CODE_KEY, code);
-      return code;
+      return saved || '';
     } catch {
-      return 'GR-VIP';
+      return '';
     }
   });
 
-  const [referralsCount, setReferralsCount] = useState<number>(() => {
-    try {
-      return parseInt(localStorage.getItem(REFERRALS_COUNT_KEY) || '1', 10);
-    } catch {
-      return 1;
-    }
-  });
+  const [referralsCount, setReferralsCount] = useState<number>(0);
+  const [referralCreditsMonths, setReferralCreditsMonths] = useState<number>(0);
 
-  const [referralCreditsMonths, setReferralCreditsMonths] = useState<number>(() => {
-    try {
-      return parseInt(localStorage.getItem(REFERRAL_CREDITS_KEY) || '1', 10);
-    } catch {
-      return 1;
+  // Sync persistent referral code and stats from Firestore when signed in
+  useEffect(() => {
+    if (!user) {
+      setReferralCode('');
+      setReferralsCount(0);
+      setReferralCreditsMonths(0);
+      return;
     }
-  });
+
+    let isMounted = true;
+
+    // Ensure user has a persistent code registered
+    getOrCreateAccountReferralCode(user.uid).then((res) => {
+      if (isMounted && res.code) {
+        setReferralCode(res.code);
+        setReferralsCount(res.referralsCount);
+        setReferralCreditsMonths(res.referralCreditsMonths);
+        try {
+          localStorage.setItem(REFERRAL_CODE_KEY, res.code);
+        } catch {}
+      }
+    }).catch((e) => console.warn('Could not initialize referral code:', e));
+
+    // Listen to real-time stats updates
+    const userRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.referralCode) {
+          setReferralCode(data.referralCode);
+          try { localStorage.setItem(REFERRAL_CODE_KEY, data.referralCode); } catch {}
+        }
+        if (typeof data.referralsCount === 'number') {
+          setReferralsCount(data.referralsCount);
+        }
+        if (typeof data.referralCreditsMonths === 'number') {
+          setReferralCreditsMonths(data.referralCreditsMonths);
+        }
+      }
+    }, (err) => console.warn('Referral snapshot listener warning:', err));
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [user]);
 
   const claimReferralBonus = () => {
-    setReferralsCount((prev) => {
-      const next = prev + 1;
-      try { localStorage.setItem(REFERRALS_COUNT_KEY, String(next)); } catch {}
-      return next;
-    });
-    setReferralCreditsMonths((prev) => {
-      const next = prev + 1;
-      try { localStorage.setItem(REFERRAL_CREDITS_KEY, String(next)); } catch {}
-      return next;
-    });
+    setReferralsCount((prev) => prev + 1);
+    setReferralCreditsMonths((prev) => prev + 1);
+
+    if (user) {
+      const userRef = doc(db, 'users', user.uid);
+      updateDoc(userRef, {
+        referralsCount: increment(1),
+        referralCreditsMonths: increment(1),
+        updatedAt: new Date().toISOString()
+      }).catch((e) => console.warn('Failed to update live referral credit:', e));
+    }
   };
 
   // Automatically downgrade to FREE if 7-day trial expires

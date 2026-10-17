@@ -10,7 +10,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  updateProfile
+  updateProfile,
+  getAdditionalUserInfo
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -21,8 +22,12 @@ import {
   onSnapshot, 
   deleteDoc, 
   getDocFromServer,
-  writeBatch
+  writeBatch,
+  addDoc,
+  updateDoc,
+  increment
 } from 'firebase/firestore';
+import { getAnalytics, logEvent, isSupported } from 'firebase/analytics';
 import { Trip } from '../types/travel';
 
 export const firebaseConfig = {
@@ -71,19 +76,27 @@ export async function testConnection(): Promise<boolean> {
 testConnection();
 
 // Auth Helpers
-export async function signInWithGoogle(): Promise<User> {
+export async function signInWithGoogle(): Promise<{ user: User; isNewUser: boolean }> {
   const result = await signInWithPopup(auth, googleProvider);
   const user = result.user;
-  // Upsert user profile to Firestore
+  const isNew = Boolean(getAdditionalUserInfo(result)?.isNewUser);
   await syncUserProfile(user);
-  return user;
+  if (isNew) {
+    await attributeReferralOnSignup(user.uid, user.email || undefined);
+    await getOrCreateAccountReferralCode(user.uid);
+  }
+  return { user, isNewUser: isNew };
 }
 
 export async function signInWithGithub(): Promise<User> {
   const result = await signInWithPopup(auth, githubProvider);
   const user = result.user;
-  // Upsert user profile to Firestore
+  const isNew = Boolean(getAdditionalUserInfo(result)?.isNewUser);
   await syncUserProfile(user);
+  if (isNew) {
+    await attributeReferralOnSignup(user.uid, user.email || undefined);
+    await getOrCreateAccountReferralCode(user.uid);
+  }
   return user;
 }
 
@@ -98,6 +111,8 @@ export async function signUpWithEmail(email: string, pass: string, name?: string
     }
   }
   await syncUserProfile(user);
+  await attributeReferralOnSignup(user.uid, user.email || undefined);
+  await getOrCreateAccountReferralCode(user.uid);
   return user;
 }
 
@@ -129,6 +144,185 @@ export async function syncUserProfile(user: User): Promise<void> {
     }, { merge: true });
   } catch (err) {
     console.error('Error saving user profile to cloud:', err);
+  }
+}
+
+// Analytics initialization and event helper
+let analyticsInstance: any = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analyticsInstance = getAnalytics(app);
+    }
+  }).catch(() => null);
+}
+
+export function trackAccountCreated(method: 'google' | 'email', origin: 'save_gate' | 'header' | 'referral') {
+  try {
+    if (analyticsInstance) {
+      logEvent(analyticsInstance, 'account_created', {
+        method,
+        origin,
+        timestamp: new Date().toISOString()
+      });
+    }
+    console.log(`[Analytics] account_created event logged: method=${method}, origin=${origin}`);
+  } catch (e) {
+    console.warn('Analytics log failed:', e);
+  }
+}
+
+// Email Capture Helper for Feature 2 ("Email me my list")
+export async function recordCapturedEmail(data: {
+  email: string;
+  tripName?: string;
+  totalItems?: number;
+  source?: string;
+}): Promise<void> {
+  try {
+    const capturedRef = collection(db, 'captured_emails');
+    await addDoc(capturedRef, {
+      email: data.email.trim().toLowerCase(),
+      tripName: data.tripName || 'Upcoming Trip',
+      totalItems: data.totalItems || 0,
+      source: data.source || 'print_manifest',
+      capturedAt: new Date().toISOString(),
+      consentNote: 'User opted into receiving packing list and occasional product updates with 1-click unsubscribe.'
+    });
+    console.log(`[CapturedEmail] Saved email lead: ${data.email}`);
+  } catch (err) {
+    console.warn('Failed to record captured email in Firestore:', err);
+  }
+}
+
+// Persistent Account Referral Helper for Feature 3
+export async function getOrCreateAccountReferralCode(userId: string): Promise<{
+  code: string;
+  referralsCount: number;
+  referralCreditsMonths: number;
+}> {
+  if (!userId) {
+    return { code: 'GR-START', referralsCount: 0, referralCreditsMonths: 0 };
+  }
+
+  try {
+    const userRef = doc(db, 'users', userId);
+    const snap = await getDoc(userRef);
+    const data = snap.exists() ? snap.data() : null;
+
+    if (data?.referralCode) {
+      return {
+        code: data.referralCode,
+        referralsCount: typeof data.referralsCount === 'number' ? data.referralsCount : 0,
+        referralCreditsMonths: typeof data.referralCreditsMonths === 'number' ? data.referralCreditsMonths : 0
+      };
+    }
+
+    // Grandfather existing anonymous-issued code from localStorage if available
+    let chosenCode = '';
+    try {
+      const existing = localStorage.getItem('gateready_referral_code');
+      if (existing && existing.startsWith('GR-')) {
+        chosenCode = existing.trim();
+      }
+    } catch {}
+
+    if (!chosenCode) {
+      // Generate clean new 6-char alphanumeric code e.g. GR-8K2N9P
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let rand = '';
+      for (let i = 0; i < 6; i++) {
+        rand += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      chosenCode = `GR-${rand}`;
+    }
+
+    // Register code in referral_codes collection
+    try {
+      const codeRef = doc(db, 'referral_codes', chosenCode);
+      await setDoc(codeRef, {
+        code: chosenCode,
+        ownerUid: userId,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Error saving code registry:', e);
+    }
+
+    // Update user profile with persistent code
+    await setDoc(userRef, {
+      referralCode: chosenCode,
+      referralsCount: 0,
+      referralCreditsMonths: 0,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+
+    // Store in localStorage as sync cache
+    try {
+      localStorage.setItem('gateready_referral_code', chosenCode);
+    } catch {}
+
+    return {
+      code: chosenCode,
+      referralsCount: 0,
+      referralCreditsMonths: 0
+    };
+  } catch (err) {
+    console.error('Error in getOrCreateAccountReferralCode:', err);
+    return { code: 'GR-START', referralsCount: 0, referralCreditsMonths: 0 };
+  }
+}
+
+// Attribute referral at signup time
+export async function attributeReferralOnSignup(newUserId: string, newUserEmail?: string) {
+  try {
+    let refCode = '';
+    try {
+      refCode = localStorage.getItem('gateready_referred_by_code') || '';
+    } catch {}
+
+    if (!refCode || !refCode.trim()) return;
+    const cleanCode = refCode.trim();
+
+    // Look up code owner in referral_codes registry
+    const codeRef = doc(db, 'referral_codes', cleanCode);
+    const codeSnap = await getDoc(codeRef);
+    let ownerUid = codeSnap.exists() ? codeSnap.data()?.ownerUid : null;
+
+    // Do not attribute if self-referral
+    if (ownerUid === newUserId) {
+      try { localStorage.removeItem('gateready_referred_by_code'); } catch {}
+      return;
+    }
+
+    // Record attribution event in referrals collection
+    const refEventDoc = doc(collection(db, 'referrals'));
+    await setDoc(refEventDoc, {
+      referrerCode: cleanCode,
+      referrerUid: ownerUid || 'unknown',
+      newUserId,
+      newUserEmail: newUserEmail || '',
+      createdAt: new Date().toISOString()
+    });
+
+    // Credit the referrer if ownerUid exists
+    if (ownerUid) {
+      const referrerUserRef = doc(db, 'users', ownerUid);
+      await updateDoc(referrerUserRef, {
+        referralsCount: increment(1),
+        referralCreditsMonths: increment(1),
+        updatedAt: new Date().toISOString()
+      }).catch((e) => console.warn('Could not update referrer count:', e));
+    }
+
+    console.log(`[Referral] Attributed signup for ${newUserId} to referrer ${cleanCode}`);
+
+    // Clean up stored referral code
+    try {
+      localStorage.removeItem('gateready_referred_by_code');
+    } catch {}
+  } catch (err) {
+    console.warn('Failed to attribute referral:', err);
   }
 }
 
