@@ -11,7 +11,8 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   updateProfile,
-  getAdditionalUserInfo
+  getAdditionalUserInfo,
+  sendEmailVerification
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -110,10 +111,20 @@ export async function signUpWithEmail(email: string, pass: string, name?: string
       console.warn('Could not set displayName on signup:', e);
     }
   }
+  try {
+    await sendEmailVerification(user);
+  } catch (evErr) {
+    console.warn('sendEmailVerification failed to send:', evErr);
+  }
   await syncUserProfile(user);
   await attributeReferralOnSignup(user.uid, user.email || undefined);
   await getOrCreateAccountReferralCode(user.uid);
   return user;
+}
+
+export async function resendVerificationEmail(user: User): Promise<void> {
+  if (!user) throw new Error('No user is currently signed in.');
+  await sendEmailVerification(user);
 }
 
 export async function signInWithEmail(email: string, pass: string): Promise<User> {
@@ -157,7 +168,7 @@ if (typeof window !== 'undefined') {
   }).catch(() => null);
 }
 
-export function trackAccountCreated(method: 'google' | 'email', origin: 'save_gate' | 'header' | 'referral') {
+export function trackAccountCreated(method: 'google' | 'email', origin: 'save_gate' | 'header' | 'referral' | 'workspace_banner') {
   try {
     if (analyticsInstance) {
       logEvent(analyticsInstance, 'account_created', {

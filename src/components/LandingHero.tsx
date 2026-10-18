@@ -12,7 +12,8 @@ import {
   ShieldCheck, 
   Star,
   Plane,
-  ChevronDown
+  ChevronDown,
+  Cloud
 } from 'lucide-react';
 
 interface LandingHeroProps {
@@ -20,13 +21,15 @@ interface LandingHeroProps {
   onLoadDemo: () => void;
   onOpenPricing: () => void;
   onOpenAirlineGuides?: () => void;
+  onOpenAccountSync?: () => void;
 }
 
 export const LandingHero: React.FC<LandingHeroProps> = ({
   onOpenAddTrip,
   onLoadDemo,
   onOpenPricing,
-  onOpenAirlineGuides
+  onOpenAirlineGuides,
+  onOpenAccountSync
 }) => {
   return (
     <section className="relative w-full pt-6 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 overflow-hidden bg-gradient-to-b from-purple-950/20 via-transparent to-transparent">
@@ -66,31 +69,51 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           </p>
         </div>
 
-        {/* Primary Call to Action & 1-Click Demo Trip Button */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
-          {/* Prominent One-Click Demo Trip Button */}
-          <button
-            type="button"
-            onClick={onLoadDemo}
-            className="w-full sm:w-auto h-12 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 active:scale-98 text-white font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all cursor-pointer border border-amber-300/40"
-            title="Load fully packed Paris & London demo trip in under 30 seconds"
-          >
-            <Zap className="w-4 h-4 fill-white" />
-            <span>Try a 1-Click Demo Trip</span>
-            <span className="text-[10px] font-extrabold bg-black/25 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              Instant
-            </span>
-          </button>
+        {/* Primary Call to Action, Secondary Account CTA & 1-Click Demo */}
+        <div className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 flex-wrap">
+            {/* Prominent One-Click Demo Trip Button */}
+            <button
+              type="button"
+              onClick={onLoadDemo}
+              className="w-full sm:w-auto h-12 px-5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 active:scale-98 text-white font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all cursor-pointer border border-amber-300/40"
+              title="Load fully packed Paris & London demo trip in under 30 seconds"
+            >
+              <Zap className="w-4 h-4 fill-white" />
+              <span>Try a 1-Click Demo Trip</span>
+              <span className="text-[10px] font-extrabold bg-black/25 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Instant
+              </span>
+            </button>
 
-          {/* Primary Create Trip Manual Path */}
-          <button
-            type="button"
-            onClick={onOpenAddTrip}
-            className="w-full sm:w-auto h-12 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 active:scale-98 text-white font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/40"
-          >
-            <span>Create Your Trip (Free)</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            {/* Primary Create Trip Manual Path */}
+            <button
+              type="button"
+              onClick={onOpenAddTrip}
+              className="w-full sm:w-auto h-12 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 active:scale-98 text-white font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/40"
+            >
+              <span>Create Your Trip (Free)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            {/* Item 2: Secondary Create Free Account CTA */}
+            {onOpenAccountSync && (
+              <button
+                type="button"
+                onClick={onOpenAccountSync}
+                className="w-full sm:w-auto h-12 px-5 rounded-2xl bg-white dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-purple-950/60 active:scale-98 text-purple-900 dark:text-purple-200 border-2 border-purple-300 dark:border-purple-750 font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                title="Create a free account to back up and sync your packing lists"
+              >
+                <Cloud className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span>Create Free Account</span>
+              </button>
+            )}
+          </div>
+
+          {/* Benefit line beneath secondary CTA */}
+          <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">
+            Save your lists forever — access them on any device.
+          </p>
         </div>
 
         {/* Pricing Hint */}

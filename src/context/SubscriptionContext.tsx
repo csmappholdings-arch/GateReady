@@ -783,10 +783,10 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   // Rule 4: Multi-device cloud sync
-  // Free, Silver: local only
-  // Gold, Platinum: cloud sync
+  // Free accounts get basic cloud sync of their own lists across their own devices (core signup incentive);
+  // Gold/Platinum sync additionally covers family members, multiple travelers, and shared multi-device groups.
   const canUseCloudSync = () => {
-    return tier === 'GOLD' || tier === 'PLATINUM' || isMasterKey;
+    return true; // Basic personal cloud sync is free for all authenticated accounts
   };
 
   const isPro = tier !== 'FREE';

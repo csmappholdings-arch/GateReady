@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Trip, TravelType } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
+import { useAuth } from '../context/AuthContext';
 import { 
   Plane, 
   Train, 
@@ -34,17 +35,27 @@ import { TripCountdownBanner } from './TripCountdownBanner';
 interface TripBannerProps {
   currentTrip: Trip | null;
   onOpenAddTrip: () => void;
+  onOpenAccountSync?: () => void;
 }
 
 export const TripBanner: React.FC<TripBannerProps> = ({
   currentTrip,
-  onOpenAddTrip
+  onOpenAddTrip,
+  onOpenAccountSync
 }) => {
   const { trips, selectTrip, updateTripDetails, deleteTrip } = usePacking();
   const { isPro, openPaywall } = useSubscription();
+  const { user } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
+  const [browserNoticeDismissed, setBrowserNoticeDismissed] = useState(() => {
+    try {
+      return localStorage.getItem('gateready_browser_only_notice_dismissed') === 'true';
+    } catch {
+      return false;
+    }
+  });
 
   // Edit fields
   const [editName, setEditName] = useState('');
@@ -138,6 +149,40 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   return (
     <div className="w-full bg-gradient-to-r from-purple-50/90 via-white to-purple-50/60 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs transition-colors">
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-2.5 sm:py-3">
+        {/* Item 5: Small, honest, dismissible disclosure in workspace for anonymous users */}
+        {!user && !browserNoticeDismissed && (
+          <div className="mb-2 py-1.5 px-3 rounded-xl bg-purple-100/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-900/60 flex items-center justify-between gap-2 text-xs text-purple-950 dark:text-purple-200 animate-in fade-in duration-200">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span className="truncate">
+                Saved in this browser only —{' '}
+                <button
+                  type="button"
+                  onClick={onOpenAccountSync}
+                  className="font-bold underline text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-white cursor-pointer"
+                >
+                  create a free account
+                </button>{' '}
+                to keep it forever.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setBrowserNoticeDismissed(true);
+                try {
+                  localStorage.setItem('gateready_browser_only_notice_dismissed', 'true');
+                } catch {}
+              }}
+              className="text-purple-400 hover:text-purple-700 dark:hover:text-purple-200 p-0.5 rounded cursor-pointer shrink-0"
+              title="Dismiss notice"
+              aria-label="Dismiss notice"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Prominent Trip Countdown Clock Banner Above Trip Info */}
         <TripCountdownBanner
           trip={currentTrip}

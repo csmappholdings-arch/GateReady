@@ -25,21 +25,32 @@ import { trackAccountCreated } from '../lib/firebase';
 interface AccountSyncModalProps {
   isOpen: boolean;
   onClose: () => void;
-  origin?: 'save_gate' | 'header' | 'referral';
+  origin?: 'save_gate' | 'header' | 'referral' | 'workspace_banner';
+  initialEmail?: string;
 }
 
-export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onClose, origin }) => {
+export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onClose, origin, initialEmail }) => {
   const { user, signIn, signInWithGithub, signUpWithEmail, signInWithEmail, resetPassword, error, clearError } = useAuth();
 
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail || '');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState<'terms' | 'privacy' | null>(null);
+  const [signupVerifySent, setSignupVerifySent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [copiedDomain, setCopiedDomain] = useState(false);
+
+  // Sync initialEmail if prop changes
+  useEffect(() => {
+    if (initialEmail) {
+      setEmail(initialEmail);
+    }
+  }, [initialEmail, isOpen]);
 
   // Current domain for troubleshooting
   const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
@@ -60,7 +71,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
 
-  const getEffectiveOrigin = (): 'save_gate' | 'header' | 'referral' => {
+  const getEffectiveOrigin = (): 'save_gate' | 'header' | 'referral' | 'workspace_banner' => {
     if (origin) return origin;
     try {
       if (localStorage.getItem('gateready_referred_by_code')) return 'referral';
@@ -132,6 +143,11 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
       return;
     }
 
+    if (mode === 'signup' && !agreeTerms) {
+      setLocalError('Please check the box to agree to the Terms of Service and Privacy Policy.');
+      return;
+    }
+
     if (!password || password.length < 6) {
       setLocalError('Password must be at least 6 characters long.');
       return;
@@ -195,7 +211,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
             {mode === 'forgot' && 'Reset Your Password'}
           </h2>
           <p className="text-[11px] text-purple-100/90 mt-0.5 pr-6">
-            Access your packing checklists, luggage tags, and loyalty rewards on all devices.
+            Access your packing checklists, luggage tags, and loyalty rewards on all devices. Upgrade anytime for shared family sync & multiple travelers.
           </p>
         </div>
 
@@ -425,9 +441,49 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
               </div>
             )}
 
+            {/* Item 10: Required Terms & Privacy Checkbox on Signup */}
+            {mode === 'signup' && (
+              <div className="pt-1">
+                <label className="flex items-start gap-2.5 cursor-pointer text-[11px] text-slate-600 dark:text-slate-300 select-none">
+                  <input
+                    type="checkbox"
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                    required
+                    className="mt-0.5 w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-300 dark:border-slate-700 cursor-pointer shrink-0"
+                  />
+                  <span>
+                    I agree to the{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowLegalModal('terms');
+                      }}
+                      className="text-purple-600 dark:text-purple-400 font-bold hover:underline cursor-pointer"
+                    >
+                      Terms of Service
+                    </button>{' '}
+                    and{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowLegalModal('privacy');
+                      }}
+                      className="text-purple-600 dark:text-purple-400 font-bold hover:underline cursor-pointer"
+                    >
+                      Privacy Policy
+                    </button>
+                    .
+                  </span>
+                </label>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || (mode === 'signup' && !agreeTerms)}
               className="w-full h-11 mt-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
@@ -459,6 +515,49 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
             </button>
           )}
         </div>
+
+        {/* Inline Legal Modal Overlay (Terms / Privacy) */}
+        {showLegalModal && (
+          <div className="absolute inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col p-5 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                {showLegalModal === 'terms' ? 'Terms of Service' : 'Privacy Policy'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowLegalModal(null)}
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="py-4 overflow-y-auto flex-1 space-y-3 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              {showLegalModal === 'terms' ? (
+                <>
+                  <p><strong>Service Overview:</strong> GateReady provides baggage weight estimations, packing checklists, and airline allowance guidance. Airline dimensions and baggage policies may vary by ticket class, codeshare carrier, or airport agent discretion.</p>
+                  <p><strong>Subscriptions &amp; Guarantee:</strong> Paid plans (Silver $1.99/mo, Gold $3.99/mo, Platinum $4.99/mo) can be cancelled at any time through the customer billing portal. All paid plans include a 14-day money-back guarantee.</p>
+                  <p><strong>Limitation of Liability:</strong> Travelers are responsible for adhering to all carrier baggage limits and TSA security directives. Estimations are provided as guidance to help prevent excess fees.</p>
+                </>
+              ) : (
+                <>
+                  <p><strong>Your Privacy is Priority #1:</strong> GateReady.ca does not sell, rent, or monetize your personal travel manifests or baggage lists.</p>
+                  <p><strong>Emergency QR Tags:</strong> When you generate a QR tag for your luggage, it contains direct traveler contact information (e.g. phone/WhatsApp) and purposefully omits your home street address to protect your vacant residence while traveling.</p>
+                  <p><strong>Local &amp; Cloud Storage:</strong> Trips and packing lists are stored securely in your browser&apos;s local storage and synced via Google Firebase Firestore when signed in.</p>
+                  <p><strong>Payments:</strong> All subscriptions are processed securely by Lemon Squeezy (our merchant of record) with 256-bit SSL encryption. We never see or store your full credit card number.</p>
+                </>
+              )}
+            </div>
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowLegalModal(null)}
+                className="h-8 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs cursor-pointer"
+              >
+                Back to Sign Up
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Footer info & explicit close button */}
         <div className="p-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">

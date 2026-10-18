@@ -212,6 +212,10 @@ export const SubscriptionModal: React.FC = () => {
                     <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                     <span className="text-slate-700 dark:text-slate-300">Climate forecast</span>
                   </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Basic personal cloud sync</span>
+                  </div>
                 </div>
               </div>
 
@@ -390,7 +394,7 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">Multi-device cloud sync</span>
+                    <span className="text-slate-900 dark:text-white font-bold">Multi-device &amp; family member sync (2 travelers)</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
@@ -491,7 +495,7 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Multi-device cloud sync</span>
+                    <span className="text-slate-700 dark:text-slate-300">Unlimited group &amp; family cloud sync</span>
                   </div>
                 </div>
               </div>

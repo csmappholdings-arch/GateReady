@@ -38,13 +38,15 @@ import {
   Sparkles,
   CloudSun,
   Crown,
-  Play
+  Play,
+  Mail
 } from 'lucide-react';
 
 function PackingAppContent() {
   const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip } = usePacking();
   const { isPro, canAddTrip, openPaywall } = useSubscription();
-  const { user } = useAuth();
+  const { user, resendVerificationEmail } = useAuth();
+  const [resentEmailNotice, setResentEmailNotice] = useState(false);
 
   const [currentScreen, setCurrentScreen] = useState<'Bags' | 'Checklist' | 'CabinIntel' | 'Allowances' | 'GateReady'>('Bags');
   const [showAddTripModal, setShowAddTripModal] = useState(false);
@@ -55,7 +57,7 @@ function PackingAppContent() {
   const [showAddBagModal, setShowAddBagModal] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [accountModalOrigin, setAccountModalOrigin] = useState<'save_gate' | 'header' | 'referral'>('header');
+  const [accountModalOrigin, setAccountModalOrigin] = useState<'save_gate' | 'header' | 'referral' | 'workspace_banner'>('header');
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showAirlineGuidesModal, setShowAirlineGuidesModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
@@ -208,6 +210,31 @@ function PackingAppContent() {
         onOpenReferral={() => setShowReferralModal(true)}
       />
 
+      {/* Item 10: Non-blocking email verification prompt */}
+      {user && !user.emailVerified && user.providerData.some((p) => p.providerId === 'password') && (
+        <div className="bg-amber-500/15 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-4 py-2 text-xs flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span>
+              Please verify your email address (<strong>{user.email}</strong>). We sent a verification link to your inbox.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await resendVerificationEmail();
+                setResentEmailNotice(true);
+                setTimeout(() => setResentEmailNotice(false), 5000);
+              } catch {}
+            }}
+            className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-colors cursor-pointer shrink-0"
+          >
+            {resentEmailNotice ? 'Verification link sent!' : 'Resend link'}
+          </button>
+        </div>
+      )}
+
       {/* Sync with Google prompt banner when signed out */}
       <MobileSyncBanner onOpenAccountModal={() => {
         setAccountModalOrigin('header');
@@ -345,6 +372,10 @@ function PackingAppContent() {
       <TripBanner
         currentTrip={currentTrip}
         onOpenAddTrip={handleOpenAddTrip}
+        onOpenAccountSync={() => {
+          setAccountModalOrigin('workspace_banner');
+          setShowAccountModal(true);
+        }}
       />
 
       {/* Main Content Area */}
@@ -362,6 +393,10 @@ function PackingAppContent() {
               onLoadDemo={loadDemoTrip}
               onOpenPricing={() => openPaywall()}
               onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
+              onOpenAccountSync={() => {
+                setAccountModalOrigin('header');
+                setShowAccountModal(true);
+              }}
             />
 
             {/* Immediately usable trip creator directly below */}

@@ -7,7 +7,8 @@ import {
   signUpWithEmail as fbSignUpWithEmail,
   signInWithEmail as fbSignInWithEmail,
   resetPassword as fbResetPassword,
-  signOutUser 
+  signOutUser,
+  resendVerificationEmail as fbResendVerificationEmail
 } from '../lib/firebase';
 
 interface AuthContextType {
@@ -18,6 +19,7 @@ interface AuthContextType {
   signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
   signOut: () => Promise<void>;
   error: string | null;
   clearError: () => void;
@@ -146,6 +148,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resendVerificationEmail = async () => {
+    if (!user) throw new Error('No user is currently signed in.');
+    setError(null);
+    try {
+      await fbResendVerificationEmail(user);
+    } catch (err: any) {
+      console.error('Failed to resend verification email:', err);
+      const msg = err.message || 'Failed to send verification email.';
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
   const signOut = async () => {
     setError(null);
     try {
@@ -167,6 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signUpWithEmail, 
       signInWithEmail, 
       resetPassword, 
+      resendVerificationEmail,
       signOut, 
       error, 
       clearError 

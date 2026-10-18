@@ -34,7 +34,8 @@ import {
   CreditCard,
   Thermometer,
   X,
-  Gift
+  Gift,
+  User as UserIcon
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
@@ -71,7 +72,8 @@ export const Header: React.FC<HeaderProps> = ({
     manualSync
   } = usePacking();
 
-  const { user, signIn, signOut, loading: authLoading, error: authError, clearError } = useAuth();
+  const { user, signIn, signOut, loading: authLoading, error: authError, clearError, resendVerificationEmail } = useAuth();
+  const [resentVerification, setResentVerification] = useState(false);
   const { 
     isPro, 
     tier, 
@@ -244,62 +246,12 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Center: Spiced Aviation Intel & Live Flight Corridor Radar */}
-        <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-purple-950/70 dark:bg-slate-900/80 border border-purple-300/30 text-purple-200 shadow-inner">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-          {currentTrip ? (
-            <div className="flex items-center gap-2 text-[11px] font-mono tracking-tight">
-              <span className="font-bold text-white uppercase">{currentTrip.originCity || 'Origin'}</span>
-              <span className="text-amber-300">✈</span>
-              <span className="font-bold text-white uppercase">{currentTrip.destinationCity || 'Destination'}</span>
-              <span className="text-purple-400">·</span>
-              <span className="text-purple-200 font-semibold">{currentTrip.companyName || 'Flight Radar'}</span>
-              <span className="text-purple-400">·</span>
-              <span className="text-emerald-300 font-semibold">{totalItems} Items ({packedPct}% Packed)</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2.5 text-[11px] tracking-wider uppercase font-semibold">
-              <span className="font-extrabold text-amber-300">TSA 3-1-1 VERIFIED</span>
-              <span className="text-purple-400">·</span>
-              <span className="text-purple-200">42+ AIRLINE LIMITS</span>
-              <span className="text-purple-400">·</span>
-              <span className="text-fuchsia-300 font-extrabold">CABIN TARE INTEL</span>
-            </div>
-          )}
-        </div>
-
-        {/* Center / Right: Action Buttons, Upgrade, Sync & Menus */}
+        {/* Center / Right: Streamlined Action Buttons, Free Month Pill, Sync Account & Settings */}
         <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Direct Quick Unit Toggles (Temp & Weight) */}
-          <div className="flex items-center gap-0.5 bg-purple-900/40 dark:bg-purple-950/70 p-0.5 sm:p-1 rounded-xl border border-purple-300/40 dark:border-purple-600/50 shadow-inner shrink-0">
-            <button
-              type="button"
-              onClick={toggleTempUnit}
-              className={`px-1.5 sm:px-2 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1 ${
-                tempUnit === 'C'
-                  ? 'bg-purple-100 text-purple-950 shadow-xs'
-                  : 'text-purple-100 hover:bg-white/15'
-              }`}
-              title="Toggle Temperature Unit: Currently °F / °C"
-            >
-              <Thermometer className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-              <span>°{tempUnit}</span>
-            </button>
-            <div className="w-[1px] h-3.5 bg-purple-300/30" />
-            <button
-              type="button"
-              onClick={toggleWeightUnit}
-              className="px-1.5 sm:px-2 py-1 rounded-lg text-xs font-black text-purple-100 hover:bg-white/15 transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1"
-              title="Toggle Weight Unit: Currently LBS / KG"
-            >
-              <Scale className="w-3.5 h-3.5 text-purple-200 shrink-0" />
-              <span>{weightUnit}</span>
-            </button>
-          </div>
-
           {/* Pro Upgrade / Badge Button */}
           {!isPro ? (
             <button
+              type="button"
               onClick={() => openPaywall("Upgrade to Silver ($1.99/mo), Gold, or Platinum to unlock unlimited bags, active trips, and multi-traveler packing.")}
               className="h-9 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
               title="Upgrade GateReady Plan"
@@ -310,6 +262,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           ) : (
             <button
+              type="button"
               onClick={() => openPaywall()}
               className="h-9 px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-1 hover:bg-amber-900/60 transition-colors cursor-pointer shadow-xs"
               title={`${tier} Plan Active`}
@@ -319,16 +272,16 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Referral Free Month Button */}
+          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account */}
           {onOpenReferral && (
             <button
               type="button"
               onClick={onOpenReferral}
-              className="h-9 px-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/40 text-purple-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              className="h-9 px-3 rounded-full bg-gradient-to-r from-purple-700 via-fuchsia-600 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer border border-fuchsia-300/40"
               title="Refer a Friend · Get 1 Month Free"
             >
-              <Gift className="w-3.5 h-3.5 text-fuchsia-400" />
-              <span className="hidden lg:inline text-[11px]">Free Month</span>
+              <Gift className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+              <span className="text-[11px]">Free Month</span>
             </button>
           )}
 
@@ -336,6 +289,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative z-50" ref={userRef}>
             {user ? (
               <button
+                type="button"
                 onClick={() => {
                   setUserMenuOpen(!userMenuOpen);
                   setSettingsOpen(false);
@@ -367,7 +321,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <ChevronDown className="w-3 h-3 text-emerald-400 shrink-0 ml-0.5" />
               </button>
             ) : (
+              /* Item 3: Fix disabled Sync Account button - immediately clickable on first load */
               <button
+                type="button"
                 onClick={() => {
                   if (onOpenAccountSync) {
                     onOpenAccountSync();
@@ -375,8 +331,7 @@ export const Header: React.FC<HeaderProps> = ({
                     setAccountSyncModalOpen(true);
                   }
                 }}
-                disabled={authLoading}
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
+                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
                 title="Sign in with Google or Email to sync trips across devices"
               >
                 <Cloud className="w-4 h-4 text-fuchsia-300 shrink-0" />
@@ -407,10 +362,31 @@ export const Header: React.FC<HeaderProps> = ({
                     <p className="text-[11px] text-slate-400 truncate">
                       {user.email}
                     </p>
-                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
-                      <CheckCircle className="w-3 h-3 text-emerald-500" />
-                      Account Active
-                    </span>
+                    {user.emailVerified ? (
+                      <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
+                        <CheckCircle className="w-3 h-3 text-emerald-500" />
+                        Account Active
+                      </span>
+                    ) : (
+                      <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md">
+                          Verify email
+                        </span>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await resendVerificationEmail();
+                              setResentVerification(true);
+                              setTimeout(() => setResentVerification(false), 5000);
+                            } catch {}
+                          }}
+                          className="text-[10px] text-purple-700 dark:text-purple-300 hover:underline font-bold cursor-pointer"
+                        >
+                          {resentVerification ? 'Link Sent!' : 'Resend link'}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <button
@@ -555,64 +531,27 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Walkthrough & Guide Video Tour Button */}
-          {onOpenTour && (
-            <button
-              onClick={() => {
-                setSettingsOpen(false);
-                setUserMenuOpen(false);
-                onOpenTour();
-              }}
-              className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-purple-700/50 bg-slate-800/80 hover:bg-purple-950/60 text-purple-200 flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Watch Short Video Walkthrough & Tour"
-              aria-label="Watch Walkthrough Video"
-            >
-              <div className="w-5 h-5 rounded-md bg-purple-600 text-white flex items-center justify-center shrink-0">
-                <Play className="w-3 h-3 fill-white ml-0.5" />
-              </div>
-              <span className="hidden lg:inline text-xs font-bold">Tour</span>
-            </button>
-          )}
-
-          {/* Travel Wallet Quick Trigger Button */}
-          <button
-            onClick={() => {
-              setSettingsOpen(false);
-              setUserMenuOpen(false);
-              openWalletModal();
-            }}
-            className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white flex items-center gap-1.5 transition-colors cursor-pointer"
-            title="Travel Wallet & Loyalty Numbers"
-            aria-label="Travel Wallet & Loyalty Numbers"
-          >
-            <CreditCard className="w-4 h-4 text-fuchsia-300" />
-            <span className="hidden md:inline text-xs font-bold">Wallet</span>
-            {walletAccounts.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-fuchsia-600 text-white text-[9px] font-bold flex items-center justify-center">
-                {walletAccounts.length}
-              </span>
-            )}
-          </button>
-
           {/* Settings Menu Dropdown */}
           <div className="relative z-50" ref={settingsRef}>
             <button
+              type="button"
               onClick={() => {
                 setSettingsOpen(!settingsOpen);
                 setUserMenuOpen(false);
               }}
               className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer"
               aria-label="Settings"
+              title="Settings & Preferences"
             >
               <Settings className="w-4 h-4 text-white" />
             </button>
 
             {settingsOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-slate-900 dark:text-white">
-                      Preferences & Actions
+                      Preferences & Settings
                     </p>
                     <p className="text-[11px] text-slate-400">Settings for GateReady.ca</p>
                   </div>
@@ -625,6 +564,77 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <X className="w-4 h-4" />
                   </button>
+                </div>
+
+                {/* Item 8: Account Row at Top of Settings */}
+                <div className="p-3 border-b border-purple-100 dark:border-purple-900/40 bg-purple-50/70 dark:bg-purple-950/30">
+                  {!user ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-purple-200 dark:bg-purple-900 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                          <UserIcon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-slate-900 dark:text-white">
+                            You're browsing as a guest
+                          </p>
+                          <p className="text-[10px] text-purple-700 dark:text-purple-300">
+                            Lists saved locally · Not backed up to cloud
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSettingsOpen(false);
+                          if (onOpenAccountSync) {
+                            onOpenAccountSync();
+                          } else {
+                            setAccountSyncModalOpen(true);
+                          }
+                        }}
+                        className="w-full h-8 px-3 rounded-lg bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                      >
+                        <Cloud className="w-3.5 h-3.5 text-purple-200" />
+                        <span>Sign in / Create free account</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {user.photoURL ? (
+                          <img
+                            src={user.photoURL}
+                            alt=""
+                            className="w-8 h-8 rounded-full border border-purple-300 shrink-0 object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                            {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-slate-900 dark:text-white truncate">
+                            {user.displayName || 'GateReady Traveler'}
+                          </p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSettingsOpen(false);
+                          signOut();
+                        }}
+                        className="h-7 px-2.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[11px] font-bold hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* GateReady.ca Brand Blueprint Thumbnail Banner */}

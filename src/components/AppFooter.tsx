@@ -160,9 +160,12 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                   <p>Have a question, missing an airline, or need help with your GateReady account?</p>
                   <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 space-y-1">
                     <p className="font-bold text-slate-900 dark:text-white">Email Support:</p>
-                    <p className="text-purple-700 dark:text-purple-300 font-mono text-xs font-bold">
-                      support@gateready.ca
-                    </p>
+                    <a
+                      href="mailto:csmappholdings@gmail.com"
+                      className="inline-block text-purple-700 dark:text-purple-300 font-mono text-xs font-bold hover:underline"
+                    >
+                      csmappholdings@gmail.com
+                    </a>
                     <p className="text-[11px] text-slate-500">We respond within 24 hours (Monday to Sunday).</p>
                   </div>
                   <p className="text-[11px] text-slate-400">

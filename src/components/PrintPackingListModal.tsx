@@ -434,14 +434,16 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                   <span>Your list is on its way to {emailInput}!</span>
                 </div>
 
-                {/* Soft upsell line for anonymous visitors */}
+                {/* Item 6: Follow-up bridge to account creation */}
                 {!user && (
-                  <div className="p-3 rounded-xl bg-white/10 border border-white/15 text-xs text-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span>Want it saved forever too?</span>
+                  <div className="p-3 rounded-xl bg-white/10 border border-white/15 text-xs text-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <span className="font-medium">
+                      Want this list on all your devices? Create a free account and we&apos;ll move it over.
+                    </span>
                     <button
                       type="button"
                       onClick={() => setShowAccountModal(true)}
-                      className="px-3 py-1 rounded-lg bg-white text-purple-900 font-black text-xs hover:bg-purple-100 transition-colors cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
+                      className="px-3.5 py-1.5 rounded-lg bg-white text-purple-900 font-black text-xs hover:bg-purple-100 transition-colors cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
                     >
                       Create a free account
                     </button>
@@ -859,6 +861,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
           isOpen={showAccountModal}
           onClose={() => setShowAccountModal(false)}
           origin="save_gate"
+          initialEmail={emailInput}
         />
       )}
     </div>,

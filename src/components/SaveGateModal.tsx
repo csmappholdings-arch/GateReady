@@ -124,7 +124,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
               onClick={onSave}
               className="w-full h-11 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-md shadow-purple-600/30 active:scale-98 transition-all cursor-pointer"
             >
-              <span>Save my list free</span>
+              <span>Create free account</span>
               <Sparkles className="w-4 h-4 text-amber-300" />
             </button>
 

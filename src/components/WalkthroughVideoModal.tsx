@@ -147,16 +147,16 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'pro_vs_free',
     title: '7. Plans: Free vs Silver vs Gold vs Platinum',
     tagline: 'Choose the plan that fits your travel style',
-    description: 'Start free with essential luggage scales and packing checklists. Upgrade to Silver, Gold, or Platinum for unlimited bags, interactive terminal maps, privacy QR tags, multiple travelers, and multi-device cloud sync. All paid plans include a 14-day money-back guarantee.',
+    description: 'Start free with essential luggage scales and packing checklists. Upgrade to Silver, Gold, or Platinum for unlimited bags, interactive terminal maps, privacy QR tags, multiple travelers, and shared family sync. All paid plans include a 14-day money-back guarantee.',
     duration: 8.5,
     icon: Crown,
     color: 'from-purple-600 to-fuchsia-600',
     isPro: true,
     features: [
-      'Free ($0): 1 traveler, 1 active trip, 2 bags, live weight scales, TSA liquids checker',
+      'Free ($0): 1 traveler, 1 active trip, 2 bags, live weight scales, TSA liquids checker, personal cloud sync',
       'Silver ($1.99/mo or $19.99/year): 1 traveler, 2 active trips, unlimited bags & all core tools',
-      'Gold ($3.99/mo or $29.99/year): 2 travelers, unlimited active trips, multi-device cloud sync (Most Popular)',
-      'Platinum ($4.99/mo or $39.99/year): Unlimited travelers & family sharing'
+      'Gold ($3.99/mo or $29.99/year): 2 travelers, unlimited active trips, multi-device & family member sync (Most Popular)',
+      'Platinum ($4.99/mo or $39.99/year): Unlimited travelers, shared family & group device sync'
     ],
     mockupType: 'PRO_VS_FREE'
   }
