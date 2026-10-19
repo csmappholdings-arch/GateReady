@@ -16,8 +16,9 @@ service cloud.firestore {
 
     // User Profile Document
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow create, update: if isOwner(userId);
+      allow get: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['referralsCount', 'referralCreditsMonths', 'referralFreeMonthExpiresAt', 'updatedAt']));
       allow delete: if isOwner(userId);
 
       // Trips Subcollection

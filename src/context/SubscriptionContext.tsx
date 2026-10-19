@@ -70,15 +70,31 @@ interface SubscriptionContextType {
   canAddTrip: (currentCount: number) => { allowed: boolean; reason?: string };
   canAddBag: (existingBags: Bag[], newBagType: BagType) => { allowed: boolean; reason?: string };
   canUseCloudSync: () => boolean;
-  // 7-day Platinum trial explicit & expiring
+  // 7-day Platinum trial explicit & expiring (strictly linked to account creation)
   isTrialActive: boolean;
   isTrialExpired: boolean;
+  trialExpiresAt: string | null;
   trialDaysRemaining: number;
   trialHoursRemaining: number;
+  trialMinutesRemaining: number;
+  trialSecondsRemaining: number;
   trialTimeLeftText: string;
   isTrialExpiringSoon: boolean;
   hasDismissedTrialExpiredNotice: boolean;
   dismissTrialExpiredNotice: () => void;
+  // 1-month Referral Platinum (strictly linked to account creation & sign in)
+  isReferralPlatinumActive: boolean;
+  referralExpiresAt: string | null;
+  referralTimeLeftText: string;
+  referralDaysRemaining: number;
+  referralHoursRemaining: number;
+  referralMinutesRemaining: number;
+  referralSecondsRemaining: number;
+  isReferralExpiringSoon: boolean;
+  // Pending anonymous referral detection
+  hasPendingReferralCode: boolean;
+  pendingReferralCode: string | null;
+  clearPendingReferralCode: () => void;
   // Collaborative referral program
   referralCode: string;
   referralsCount: number;
@@ -98,6 +114,7 @@ const TRIAL_DISMISSED_KEY = 'gateready_trial_expired_dismissed_v1';
 const REFERRAL_CODE_KEY = 'gateready_referral_code_v1';
 const REFERRALS_COUNT_KEY = 'gateready_referrals_count_v1';
 const REFERRAL_CREDITS_KEY = 'gateready_referral_credits_months_v1';
+const REFERRAL_EXPIRES_KEY = 'gateready_referral_free_month_expires_at';
 
 export const MAX_FREE_TRAVELERS = 1;
 export const MAX_FREE_BAGS_TOTAL = 2;
@@ -106,21 +123,29 @@ export const MAX_FREE_ACTIVE_TRIPS = 1;
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
 
-  // 7-day Platinum trial state
-  const [trialExpiresAt] = useState<string | null>(() => {
+  // 7-day Platinum trial state - strictly tied to account creation
+  const [trialExpiresAt, setTrialExpiresAt] = useState<string | null>(null);
+
+  // 1-month Referral Platinum state - strictly tied to account creation
+  const [referralFreeMonthExpiresAt, setReferralFreeMonthExpiresAt] = useState<string | null>(null);
+
+  // Pending anonymous referral code in URL waiting for account creation
+  const [pendingReferralCode, setPendingReferralCode] = useState<string | null>(() => {
     try {
-      const saved = localStorage.getItem(TRIAL_EXPIRES_KEY);
-      if (saved) return saved;
-      // Auto-start 7-day Platinum trial for new visitors
-      const now = Date.now();
-      const expires = new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
-      localStorage.setItem(TRIAL_STARTED_KEY, new Date(now).toISOString());
-      localStorage.setItem(TRIAL_EXPIRES_KEY, expires);
-      return expires;
+      return localStorage.getItem('gateready_referred_by_code');
     } catch {
       return null;
     }
   });
+
+  const clearPendingReferralCode = () => {
+    try {
+      localStorage.removeItem('gateready_referred_by_code');
+    } catch {}
+    setPendingReferralCode(null);
+  };
+
+  const hasPendingReferralCode = Boolean(!user && pendingReferralCode);
 
   const [hasDismissedTrialExpiredNotice, setHasDismissedTrialExpiredNotice] = useState<boolean>(() => {
     try {
@@ -137,11 +162,12 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch {}
   };
 
+  // Real-time 1-second countdown tick for live countdown timers
   const [nowTick, setNowTick] = useState(Date.now());
   useEffect(() => {
     const interval = setInterval(() => {
       setNowTick(Date.now());
-    }, 10000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -222,21 +248,13 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return saved;
       }
       if (saved === 'FREE') return 'FREE';
-
-      // 7-day Platinum trial for new visitors
-      const trialExpires = localStorage.getItem(TRIAL_EXPIRES_KEY);
-      if (trialExpires) {
-        const diff = new Date(trialExpires).getTime() - Date.now();
-        if (diff > 0) return 'PLATINUM';
-        return 'FREE';
-      }
     } catch {
       // Ignore
     }
-    return 'PLATINUM';
+    // Default to FREE for all non-subscribed visitors and anonymous guests
+    return 'FREE';
   });
 
-  const trialDiffMs = trialExpiresAt ? Math.max(0, new Date(trialExpiresAt).getTime() - nowTick) : 0;
   const hasPaidLicense = Boolean(
     manualLicenseKey || 
     subscriptionExpiresAt || 
@@ -244,14 +262,78 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     tier === 'GOLD' || 
     (tier === 'PLATINUM' && isMasterKey)
   );
-  const isTrialActive = !hasPaidLicense && tier === 'PLATINUM' && trialDiffMs > 0;
-  const isTrialExpired = !hasPaidLicense && trialExpiresAt !== null && trialDiffMs <= 0;
-  const trialDaysRemaining = Math.max(1, Math.ceil(trialDiffMs / (24 * 60 * 60 * 1000)));
-  const trialHoursRemaining = Math.max(0, Math.floor(trialDiffMs / (60 * 60 * 1000)));
+
+  // 1-month Referral Platinum countdown calculation
+  const referralDiffMs = (user && referralFreeMonthExpiresAt)
+    ? Math.max(0, new Date(referralFreeMonthExpiresAt).getTime() - nowTick)
+    : 0;
+
+  const isReferralPlatinumActive = Boolean(user && referralDiffMs > 0);
+  const referralDaysRemaining = Math.floor(referralDiffMs / (24 * 60 * 60 * 1000));
+  const referralHoursRemaining = Math.floor((referralDiffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  const referralMinutesRemaining = Math.floor((referralDiffMs % (60 * 60 * 1000)) / (60 * 1000));
+  const referralSecondsRemaining = Math.floor((referralDiffMs % 60000) / 1000);
+
+  const referralTimeLeftText = referralDiffMs > 86400000
+    ? `${referralDaysRemaining}d ${referralHoursRemaining}h left`
+    : referralDiffMs > 3600000
+      ? `${referralHoursRemaining}h ${referralMinutesRemaining}m left`
+      : `${referralMinutesRemaining}m ${referralSecondsRemaining}s left`;
+
+  const isReferralExpiringSoon = isReferralPlatinumActive && referralDiffMs <= 3 * 24 * 60 * 60 * 1000;
+
+  // 7-day Platinum trial countdown calculation (strictly linked to account creation)
+  const trialDiffMs = (user && trialExpiresAt)
+    ? Math.max(0, new Date(trialExpiresAt).getTime() - nowTick)
+    : 0;
+
+  const isTrialActive = Boolean(
+    user && 
+    !hasPaidLicense && 
+    !isReferralPlatinumActive && 
+    trialDiffMs > 0
+  );
+  const isTrialExpired = Boolean(
+    user && 
+    !hasPaidLicense && 
+    !isReferralPlatinumActive && 
+    trialExpiresAt !== null && 
+    trialDiffMs <= 0
+  );
+
+  const trialDaysRemaining = Math.floor(trialDiffMs / (24 * 60 * 60 * 1000));
+  const trialHoursRemaining = Math.floor((trialDiffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  const trialMinutesRemaining = Math.floor((trialDiffMs % (60 * 60 * 1000)) / (60 * 1000));
+  const trialSecondsRemaining = Math.floor((trialDiffMs % 60000) / 1000);
+
   const trialTimeLeftText = trialDiffMs > 86400000
-    ? `${trialDaysRemaining} days left`
-    : `${trialHoursRemaining}h ${Math.floor((trialDiffMs % 3600000) / 60000)}m left`;
+    ? `${trialDaysRemaining}d ${trialHoursRemaining}h left`
+    : trialDiffMs > 3600000
+      ? `${trialHoursRemaining}h ${trialMinutesRemaining}m left`
+      : `${trialMinutesRemaining}m ${trialSecondsRemaining}s left`;
+
   const isTrialExpiringSoon = isTrialActive && trialDiffMs <= 2 * 24 * 60 * 60 * 1000;
+
+  // Active tier arbitration: Paid > Referral Platinum (1 mo) > Account Trial (7 days) > Free
+  useEffect(() => {
+    if (hasPaidLicense) return;
+
+    if (!user) {
+      setTier('FREE');
+      setTrialExpiresAt(null);
+      setReferralFreeMonthExpiresAt(null);
+      return;
+    }
+
+    if (isReferralPlatinumActive || isTrialActive) {
+      setTier('PLATINUM');
+    } else {
+      setTier('FREE');
+      try {
+        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+      } catch {}
+    }
+  }, [user, hasPaidLicense, isReferralPlatinumActive, isTrialActive]);
 
   // Referral program state (Feature 3: tied strictly to authenticated accounts)
   const [referralCode, setReferralCode] = useState<string>(() => {
@@ -266,12 +348,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [referralsCount, setReferralsCount] = useState<number>(0);
   const [referralCreditsMonths, setReferralCreditsMonths] = useState<number>(0);
 
-  // Sync persistent referral code and stats from Firestore when signed in
+  // Sync persistent referral code, stats, trial, and referral credit from Firestore when signed in
   useEffect(() => {
     if (!user) {
       setReferralCode('');
       setReferralsCount(0);
       setReferralCreditsMonths(0);
+      setTrialExpiresAt(null);
+      setReferralFreeMonthExpiresAt(null);
       return;
     }
 
@@ -289,11 +373,13 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     }).catch((e) => console.warn('Could not initialize referral code:', e));
 
-    // Listen to real-time stats updates
+    // Listen to real-time user stats, trial, and referral bonus updates
     const userRef = doc(db, 'users', user.uid);
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
-      if (snapshot.exists()) {
+      if (snapshot.exists() && isMounted) {
         const data = snapshot.data();
+
+        // Referral stats
         if (data.referralCode) {
           setReferralCode(data.referralCode);
           try { localStorage.setItem(REFERRAL_CODE_KEY, data.referralCode); } catch {}
@@ -304,6 +390,35 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (typeof data.referralCreditsMonths === 'number') {
           setReferralCreditsMonths(data.referralCreditsMonths);
         }
+
+        // Referral 1-month Free Platinum tracking
+        if (data.referralFreeMonthExpiresAt) {
+          setReferralFreeMonthExpiresAt(data.referralFreeMonthExpiresAt);
+          try {
+            localStorage.setItem(REFERRAL_EXPIRES_KEY, data.referralFreeMonthExpiresAt);
+          } catch {}
+        } else {
+          setReferralFreeMonthExpiresAt(null);
+        }
+
+        // 7-day trial tracking (strictly linked to account creation)
+        if (data.trialExpiresAt) {
+          setTrialExpiresAt(data.trialExpiresAt);
+          try {
+            localStorage.setItem(TRIAL_EXPIRES_KEY, data.trialExpiresAt);
+          } catch {}
+        } else if (!data.trialStartedAt) {
+          // Initialize 7-day Platinum trial immediately on account creation
+          const now = Date.now();
+          const trialExpires = new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
+          setDoc(userRef, {
+            trialStartedAt: new Date(now).toISOString(),
+            trialExpiresAt: trialExpires,
+            trialUsed: true,
+            updatedAt: new Date(now).toISOString()
+          }, { merge: true }).catch((err) => console.warn('Failed to initialize account trial:', err));
+          setTrialExpiresAt(trialExpires);
+        }
       }
     }, (err) => console.warn('Referral snapshot listener warning:', err));
 
@@ -313,29 +428,35 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   }, [user]);
 
+  // Live simulator / claim handler: each referral provides 1 month of free Platinum
   const claimReferralBonus = () => {
+    if (!user) {
+      openPaywall("Sign in or create a free account to track and apply referral bonuses to your account.");
+      return;
+    }
+
+    const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
+    const currentExp = referralFreeMonthExpiresAt ? new Date(referralFreeMonthExpiresAt).getTime() : Date.now();
+    const base = Math.max(Date.now(), currentExp);
+    const newExp = new Date(base + oneMonthMs).toISOString();
+
     setReferralsCount((prev) => prev + 1);
     setReferralCreditsMonths((prev) => prev + 1);
+    setReferralFreeMonthExpiresAt(newExp);
+    try {
+      localStorage.setItem(REFERRAL_EXPIRES_KEY, newExp);
+      localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PLATINUM');
+    } catch {}
 
-    if (user) {
-      const userRef = doc(db, 'users', user.uid);
-      updateDoc(userRef, {
-        referralsCount: increment(1),
-        referralCreditsMonths: increment(1),
-        updatedAt: new Date().toISOString()
-      }).catch((e) => console.warn('Failed to update live referral credit:', e));
-    }
+    const userRef = doc(db, 'users', user.uid);
+    updateDoc(userRef, {
+      referralsCount: increment(1),
+      referralCreditsMonths: increment(1),
+      referralFreeMonthExpiresAt: newExp,
+      subscriptionTier: 'PLATINUM',
+      updatedAt: new Date().toISOString()
+    }).catch((e) => console.warn('Failed to update live referral credit:', e));
   };
-
-  // Automatically downgrade to FREE if 7-day trial expires
-  useEffect(() => {
-    if (isTrialExpired && tier === 'PLATINUM' && !hasPaidLicense) {
-      setTier('FREE');
-      try {
-        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
-      } catch {}
-    }
-  }, [isTrialExpired, tier, hasPaidLicense]);
 
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(() => {
     try {
@@ -815,12 +936,26 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         canUseCloudSync,
         isTrialActive,
         isTrialExpired,
+        trialExpiresAt,
         trialDaysRemaining,
         trialHoursRemaining,
+        trialMinutesRemaining,
+        trialSecondsRemaining,
         trialTimeLeftText,
         isTrialExpiringSoon,
         hasDismissedTrialExpiredNotice,
         dismissTrialExpiredNotice,
+        isReferralPlatinumActive,
+        referralExpiresAt: referralFreeMonthExpiresAt,
+        referralTimeLeftText,
+        referralDaysRemaining,
+        referralHoursRemaining,
+        referralMinutesRemaining,
+        referralSecondsRemaining,
+        isReferralExpiringSoon,
+        hasPendingReferralCode,
+        pendingReferralCode,
+        clearPendingReferralCode,
         referralCode,
         referralsCount,
         referralCreditsMonths,

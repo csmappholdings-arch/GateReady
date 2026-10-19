@@ -39,12 +39,14 @@ import {
   CloudSun,
   Crown,
   Play,
-  Mail
+  Mail,
+  Gift,
+  X
 } from 'lucide-react';
 
 function PackingAppContent() {
   const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip } = usePacking();
-  const { isPro, canAddTrip, openPaywall } = useSubscription();
+  const { isPro, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
   const { user, resendVerificationEmail } = useAuth();
   const [resentEmailNotice, setResentEmailNotice] = useState(false);
 
@@ -209,6 +211,45 @@ function PackingAppContent() {
         }}
         onOpenReferral={() => setShowReferralModal(true)}
       />
+
+      {/* Pending Referral Link Announcement for Anonymous Visitors */}
+      {hasPendingReferralCode && (
+        <div className="bg-gradient-to-r from-fuchsia-700 via-purple-700 to-indigo-800 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs flex-wrap relative z-30">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-xl bg-amber-400 text-purple-950 flex items-center justify-center shrink-0 font-bold shadow-xs">
+              <Gift className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-black text-amber-200">
+                🎁 Referral Bonus Detected!
+              </p>
+              <p className="text-purple-100 text-[11px] leading-tight">
+                Create an account & sign in to apply your <strong>1 Free Month of Platinum</strong> ($9.99 value). Mandatory to activate.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setAccountModalOrigin('referral');
+                setShowAccountModal(true);
+              }}
+              className="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-xs transition-all cursor-pointer shadow-sm active:scale-95"
+            >
+              Claim 1-Mo Platinum
+            </button>
+            <button
+              type="button"
+              onClick={clearPendingReferralCode}
+              className="w-7 h-7 rounded-lg hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors cursor-pointer"
+              title="Dismiss referral offer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Item 10: Non-blocking email verification prompt */}
       {user && !user.emailVerified && user.providerData.some((p) => p.providerId === 'password') && (

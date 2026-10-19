@@ -86,7 +86,10 @@ export const Header: React.FC<HeaderProps> = ({
     applyLicenseKey,
     removeLicenseKey,
     isTrialActive,
-    trialTimeLeftText
+    trialTimeLeftText,
+    isReferralPlatinumActive,
+    referralTimeLeftText,
+    hasPendingReferralCode
   } = useSubscription();
 
   const { accounts: walletAccounts, openWalletModal } = useTravelWallet();
@@ -222,17 +225,40 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Pro / Trial / Free Plan Badge */}
+          {/* Pro / Referral / Trial / Free Plan Badge */}
           <div className="flex items-center">
-            {isTrialActive ? (
+            {isReferralPlatinumActive ? (
+              <button
+                type="button"
+                onClick={() => openPaywall("You have an active 1-Month Free Platinum Referral access! All Platinum features are unlocked.")}
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-fuchsia-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+                title={`Referral 1-Month Free Platinum · ${referralTimeLeftText} · Click to view plans`}
+              >
+                <Gift className="w-3 h-3 text-amber-300 shrink-0 animate-bounce" />
+                <span className="whitespace-nowrap">Referral Platinum · {referralTimeLeftText}</span>
+              </button>
+            ) : isTrialActive ? (
               <button
                 type="button"
                 onClick={() => openPaywall("You are on a 7-day Platinum trial with full access. Choose a plan to lock in uninterrupted access.")}
                 className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-amber-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
-                title="Platinum 7-Day Trial Active · Click to view plans"
+                title={`Platinum 7-Day Trial Active · ${trialTimeLeftText} · Click to view plans`}
               >
                 <Crown className="w-3 h-3 fill-amber-200 text-amber-200 shrink-0 animate-pulse" />
                 <span className="whitespace-nowrap">Platinum trial · {trialTimeLeftText}</span>
+              </button>
+            ) : hasPendingReferralCode ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenAccountSync) onOpenAccountSync();
+                  else setAccountSyncModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-fuchsia-600 to-purple-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-amber-300/50 cursor-pointer hover:brightness-110 active:scale-95 transition-all animate-pulse"
+                title="Referral detected · Create a free account & sign in to apply 1 Free Month of Platinum"
+              >
+                <Gift className="w-3 h-3 text-amber-200 shrink-0" />
+                <span className="whitespace-nowrap">Claim 1-Mo Platinum</span>
               </button>
             ) : isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40">
@@ -598,41 +624,79 @@ export const Header: React.FC<HeaderProps> = ({
                         <Cloud className="w-3.5 h-3.5 text-purple-200" />
                         <span>Sign in / Create free account</span>
                       </button>
+
+                      {hasPendingReferralCode && (
+                        <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                          <span className="font-bold flex items-center gap-1">
+                            <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
+                            <span>Referral Bonus Pending:</span>
+                          </span>
+                          <span className="font-black text-purple-700 dark:text-purple-300">
+                            1 Mo Platinum
+                          </span>
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {user.photoURL ? (
-                          <img
-                            src={user.photoURL}
-                            alt=""
-                            className="w-8 h-8 rounded-full border border-purple-300 shrink-0 object-cover"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
-                            {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {user.photoURL ? (
+                            <img
+                              src={user.photoURL}
+                              alt=""
+                              className="w-8 h-8 rounded-full border border-purple-300 shrink-0 object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                              {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="text-xs font-black text-slate-900 dark:text-white truncate">
+                              {user.displayName || 'GateReady Traveler'}
+                            </p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                              {user.email}
+                            </p>
                           </div>
-                        )}
-                        <div className="min-w-0">
-                          <p className="text-xs font-black text-slate-900 dark:text-white truncate">
-                            {user.displayName || 'GateReady Traveler'}
-                          </p>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                            {user.email}
-                          </p>
                         </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSettingsOpen(false);
+                            signOut();
+                          }}
+                          className="h-7 px-2.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[11px] font-bold hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
+                        >
+                          Sign out
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSettingsOpen(false);
-                          signOut();
-                        }}
-                        className="h-7 px-2.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[11px] font-bold hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
-                      >
-                        Sign out
-                      </button>
+                      {isReferralPlatinumActive && (
+                        <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-[11px] text-purple-700 dark:text-purple-300 flex items-center justify-between">
+                          <span className="font-bold flex items-center gap-1">
+                            <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
+                            <span>Referral Platinum:</span>
+                          </span>
+                          <span className="font-mono font-black text-amber-600 dark:text-amber-400">
+                            ⏳ {referralTimeLeftText}
+                          </span>
+                        </div>
+                      )}
+
+                      {isTrialActive && (
+                        <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                          <span className="font-bold flex items-center gap-1">
+                            <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                            <span>7-Day Account Trial:</span>
+                          </span>
+                          <span className="font-mono font-black text-purple-700 dark:text-purple-300">
+                            ⏳ {trialTimeLeftText}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

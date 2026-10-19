@@ -4,17 +4,31 @@ import { usePacking } from '../context/PackingContext';
 import { Crown, Sparkles, X, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export const TrialNudgeBanner: React.FC = () => {
-  const { isTrialActive, isTrialExpiringSoon, trialTimeLeftText, openPaywall } = useSubscription();
+  const { 
+    isTrialActive, 
+    isTrialExpiringSoon, 
+    trialTimeLeftText, 
+    isReferralPlatinumActive,
+    isReferralExpiringSoon,
+    referralTimeLeftText,
+    openPaywall 
+  } = useSubscription();
   const { currentTrip } = usePacking();
   const [dismissed, setDismissed] = useState(false);
 
-  if (!isTrialActive || !isTrialExpiringSoon || dismissed) {
+  const showReferralNudge = isReferralPlatinumActive && isReferralExpiringSoon;
+  const showTrialNudge = isTrialActive && isTrialExpiringSoon;
+
+  if ((!showReferralNudge && !showTrialNudge) || dismissed) {
     return null;
   }
 
   const travelerCount = currentTrip?.familyMembers?.length || 1;
   const recommendedTier = travelerCount > 1 ? 'GOLD' : 'SILVER';
   const tierCost = recommendedTier === 'GOLD' ? '$3.99/mo' : '$1.99/mo';
+
+  const countdownText = showReferralNudge ? referralTimeLeftText : trialTimeLeftText;
+  const bannerTitle = showReferralNudge ? '⏳ 1-Month Referral Platinum Ends Soon:' : '⏳ 7-Day Platinum Trial Ends Soon:';
 
   return (
     <div className="w-full bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white px-4 py-2.5 shadow-md relative z-30 transition-all">
@@ -25,9 +39,9 @@ export const TrialNudgeBanner: React.FC = () => {
           </div>
           <div className="min-w-0">
             <p className="font-black text-white flex items-center gap-1.5 flex-wrap">
-              <span>⏳ 7-Day Platinum Trial Ends Soon:</span>
+              <span>{bannerTitle}</span>
               <span className="bg-black/30 px-2 py-0.2 rounded-md font-mono text-[11px] text-amber-200">
-                {trialTimeLeftText}
+                {countdownText}
               </span>
             </p>
             <p className="text-[11px] text-white/90 leading-tight">

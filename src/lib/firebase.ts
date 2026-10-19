@@ -146,13 +146,26 @@ export async function syncUserProfile(user: User): Promise<void> {
   if (!user) return;
   try {
     const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, {
+    const snap = await getDoc(userRef);
+    const data = snap.exists() ? snap.data() : null;
+
+    const updatePayload: Record<string, any> = {
       userId: user.uid,
       email: user.email || '',
       displayName: user.displayName || 'Traveler',
       photoURL: user.photoURL || '',
       updatedAt: new Date().toISOString()
-    }, { merge: true });
+    };
+
+    // Free 7-day trial is linked strictly to when an account is created
+    if (!data?.trialStartedAt) {
+      const now = Date.now();
+      updatePayload.trialStartedAt = new Date(now).toISOString();
+      updatePayload.trialExpiresAt = new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
+      updatePayload.trialUsed = true;
+    }
+
+    await setDoc(userRef, updatePayload, { merge: true });
   } catch (err) {
     console.error('Error saving user profile to cloud:', err);
   }
@@ -285,15 +298,20 @@ export async function getOrCreateAccountReferralCode(userId: string): Promise<{
 }
 
 // Attribute referral at signup time
-export async function attributeReferralOnSignup(newUserId: string, newUserEmail?: string) {
+// Grants 1 FREE MONTH of Platinum to the new user AND extends 1 month of Platinum to the referrer
+export async function attributeReferralOnSignup(newUserId: string, newUserEmail?: string): Promise<{
+  attributed: boolean;
+  referrerCode?: string;
+  expiresAt?: string;
+}> {
   try {
     let refCode = '';
     try {
       refCode = localStorage.getItem('gateready_referred_by_code') || '';
     } catch {}
 
-    if (!refCode || !refCode.trim()) return;
-    const cleanCode = refCode.trim();
+    if (!refCode || !refCode.trim()) return { attributed: false };
+    const cleanCode = refCode.trim().toUpperCase();
 
     // Look up code owner in referral_codes registry
     const codeRef = doc(db, 'referral_codes', cleanCode);
@@ -303,8 +321,28 @@ export async function attributeReferralOnSignup(newUserId: string, newUserEmail?
     // Do not attribute if self-referral
     if (ownerUid === newUserId) {
       try { localStorage.removeItem('gateready_referred_by_code'); } catch {}
-      return;
+      return { attributed: false };
     }
+
+    const now = Date.now();
+    const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
+    const newUserExpiresAt = new Date(now + oneMonthMs).toISOString();
+
+    // Mandatory: Apply 1 FREE MONTH of Platinum to the NEW user who created an account
+    const newUserRef = doc(db, 'users', newUserId);
+    await setDoc(newUserRef, {
+      hasClaimedReferralMonth: true,
+      referralFreeMonthStartedAt: new Date(now).toISOString(),
+      referralFreeMonthExpiresAt: newUserExpiresAt,
+      referredByCode: cleanCode,
+      subscriptionTier: 'PLATINUM',
+      updatedAt: new Date(now).toISOString()
+    }, { merge: true });
+
+    try {
+      localStorage.setItem('gateready_referral_free_month_expires_at', newUserExpiresAt);
+      localStorage.setItem('gateready_subscription_tier_v1', 'PLATINUM');
+    } catch {}
 
     // Record attribution event in referrals collection
     const refEventDoc = doc(collection(db, 'referrals'));
@@ -313,27 +351,52 @@ export async function attributeReferralOnSignup(newUserId: string, newUserEmail?
       referrerUid: ownerUid || 'unknown',
       newUserId,
       newUserEmail: newUserEmail || '',
+      freeMonthExpiresAt: newUserExpiresAt,
       createdAt: new Date().toISOString()
     });
 
-    // Credit the referrer if ownerUid exists
+    // Credit the referrer: Each one provides 1 month of free platinum account
     if (ownerUid) {
       const referrerUserRef = doc(db, 'users', ownerUid);
-      await updateDoc(referrerUserRef, {
-        referralsCount: increment(1),
-        referralCreditsMonths: increment(1),
-        updatedAt: new Date().toISOString()
-      }).catch((e) => console.warn('Could not update referrer count:', e));
+      try {
+        const referrerSnap = await getDoc(referrerUserRef);
+        let refExpires = now + oneMonthMs;
+        if (referrerSnap.exists()) {
+          const refData = referrerSnap.data();
+          if (refData?.referralFreeMonthExpiresAt) {
+            const existingTime = new Date(refData.referralFreeMonthExpiresAt).getTime();
+            if (Number.isFinite(existingTime) && existingTime > now) {
+              refExpires = existingTime + oneMonthMs;
+            }
+          }
+        }
+        const refExpiresStr = new Date(refExpires).toISOString();
+        await updateDoc(referrerUserRef, {
+          referralsCount: increment(1),
+          referralCreditsMonths: increment(1),
+          referralFreeMonthExpiresAt: refExpiresStr,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Could not update referrer count:', e);
+      }
     }
 
-    console.log(`[Referral] Attributed signup for ${newUserId} to referrer ${cleanCode}`);
+    console.log(`[Referral] Attributed signup for ${newUserId} to referrer ${cleanCode} with 1 month Platinum valid until ${newUserExpiresAt}`);
 
     // Clean up stored referral code
     try {
       localStorage.removeItem('gateready_referred_by_code');
     } catch {}
+
+    return {
+      attributed: true,
+      referrerCode: cleanCode,
+      expiresAt: newUserExpiresAt
+    };
   } catch (err) {
     console.warn('Failed to attribute referral:', err);
+    return { attributed: false };
   }
 }
 

@@ -18,7 +18,8 @@ import {
   Copy,
   Check,
   ExternalLink,
-  ShieldAlert
+  ShieldAlert,
+  Gift
 } from 'lucide-react';
 import { trackAccountCreated } from '../lib/firebase';
 
@@ -204,6 +205,13 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
               Cross-Device Cloud Sync
             </span>
           </div>
+
+          {getEffectiveOrigin() === 'referral' && (
+            <div className="mb-2 p-2 rounded-xl bg-amber-400 text-purple-950 font-black text-xs flex items-center gap-2 shadow-sm animate-pulse">
+              <Gift className="w-4 h-4 text-purple-900 shrink-0" />
+              <span>🎁 Referral Active: 1 Free Month of Platinum ($9.99 value) will be applied upon account creation!</span>
+            </div>
+          )}
 
           <h2 className="text-lg sm:text-xl font-black pr-8 leading-tight">
             {mode === 'signup' && 'Create Your Gate Ready Account'}

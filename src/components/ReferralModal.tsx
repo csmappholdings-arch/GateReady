@@ -30,6 +30,8 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
     referralCode, 
     referralsCount, 
     referralCreditsMonths, 
+    isReferralPlatinumActive,
+    referralTimeLeftText,
     claimReferralBonus, 
     openPaywall 
   } = useSubscription();
@@ -92,17 +94,17 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
           </span>
 
           <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            Give a Free Month, Get a Free Month
+            Give 1 Month Platinum, Get 1 Month Platinum
           </h3>
           <p className="text-xs text-purple-200/90 mt-1 max-w-sm mx-auto leading-relaxed">
-            Give a friend a free month of Silver. When they subscribe, you get a free month automatically credited to your account!
+            Give a friend 1 free month of GateReady Platinum. When they create an account and sign in, you both get 1 month of Platinum automatically credited and tracked!
           </p>
         </div>
 
         {/* Content Area */}
         <div className="p-5 sm:p-6 space-y-4 text-xs">
           {!user ? (
-            /* Account Required State (Feature 3: codes issued only to signed-in accounts) */
+            /* Account Required State (Mandatory Account Creation) */
             <div className="space-y-4 text-center py-2">
               <div className="w-14 h-14 mx-auto rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-purple-600 dark:text-purple-300 shadow-sm">
                 <Lock className="w-7 h-7" />
@@ -110,10 +112,10 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
 
               <div>
                 <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                  Create a Free Account to Get Your Code
+                  Mandatory: Create Account to Apply Free Month
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
-                  Referral codes are tied directly to your GateReady account so we can track every friend who signs up and automatically apply free months of Silver to your billing.
+                  Referral bonuses are tied strictly to authenticated accounts. You must create an account and sign in so the 1 Free Month of Platinum ($9.99 value) can be applied and accurately tracked.
                 </p>
               </div>
 
@@ -121,19 +123,19 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                 <div className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                   <p className="text-slate-700 dark:text-slate-200">
-                    <strong className="text-slate-900 dark:text-white font-bold">Your friends get 1 month free</strong> of GateReady Silver ($1.99 value) automatically.
+                    <strong className="text-slate-900 dark:text-white font-bold">Your friends get 1 month free</strong> of GateReady Platinum ($9.99 value) as soon as they create their account.
                   </p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <Gift className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                   <p className="text-slate-700 dark:text-slate-200">
-                    <strong className="text-slate-900 dark:text-white font-bold">You earn 1 month free</strong> credited to your account for every friend who subscribes.
+                    <strong className="text-slate-900 dark:text-white font-bold">You earn 1 month free</strong> of Platinum credited to your account for each friend who signs up.
                   </p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                   <p className="text-slate-700 dark:text-slate-200">
-                    <strong className="text-slate-900 dark:text-white font-bold">100% Free Forever</strong> to create an account — no credit card needed.
+                    <strong className="text-slate-900 dark:text-white font-bold">Accurate Live Countdown</strong>: Tracks the time remaining until free access runs out, ensuring exactly 1 month of Platinum is granted and then removed.
                   </p>
                 </div>
               </div>
@@ -158,6 +160,29 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
           ) : (
             /* Signed In User: Full Persistent Referral Code and Stats Panel */
             <>
+              {/* Active Referral Platinum Countdown Banner */}
+              {isReferralPlatinumActive && (
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-fuchsia-950/80 via-purple-950/80 to-indigo-950/80 border border-fuchsia-400/40 text-white flex items-center justify-between gap-3 shadow-md">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-fuchsia-500/20 text-fuchsia-300 flex items-center justify-center shrink-0 border border-fuchsia-400/30">
+                      <Crown className="w-4 h-4 fill-amber-300 text-amber-300 animate-pulse" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold text-fuchsia-200 flex items-center gap-1.5">
+                        <span>Active 1-Month Free Platinum</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                      </p>
+                      <p className="text-sm sm:text-base font-black font-mono text-amber-300 tracking-tight">
+                        ⏳ {referralTimeLeftText}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] uppercase font-black bg-fuchsia-500/40 text-fuchsia-100 px-2.5 py-1 rounded-full border border-fuchsia-300/40 shrink-0">
+                    Live Clock
+                  </span>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/60 text-center">
                   <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
@@ -167,7 +192,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                     {referralsCount}
                   </span>
                   <span className="text-[10px] text-purple-600/80 dark:text-purple-400/80 font-medium">
-                    Active connections
+                    Verified signups
                   </span>
                 </div>
 
@@ -179,7 +204,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                     {referralCreditsMonths} mo
                   </span>
                   <span className="text-[10px] text-amber-700 dark:text-amber-300 font-bold">
-                    Auto-applied to billing
+                    Platinum credited
                   </span>
                 </div>
               </div>
@@ -239,19 +264,19 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                   <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     1
                   </span>
-                  <span>Send your link or packing list to a friend traveling with you.</span>
+                  <span>Send your link or packing list to friends traveling with you.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     2
                   </span>
-                  <span>They receive a free month of Silver ($1.99 value) automatically when they start.</span>
+                  <span><strong>Mandatory Account Creation:</strong> When they create a free account and sign in, their 1 Free Month of Platinum is immediately applied.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     3
                   </span>
-                  <span>When they continue or upgrade, you get a 1-month credit applied automatically to your next invoice.</span>
+                  <span>You automatically receive 1 Month of Free Platinum per signup, tracked with an accurate live countdown until the month ends and is removed.</span>
                 </div>
               </div>
 
