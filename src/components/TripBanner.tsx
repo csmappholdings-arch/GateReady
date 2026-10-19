@@ -139,11 +139,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     return null;
   }
 
-  const isCar = currentTrip.travelType === 'CAR' || (Boolean(currentTrip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(currentTrip.seatClassOrCarSize || ''));
-  const isTrain = currentTrip.travelType === 'TRAIN' || (Boolean(currentTrip.seatClassOrCarSize) && /train|rail|coach/i.test(currentTrip.seatClassOrCarSize || ''));
-  const isCruise = currentTrip.travelType === 'CRUISE' || (Boolean(currentTrip.seatClassOrCarSize) && /cruise|stateroom|ship|cabin|porthole/i.test(currentTrip.seatClassOrCarSize || ''));
-  const isBus = currentTrip.travelType === 'BUS' || (Boolean(currentTrip.seatClassOrCarSize) && /bus/i.test(currentTrip.seatClassOrCarSize || ''));
-  const isFlight = (currentTrip.travelType === 'PLANE' || !currentTrip.travelType) && !isCar && !isTrain && !isCruise && !isBus;
+  const isFlight = (currentTrip.travelType === 'PLANE' || !currentTrip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(currentTrip.travelType || '');
+  const isCar = !isFlight && (currentTrip.travelType === 'CAR' || (Boolean(currentTrip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(currentTrip.seatClassOrCarSize || '')));
+  const isTrain = !isFlight && (currentTrip.travelType === 'TRAIN' || (Boolean(currentTrip.seatClassOrCarSize) && /train|rail/i.test(currentTrip.seatClassOrCarSize || '')));
+  const isCruise = !isFlight && (currentTrip.travelType === 'CRUISE' || (Boolean(currentTrip.seatClassOrCarSize) && /cruise|stateroom|ship|porthole/i.test(currentTrip.seatClassOrCarSize || '')));
+  const isBus = !isFlight && (currentTrip.travelType === 'BUS' || (Boolean(currentTrip.seatClassOrCarSize) && /bus/i.test(currentTrip.seatClassOrCarSize || '')));
 
   // Active Trip Banner with full location, carrier, and level of seat details!
   return (
@@ -612,7 +612,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  isTrain ? 'Rail Operator' :
                  isCruise ? 'Cruise Line / Ship' :
                  isBus ? 'Bus Operator' :
-                 'Airline / Carrier'}
+                 'Airline'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
                 {currentTrip.companyName || (isCar ? 'Personal / Rental Vehicle' : 'Carrier Unspecified')}
@@ -638,7 +638,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  isCruise ? 'Stateroom / Cabin' :
                  isTrain ? 'Class of Service' :
                  isBus ? 'Seat Type' :
-                 'Level of Seat / Class'}
+                 'Cabin'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
                 {currentTrip.seatClassOrCarSize || (isCar ? 'Mid-Size SUV / Car' : 'Standard Main Cabin')}

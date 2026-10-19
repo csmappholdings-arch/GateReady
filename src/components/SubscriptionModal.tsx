@@ -158,6 +158,41 @@ export const SubscriptionModal: React.FC = () => {
             </div>
           )}
 
+          {/* Fix 7: 7-Day Platinum Trial Explanation */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-purple-950/40 border border-purple-200 dark:border-purple-800/80 shadow-xs">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start gap-3 w-full">
+                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5 sm:mt-0">
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                      7-Day Full Platinum Trial
+                    </h4>
+                    <span className="text-[10px] font-bold bg-amber-400 text-purple-950 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Free Account Bonus
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2.5 text-xs text-slate-600 dark:text-slate-300">
+                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
+                      <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">What it includes:</span>
+                      Full access to all Platinum features — unlimited bags, multiple travelers, offline terminal maps, privacy QR luggage tags, and PDF exports.
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
+                      <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">How it activates:</span>
+                      Activates automatically when you create a free GateReady account. No credit card or payment method required upfront.
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
+                      <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">What happens at day 7:</span>
+                      When the 7 days end, your account automatically returns to the Free plan. No surprise charges, and your lists stay saved.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* 4-Column Grid: Free / Silver / Gold / Platinum */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-stretch">
             {/* COLUMN 1: FREE */}
@@ -443,11 +478,16 @@ export const SubscriptionModal: React.FC = () => {
                   <span className="text-xs font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
                     Platinum
                   </span>
-                  {selectedCycle === 'yearly' && (
-                    <span className="text-[9px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
-                      Save 33%
+                  <div className="flex items-center gap-1">
+                    {selectedCycle === 'yearly' && (
+                      <span className="text-[9px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
+                        Save 33%
+                      </span>
+                    )}
+                    <span className="text-[9px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60 px-1.5 py-0.2 rounded-full">
+                      7-day trial
                     </span>
-                  )}
+                  </div>
                 </div>
 
                 <div className="mb-3">

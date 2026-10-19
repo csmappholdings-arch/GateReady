@@ -426,6 +426,22 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                 <p className="text-[11px] text-purple-200/80 leading-relaxed">
                   🔒 You'll only receive your packing list and occasional product updates. Unsubscribe anytime with 1 click.
                 </p>
+
+                {/* Fix 2: Bridge to account creation beneath form */}
+                {!user && (
+                  <div className="pt-2 mt-2 border-t border-purple-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white/10 p-3 rounded-xl">
+                    <span className="text-xs text-purple-100 font-medium">
+                      Want your lists on all your devices too? Create a free account — we'll use this email.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowAccountModal(true)}
+                      className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-purple-100 active:scale-95 text-purple-950 font-black text-xs transition-all cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
+                    >
+                      Create Free Account
+                    </button>
+                  </div>
+                )}
               </form>
             ) : (
               <div className="max-w-xl space-y-2 py-1">
@@ -434,18 +450,18 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                   <span>Your list is on its way to {emailInput}!</span>
                 </div>
 
-                {/* Item 6: Follow-up bridge to account creation */}
+                {/* Fix 2: Bridge to account creation on submit */}
                 {!user && (
                   <div className="p-3 rounded-xl bg-white/10 border border-white/15 text-xs text-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                     <span className="font-medium">
-                      Want this list on all your devices? Create a free account and we&apos;ll move it over.
+                      Want your lists on all your devices too? Create a free account — we'll use this email.
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowAccountModal(true)}
-                      className="px-3.5 py-1.5 rounded-lg bg-white text-purple-900 font-black text-xs hover:bg-purple-100 transition-colors cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
+                      className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-purple-100 text-purple-900 font-black text-xs transition-colors cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
                     >
-                      Create a free account
+                      Create Free Account
                     </button>
                   </div>
                 )}

@@ -56,8 +56,12 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
   };
 
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
-  const [dateInput, setDateInput] = useState(trip.departureDate || new Date().toISOString().split('T')[0]);
+  const [dateInput, setDateInput] = useState(trip.departureDate || '');
   const [timeInput, setTimeInput] = useState(trip.departureTime || '09:00');
+
+  useEffect(() => {
+    setDateInput(trip.departureDate || '');
+  }, [trip.departureDate]);
   
   // Custom reminder modal state
   const [showAddReminderModal, setShowAddReminderModal] = useState(false);
@@ -292,7 +296,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                 <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 Time Until Travel
               </span>
-              {timeLeft.isPast && (
+              {timeLeft.isPast && trip.departureDate && (
                 <span className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
                   Travel Day Arrived!
                 </span>
@@ -300,7 +304,25 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
             </div>
 
             {/* Countdown Digital Gauge */}
-            {timeLeft.isPast ? (
+            {!trip.departureDate ? (
+              <div className="p-5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-850 text-center space-y-2">
+                <Calendar className="w-7 h-7 text-amber-600 dark:text-amber-400 mx-auto" />
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Set your departure date to start the countdown
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Pick your travel date to track takeoff and receive day-of alerts.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingSchedule(true)}
+                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Set Departure Date</span>
+                </button>
+              </div>
+            ) : timeLeft.isPast ? (
               <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center space-y-2">
                 <Sparkles className="w-7 h-7 text-emerald-600 mx-auto animate-bounce" />
                 <h4 className="text-base font-black text-emerald-900 dark:text-emerald-200">

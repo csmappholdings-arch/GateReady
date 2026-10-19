@@ -89,11 +89,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
   const hasRealDestination = Boolean(rawCity && rawCity.length > 1);
   const city = hasRealDestination ? rawCity! : '';
 
-  const isCar = trip.travelType === 'CAR' || (Boolean(trip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(trip.seatClassOrCarSize || ''));
-  const isTrain = trip.travelType === 'TRAIN' || (Boolean(trip.seatClassOrCarSize) && /train|rail|coach/i.test(trip.seatClassOrCarSize || ''));
-  const isCruise = trip.travelType === 'CRUISE' || (Boolean(trip.seatClassOrCarSize) && /cruise|stateroom|ship|cabin|porthole/i.test(trip.seatClassOrCarSize || ''));
-  const isBus = trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || ''));
-  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !isCar && !isTrain && !isCruise && !isBus;
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
+  const isCar = !isFlight && (trip.travelType === 'CAR' || (Boolean(trip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(trip.seatClassOrCarSize || '')));
+  const isTrain = !isFlight && (trip.travelType === 'TRAIN' || (Boolean(trip.seatClassOrCarSize) && /train|rail/i.test(trip.seatClassOrCarSize || '')));
+  const isCruise = !isFlight && (trip.travelType === 'CRUISE' || (Boolean(trip.seatClassOrCarSize) && /cruise|stateroom|ship|porthole/i.test(trip.seatClassOrCarSize || '')));
+  const isBus = !isFlight && (trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || '')));
 
   const [intelSubTab, setIntelSubTab] = useState<'PREP' | 'MAPS'>(initialSubTab || 'PREP');
   const [destinationInput, setDestinationInput] = useState(trip.destinationCity || '');

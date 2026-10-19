@@ -32,11 +32,11 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
   const [activeLeg, setActiveLeg] = useState<'departure' | 'return'>('departure');
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
-  const isCar = trip.travelType === 'CAR' || (Boolean(trip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(trip.seatClassOrCarSize || ''));
-  const isTrain = trip.travelType === 'TRAIN' || (Boolean(trip.seatClassOrCarSize) && /train|rail|coach/i.test(trip.seatClassOrCarSize || ''));
-  const isCruise = trip.travelType === 'CRUISE' || (Boolean(trip.seatClassOrCarSize) && /cruise|stateroom|ship|cabin|porthole/i.test(trip.seatClassOrCarSize || ''));
-  const isBus = trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || ''));
-  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !isCar && !isTrain && !isCruise && !isBus;
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
+  const isCar = !isFlight && (trip.travelType === 'CAR' || (Boolean(trip.seatClassOrCarSize) && /car|suv|sedan|truck|van|overland/i.test(trip.seatClassOrCarSize || '')));
+  const isTrain = !isFlight && (trip.travelType === 'TRAIN' || (Boolean(trip.seatClassOrCarSize) && /train|rail/i.test(trip.seatClassOrCarSize || '')));
+  const isCruise = !isFlight && (trip.travelType === 'CRUISE' || (Boolean(trip.seatClassOrCarSize) && /cruise|stateroom|ship|porthole/i.test(trip.seatClassOrCarSize || '')));
+  const isBus = !isFlight && (trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || '')));
 
   // Auto-switch to Return countdown for Pro users if departure date/time has already passed
   useEffect(() => {
@@ -174,20 +174,28 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
       <div className="p-3 sm:p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Left: Digital Clock Blocks or Empty State */}
         {!hasTargetDate || !countdown.isValid ? (
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-300/30 flex items-center justify-center shrink-0">
-              <Calendar className="w-5 h-5 text-amber-300" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-300/30 flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-amber-300" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-bold text-white">
+                  Set your departure date to start the countdown
+                </p>
+                <p className="text-[11px] text-purple-200/80 mt-0.5">
+                  Pick your travel date to track {isFlight ? 'takeoff' : 'departure'} and start the live countdown clock.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-white">
-                {activeLeg === 'departure' 
-                  ? 'No departure date scheduled' 
-                  : (isFlight ? 'No return flight date scheduled' : 'No return leg date scheduled')}
-              </p>
-              <p className="text-[11px] text-purple-200/80 mt-0.5">
-                Set your {activeLeg === 'departure' ? 'departure' : 'return'} schedule to start the live countdown clock.
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={onOpenEditSchedule}
+              className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 shadow-sm self-start sm:self-auto"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Set Departure Date</span>
+            </button>
           </div>
         ) : countdown.isPast ? (
           <div className="flex items-center gap-2.5">

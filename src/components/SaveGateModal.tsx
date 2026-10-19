@@ -74,7 +74,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
           </span>
 
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
-            Don't lose this packing list
+            Keep this list forever?
           </h2>
         </div>
 
@@ -91,7 +91,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
                   {trip.name || 'My Upcoming Trip'}
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  {totalBags} {totalBags === 1 ? 'bag' : 'bags'} · {packedItems} of {totalItems} items packed
+                  {totalBags} {totalBags === 1 ? 'bag' : 'bags'} · {totalItems} {totalItems === 1 ? 'item' : 'items'}
                 </p>
               </div>
 
@@ -103,13 +103,13 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
 
           {/* Benefit-led body text */}
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            Right now your list lives in this browser only — clear your data or switch phones and it's gone. Create a free account and it's yours forever, on every device.
+            This list currently lives only in this browser. Clear your site data or switch devices and it's gone. Create a free account to keep it safe and synced.
           </p>
 
           <div className="grid grid-cols-2 gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-300 pt-1">
             <div className="flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-              <span>Sync across all phones</span>
+              <span>Sync across your devices</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Cloud className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
@@ -124,7 +124,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
               onClick={onSave}
               className="w-full h-11 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-md shadow-purple-600/30 active:scale-98 transition-all cursor-pointer"
             >
-              <span>Create free account</span>
+              <span>Create Free Account</span>
               <Sparkles className="w-4 h-4 text-amber-300" />
             </button>
 
@@ -133,7 +133,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
               onClick={onDismiss}
               className="w-full h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
-              Maybe later
+              Keep editing
             </button>
           </div>
         </div>

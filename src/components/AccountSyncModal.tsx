@@ -219,7 +219,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
             {mode === 'forgot' && 'Reset Your Password'}
           </h2>
           <p className="text-[11px] text-purple-100/90 mt-0.5 pr-6">
-            Access your packing checklists, luggage tags, and loyalty rewards on all devices. Upgrade anytime for shared family sync & multiple travelers.
+            Access your packing checklists, luggage tags, and loyalty rewards on your own devices. Upgrade anytime for shared family sync & multiple travelers.
           </p>
         </div>
 
@@ -406,6 +406,11 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
                   className="w-full h-10 pl-9 pr-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                 />
               </div>
+              {mode === 'signup' && (
+                <p className="text-[11px] text-purple-600 dark:text-purple-400 mt-1 font-medium">
+                  We'll send a verification link to confirm your email.
+                </p>
+              )}
             </div>
 
             {mode !== 'forgot' && (

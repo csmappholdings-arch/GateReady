@@ -91,78 +91,43 @@ function PackingAppContent() {
     } catch {}
   }, []);
 
-  // Feature 1: Trigger Save Gate when anonymous user finishes building a trip (trip created with at least 1 bag with at least 1 packed item)
+  // Fix 1: Trigger Save Gate when anonymous user adds their FIRST item to their FIRST trip via the organic builder (once per browser — never nag)
   useEffect(() => {
-    // Never show to users who already have an account
     if (user) {
       setShowSaveGateModal(false);
       return;
     }
 
-    // Must have a trip with at least one bag containing at least one packed item
-    const hasTripWithPackedItem = Boolean(
-      currentTrip &&
-      currentTrip.bags &&
-      currentTrip.bags.length > 0 &&
-      currentTrip.bags.some((b) => b.items && b.items.some((i) => i.isPacked))
-    );
+    const ORGANIC_GATE_DISMISSED_KEY = 'gateready_organic_save_gate_dismissed';
 
-    if (!hasTripWithPackedItem) return;
+    const handleOrganicItemAdded = () => {
+      if (user) return;
+      try {
+        if (localStorage.getItem(ORGANIC_GATE_DISMISSED_KEY) === 'true') {
+          return;
+        }
+        setShowSaveGateModal(true);
+      } catch {}
+    };
 
-    // Do not show again in that browser session if already dismissed
-    const SESSION_DISMISSED_KEY = 'gateready_save_gate_session_dismissed';
-    try {
-      if (sessionStorage.getItem(SESSION_DISMISSED_KEY) === 'true') {
-        return;
-      }
-    } catch {}
-
-    const DISMISSED_COUNT_KEY = 'gateready_save_gate_dismissed_count';
-    const VISIT_COUNT_KEY = 'gateready_visit_count';
-    const VISIT_3_SHOWN_KEY = 'gateready_save_gate_visit_3_shown';
-
-    let dismissedCount = 0;
-    let visitCount = 1;
-    let visit3Shown = false;
-
-    try {
-      dismissedCount = parseInt(localStorage.getItem(DISMISSED_COUNT_KEY) || '0', 10);
-      visitCount = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '1', 10);
-      visit3Shown = localStorage.getItem(VISIT_3_SHOWN_KEY) === 'true';
-    } catch {}
-
-    // First time an anonymous visitor finishes building a trip: show one-time dialog
-    if (dismissedCount === 0) {
-      setShowSaveGateModal(true);
-      return;
-    }
-
-    // Also show it on their 3rd separate visit if they dismissed it and still have no account
-    if (dismissedCount === 1 && visitCount >= 3 && !visit3Shown) {
-      setShowSaveGateModal(true);
-      return;
-    }
-
-    // After that, stop asking and rely on the header button
-  }, [user, currentTrip]);
+    window.addEventListener('gateready:organic-item-added', handleOrganicItemAdded);
+    return () => {
+      window.removeEventListener('gateready:organic-item-added', handleOrganicItemAdded);
+    };
+  }, [user]);
 
   const handleDismissSaveGate = () => {
     setShowSaveGateModal(false);
     try {
+      localStorage.setItem('gateready_organic_save_gate_dismissed', 'true');
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
-      const DISMISSED_COUNT_KEY = 'gateready_save_gate_dismissed_count';
-      const current = parseInt(localStorage.getItem(DISMISSED_COUNT_KEY) || '0', 10);
-      localStorage.setItem(DISMISSED_COUNT_KEY, String(current + 1));
-      const visitCount = parseInt(localStorage.getItem('gateready_visit_count') || '1', 10);
-      if (visitCount >= 3) {
-        localStorage.setItem('gateready_save_gate_visit_3_shown', 'true');
-      }
     } catch {}
   };
 
   const handleSaveFromSaveGate = () => {
     setShowSaveGateModal(false);
     try {
+      localStorage.setItem('gateready_organic_save_gate_dismissed', 'true');
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
     } catch {}
     setAccountModalOrigin('save_gate');

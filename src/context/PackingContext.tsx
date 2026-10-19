@@ -433,9 +433,9 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ? type
       : /car|suv|sedan|truck|van|overland/i.test(seatOrSize || '')
         ? 'CAR'
-        : /train|rail|coach/i.test(seatOrSize || '')
+        : /train|rail/i.test(seatOrSize || '')
           ? 'TRAIN'
-          : /cruise|stateroom|ship|cabin|porthole/i.test(seatOrSize || '')
+          : /cruise|stateroom|ship|porthole/i.test(seatOrSize || '')
             ? 'CRUISE'
             : /bus/i.test(seatOrSize || '')
               ? 'BUS'
@@ -451,10 +451,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       destinationCity: extraDetails?.destinationCity?.trim() || '',
       destinationCountry: extraDetails?.destinationCountry?.trim() || '',
       aircraftType: extraDetails?.aircraftType?.trim() || '',
-      departureDate: extraDetails?.departureDate || new Date().toISOString().split('T')[0],
-      departureTime: extraDetails?.departureTime || '09:00',
-      returnTripDate: extraDetails?.returnTripDate || '',
-      returnTripTime: extraDetails?.returnTripTime || '',
+      departureDate: extraDetails?.departureDate?.trim() || '',
+      departureTime: extraDetails?.departureTime?.trim() || '',
+      returnTripDate: extraDetails?.returnTripDate?.trim() || '',
+      returnTripTime: extraDetails?.returnTripTime?.trim() || '',
       departureCountdownEnabled: true,
       departureReminders: getDefaultDepartureReminders(),
       familyMembers: resolvedFamily,
@@ -611,6 +611,16 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
 
     if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+
+    // Fix 1: Fire save gate event on FIRST item added via organic builder
+    if (typeof window !== 'undefined' && !tripId.startsWith('trip-demo-')) {
+      try {
+        const isDismissed = localStorage.getItem('gateready_organic_save_gate_dismissed') === 'true';
+        if (!isDismissed) {
+          window.dispatchEvent(new CustomEvent('gateready:organic-item-added', { detail: { tripId } }));
+        }
+      } catch {}
+    }
   };
 
   const toggleItemPacked = (tripId: string, bagId: string, itemId: string) => {
