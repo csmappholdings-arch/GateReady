@@ -91,35 +91,56 @@ function PackingAppContent() {
     } catch {}
   }, []);
 
-  // Fix 1: Trigger Save Gate when anonymous user adds their FIRST item to their FIRST trip via the organic builder (once per browser — never nag)
+  const totalBags = currentTrip?.bags.length ?? 0;
+  const totalItems = currentTrip?.bags.reduce((acc, b) => acc + b.items.length, 0) ?? 0;
+  const packedItems = currentTrip?.bags.reduce((acc, b) => acc + b.items.filter((i) => i.isPacked).length, 0) ?? 0;
+  const isAllPacked = totalItems > 0 && packedItems === totalItems;
+
+  // Cleanup legacy localStorage key so it never permanently blocks session save gate
+  useEffect(() => {
+    try {
+      localStorage.removeItem('gateready_organic_save_gate_dismissed');
+    } catch {}
+  }, []);
+
+  // Fix 1: Trigger Save Gate once per session when anonymous user builds a real list (e.g. 3rd item added)
   useEffect(() => {
     if (user) {
       setShowSaveGateModal(false);
       return;
     }
 
-    const ORGANIC_GATE_DISMISSED_KEY = 'gateready_organic_save_gate_dismissed';
+    if (!currentTrip || currentTrip.id.startsWith('trip-demo-')) {
+      return;
+    }
 
-    const handleOrganicItemAdded = () => {
-      if (user) return;
-      try {
-        if (localStorage.getItem(ORGANIC_GATE_DISMISSED_KEY) === 'true') {
-          return;
+    const isSessionDismissed = 
+      sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
+      sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
+
+    if (isSessionDismissed) {
+      return;
+    }
+
+    // Trigger during normal list-building after user has built a real list (3 or more items added)
+    if (totalItems >= 3) {
+      const timer = setTimeout(() => {
+        const stillDismissed = 
+          sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
+          sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
+        if (!stillDismissed && !user) {
+          setShowSaveGateModal(true);
         }
-        setShowSaveGateModal(true);
-      } catch {}
-    };
+      }, 350);
 
-    window.addEventListener('gateready:organic-item-added', handleOrganicItemAdded);
-    return () => {
-      window.removeEventListener('gateready:organic-item-added', handleOrganicItemAdded);
-    };
-  }, [user]);
+      return () => clearTimeout(timer);
+    }
+  }, [user, currentTrip?.id, totalItems]);
 
   const handleDismissSaveGate = () => {
     setShowSaveGateModal(false);
     try {
-      localStorage.setItem('gateready_organic_save_gate_dismissed', 'true');
+      sessionStorage.setItem('gateready_save_gate_session_shown', 'true');
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
     } catch {}
   };
@@ -127,7 +148,7 @@ function PackingAppContent() {
   const handleSaveFromSaveGate = () => {
     setShowSaveGateModal(false);
     try {
-      localStorage.setItem('gateready_organic_save_gate_dismissed', 'true');
+      sessionStorage.setItem('gateready_save_gate_session_shown', 'true');
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
     } catch {}
     setAccountModalOrigin('save_gate');
@@ -154,11 +175,6 @@ function PackingAppContent() {
   };
 
   const currentBag = currentTrip?.bags.find((b) => b.id === (targetBagId || selectedBagId)) || currentTrip?.bags[0];
-
-  const totalBags = currentTrip?.bags.length ?? 0;
-  const totalItems = currentTrip?.bags.reduce((acc, b) => acc + b.items.length, 0) ?? 0;
-  const packedItems = currentTrip?.bags.reduce((acc, b) => acc + b.items.filter((i) => i.isPacked).length, 0) ?? 0;
-  const isAllPacked = totalItems > 0 && packedItems === totalItems;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">

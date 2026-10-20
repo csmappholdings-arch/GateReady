@@ -41,7 +41,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[99998] overflow-y-auto p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 flex items-center justify-center min-h-screen cursor-pointer"
+      className="fixed inset-0 z-[100005] overflow-y-auto p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 flex items-center justify-center min-h-screen cursor-pointer"
       style={{ margin: 0 }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -50,7 +50,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
       }}
     >
       <div
-        className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl border border-purple-200 dark:border-purple-800 shadow-2xl overflow-hidden flex flex-col relative z-[99999] cursor-default animate-in zoom-in-95 duration-150"
+        className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl border border-purple-200 dark:border-purple-800 shadow-2xl overflow-hidden flex flex-col relative z-[100006] cursor-default animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Protection Shield */}

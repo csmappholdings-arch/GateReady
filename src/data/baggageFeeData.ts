@@ -815,7 +815,7 @@ export function calculateTripBaggageFees(
 
   const totalFormatted = totalFee === 0 
     ? `${feeRecord.currencySymbol}0` 
-    : `${feeRecord.currencySymbol}${totalFee} ${feeRecord.currency}`;
+    : `${feeRecord.currencySymbol}${totalFee}`;
 
   const disclaimer = `Estimate from published airline fee tables, last verified ${feeRecord.lastVerified}. Airlines change fees — confirm at booking.`;
 

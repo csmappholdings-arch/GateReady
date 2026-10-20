@@ -184,7 +184,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
                   Set your departure date to start the countdown
                 </p>
                 <p className="text-[11px] text-purple-200/80 mt-0.5">
-                  Pick your travel date to track {isFlight ? 'takeoff' : 'departure'} and start the live countdown clock.
+                  Pick your travel date to track takeoff and start the live countdown clock.
                 </p>
               </div>
             </div>
@@ -293,16 +293,18 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
           </div>
         )}
 
-        {/* Right: Quick Action to Edit Schedule */}
-        <div className="flex items-center gap-2 self-start md:self-center shrink-0">
-          <button
-            type="button"
-            onClick={onOpenEditSchedule}
-            className="h-9 px-3.5 rounded-xl border border-purple-400/40 bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-          >
-            <span>{hasTargetDate ? 'Edit Schedule' : 'Set Departure Date'}</span>
-          </button>
-        </div>
+        {/* Right: Quick Action to Edit Schedule (Only when departure date is configured) */}
+        {hasTargetDate && countdown.isValid && (
+          <div className="flex items-center gap-2 self-start md:self-center shrink-0">
+            <button
+              type="button"
+              onClick={onOpenEditSchedule}
+              className="h-9 px-3.5 rounded-xl border border-purple-400/40 bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            >
+              <span>Edit Schedule</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

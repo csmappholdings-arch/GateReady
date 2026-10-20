@@ -28,8 +28,21 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
   onOpenEditDestination,
   className = ''
 }) => {
-  // Canadian-first default per brand guidelines
-  const [nationality, setNationality] = useState<PassportNationality>('CA');
+  // Canadian-first default per brand guidelines, persisted in localStorage across edits & re-renders
+  const [nationality, setNationalityState] = useState<PassportNationality>(() => {
+    try {
+      const saved = localStorage.getItem('gateready_selected_passport_nationality');
+      if (saved === 'US' || saved === 'CA') return saved;
+    } catch {}
+    return 'CA';
+  });
+
+  const setNationality = (newNat: PassportNationality) => {
+    setNationalityState(newNat);
+    try {
+      localStorage.setItem('gateready_selected_passport_nationality', newNat);
+    } catch {}
+  };
 
   const destinationCity = trip.destinationCity?.trim() || '';
   const destinationCountry = trip.destinationCountry?.trim() || '';

@@ -612,13 +612,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
 
-    // Fix 1: Fire save gate event on FIRST item added via organic builder
+    // Fix 1: Fire save gate event on item added via organic builder
     if (typeof window !== 'undefined' && !tripId.startsWith('trip-demo-')) {
       try {
-        const isDismissed = localStorage.getItem('gateready_organic_save_gate_dismissed') === 'true';
-        if (!isDismissed) {
-          window.dispatchEvent(new CustomEvent('gateready:organic-item-added', { detail: { tripId } }));
-        }
+        window.dispatchEvent(new CustomEvent('gateready:organic-item-added', { detail: { tripId } }));
       } catch {}
     }
   };

@@ -159,7 +159,7 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
                   {feeResult.totalEstimatedFeeFormatted}
                 </span>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                  estimated total {trip.bags.length} {trip.bags.length === 1 ? 'bag' : 'bags'}
+                  estimated total · {trip.bags.length} {trip.bags.length === 1 ? 'bag' : 'bags'}
                 </span>
               </div>
 
