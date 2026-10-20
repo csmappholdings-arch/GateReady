@@ -37,6 +37,8 @@ import { PackingPresetsModal } from './PackingPresetsModal';
 import { TarePresetsModal } from './TarePresetsModal';
 import { AddItemDialog } from './AddItemDialog';
 import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
+import { EntryRequirementsCard } from './EntryRequirementsCard';
+import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { SharePackingListModal } from './SharePackingListModal';
 
@@ -444,6 +446,12 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
       {/* Destination Weather & Clothing Advisor (Quick Access on Packing Screen) */}
       <DestinationWeatherAdvisor trip={trip} />
+
+      {/* Feature 2: Entry Requirements (Passport validity + Visa rules, CA/US) */}
+      <EntryRequirementsCard trip={trip} />
+
+      {/* Feature 1: Baggage Fee Estimator (Airline Bag Fees & Overweight Calculator) */}
+      <BaggageFeeEstimatorCard trip={trip} />
 
       {/* Airline Overweight Risk Radar & Bag Rebalancer Banner */}
       {overweightRiskBag && (

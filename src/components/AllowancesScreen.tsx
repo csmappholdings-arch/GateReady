@@ -18,6 +18,8 @@ import {
   Pill
 } from 'lucide-react';
 
+import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
+
 interface AllowancesScreenProps {
   trip: Trip;
 }
@@ -168,6 +170,11 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
               {trip.seatClassOrCarSize}
             </span>
           )}
+        </div>
+        
+        {/* Feature 1: Baggage Fee Estimator for configured bags & carrier */}
+        <div className="mt-4">
+          <BaggageFeeEstimatorCard trip={trip} />
         </div>
 
         {/* Matched Carrier Direct Highlight */}

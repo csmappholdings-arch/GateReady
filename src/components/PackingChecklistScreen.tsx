@@ -41,6 +41,7 @@ import {
 import { PackingPresetsModal } from './PackingPresetsModal';
 import { RouteIntelBanner } from './RouteIntelBanner';
 import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
+import { EntryRequirementsCard } from './EntryRequirementsCard';
 import { LuggageQrTagModal } from './LuggageQrTagModal';
 
 interface PackingChecklistScreenProps {
@@ -809,6 +810,9 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
 
         {/* Destination Weather & Clothing Packing Advisor */}
         <DestinationWeatherAdvisor trip={trip} />
+
+        {/* Feature 2: Entry Requirements (Passport validity + Visa rules, CA/US) */}
+        <EntryRequirementsCard trip={trip} />
 
         {/* Interactive Live Departure Countdown & Smart Reminders (Pro exclusive) */}
         <DepartureCountdownCard trip={trip} />
