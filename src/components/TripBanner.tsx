@@ -31,6 +31,7 @@ import {
 import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
 import { TripCountdownBanner } from './TripCountdownBanner';
+import { DatePickerInput } from './DatePickerInput';
 
 interface TripBannerProps {
   currentTrip: Trip | null;
@@ -49,6 +50,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
   const [browserNoticeDismissed, setBrowserNoticeDismissed] = useState(() => {
     try {
       return localStorage.getItem('gateready_browser_only_notice_dismissed') === 'true';
@@ -57,18 +59,36 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     }
   });
 
-  // Edit fields
-  const [editName, setEditName] = useState('');
-  const [editCarrier, setEditCarrier] = useState('');
-  const [editSeatClass, setEditSeatClass] = useState('');
-  const [editTravelType, setEditTravelType] = useState<TravelType>('PLANE');
-  const [editOriginCity, setEditOriginCity] = useState('');
-  const [editDestinationCity, setEditDestinationCity] = useState('');
-  const [editDate, setEditDate] = useState('');
-  const [editTime, setEditTime] = useState('');
-  const [editReturnDate, setEditReturnDate] = useState('');
-  const [editReturnTime, setEditReturnTime] = useState('');
-  const [editAircraft, setEditAircraft] = useState('');
+  // Edit fields - initialized with currentTrip values
+  const [editName, setEditName] = useState(currentTrip?.name || '');
+  const [editCarrier, setEditCarrier] = useState(currentTrip?.companyName || '');
+  const [editSeatClass, setEditSeatClass] = useState(currentTrip?.seatClassOrCarSize || '');
+  const [editTravelType, setEditTravelType] = useState<TravelType>(currentTrip?.travelType || 'PLANE');
+  const [editOriginCity, setEditOriginCity] = useState(currentTrip?.originCity || '');
+  const [editDestinationCity, setEditDestinationCity] = useState(currentTrip?.destinationCity || '');
+  const [editDate, setEditDate] = useState(currentTrip?.departureDate || '');
+  const [editTime, setEditTime] = useState(currentTrip?.departureTime || '');
+  const [editReturnDate, setEditReturnDate] = useState(currentTrip?.returnTripDate || '');
+  const [editReturnTime, setEditReturnTime] = useState(currentTrip?.returnTripTime || '');
+  const [editAircraft, setEditAircraft] = useState(currentTrip?.aircraftType || '');
+
+  // Keep edit fields prefilled whenever isEditing opens or currentTrip updates
+  useEffect(() => {
+    if (currentTrip && isEditing) {
+      setEditName(currentTrip.name || '');
+      setEditCarrier(currentTrip.companyName || '');
+      setEditSeatClass(currentTrip.seatClassOrCarSize || '');
+      setEditTravelType(currentTrip.travelType || 'PLANE');
+      setEditOriginCity(currentTrip.originCity || '');
+      setEditDestinationCity(currentTrip.destinationCity || '');
+      setEditDate(currentTrip.departureDate || '');
+      setEditTime(currentTrip.departureTime || '');
+      setEditReturnDate(currentTrip.returnTripDate || '');
+      setEditReturnTime(currentTrip.returnTripTime || '');
+      setEditAircraft(currentTrip.aircraftType || '');
+      setEditError(null);
+    }
+  }, [currentTrip, isEditing]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -112,25 +132,43 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     setEditReturnDate(currentTrip.returnTripDate || '');
     setEditReturnTime(currentTrip.returnTripTime || '');
     setEditAircraft(currentTrip.aircraftType || '');
+    setEditError(null);
     setIsEditing(true);
   };
 
   const handleSaveEdit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentTrip) return;
+
+    const trimmedName = editName.trim() || currentTrip.name?.trim();
+    if (!trimmedName) {
+      setEditError('Trip name is required.');
+      return;
+    }
+
+    // Safely preserve existing values so we never write empty values over existing trip data
+    const resolvedCarrier = editCarrier.trim() || currentTrip.companyName || '';
+    const resolvedSeatClass = editSeatClass.trim() || currentTrip.seatClassOrCarSize || '';
+    const resolvedOriginCity = editOriginCity.trim() || currentTrip.originCity || '';
+    const resolvedDestinationCity = editDestinationCity.trim() || currentTrip.destinationCity || '';
+    const resolvedAircraft = editAircraft.trim() || currentTrip.aircraftType || '';
+    const resolvedDepartureDate = editDate.trim() || currentTrip.departureDate || '';
+    const resolvedDepartureTime = editTime.trim() || currentTrip.departureTime || '';
+
     updateTripDetails(currentTrip.id, {
-      name: editName,
-      companyName: editCarrier,
-      seatClassOrCarSize: editSeatClass,
+      name: trimmedName,
+      companyName: resolvedCarrier,
+      seatClassOrCarSize: resolvedSeatClass,
       travelType: editTravelType,
-      originCity: editOriginCity,
-      destinationCity: editDestinationCity,
-      departureDate: editDate,
-      departureTime: editTime,
-      returnTripDate: editReturnDate,
-      returnTripTime: editReturnTime,
-      aircraftType: editAircraft
+      originCity: resolvedOriginCity,
+      destinationCity: resolvedDestinationCity,
+      departureDate: resolvedDepartureDate,
+      departureTime: resolvedDepartureTime,
+      returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
+      returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
+      aircraftType: resolvedAircraft
     });
+    setEditError(null);
     setIsEditing(false);
   };
 
@@ -186,7 +224,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         {/* Prominent Trip Countdown Clock Banner Above Trip Info */}
         <TripCountdownBanner
           trip={currentTrip}
-          onOpenEditSchedule={() => setIsEditing(true)}
+          onOpenEditSchedule={handleStartEdit}
         />
 
         {/* Top bar of banner: Trip dropdown selector & edit action */}
@@ -484,11 +522,10 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                   <Calendar className="w-3.5 h-3.5 text-purple-600" />
                   <span>Departure Date</span>
                 </label>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={editDate}
-                  onChange={(e) => setEditDate(e.target.value)}
-                  className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  onChange={(val) => setEditDate(val)}
+                  className="h-10 px-3 text-xs"
                 />
               </div>
 
@@ -530,11 +567,10 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                     </span>
                   </div>
                 ) : (
-                  <input
-                    type="date"
+                  <DatePickerInput
                     value={editReturnDate}
-                    onChange={(e) => setEditReturnDate(e.target.value)}
-                    className="w-full h-10 px-3 text-xs rounded-xl border border-indigo-200 dark:border-indigo-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    onChange={(val) => setEditReturnDate(val)}
+                    className="h-10 px-3 text-xs"
                   />
                 )}
               </div>
@@ -553,6 +589,12 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                 />
               </div>
             </div>
+
+            {editError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-bold">
+                {editError}
+              </div>
+            )}
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-purple-50 dark:border-purple-900/40">
               <button

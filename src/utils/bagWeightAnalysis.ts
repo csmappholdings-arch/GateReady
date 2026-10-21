@@ -36,7 +36,10 @@ export function computeBagWeightStatus(bag: Bag, weightUnit: 'LBS' | 'KG' = 'LBS
   }, 0);
 
   const totalWeightLbs = emptyLbs + itemsLbs;
-  const limitLbs = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
+  const standardCapLbs = bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15;
+  const limitLbs = (!bag.maxWeightLimitLbs || (bag.type !== 'CHECKED' && bag.maxWeightLimitLbs >= 40))
+    ? standardCapLbs
+    : bag.maxWeightLimitLbs;
   const pct = Math.round((totalWeightLbs / limitLbs) * 100);
   const isOverweight = totalWeightLbs > limitLbs;
   const isNearLimit = !isOverweight && totalWeightLbs >= limitLbs * 0.85;

@@ -191,7 +191,11 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   };
 
   const getBagWeightCap = (bag: Bag): number => {
-    const rawLimitLbs = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
+    const standardCapLbs = bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15;
+    let rawLimitLbs = bag.maxWeightLimitLbs;
+    if (!rawLimitLbs || (bag.type !== 'CHECKED' && rawLimitLbs >= 40)) {
+      rawLimitLbs = standardCapLbs;
+    }
     if (weightUnit === 'KG') {
       return Math.round(rawLimitLbs * 0.45359237);
     }

@@ -972,12 +972,19 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ...trip,
           bags: trip.bags.map((b) => {
             if (b.id !== bagId) return b;
+            const newType = updates.type !== undefined ? updates.type : b.type;
+            let resolvedMaxWeight = updates.maxWeightLimitLbs !== undefined ? updates.maxWeightLimitLbs : b.maxWeightLimitLbs;
+            if (updates.type !== undefined && updates.type !== b.type) {
+              if (updates.maxWeightLimitLbs === undefined || (updates.type !== 'CHECKED' && (resolvedMaxWeight ?? 0) >= 40)) {
+                resolvedMaxWeight = updates.type === 'CHECKED' ? 50 : updates.type === 'CARRY_ON' ? 22 : 15;
+              }
+            }
             return {
               ...b,
               ...(updates.label !== undefined ? { label: updates.label.trim() } : {}),
               ...(updates.type !== undefined ? { type: updates.type } : {}),
               ...(updates.assignedTo !== undefined ? { assignedTo: updates.assignedTo } : {}),
-              ...(updates.maxWeightLimitLbs !== undefined ? { maxWeightLimitLbs: updates.maxWeightLimitLbs } : {}),
+              ...(resolvedMaxWeight !== undefined ? { maxWeightLimitLbs: resolvedMaxWeight } : {}),
               ...(updates.material !== undefined ? { material: updates.material } : {}),
               ...(updates.emptyBagWeightLbs !== undefined ? { emptyBagWeightLbs: updates.emptyBagWeightLbs } : {})
             };

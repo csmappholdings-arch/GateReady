@@ -59,9 +59,8 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
     if (!el) return;
 
     const handleNative = () => {
-      if (el.value) {
-        onChange(el.value);
-      }
+      // Must allow empty string so Clear button in native picker works!
+      onChange(el.value || '');
     };
 
     el.addEventListener('input', handleNative);
@@ -72,6 +71,13 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
       el.removeEventListener('change', handleNative);
     };
   }, [onChange]);
+
+  // Sync ref value when value prop changes externally
+  useEffect(() => {
+    if (dateInputRef.current) {
+      dateInputRef.current.value = value || '';
+    }
+  }, [value]);
 
   // Close calendar popup on click outside
   useEffect(() => {
@@ -98,6 +104,19 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
       dateInputRef.current.value = formatted;
     }
     setShowCustomCalendar(false);
+  };
+
+  const handleClearDate = () => {
+    onChange('');
+    if (dateInputRef.current) {
+      dateInputRef.current.value = '';
+    }
+    setShowCustomCalendar(false);
+  };
+
+  const handleTodayDate = () => {
+    const now = new Date();
+    handleApplyDate(now.getFullYear(), now.getMonth(), now.getDate());
   };
 
   // Generate calendar days for viewMonth and viewYear
@@ -198,36 +217,47 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
             </div>
           </div>
 
-          {/* Quick Date Selectors */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-2 mb-2 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold">
+          {/* Quick Date Selectors with Clear and Today */}
+          <div className="flex items-center justify-between gap-1 pb-2 mb-2 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold">
             <button
               type="button"
-              onClick={() => handleQuickAddDays(0)}
-              className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
+              onClick={handleClearDate}
+              className="px-2 py-0.5 rounded-md text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
+              title="Clear date"
             >
-              Today
+              Clear
             </button>
-            <button
-              type="button"
-              onClick={() => handleQuickAddDays(1)}
-              className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
-            >
-              Tomorrow
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickAddDays(7)}
-              className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
-            >
-              +1 Week
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickAddDays(14)}
-              className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
-            >
-              +2 Weeks
-            </button>
+            <div className="flex items-center gap-1 overflow-x-auto">
+              <button
+                type="button"
+                onClick={handleTodayDate}
+                className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-200 transition-colors cursor-pointer shrink-0 font-black"
+                title="Today"
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickAddDays(1)}
+                className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
+              >
+                Tomorrow
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickAddDays(7)}
+                className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
+              >
+                +1 Wk
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickAddDays(14)}
+                className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer shrink-0"
+              >
+                +2 Wks
+              </button>
+            </div>
           </div>
 
           {/* Weekday Labels */}
@@ -270,6 +300,24 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
                 </button>
               );
             })}
+          </div>
+
+          {/* Bottom Clear & Today Quick Action Bar */}
+          <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-purple-100 dark:border-purple-900/60 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={handleClearDate}
+              className="text-slate-500 hover:text-rose-600 transition-colors cursor-pointer px-1 py-0.5"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={handleTodayDate}
+              className="text-purple-600 dark:text-purple-400 font-bold hover:underline transition-colors cursor-pointer px-1 py-0.5"
+            >
+              Today
+            </button>
           </div>
         </div>
       )}

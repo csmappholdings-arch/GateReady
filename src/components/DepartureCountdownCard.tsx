@@ -23,6 +23,7 @@ import {
   Bell,
   RotateCcw
 } from 'lucide-react';
+import { DatePickerInput } from './DatePickerInput';
 
 interface DepartureCountdownCardProps {
   trip: Trip;
@@ -123,10 +124,6 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
   const handleSaveSchedule = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isPro) {
-      openPaywall("Trip Departure Countdown Clock is exclusive to Gate Ready Pro. Upgrade to set custom departure times and receive day-of travel reminders.");
-      return;
-    }
     updateDepartureSchedule(trip.id, dateInput, timeInput, true);
     setIsEditingSchedule(false);
   };
@@ -251,12 +248,10 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
               <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300 mb-1">
                 Departure Date
               </label>
-              <input
-                type="date"
-                required
+              <DatePickerInput
                 value={dateInput}
-                onChange={(e) => setDateInput(e.target.value)}
-                className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                onChange={(val) => setDateInput(val)}
+                className="h-10 px-3 text-xs"
               />
             </div>
 

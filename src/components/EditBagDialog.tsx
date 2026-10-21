@@ -87,7 +87,7 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
     setEmptyBagWeight(displayVal);
   };
 
-  // When changing bag type, adjust material preset default if not overridden
+  // When changing bag type, adjust material preset default and update max weight limit
   const handleSelectType = (newType: BagType) => {
     setType(newType);
     const newLbs = getUserPresetWeightLbs(newType, material);
@@ -95,11 +95,14 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
       ? (newLbs * 0.45359237).toFixed(1)
       : newLbs.toFixed(1);
     setEmptyBagWeight(displayVal);
-    if (!bag?.maxWeightLimitLbs) {
-      setMaxWeight(
-        newType === 'CHECKED' ? (weightUnit === 'KG' ? '23' : '50') : (weightUnit === 'KG' ? '10' : '22')
-      );
-    }
+
+    // Automatically update the max weight limit to the standard cap for the new bag type
+    const defaultWeight = newType === 'CHECKED' 
+      ? (weightUnit === 'KG' ? '23' : '50') 
+      : newType === 'CARRY_ON'
+        ? (weightUnit === 'KG' ? '10' : '22')
+        : (weightUnit === 'KG' ? '7' : '15');
+    setMaxWeight(defaultWeight);
   };
 
   const handleSubmit = (e: React.FormEvent) => {

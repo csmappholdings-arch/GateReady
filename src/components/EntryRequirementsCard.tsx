@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Trip } from '../types/travel';
 import { 
   getEntryRequirements, 
@@ -41,8 +41,32 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
     setNationalityState(newNat);
     try {
       localStorage.setItem('gateready_selected_passport_nationality', newNat);
+      window.dispatchEvent(new CustomEvent('gateready_passport_changed', { detail: newNat }));
     } catch {}
   };
+
+  useEffect(() => {
+    const handlePassportSync = (e: Event) => {
+      const ce = e as CustomEvent<PassportNationality>;
+      if (ce.detail && (ce.detail === 'CA' || ce.detail === 'US')) {
+        setNationalityState(ce.detail);
+      } else {
+        try {
+          const saved = localStorage.getItem('gateready_selected_passport_nationality');
+          if (saved === 'US' || saved === 'CA') {
+            setNationalityState(saved as PassportNationality);
+          }
+        } catch {}
+      }
+    };
+
+    window.addEventListener('gateready_passport_changed', handlePassportSync);
+    window.addEventListener('storage', handlePassportSync);
+    return () => {
+      window.removeEventListener('gateready_passport_changed', handlePassportSync);
+      window.removeEventListener('storage', handlePassportSync);
+    };
+  }, []);
 
   const destinationCity = trip.destinationCity?.trim() || '';
   const destinationCountry = trip.destinationCountry?.trim() || '';
@@ -53,6 +77,22 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
   const entryData: ResolvedEntryRequirement = useMemo(() => {
     return getEntryRequirements(destinationText, nationality);
   }, [destinationText, nationality]);
+
+  // Guaranteed matching official source label and URL for the selected passport
+  const officialSourceLabel = nationality === 'CA' ? 'travel.gc.ca Advisory' : 'travel.state.gov Advisory';
+  const officialSourceUrl = useMemo(() => {
+    if (nationality === 'CA') {
+      if (entryData.officialSourceUrl && entryData.officialSourceUrl.includes('travel.gc.ca')) {
+        return entryData.officialSourceUrl;
+      }
+      return `https://travel.gc.ca/destinations/${encodeURIComponent(destinationText.toLowerCase().trim().replace(/\s+/g, '-'))}`;
+    } else {
+      if (entryData.officialSourceUrl && entryData.officialSourceUrl.includes('travel.state.gov')) {
+        return entryData.officialSourceUrl;
+      }
+      return 'https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages.html';
+    }
+  }, [nationality, entryData.officialSourceUrl, destinationText]);
 
   // If no destination is set yet
   if (!hasDestination) {
@@ -139,9 +179,9 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
             <button
               type="button"
               onClick={() => setNationality('CA')}
-              className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                 nationality === 'CA'
-                  ? 'bg-white dark:bg-slate-900 text-purple-900 dark:text-purple-300 shadow-xs'
+                  ? 'bg-purple-600 text-white font-black shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -150,9 +190,9 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
             <button
               type="button"
               onClick={() => setNationality('US')}
-              className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                 nationality === 'US'
-                  ? 'bg-white dark:bg-slate-900 text-purple-900 dark:text-purple-300 shadow-xs'
+                  ? 'bg-purple-600 text-white font-black shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -219,12 +259,12 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
           </div>
           <div className="sm:w-2/3 sm:text-right">
             <a
-              href={entryData.officialSourceUrl}
+              href={officialSourceUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-purple-700 dark:text-purple-300 font-bold hover:underline"
             >
-              <span>{nationality === 'CA' ? 'travel.gc.ca Advisory' : 'travel.state.gov Advisory'}</span>
+              <span>{officialSourceLabel}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
