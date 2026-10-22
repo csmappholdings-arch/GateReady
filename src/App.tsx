@@ -26,7 +26,8 @@ import { TrialNudgeBanner } from './components/TrialNudgeBanner';
 import { TrialExpiredModal } from './components/TrialExpiredModal';
 import { ReferralModal } from './components/ReferralModal';
 import { AirlineGuidesModal } from './components/AirlineGuidesModal';
-import { TravelType } from './types/travel';
+import { LandingQuickCheckers } from './components/LandingQuickCheckers';
+import { TravelType, BagType, BagMaterial } from './types/travel';
 import { 
   CheckCircle2, 
   Info, 
@@ -54,6 +55,17 @@ function PackingAppContent() {
   const [showAddTripModal, setShowAddTripModal] = useState(false);
   const [selectedTravelTypeForAdd, setSelectedTravelTypeForAdd] = useState<TravelType | undefined>(undefined);
   const [selectedDestinationForAdd, setSelectedDestinationForAdd] = useState<string | undefined>(undefined);
+  const [addTripPreFill, setAddTripPreFill] = useState<{
+    carrier?: string;
+    seatClass?: string;
+    bags?: Array<{
+      type: BagType;
+      label: string;
+      assignedTo?: string;
+      material?: BagMaterial;
+      emptyBagWeightLbs?: number;
+    }>;
+  } | null>(null);
   const [addTripKey, setAddTripKey] = useState(0);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddBagModal, setShowAddBagModal] = useState(false);
@@ -89,6 +101,13 @@ function PackingAppContent() {
         localStorage.setItem('gateready_referred_by_code', refCode.trim().toUpperCase());
       }
     } catch {}
+  }, []);
+
+  // Listen for open referral modal events from Pricing dialog or Header
+  useEffect(() => {
+    const handleOpenReferralEvent = () => setShowReferralModal(true);
+    window.addEventListener('gateready:open-referral', handleOpenReferralEvent);
+    return () => window.removeEventListener('gateready:open-referral', handleOpenReferralEvent);
   }, []);
 
   const totalBags = currentTrip?.bags.length ?? 0;
@@ -165,6 +184,81 @@ function PackingAppContent() {
     }
     setSelectedTravelTypeForAdd(safeTravelType);
     setSelectedDestinationForAdd(safeDest);
+    setAddTripPreFill(null);
+    setAddTripKey((prev) => prev + 1);
+    setShowAddTripModal(true);
+  };
+
+  const handleBuildPackingListFromChecker = (config: {
+    carrier: string;
+    seatClass: string;
+    checkedCount: number;
+    carryOnCount: number;
+  }) => {
+    const tripCheck = canAddTrip(trips.length);
+    if (!tripCheck.allowed) {
+      openPaywall(tripCheck.reason);
+      return;
+    }
+    const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
+    const prefilledBags: Array<{
+      type: BagType;
+      label: string;
+      assignedTo?: string;
+      material?: BagMaterial;
+      emptyBagWeightLbs?: number;
+    }> = [];
+
+    for (let i = 0; i < config.checkedCount; i++) {
+      prefilledBags.push({
+        type: 'CHECKED',
+        label: config.checkedCount === 1 ? 'Checked Bag' : `Checked Bag ${i + 1}`,
+        assignedTo: defaultUser,
+        material: 'HARD_SHELL',
+        emptyBagWeightLbs: 9.5
+      });
+    }
+
+    for (let i = 0; i < config.carryOnCount; i++) {
+      prefilledBags.push({
+        type: 'CARRY_ON',
+        label: config.carryOnCount === 1 ? 'Carry-On Roller' : `Carry-On ${i + 1}`,
+        assignedTo: defaultUser,
+        material: 'HARD_SHELL',
+        emptyBagWeightLbs: 6.5
+      });
+    }
+
+    if (prefilledBags.length === 0) {
+      prefilledBags.push({
+        type: 'PERSONAL',
+        label: 'Personal Backpack',
+        assignedTo: defaultUser,
+        material: 'FABRIC',
+        emptyBagWeightLbs: 1.5
+      });
+    }
+
+    setSelectedTravelTypeForAdd('PLANE');
+    setSelectedDestinationForAdd(undefined);
+    setAddTripPreFill({
+      carrier: config.carrier,
+      seatClass: config.seatClass,
+      bags: prefilledBags
+    });
+    setAddTripKey((prev) => prev + 1);
+    setShowAddTripModal(true);
+  };
+
+  const handlePlanTripFromChecker = (destinationCity: string) => {
+    const tripCheck = canAddTrip(trips.length);
+    if (!tripCheck.allowed) {
+      openPaywall(tripCheck.reason);
+      return;
+    }
+    setSelectedTravelTypeForAdd('PLANE');
+    setSelectedDestinationForAdd(destinationCity);
+    setAddTripPreFill(null);
     setAddTripKey((prev) => prev + 1);
     setShowAddTripModal(true);
   };
@@ -421,6 +515,12 @@ function PackingAppContent() {
               }}
             />
 
+            {/* Standalone Quick Checkers: Baggage Fees & Entry Requirements */}
+            <LandingQuickCheckers
+              onBuildPackingList={handleBuildPackingListFromChecker}
+              onPlanTrip={handlePlanTripFromChecker}
+            />
+
             {/* Immediately usable trip creator directly below */}
             <TransitNetworkHub
               onOpenAddTrip={handleOpenAddTrip}
@@ -566,6 +666,9 @@ function PackingAppContent() {
         onClose={() => setShowAddTripModal(false)}
         initialTravelType={selectedTravelTypeForAdd}
         initialDestinationCity={selectedDestinationForAdd}
+        initialCarrier={addTripPreFill?.carrier}
+        initialSeatClass={addTripPreFill?.seatClass}
+        initialBags={addTripPreFill?.bags}
       />
 
       {showAddItemModal && currentTrip && currentBag && (

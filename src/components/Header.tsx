@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
-import { TravelType } from '../types/travel';
+import { TravelType, Trip } from '../types/travel';
 import { 
   Plane, 
   Train, 
@@ -99,6 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [tripMenuOpen, setTripMenuOpen] = useState(false);
   const [accountSyncModalOpen, setAccountSyncModalOpen] = useState(false);
   const [isManualSyncing, setIsManualSyncing] = useState(false);
+  const [tripToDeleteFromSettings, setTripToDeleteFromSettings] = useState<Trip | null>(null);
 
   // Manual Pro license input state
   const [licenseInput, setLicenseInput] = useState('');
@@ -264,11 +266,11 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
               </span>
-            ) : (
+            ) : user ? (
               <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2.5 py-1 rounded-full">
                 Free Plan
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -298,8 +300,8 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account */}
-          {onOpenReferral && (
+          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account for signed-in users */}
+          {onOpenReferral && user && (
             <button
               type="button"
               onClick={onOpenReferral}
@@ -346,8 +348,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
                 <ChevronDown className="w-3 h-3 text-emerald-400 shrink-0 ml-0.5" />
               </button>
-            ) : (
-              /* Item 3: Fix disabled Sync Account button - immediately clickable on first load */
+            ) : trips.length > 0 ? (
+              /* Sync Account button: surfaced for guests ONLY when they have saved trips worth syncing */
               <button
                 type="button"
                 onClick={() => {
@@ -364,7 +366,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="hidden sm:inline">Sync Account</span>
                 <span className="sm:hidden text-[11px]">Sync</span>
               </button>
-            )}
+            ) : null}
 
             {/* User Account Popover */}
             {userMenuOpen && user && (
@@ -986,51 +988,82 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
 
+                {/* Refer a Friend / Free Month in Settings */}
+                {onOpenReferral && (
+                  <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Gift className="w-4 h-4 text-fuchsia-500" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                          Refer a Friend
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          Get 1 Month Platinum Free
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onOpenReferral();
+                        setSettingsOpen(false);
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-fuchsia-50 dark:bg-fuchsia-950/60 text-fuchsia-600 dark:text-fuchsia-300 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900 transition-colors cursor-pointer border border-fuchsia-200 dark:border-fuchsia-800/40"
+                    >
+                      Invite & Earn
+                    </button>
+                  </div>
+                )}
+
                 {/* Batch Actions for Current Trip */}
                 {currentTrip && (
-                  <>
-                    <div className="py-1 border-b border-slate-100 dark:border-slate-800">
-                      <button
-                        onClick={() => {
-                          markAllPacked(currentTrip.id);
-                          setSettingsOpen(false);
-                        }}
-                        className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center gap-2 transition-colors cursor-pointer"
-                      >
-                        <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Mark All Items Packed</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          resetAllPacked(currentTrip.id);
-                          setSettingsOpen(false);
-                        }}
-                        className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center gap-2 transition-colors cursor-pointer"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Uncheck All Items</span>
-                      </button>
-                    </div>
+                  <div className="py-1 border-b border-slate-100 dark:border-slate-800">
+                    <button
+                      onClick={() => {
+                        markAllPacked(currentTrip.id);
+                        setSettingsOpen(false);
+                      }}
+                      className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Mark All Items Packed</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        resetAllPacked(currentTrip.id);
+                        setSettingsOpen(false);
+                      }}
+                      className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Uncheck All Items</span>
+                    </button>
+                  </div>
+                )}
 
-                    <div className="p-1.5">
-                      <button
-                        onClick={() => {
-                          if (
-                            confirm(
-                              `Are you sure you want to delete the trip "${currentTrip.name}"?`
-                            )
-                          ) {
-                            deleteTrip(currentTrip.id);
-                            setSettingsOpen(false);
-                          }
-                        }}
-                        className="w-full px-3 py-1.5 rounded-lg text-left text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center gap-2 transition-colors cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                        <span>Delete Current Trip</span>
-                      </button>
-                    </div>
-                  </>
+                {/* Delete Current Trip: disabled or hidden if no current trip, uses custom modal */}
+                {currentTrip && (
+                  <div className="p-1.5">
+                    <button
+                      type="button"
+                      disabled={!currentTrip}
+                      onClick={() => {
+                        if (currentTrip) {
+                          setTripToDeleteFromSettings(currentTrip);
+                          setSettingsOpen(false);
+                        }
+                      }}
+                      className={`w-full px-3 py-1.5 rounded-lg text-left text-xs font-medium flex items-center gap-2 transition-colors ${
+                        currentTrip
+                          ? 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 cursor-pointer'
+                          : 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50'
+                      }`}
+                      title={currentTrip ? `Delete ${currentTrip.name}` : 'No active trip to delete'}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Delete Current Trip</span>
+                    </button>
+                  </div>
                 )}
               </div>
             )}
@@ -1043,6 +1076,62 @@ export const Header: React.FC<HeaderProps> = ({
         isOpen={accountSyncModalOpen}
         onClose={() => setAccountSyncModalOpen(false)}
       />
+
+      {/* Settings Delete Trip Confirmation Modal */}
+      {tripToDeleteFromSettings && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-150 min-h-screen cursor-pointer"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setTripToDeleteFromSettings(null);
+          }}
+        >
+          <div 
+            className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-rose-200 dark:border-rose-900/60 animate-in zoom-in-95 duration-150 relative z-[100000] cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-900/40">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Delete Trip?
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {tripToDeleteFromSettings.name}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-6 bg-rose-50/60 dark:bg-rose-950/20 p-3.5 rounded-2xl border border-rose-100 dark:border-rose-900/40">
+              Are you sure you want to delete this trip? All <strong>{tripToDeleteFromSettings.bags.length} bags</strong>, packed items, and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setTripToDeleteFromSettings(null)}
+                className="h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                Keep Trip
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteTrip(tripToDeleteFromSettings.id);
+                  setTripToDeleteFromSettings(null);
+                  setSettingsOpen(false);
+                }}
+                className="h-10 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-rose-600/30 cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Yes, Delete Trip</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Bottom glowing neon transit rail line from branding */}
       <div className="h-[2px] w-full bg-gradient-to-r from-purple-600 via-fuchsia-400 to-indigo-500 shadow-[0_1px_10px_rgba(217,70,239,0.7)] relative z-20" />

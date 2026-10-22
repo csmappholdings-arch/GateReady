@@ -44,9 +44,26 @@ interface AddTripDialogProps {
   onClose: () => void;
   initialTravelType?: TravelType;
   initialDestinationCity?: string;
+  initialCarrier?: string;
+  initialSeatClass?: string;
+  initialBags?: Array<{ 
+    type: BagType; 
+    label: string; 
+    assignedTo?: string;
+    material?: BagMaterial;
+    emptyBagWeightLbs?: number;
+  }>;
 }
 
-export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, initialTravelType, initialDestinationCity }) => {
+export const AddTripDialog: React.FC<AddTripDialogProps> = ({ 
+  isOpen, 
+  onClose, 
+  initialTravelType, 
+  initialDestinationCity,
+  initialCarrier,
+  initialSeatClass,
+  initialBags
+}) => {
   const { addTrip } = usePacking();
   const { isPro, tier, canAddTraveler, canAddBag, canAddTrip, openPaywall } = useSubscription();
   const { user } = useAuth();
@@ -121,30 +138,44 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
     }
   }, [travelType]);
 
-  // Reset all dialog form inputs to a fresh, completely blank state whenever dialog opens
+  // Reset all dialog form inputs to a fresh state (or prefilled if launched from quick checker) whenever dialog opens
   useEffect(() => {
     if (isOpen) {
       setActiveTab('flight');
-      setName('');
       const initialType = initialTravelType || 'PLANE';
       setTravelType(initialType);
-      setCompanyName('');
-      setSeatOrSize(
-        initialType === 'CAR'
-          ? 'Mid-Size SUV / Car'
-          : initialType === 'CRUISE'
-          ? 'Balcony Stateroom'
-          : initialType === 'TRAIN'
-          ? 'Standard Coach'
-          : initialType === 'BUS'
-          ? 'Standard Reserved Seat'
-          : 'Main Cabin'
-      );
-      setOriginCity('');
-      setDestinationCity(initialDestinationCity || '');
-      if (initialDestinationCity && !name) {
-        setName(`${initialDestinationCity.split(' ')[0]} Trip`);
+      
+      const safeCarrier = initialCarrier || '';
+      setCompanyName(safeCarrier);
+
+      if (initialSeatClass) {
+        setSeatOrSize(initialSeatClass);
+      } else {
+        setSeatOrSize(
+          initialType === 'CAR'
+            ? 'Mid-Size SUV / Car'
+            : initialType === 'CRUISE'
+            ? 'Balcony Stateroom'
+            : initialType === 'TRAIN'
+            ? 'Standard Coach'
+            : initialType === 'BUS'
+            ? 'Standard Reserved Seat'
+            : 'Main Cabin'
+        );
       }
+
+      setOriginCity('');
+      const safeDest = initialDestinationCity || '';
+      setDestinationCity(safeDest);
+
+      if (safeDest) {
+        setName(`${safeDest.split(',')[0].trim()} Trip`);
+      } else if (safeCarrier) {
+        setName(`${safeCarrier} Journey`);
+      } else {
+        setName('');
+      }
+
       setDepartureDate('');
       setDepartureTime('');
       setReturnTripDate('');
@@ -154,12 +185,17 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({ isOpen, onClose, i
       setFamilyMembers([defaultUser]);
       setNewMemberInput('');
       setTravelerError('');
-      setBags([
-        { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: defaultUser },
-        { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: defaultUser }
-      ]);
+
+      if (initialBags && initialBags.length > 0) {
+        setBags(initialBags);
+      } else {
+        setBags([
+          { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: defaultUser },
+          { type: 'PERSONAL', label: 'Personal Backpack', assignedTo: defaultUser }
+        ]);
+      }
     }
-  }, [isOpen, user, initialTravelType, initialDestinationCity]);
+  }, [isOpen, user, initialTravelType, initialDestinationCity, initialCarrier, initialSeatClass, initialBags]);
 
   // Keyboard Escape handler
   useEffect(() => {

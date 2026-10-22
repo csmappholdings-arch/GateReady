@@ -15,7 +15,8 @@ import {
   Users,
   Luggage,
   Cloud,
-  CheckCircle2
+  CheckCircle2,
+  Gift
 } from 'lucide-react';
 
 export const SubscriptionModal: React.FC = () => {
@@ -594,60 +595,74 @@ export const SubscriptionModal: React.FC = () => {
             </p>
           </div>
 
-          {/* Manual or Testing License Code redemption */}
-          <div className="pt-2 text-center">
+          {/* Referral Program / Free Month link in pricing dialog */}
+          <div className="pt-2 text-center flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                closePaywall();
+                window.dispatchEvent(new CustomEvent('gateready:open-referral'));
+              }}
+              className="text-[11px] font-semibold text-fuchsia-600 dark:text-fuchsia-400 hover:underline flex items-center justify-center gap-1 cursor-pointer"
+            >
+              <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
+              <span>Invite Friends · Get 1 Month Free</span>
+            </button>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
             {!showLicenseEntry ? (
               <button
                 type="button"
                 onClick={() => setShowLicenseEntry(true)}
-                className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Key className="w-3 h-3" />
                 <span>Have a license key?</span>
               </button>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setLicenseError('');
-                  setLicenseSuccessMsg('');
-                  const res = applyLicenseKey(licenseInput);
-                  if (res.success) {
-                    setLicenseSuccessMsg(res.message);
-                    setLicenseInput('');
-                    setTimeout(() => {
-                      closePaywall();
-                    }, 2000);
-                  } else {
-                    setLicenseError(res.message);
-                  }
-                }}
-                className="max-w-xs mx-auto space-y-2"
-              >
-                <div className="flex gap-1.5">
-                  <input
-                    type="text"
-                    value={licenseInput}
-                    onChange={(e) => setLicenseInput(e.target.value)}
-                    placeholder="Enter License Key"
-                    className="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono uppercase text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500"
-                  />
-                  <button
-                    type="submit"
-                    className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs cursor-pointer transition-colors"
-                  >
-                    Redeem
-                  </button>
-                </div>
-                {licenseError && (
-                  <p className="text-[11px] text-rose-500 font-semibold">{licenseError}</p>
-                )}
-                {licenseSuccessMsg && (
-                  <p className="text-[11px] text-emerald-500 font-semibold">{licenseSuccessMsg}</p>
-                )}
-              </form>
-            )}
+            ) : null}
           </div>
+
+          {showLicenseEntry && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setLicenseError('');
+                setLicenseSuccessMsg('');
+                const res = applyLicenseKey(licenseInput);
+                if (res.success) {
+                  setLicenseSuccessMsg(res.message);
+                  setLicenseInput('');
+                  setTimeout(() => {
+                    closePaywall();
+                  }, 2000);
+                } else {
+                  setLicenseError(res.message);
+                }
+              }}
+              className="max-w-xs mx-auto space-y-2 mt-2"
+            >
+              <div className="flex gap-1.5">
+                <input
+                  type="text"
+                  value={licenseInput}
+                  onChange={(e) => setLicenseInput(e.target.value)}
+                  placeholder="Enter License Key"
+                  className="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono uppercase text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs cursor-pointer transition-colors"
+                >
+                  Redeem
+                </button>
+              </div>
+              {licenseError && (
+                <p className="text-[11px] text-rose-500 font-semibold">{licenseError}</p>
+              )}
+              {licenseSuccessMsg && (
+                <p className="text-[11px] text-emerald-500 font-semibold">{licenseSuccessMsg}</p>
+              )}
+            </form>
+          )}
         </div>
       </div>
     </div>,

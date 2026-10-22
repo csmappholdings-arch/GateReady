@@ -69,51 +69,31 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           </p>
         </div>
 
-        {/* Primary Call to Action, Secondary Account CTA & 1-Click Demo */}
-        <div className="space-y-2.5">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 flex-wrap">
-            {/* Prominent One-Click Demo Trip Button */}
-            <button
-              type="button"
-              onClick={onLoadDemo}
-              className="w-full sm:w-auto h-12 px-5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 active:scale-98 text-white font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all cursor-pointer border border-amber-300/40"
-              title="Load fully packed Paris & London demo trip in under 30 seconds"
-            >
-              <Zap className="w-4 h-4 fill-white" />
-              <span>Try a 1-Click Demo Trip</span>
-              <span className="text-[10px] font-extrabold bg-black/25 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Instant
-              </span>
-            </button>
-
-            {/* Primary Create Trip Manual Path */}
+        {/* Primary Call to Action & Subordinate Sample Demo Link */}
+        <div className="space-y-3 pt-1">
+          <div className="flex flex-col items-center justify-center gap-3">
+            {/* ONE Primary CTA above the fold */}
             <button
               type="button"
               onClick={onOpenAddTrip}
-              className="w-full sm:w-auto h-12 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 active:scale-98 text-white font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/40"
+              className="w-full sm:w-auto h-13 px-8 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 active:scale-98 text-white font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/40"
             >
               <span>Create Your Trip (Free)</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4.5 h-4.5" />
             </button>
 
-            {/* Item 2: Secondary Create Free Account CTA */}
-            {onOpenAccountSync && (
+            {/* Clearly secondary, visually quieter demo option with clear explanation */}
+            <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+              <span>Want to preview how it works?</span>
               <button
                 type="button"
-                onClick={onOpenAccountSync}
-                className="w-full sm:w-auto h-12 px-5 rounded-2xl bg-white dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-purple-950/60 active:scale-98 text-purple-900 dark:text-purple-200 border-2 border-purple-300 dark:border-purple-750 font-black text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-                title="Create a free account to back up and sync your packing lists"
+                onClick={onLoadDemo}
+                className="text-purple-700 dark:text-purple-300 font-bold hover:underline cursor-pointer inline-flex items-center gap-0.5 transition-colors"
               >
-                <Cloud className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span>Create Free Account</span>
+                <span>or see a sample trip first →</span>
               </button>
-            )}
+            </div>
           </div>
-
-          {/* Benefit line beneath secondary CTA */}
-          <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">
-            Save your lists forever — access them on any device.
-          </p>
         </div>
 
         {/* Pricing Hint */}
