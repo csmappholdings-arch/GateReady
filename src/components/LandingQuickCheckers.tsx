@@ -37,7 +37,7 @@ interface LandingQuickCheckersProps {
   onPlanTrip: (destinationCity: string) => void;
 }
 
-export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
+const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
   onBuildPackingList,
   onPlanTrip
 }) => {
@@ -86,8 +86,8 @@ export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
 
   // Run official published airline calculation
   const feeResult: BagFeeCalculationResult | null = useMemo(() => {
-    return calculateTripBaggageFees(selectedAirline, simulatedBags);
-  }, [selectedAirline, simulatedBags]);
+    return calculateTripBaggageFees(selectedAirline, simulatedBags, selectedCabin);
+  }, [selectedAirline, simulatedBags, selectedCabin]);
 
   // Dynamic USD approximation based on active total fee
   const approxUsd = useMemo(() => {
@@ -231,13 +231,18 @@ export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Airline Dropdown */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1">
+                  <label
+                    htmlFor="landing-airline-select"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1 cursor-pointer select-none"
+                  >
                     Select Airline (42 Available)
                   </label>
                   <select
+                    id="landing-airline-select"
+                    name="airline"
                     value={selectedAirline}
                     onChange={(e) => setSelectedAirline(e.target.value)}
-                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs"
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs relative z-10 pointer-events-auto"
                   >
                     {AIRLINE_BAGGAGE_FEES.map((airline) => (
                       <option key={airline.airlineId} value={airline.airlineName}>
@@ -249,13 +254,18 @@ export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
 
                 {/* Cabin / Fare Class */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1">
+                  <label
+                    htmlFor="landing-cabin-select"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1 cursor-pointer select-none"
+                  >
                     Cabin / Fare Tier
                   </label>
                   <select
+                    id="landing-cabin-select"
+                    name="cabin"
                     value={selectedCabin}
                     onChange={(e) => setSelectedCabin(e.target.value)}
-                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs"
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs relative z-10 pointer-events-auto"
                   >
                     <option value="Main Cabin / Economy">Main Cabin / Standard Economy</option>
                     <option value="UltraBasic / Basic Economy">UltraBasic / Basic Economy</option>
@@ -431,7 +441,7 @@ export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
                       </span>
                     </div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                      Passport & Visa Rules for {entryData.matchedDestinationName}
+                      {`Passport & Visa Rules for ${entryData.matchedDestinationName}`}
                     </h3>
                   </div>
                 </div>
@@ -474,13 +484,18 @@ export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
 
                 {/* Destination Country Dropdown */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1.5">
+                  <label
+                    htmlFor="landing-destination-country-select"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1.5 cursor-pointer select-none"
+                  >
                     Destination Country
                   </label>
                   <select
+                    id="landing-destination-country-select"
+                    name="destinationCountry"
                     value={destinationCountry}
                     onChange={(e) => setDestinationCountry(e.target.value)}
-                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs"
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs relative z-10 pointer-events-auto"
                   >
                     {ENTRY_REQUIREMENTS_DATABASE.map((item) => (
                       <option key={item.countryCode} value={item.destinationCountry}>
@@ -591,3 +606,5 @@ export const LandingQuickCheckers: React.FC<LandingQuickCheckersProps> = ({
     </section>
   );
 };
+
+export const LandingQuickCheckers = React.memo(LandingQuickCheckersComponent);

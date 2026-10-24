@@ -166,7 +166,7 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
                 </span>
               </div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                Traveling to {entryData.matchedDestinationName}
+                {`Traveling to ${entryData.matchedDestinationName}`}
               </h3>
             </div>
           </div>

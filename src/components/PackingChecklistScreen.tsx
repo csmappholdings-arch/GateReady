@@ -1070,19 +1070,40 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
-                onClick={() => addBagToTrip(trip.id, 'PERSONAL', 'Backpack / Personal Item')}
+                onClick={() => {
+                  const bagCheck = canAddBag(trip.bags, 'PERSONAL');
+                  if (!bagCheck.allowed) {
+                    openPaywall(bagCheck.reason);
+                    return;
+                  }
+                  addBagToTrip(trip.id, 'PERSONAL', 'Backpack / Personal Item');
+                }}
                 className="h-10 px-4 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-semibold hover:bg-purple-100 transition-colors cursor-pointer"
               >
                 + Add Personal Item
               </button>
               <button
-                onClick={() => addBagToTrip(trip.id, 'CARRY_ON', 'Main Carry-On')}
+                onClick={() => {
+                  const bagCheck = canAddBag(trip.bags, 'CARRY_ON');
+                  if (!bagCheck.allowed) {
+                    openPaywall(bagCheck.reason);
+                    return;
+                  }
+                  addBagToTrip(trip.id, 'CARRY_ON', 'Main Carry-On');
+                }}
                 className="h-10 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md shadow-purple-600/25 transition-all cursor-pointer"
               >
                 + Add Carry-On Bag
               </button>
               <button
-                onClick={() => addBagToTrip(trip.id, 'CHECKED', 'Checked Suitcase')}
+                onClick={() => {
+                  const bagCheck = canAddBag(trip.bags, 'CHECKED');
+                  if (!bagCheck.allowed) {
+                    openPaywall(bagCheck.reason);
+                    return;
+                  }
+                  addBagToTrip(trip.id, 'CHECKED', 'Checked Suitcase');
+                }}
                 className="h-10 px-4 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-semibold hover:bg-purple-100 transition-colors cursor-pointer"
               >
                 + Add Checked Bag

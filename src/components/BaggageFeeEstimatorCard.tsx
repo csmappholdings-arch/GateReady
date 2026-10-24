@@ -52,8 +52,8 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
   // Fee calculation from static published fee table
   const feeResult: BagFeeCalculationResult | null = useMemo(() => {
     if (!hasAirline) return null;
-    return calculateTripBaggageFees(airlineName, bagsWithWeights);
-  }, [airlineName, hasAirline, bagsWithWeights]);
+    return calculateTripBaggageFees(airlineName, bagsWithWeights, trip.seatClassOrCarSize);
+  }, [airlineName, hasAirline, bagsWithWeights, trip.seatClassOrCarSize]);
 
   // If no airline has been selected yet
   if (!hasAirline) {
@@ -91,33 +91,44 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
     );
   }
 
-  // If airline exists but has no fee table entry
+  // If airline exists but has no fee table entry or calculation unavailable
   if (feeResult && !feeResult.hasFeeData) {
     return (
       <div className={`rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs ${className}`}>
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center shrink-0">
-            <Receipt className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Bag Fee Estimate · {airlineName}
-              </span>
-              <span className="text-[10px] font-semibold text-slate-400">
-                Fee data coming soon
-              </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center shrink-0">
+              <Receipt className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
-              Fee data coming soon for {airlineName}
-            </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              We never invent fee numbers. Official published baggage fees for {airlineName} will be indexed in an upcoming update.
-            </p>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">
-              {feeResult.disclaimer}
-            </p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Bag Fee Estimate · {airlineName}
+                </span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                Estimate unavailable — check the airline's policy
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                We never invent fee numbers. Official published baggage fees for {airlineName} could not be estimated for this route.
+              </p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">
+                {feeResult.disclaimer}
+              </p>
+            </div>
           </div>
+
+          {feeResult.officialBaggagePageUrl && (
+            <a
+              href={feeResult.officialBaggagePageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-8.5 px-3 rounded-xl border border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-slate-800 text-purple-700 dark:text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-auto"
+            >
+              <span>Official Policy</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
         </div>
       </div>
     );

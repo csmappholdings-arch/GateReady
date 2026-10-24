@@ -187,7 +187,25 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       setTravelerError('');
 
       if (initialBags && initialBags.length > 0) {
-        setBags(initialBags);
+        if (!isPro) {
+          // Hard cap for Free Plan: max 1 checked bag, max 2 bags total
+          const safeBags: typeof initialBags = [];
+          let hasChecked = false;
+          for (const b of initialBags) {
+            if (safeBags.length >= 2) break;
+            if (b.type === 'CHECKED') {
+              if (!hasChecked) {
+                safeBags.push(b);
+                hasChecked = true;
+              }
+            } else {
+              safeBags.push(b);
+            }
+          }
+          setBags(safeBags.length > 0 ? safeBags : [{ type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: defaultUser }]);
+        } else {
+          setBags(initialBags);
+        }
       } else {
         setBags([
           { type: 'CARRY_ON', label: 'Carry-On Roller', assignedTo: defaultUser },
@@ -427,6 +445,19 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     const finalBags = bags.length > 0 
       ? bags 
       : [{ type: 'CARRY_ON' as BagType, label: 'Carry-On Roller', assignedTo: finalFamily[0] }];
+
+    // Hard limit enforcement: Free plan cannot hold > 2 bags or > 1 checked bag
+    if (!isPro) {
+      const checkedCount = finalBags.filter((b) => b.type === 'CHECKED').length;
+      if (checkedCount > 1) {
+        openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
+        return;
+      }
+      if (finalBags.length > 2) {
+        openPaywall('Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.');
+        return;
+      }
+    }
 
     addTrip(
       tripTitle,
@@ -887,11 +918,14 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
               {/* Departure Schedule */}
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-purple-600" />
-                    <span>Departure Date</span>
-                  </label>
                   <DatePickerInput
+                    label={
+                      <>
+                        <Calendar className="w-3.5 h-3.5 text-purple-600" />
+                        <span>Departure Date</span>
+                      </>
+                    }
+                    placeholder="Select date"
                     value={departureDate}
                     onChange={(val) => setDepartureDate(val)}
                     className={isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'}

@@ -27,7 +27,8 @@ import { TrialExpiredModal } from './components/TrialExpiredModal';
 import { ReferralModal } from './components/ReferralModal';
 import { AirlineGuidesModal } from './components/AirlineGuidesModal';
 import { LandingQuickCheckers } from './components/LandingQuickCheckers';
-import { TravelType, BagType, BagMaterial } from './types/travel';
+import { FreeLimitCheckerModal } from './components/FreeLimitCheckerModal';
+import { TravelType, BagType, BagMaterial, getUserPresetWeightLbs } from './types/travel';
 import { 
   CheckCircle2, 
   Info, 
@@ -67,6 +68,13 @@ function PackingAppContent() {
     }>;
   } | null>(null);
   const [addTripKey, setAddTripKey] = useState(0);
+  const [pendingCheckerConfig, setPendingCheckerConfig] = useState<{
+    carrier: string;
+    seatClass: string;
+    checkedCount: number;
+    carryOnCount: number;
+  } | null>(null);
+  const [tripNotice, setTripNotice] = useState<string | null>(null);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddBagModal, setShowAddBagModal] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
@@ -200,6 +208,13 @@ function PackingAppContent() {
       openPaywall(tripCheck.reason);
       return;
     }
+
+    // Hard free-plan bag limit enforcement: max 1 checked bag, max 2 bags total
+    if (!isPro && (config.checkedCount > 1 || (config.checkedCount + config.carryOnCount) > 2)) {
+      setPendingCheckerConfig(config);
+      return;
+    }
+
     const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
     const prefilledBags: Array<{
       type: BagType;
@@ -215,7 +230,7 @@ function PackingAppContent() {
         label: config.checkedCount === 1 ? 'Checked Bag' : `Checked Bag ${i + 1}`,
         assignedTo: defaultUser,
         material: 'HARD_SHELL',
-        emptyBagWeightLbs: 9.5
+        emptyBagWeightLbs: getUserPresetWeightLbs('CHECKED', 'HARD_SHELL')
       });
     }
 
@@ -225,7 +240,7 @@ function PackingAppContent() {
         label: config.carryOnCount === 1 ? 'Carry-On Roller' : `Carry-On ${i + 1}`,
         assignedTo: defaultUser,
         material: 'HARD_SHELL',
-        emptyBagWeightLbs: 6.5
+        emptyBagWeightLbs: getUserPresetWeightLbs('CARRY_ON', 'HARD_SHELL')
       });
     }
 
@@ -235,19 +250,47 @@ function PackingAppContent() {
         label: 'Personal Backpack',
         assignedTo: defaultUser,
         material: 'FABRIC',
-        emptyBagWeightLbs: 1.5
+        emptyBagWeightLbs: getUserPresetWeightLbs('PERSONAL', 'FABRIC')
       });
     }
 
-    setSelectedTravelTypeForAdd('PLANE');
-    setSelectedDestinationForAdd(undefined);
-    setAddTripPreFill({
-      carrier: config.carrier,
-      seatClass: config.seatClass,
-      bags: prefilledBags
-    });
-    setAddTripKey((prev) => prev + 1);
-    setShowAddTripModal(true);
+    const tripTitle = `${config.carrier} Journey`;
+    addTrip(
+      tripTitle,
+      'PLANE',
+      config.carrier,
+      config.seatClass,
+      prefilledBags,
+      [defaultUser],
+      {}
+    );
+  };
+
+  const handleContinueWithTwoBagsFree = (
+    allowedBags: Array<{
+      type: BagType;
+      label: string;
+      assignedTo?: string;
+      material?: BagMaterial;
+      emptyBagWeightLbs?: number;
+    }>,
+    leftOutNote: string
+  ) => {
+    if (!pendingCheckerConfig) return;
+    const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
+    const finalBags = allowedBags.map((b) => ({ ...b, assignedTo: defaultUser }));
+    const tripTitle = `${pendingCheckerConfig.carrier} Journey`;
+    addTrip(
+      tripTitle,
+      'PLANE',
+      pendingCheckerConfig.carrier,
+      pendingCheckerConfig.seatClass,
+      finalBags,
+      [defaultUser],
+      {}
+    );
+    setTripNotice(leftOutNote);
+    setPendingCheckerConfig(null);
   };
 
   const handlePlanTripFromChecker = (destinationCity: string) => {
@@ -287,6 +330,28 @@ function PackingAppContent() {
         onOpenReferral={() => setShowReferralModal(true)}
       />
 
+      {/* Free Plan Bag Limit Trip Notice (e.g. When extra bags were left out) */}
+      {tripNotice && (
+        <div className="bg-purple-950 text-white px-4 py-3 shadow-lg flex items-center justify-between gap-3 text-xs border-b border-purple-800 relative z-30 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-6 h-6 rounded-lg bg-amber-400 text-purple-950 flex items-center justify-center shrink-0 font-bold shadow-xs">
+              <Info className="w-3.5 h-3.5" />
+            </div>
+            <p className="font-semibold text-purple-100 leading-snug">
+              {tripNotice}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTripNotice(null)}
+            className="p-1 rounded-lg text-purple-300 hover:text-white hover:bg-purple-900 transition-colors cursor-pointer shrink-0"
+            aria-label="Dismiss notice"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Pending Referral Link Announcement for Anonymous Visitors */}
       {hasPendingReferralCode && (
         <div className="bg-gradient-to-r from-fuchsia-700 via-purple-700 to-indigo-800 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs flex-wrap relative z-30">
@@ -299,7 +364,7 @@ function PackingAppContent() {
                 🎁 Referral Bonus Detected!
               </p>
               <p className="text-purple-100 text-[11px] leading-tight">
-                Create an account & sign in to apply your <strong>1 Free Month of Platinum</strong> ($9.99 value). Mandatory to activate.
+                Create an account & sign in to apply your <strong>1 Free Month of Platinum</strong> ($4.99 value). Mandatory to activate.
               </p>
             </div>
           </div>
@@ -728,6 +793,18 @@ function PackingAppContent() {
         isOpen={showAirlineGuidesModal}
         onClose={() => setShowAirlineGuidesModal(false)}
         onSelectAirline={(name) => handleOpenAddTrip('PLANE', name)}
+      />
+
+      {/* Free Plan Hard Bag Limit Modal for Landing Fee Checker */}
+      <FreeLimitCheckerModal
+        isOpen={pendingCheckerConfig !== null}
+        onClose={() => setPendingCheckerConfig(null)}
+        config={pendingCheckerConfig}
+        onContinueFree={handleContinueWithTwoBagsFree}
+        onSeePlans={() => {
+          setPendingCheckerConfig(null);
+          openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
+        }}
       />
 
       {/* Conversion Marketing & Navigation Footer */}

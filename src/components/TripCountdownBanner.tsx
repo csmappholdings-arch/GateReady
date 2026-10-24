@@ -135,7 +135,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
           )}
           {!validOrigin && validDest && (
             <span className="text-[11px] text-purple-300/80 hidden sm:inline">
-              · To {validDest}
+              {`· To ${validDest}`}
             </span>
           )}
         </div>

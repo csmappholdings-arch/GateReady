@@ -1,7 +1,31 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
-interface DatePickerInputProps {
+export function formatFriendlyDate(dStr: string): string {
+  if (!dStr) return '';
+  const parts = dStr.split('-').map(Number);
+  if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    return d.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+  const d = new Date(dStr);
+  if (!isNaN(d.getTime())) {
+    return d.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+  return dStr;
+}
+
+export interface DatePickerInputProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
@@ -9,23 +33,23 @@ interface DatePickerInputProps {
   placeholder?: string;
   required?: boolean;
   id?: string;
+  label?: React.ReactNode;
 }
 
 /**
- * Robust date input that supports:
- * 1. Typed entry (spinbuttons or keyboard)
- * 2. Native date picker with direct event listeners
- * 3. Interactive calendar popup with day cells and quick-select presets that reliably applies chosen date
+ * Click-anywhere Departure Date field that displays friendly date formatting
+ * (e.g. "Mon, Dec 15, 2026"), placeholder hint "Select date", visible calendar icon,
+ * and reliable calendar popup with Day selection, Today, and Clear actions.
  */
 export const DatePickerInput: React.FC<DatePickerInputProps> = ({
   value,
   onChange,
   className = '',
-  min,
+  placeholder = 'Select date',
   required = false,
-  id
+  id,
+  label
 }) => {
-  const dateInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCustomCalendar, setShowCustomCalendar] = useState(false);
 
@@ -53,44 +77,28 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
     }
   }, [value]);
 
-  // Direct native event listener to ensure Chromium calendar picker selections are never dropped
-  useEffect(() => {
-    const el = dateInputRef.current;
-    if (!el) return;
-
-    const handleNative = () => {
-      // Must allow empty string so Clear button in native picker works!
-      onChange(el.value || '');
-    };
-
-    el.addEventListener('input', handleNative);
-    el.addEventListener('change', handleNative);
-
-    return () => {
-      el.removeEventListener('input', handleNative);
-      el.removeEventListener('change', handleNative);
-    };
-  }, [onChange]);
-
-  // Sync ref value when value prop changes externally
-  useEffect(() => {
-    if (dateInputRef.current) {
-      dateInputRef.current.value = value || '';
-    }
-  }, [value]);
-
   // Close calendar popup on click outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowCustomCalendar(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowCustomCalendar(false);
+      }
+    };
+
     if (showCustomCalendar) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [showCustomCalendar]);
 
@@ -100,17 +108,11 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
     const dStr = d.toString().padStart(2, '0');
     const formatted = `${yStr}-${mStr}-${dStr}`;
     onChange(formatted);
-    if (dateInputRef.current) {
-      dateInputRef.current.value = formatted;
-    }
     setShowCustomCalendar(false);
   };
 
   const handleClearDate = () => {
     onChange('');
-    if (dateInputRef.current) {
-      dateInputRef.current.value = '';
-    }
     setShowCustomCalendar(false);
   };
 
@@ -154,34 +156,80 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
   };
 
   return (
-    <div className="relative flex items-center w-full" ref={containerRef}>
-      <input
-        ref={dateInputRef}
-        id={id}
-        type="date"
-        value={value || ''}
-        min={min}
-        required={required}
-        onChange={(e) => onChange(e.target.value)}
-        onInput={(e) => onChange((e.target as HTMLInputElement).value)}
-        className={`w-full text-slate-900 dark:text-white bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-xl focus:outline-hidden focus:border-purple-500 cursor-text pr-10 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:p-1.5 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-opacity [&::-webkit-calendar-picker-indicator]:opacity-75 hover:[&::-webkit-calendar-picker-indicator]:opacity-100 ${className}`}
-      />
+    <div className="relative w-full flex flex-col" ref={containerRef}>
+      {/* Optional Label (clicking label opens picker directly) */}
+      {label && (
+        <label
+          onClick={() => setShowCustomCalendar(true)}
+          className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1 cursor-pointer select-none"
+        >
+          {label}
+        </label>
+      )}
 
-      {/* Explicit "Show date picker" interactive button with custom calendar popup */}
-      <button
-        type="button"
-        title="Show date picker"
-        aria-label="Show date picker"
+      {/* Main Field Box - Clicking anywhere opens the calendar */}
+      <div
+        id={id}
+        role="button"
+        tabIndex={0}
+        aria-haspopup="dialog"
+        aria-expanded={showCustomCalendar}
         onClick={() => setShowCustomCalendar((prev) => !prev)}
-        className="absolute right-2.5 p-1 rounded-lg text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/60 transition-colors cursor-pointer"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setShowCustomCalendar((prev) => !prev);
+          }
+        }}
+        className={`w-full flex items-center justify-between text-left transition-all cursor-pointer select-none bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-xl hover:border-purple-400 dark:hover:border-purple-600 focus:outline-hidden focus:ring-2 focus:ring-purple-500/40 shadow-2xs ${className}`}
       >
-        <CalendarIcon className="w-4 h-4" />
-      </button>
+        <span
+          className={`truncate ${
+            value
+              ? 'text-slate-900 dark:text-white font-semibold'
+              : 'text-slate-400 dark:text-slate-500 font-normal'
+          }`}
+        >
+          {value ? formatFriendlyDate(value) : placeholder}
+        </span>
+
+        <div className="flex items-center gap-1 shrink-0 ml-2">
+          {value && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClearDate();
+              }}
+              className="p-1 rounded-md text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              title="Clear date"
+              aria-label="Clear date"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <span className="p-1 rounded-md text-purple-600 dark:text-purple-400">
+            <CalendarIcon className="w-4 h-4" />
+          </span>
+        </div>
+      </div>
+
+      {/* Hidden input for form validation if required */}
+      {required && (
+        <input
+          type="text"
+          value={value}
+          readOnly
+          required={required}
+          className="sr-only"
+          tabIndex={-1}
+        />
+      )}
 
       {/* Interactive Click-to-Select Calendar Popup */}
       {showCustomCalendar && (
         <div 
-          className="absolute top-full left-0 mt-2 z-[100050] w-72 sm:w-80 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 shadow-2xl p-3.5 text-slate-900 dark:text-white animate-in fade-in zoom-in-95 duration-150"
+          className="absolute top-full left-0 sm:left-auto mt-2 z-[100050] w-72 sm:w-80 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 shadow-2xl p-3.5 text-slate-900 dark:text-white animate-in fade-in zoom-in-95 duration-150"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header with Month/Year Navigation */}
@@ -195,6 +243,7 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
                 onClick={handlePrevMonth}
                 className="p-1 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/60 text-slate-600 dark:text-slate-300 cursor-pointer"
                 title="Previous month"
+                aria-label="Previous month"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -203,6 +252,7 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
                 onClick={handleNextMonth}
                 className="p-1 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/60 text-slate-600 dark:text-slate-300 cursor-pointer"
                 title="Next month"
+                aria-label="Next month"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -211,6 +261,7 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
                 onClick={() => setShowCustomCalendar(false)}
                 className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 cursor-pointer ml-1"
                 title="Close calendar"
+                aria-label="Close calendar"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

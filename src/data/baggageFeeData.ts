@@ -718,7 +718,8 @@ export function calculateTripBaggageFees(
     type: 'PERSONAL' | 'CARRY_ON' | 'CHECKED';
     currentWeightLbs: number;
     maxWeightLimitLbs?: number;
-  }>
+  }>,
+  cabinOrSeatClass?: string
 ): BagFeeCalculationResult | null {
   if (!companyName || !companyName.trim()) {
     return null;
@@ -734,6 +735,7 @@ export function calculateTripBaggageFees(
   });
 
   if (!feeRecord) {
+    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(companyName.trim() + ' baggage fee policy official')}`;
     return {
       hasFeeData: false,
       airlineName: companyName,
@@ -744,8 +746,9 @@ export function calculateTripBaggageFees(
       breakdown: [],
       overweightBagCount: 0,
       totalOverweightFee: 0,
-      feeNotes: 'Fee data coming soon for this carrier',
-      disclaimer: 'Fee data coming soon. Always confirm baggage fees directly with your carrier at booking.'
+      officialBaggagePageUrl: searchUrl,
+      feeNotes: "Estimate unavailable — check the airline's policy",
+      disclaimer: "Estimate unavailable — check the airline's policy. Always confirm baggage fees directly with your carrier before you travel."
     };
   }
 
@@ -762,19 +765,23 @@ export function calculateTripBaggageFees(
     let isOverweight = false;
     let overweightReason: string | undefined;
 
-    // Determine weight cap (default 50 lbs / 23 kg for checked, 22 lbs for carry-on)
-    const weightCap = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
+    const isBusinessOrFirst = Boolean(cabinOrSeatClass && /business|first|polaris|delta one|signature/i.test(cabinOrSeatClass));
+
+    // Determine weight cap (default 50 lbs / 23 kg for checked, 22 lbs for carry-on; 70 lbs for Business/First)
+    const weightCap = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? (isBusinessOrFirst ? 70 : 50) : bag.type === 'CARRY_ON' ? 22 : 15);
     const weightLbs = bag.currentWeightLbs || 0;
 
     if (bag.type === 'CHECKED') {
       checkedBagIndex += 1;
-      if (checkedBagIndex === 1) {
+      if (isBusinessOrFirst && checkedBagIndex <= 2) {
+        baseFee = 0; // Standard Business & First class ticket includes 2 free checked bags
+      } else if (checkedBagIndex === 1) {
         baseFee = feeRecord.firstCheckedFee;
       } else {
         baseFee = feeRecord.secondCheckedFee;
       }
 
-      // Check if overweight (> 50 lbs)
+      // Check if overweight
       if (weightLbs > weightCap) {
         isOverweight = true;
         overweightFee = feeRecord.overweightFee51to70lbs;

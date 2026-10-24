@@ -873,20 +873,32 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   // Rule 3: Bags limit
-  // Free: 2 bags total, 1 of each type
+  // Free: 2 bags total, max 1 checked bag, 1 of each type
   // Silver, Gold, Platinum: Unlimited bags
   const canAddBag = (existingBags: Bag[], newBagType: BagType) => {
     if (tier === 'SILVER' || tier === 'GOLD' || tier === 'PLATINUM' || isMasterKey) {
       return { allowed: true };
     }
 
-    if (existingBags.length >= MAX_FREE_BAGS_TOTAL) {
+    // 1. Hard checked-bag cap for Free Plan (max 1 checked bag)
+    if (newBagType === 'CHECKED' && existingBags.some((b) => b.type === 'CHECKED')) {
       return {
         allowed: false,
-        reason: `Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.`
+        reason: 'Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.'
       };
     }
 
+    // 2. Hard total bag cap for Free Plan (max 2 bags total)
+    if (existingBags.length >= MAX_FREE_BAGS_TOTAL) {
+      return {
+        allowed: false,
+        reason: newBagType === 'CHECKED'
+          ? 'Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.'
+          : 'Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.'
+      };
+    }
+
+    // 3. Max 1 of any bag type on Free Plan
     const hasSameType = existingBags.some((b) => b.type === newBagType);
     if (hasSameType) {
       const bagLabel = newBagType === 'PERSONAL' 

@@ -115,7 +115,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                   Mandatory: Create Account to Apply Free Month
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
-                  Referral bonuses are tied strictly to authenticated accounts. You must create an account and sign in so the 1 Free Month of Platinum ($9.99 value) can be applied and accurately tracked.
+                  Referral bonuses are tied strictly to authenticated accounts. You must create an account and sign in so the 1 Free Month of Platinum ($4.99 value) can be applied and accurately tracked.
                 </p>
               </div>
 
@@ -123,7 +123,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                 <div className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                   <p className="text-slate-700 dark:text-slate-200">
-                    <strong className="text-slate-900 dark:text-white font-bold">Your friends get 1 month free</strong> of GateReady Platinum ($9.99 value) as soon as they create their account.
+                    <strong className="text-slate-900 dark:text-white font-bold">Your friends get 1 month free</strong> of GateReady Platinum ($4.99 value) as soon as they create their account.
                   </p>
                 </div>
                 <div className="flex items-start gap-2.5">

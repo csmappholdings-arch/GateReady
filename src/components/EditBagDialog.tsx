@@ -11,6 +11,7 @@ import {
   setUserPresetWeightLbs
 } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { 
   Briefcase, 
   Luggage, 
@@ -42,7 +43,8 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
   familyMembers,
   weightUnit
 }) => {
-  const { updateBag } = usePacking();
+  const { updateBag, trips } = usePacking();
+  const { isPro, canAddBag, openPaywall } = useSubscription();
 
   const [label, setLabel] = useState('');
   const [type, setType] = useState<BagType>('CARRY_ON');
@@ -89,6 +91,16 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
 
   // When changing bag type, adjust material preset default and update max weight limit
   const handleSelectType = (newType: BagType) => {
+    if (!isPro && newType !== bag.type) {
+      const activeTrip = trips.find((t) => t.id === tripId);
+      const otherBags = (activeTrip?.bags || []).filter((b) => b.id !== bag.id);
+      const bagCheck = canAddBag(otherBags, newType);
+      if (!bagCheck.allowed) {
+        openPaywall(bagCheck.reason);
+        return;
+      }
+    }
+
     setType(newType);
     const newLbs = getUserPresetWeightLbs(newType, material);
     const displayVal = weightUnit === 'KG'
@@ -109,6 +121,16 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
     e.preventDefault();
     const trimmedLabel = label.trim();
     if (!trimmedLabel) return;
+
+    if (!isPro && type !== bag.type) {
+      const activeTrip = trips.find((t) => t.id === tripId);
+      const otherBags = (activeTrip?.bags || []).filter((b) => b.id !== bag.id);
+      const bagCheck = canAddBag(otherBags, type);
+      if (!bagCheck.allowed) {
+        openPaywall(bagCheck.reason);
+        return;
+      }
+    }
 
     const parsedWeight = parseFloat(maxWeight);
     const weightLbs = !isNaN(parsedWeight) && parsedWeight > 0

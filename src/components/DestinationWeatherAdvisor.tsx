@@ -17,7 +17,9 @@ import {
   AlertTriangle,
   Shirt,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CheckCircle2,
+  Info
 } from 'lucide-react';
 import { AirportCitySearchInput } from './AirportCitySearchInput';
 
@@ -125,54 +127,232 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
     );
   }
 
-  // Realistic seasonal weather simulation based on city heuristics
+  // Compute departure date window: <= 14 days = live/dated forecast; > 14 days (or no date) = climate norms
+  let departureDateObj: Date | null = null;
+  if (trip.departureDate && trip.departureDate.trim()) {
+    try {
+      const parts = trip.departureDate.trim().split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+          departureDateObj = new Date(y, m, d);
+        }
+      } else {
+        const parsed = new Date(trip.departureDate);
+        if (!isNaN(parsed.getTime())) departureDateObj = parsed;
+      }
+    } catch {
+      departureDateObj = null;
+    }
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let daysUntilDep: number | null = null;
+  if (departureDateObj) {
+    const depMidnight = new Date(departureDateObj);
+    depMidnight.setHours(0, 0, 0, 0);
+    daysUntilDep = Math.round((depMidnight.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  // Active forecast mode if trip departs within 0 to 14 days
+  const isForecastMode = daysUntilDep !== null && daysUntilDep >= 0 && daysUntilDep <= 14;
+
+  const travelMonth = departureDateObj
+    ? departureDateObj.toLocaleString('en-US', { month: 'long' })
+    : 'December';
+
+  // Realistic seasonal weather simulation or historical climate norms
   const getSimulatedForecast = (cityName: string): WeatherForecastDay[] => {
     const lower = cityName.toLowerCase();
-    const today = new Date();
-    const days = ['Today', 'Tomorrow', 'Day 3', 'Day 4', 'Day 5'];
 
-    if (lower.includes('london') || lower.includes('uk') || lower.includes('seattle') || lower.includes('ireland')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'RAIN', tempHighF: 59, tempLowF: 48, rainChance: 75, uvIndex: 3, summary: 'Intermittent brisk rain & overcast' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'RAIN', tempHighF: 57, tempLowF: 46, rainChance: 80, uvIndex: 2, summary: 'Afternoon downpours & breeze' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'CLOUDY', tempHighF: 62, tempLowF: 50, rainChance: 35, uvIndex: 4, summary: 'Mostly cloudy with mild breaks' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'CLOUDY', tempHighF: 63, tempLowF: 51, rainChance: 25, uvIndex: 4, summary: 'Breezy & partly overcast' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'RAIN', tempHighF: 60, tempLowF: 49, rainChance: 65, uvIndex: 3, summary: 'Scattered light showers' }
-      ];
-    } else if (lower.includes('tokyo') || lower.includes('japan') || lower.includes('seoul')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'SUNNY', tempHighF: 73, tempLowF: 59, rainChance: 15, uvIndex: 7, summary: 'Crisp sunshine & light breeze' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'SUNNY', tempHighF: 75, tempLowF: 60, rainChance: 10, uvIndex: 8, summary: 'Pleasant & ideal walking weather' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'CLOUDY', tempHighF: 70, tempLowF: 57, rainChance: 30, uvIndex: 5, summary: 'Passing high clouds' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'RAIN', tempHighF: 66, tempLowF: 55, rainChance: 70, uvIndex: 3, summary: 'Light rain in metropolitan area' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'SUNNY', tempHighF: 72, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear blue skies' }
-      ];
-    } else if (lower.includes('miami') || lower.includes('cancun') || lower.includes('orlando') || lower.includes('hawaii') || lower.includes('bali')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'SUNNY', tempHighF: 86, tempLowF: 76, rainChance: 20, uvIndex: 10, summary: 'Tropical heat & high humidity' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'THUNDERSTORM', tempHighF: 84, tempLowF: 75, rainChance: 65, uvIndex: 8, summary: 'Afternoon coastal thunderstorm' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'SUNNY', tempHighF: 87, tempLowF: 77, rainChance: 15, uvIndex: 11, summary: 'Intense sunshine & tropical warmth' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'SUNNY', tempHighF: 88, tempLowF: 78, rainChance: 10, uvIndex: 11, summary: 'Clear skies with ocean breeze' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'CLOUDY', tempHighF: 85, tempLowF: 76, rainChance: 30, uvIndex: 9, summary: 'Warm with passing sun clouds' }
-      ];
-    } else if (lower.includes('denver') || lower.includes('alps') || lower.includes('calgary') || lower.includes('tromso') || lower.includes('ski')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'SNOW', tempHighF: 34, tempLowF: 22, rainChance: 85, uvIndex: 4, summary: 'Snow flurries & crisp mountain air' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'CHILLY', tempHighF: 38, tempLowF: 24, rainChance: 20, uvIndex: 6, summary: 'Sunny but sub-freezing mornings' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'SNOW', tempHighF: 32, tempLowF: 19, rainChance: 70, uvIndex: 3, summary: 'Steady mountain snowfall' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'CHILLY', tempHighF: 40, tempLowF: 26, rainChance: 15, uvIndex: 5, summary: 'Dry cold with crisp wind' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'SUNNY', tempHighF: 42, tempLowF: 28, rainChance: 10, uvIndex: 6, summary: 'Bright alpine sunshine' }
-      ];
+    if (isForecastMode && departureDateObj) {
+      // 5-Day dated forecast window starting from trip departure date
+      const result: WeatherForecastDay[] = [];
+      const baseDate = new Date(departureDateObj);
+
+      for (let i = 0; i < 5; i++) {
+        const dayDate = new Date(baseDate);
+        dayDate.setDate(baseDate.getDate() + i);
+        const dateLabel = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const weekday = dayDate.toLocaleDateString('en-US', { weekday: 'short' });
+        const dayName = i === 0 && daysUntilDep === 0 ? 'Today' : i === 1 && daysUntilDep === 0 ? 'Tomorrow' : `${weekday}, ${dateLabel}`;
+
+        if (lower.includes('london') || lower.includes('uk') || lower.includes('seattle') || lower.includes('ireland')) {
+          const specs = [
+            { condition: 'RAIN' as const, tempHighF: 59, tempLowF: 48, rainChance: 75, uvIndex: 3, summary: 'Intermittent brisk rain & overcast' },
+            { condition: 'RAIN' as const, tempHighF: 57, tempLowF: 46, rainChance: 80, uvIndex: 2, summary: 'Afternoon downpours & breeze' },
+            { condition: 'CLOUDY' as const, tempHighF: 62, tempLowF: 50, rainChance: 35, uvIndex: 4, summary: 'Mostly cloudy with mild breaks' },
+            { condition: 'CLOUDY' as const, tempHighF: 63, tempLowF: 51, rainChance: 25, uvIndex: 4, summary: 'Breezy & partly overcast' },
+            { condition: 'RAIN' as const, tempHighF: 60, tempLowF: 49, rainChance: 65, uvIndex: 3, summary: 'Scattered light showers' }
+          ][i % 5];
+          result.push({ dayName, date: dateLabel, ...specs });
+        } else if (lower.includes('tokyo') || lower.includes('japan') || lower.includes('seoul')) {
+          const specs = [
+            { condition: 'SUNNY' as const, tempHighF: 73, tempLowF: 59, rainChance: 15, uvIndex: 7, summary: 'Crisp sunshine & light breeze' },
+            { condition: 'SUNNY' as const, tempHighF: 75, tempLowF: 60, rainChance: 10, uvIndex: 8, summary: 'Pleasant & ideal walking weather' },
+            { condition: 'CLOUDY' as const, tempHighF: 70, tempLowF: 57, rainChance: 30, uvIndex: 5, summary: 'Passing high clouds' },
+            { condition: 'RAIN' as const, tempHighF: 66, tempLowF: 55, rainChance: 70, uvIndex: 3, summary: 'Light rain in metropolitan area' },
+            { condition: 'SUNNY' as const, tempHighF: 72, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear blue skies' }
+          ][i % 5];
+          result.push({ dayName, date: dateLabel, ...specs });
+        } else if (lower.includes('miami') || lower.includes('cancun') || lower.includes('orlando') || lower.includes('hawaii') || lower.includes('bali')) {
+          const specs = [
+            { condition: 'SUNNY' as const, tempHighF: 86, tempLowF: 76, rainChance: 20, uvIndex: 10, summary: 'Tropical heat & high humidity' },
+            { condition: 'THUNDERSTORM' as const, tempHighF: 84, tempLowF: 75, rainChance: 65, uvIndex: 8, summary: 'Afternoon coastal thunderstorm' },
+            { condition: 'SUNNY' as const, tempHighF: 87, tempLowF: 77, rainChance: 15, uvIndex: 11, summary: 'Intense sunshine & tropical warmth' },
+            { condition: 'SUNNY' as const, tempHighF: 88, tempLowF: 78, rainChance: 10, uvIndex: 11, summary: 'Clear skies with ocean breeze' },
+            { condition: 'CLOUDY' as const, tempHighF: 85, tempLowF: 76, rainChance: 30, uvIndex: 9, summary: 'Warm with passing sun clouds' }
+          ][i % 5];
+          result.push({ dayName, date: dateLabel, ...specs });
+        } else if (lower.includes('denver') || lower.includes('alps') || lower.includes('calgary') || lower.includes('tromso') || lower.includes('ski')) {
+          const specs = [
+            { condition: 'SNOW' as const, tempHighF: 34, tempLowF: 22, rainChance: 85, uvIndex: 4, summary: 'Snow flurries & crisp mountain air' },
+            { condition: 'CHILLY' as const, tempHighF: 38, tempLowF: 24, rainChance: 20, uvIndex: 6, summary: 'Sunny but sub-freezing mornings' },
+            { condition: 'SNOW' as const, tempHighF: 32, tempLowF: 19, rainChance: 70, uvIndex: 3, summary: 'Steady mountain snowfall' },
+            { condition: 'CHILLY' as const, tempHighF: 40, tempLowF: 26, rainChance: 15, uvIndex: 5, summary: 'Dry cold with crisp wind' },
+            { condition: 'SUNNY' as const, tempHighF: 42, tempLowF: 28, rainChance: 10, uvIndex: 6, summary: 'Bright alpine sunshine' }
+          ][i % 5];
+          result.push({ dayName, date: dateLabel, ...specs });
+        } else {
+          const specs = [
+            { condition: 'SUNNY' as const, tempHighF: 71, tempLowF: 56, rainChance: 20, uvIndex: 6, summary: 'Mild & pleasant traveling weather' },
+            { condition: 'CLOUDY' as const, tempHighF: 68, tempLowF: 54, rainChance: 40, uvIndex: 4, summary: 'Overcast with brief afternoon breeze' },
+            { condition: 'RAIN' as const, tempHighF: 64, tempLowF: 52, rainChance: 65, uvIndex: 3, summary: 'Passing showers; umbrella advised' },
+            { condition: 'SUNNY' as const, tempHighF: 73, tempLowF: 57, rainChance: 15, uvIndex: 7, summary: 'Sunny & warm walking conditions' },
+            { condition: 'SUNNY' as const, tempHighF: 74, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear skies through the evening' }
+          ][i % 5];
+          result.push({ dayName, date: dateLabel, ...specs });
+        }
+      }
+      return result;
     }
 
-    // Default versatile destination forecast
-    return [
-      { dayName: 'Today', date: 'Day 1', condition: 'SUNNY', tempHighF: 71, tempLowF: 56, rainChance: 20, uvIndex: 6, summary: 'Mild & pleasant traveling weather' },
-      { dayName: 'Tomorrow', date: 'Day 2', condition: 'CLOUDY', tempHighF: 68, tempLowF: 54, rainChance: 40, uvIndex: 4, summary: 'Overcast with brief afternoon breeze' },
-      { dayName: 'Day 3', date: 'Day 3', condition: 'RAIN', tempHighF: 64, tempLowF: 52, rainChance: 65, uvIndex: 3, summary: 'Passing showers; umbrella advised' },
-      { dayName: 'Day 4', date: 'Day 4', condition: 'SUNNY', tempHighF: 73, tempLowF: 57, rainChance: 15, uvIndex: 7, summary: 'Sunny & warm walking conditions' },
-      { dayName: 'Day 5', date: 'Day 5', condition: 'SUNNY', tempHighF: 74, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear skies through the evening' }
+    // Beyond 14 days or far future (e.g. Dec 2027) or no departure date:
+    // Present labeled climate norms for that travel month
+    const monthIdx = departureDateObj ? departureDateObj.getMonth() : 11; // default Dec
+    const isWinter = [11, 0, 1].includes(monthIdx);
+    const isSummer = [5, 6, 7].includes(monthIdx);
+
+    const periodLabels = [
+      `Early ${travelMonth}`,
+      `Mid ${travelMonth}`,
+      `Late ${travelMonth}`,
+      `Monthly Mean`,
+      `Precipitation Norm`
     ];
+
+    if (lower.includes('tokyo') || lower.includes('japan') || lower.includes('seoul')) {
+      if (isWinter) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 54, tempLowF: 39, rainChance: 15, uvIndex: 4, summary: 'Crisp, sunny winter air' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 52, tempLowF: 37, rainChance: 15, uvIndex: 4, summary: 'Clear skies & cold evenings' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 50, tempLowF: 35, rainChance: 20, uvIndex: 4, summary: 'Dry winter chill with wind' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'CHILLY', tempHighF: 52, tempLowF: 37, rainChance: 15, uvIndex: 4, summary: `Average ${travelMonth}: 52°F / 37°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 53, tempLowF: 38, rainChance: 18, uvIndex: 4, summary: 'Dry season, ~4 rain days/mo' }
+        ];
+      } else if (isSummer) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'RAIN', tempHighF: 84, tempLowF: 74, rainChance: 55, uvIndex: 9, summary: 'Summer humidity with rain' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 88, tempLowF: 77, rainChance: 35, uvIndex: 10, summary: 'Hot & humid city weather' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 89, tempLowF: 78, rainChance: 60, uvIndex: 9, summary: 'Warm tropical downpours' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 87, tempLowF: 76, rainChance: 45, uvIndex: 10, summary: `Average ${travelMonth}: 87°F / 76°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 86, tempLowF: 75, rainChance: 50, uvIndex: 8, summary: 'High humidity & showers' }
+        ];
+      } else {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 68, tempLowF: 54, rainChance: 30, uvIndex: 6, summary: 'Mild transition temperatures' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 71, tempLowF: 56, rainChance: 25, uvIndex: 6, summary: 'Pleasant sightseeing climate' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 69, tempLowF: 55, rainChance: 35, uvIndex: 5, summary: 'Moderate breeze & clouds' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 70, tempLowF: 55, rainChance: 30, uvIndex: 6, summary: `Average ${travelMonth}: 70°F / 55°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 67, tempLowF: 53, rainChance: 40, uvIndex: 5, summary: 'Moderate seasonal rain' }
+        ];
+      }
+    } else if (lower.includes('london') || lower.includes('uk') || lower.includes('seattle') || lower.includes('ireland')) {
+      if (isWinter) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'RAIN', tempHighF: 48, tempLowF: 39, rainChance: 65, uvIndex: 2, summary: 'Cold drizzle & overcast skies' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 46, tempLowF: 37, rainChance: 55, uvIndex: 2, summary: 'Grey skies & damp breeze' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'RAIN', tempHighF: 45, tempLowF: 36, rainChance: 70, uvIndex: 2, summary: 'Brisk wind & cold rain' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'RAIN', tempHighF: 47, tempLowF: 38, rainChance: 65, uvIndex: 2, summary: `Average ${travelMonth}: 47°F / 38°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 46, tempLowF: 37, rainChance: 65, uvIndex: 2, summary: 'Frequent light rain & fog' }
+        ];
+      } else {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 69, tempLowF: 54, rainChance: 35, uvIndex: 5, summary: 'Partly sunny & temperate' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'RAIN', tempHighF: 66, tempLowF: 52, rainChance: 50, uvIndex: 4, summary: 'Passing showers & cool breeze' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 72, tempLowF: 55, rainChance: 25, uvIndex: 6, summary: 'Comfortable & bright' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'CLOUDY', tempHighF: 68, tempLowF: 53, rainChance: 35, uvIndex: 5, summary: `Average ${travelMonth}: 68°F / 53°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 67, tempLowF: 53, rainChance: 40, uvIndex: 5, summary: 'Scattered occasional rain' }
+        ];
+      }
+    } else if (lower.includes('denver') || lower.includes('alps') || lower.includes('calgary') || lower.includes('tromso') || lower.includes('ski')) {
+      if (isWinter) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'SNOW', tempHighF: 43, tempLowF: 19, rainChance: 45, uvIndex: 3, summary: 'Sub-freezing nights & snow' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 41, tempLowF: 17, rainChance: 35, uvIndex: 3, summary: 'Sunny dry cold & frost' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'SNOW', tempHighF: 39, tempLowF: 16, rainChance: 55, uvIndex: 3, summary: 'Mountain snow showers' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'CHILLY', tempHighF: 42, tempLowF: 18, rainChance: 45, uvIndex: 3, summary: `Average ${travelMonth}: 42°F / 18°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'SNOW', tempHighF: 40, tempLowF: 17, rainChance: 50, uvIndex: 3, summary: 'Low humidity, periodic snow' }
+        ];
+      } else {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 84, tempLowF: 57, rainChance: 20, uvIndex: 8, summary: 'Warm sun & dry air' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 82, tempLowF: 56, rainChance: 45, uvIndex: 7, summary: 'Afternoon mountain thunder' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 86, tempLowF: 58, rainChance: 15, uvIndex: 8, summary: 'Bright clear summer days' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 84, tempLowF: 57, rainChance: 25, uvIndex: 8, summary: `Average ${travelMonth}: 84°F / 57°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 83, tempLowF: 56, rainChance: 20, uvIndex: 8, summary: 'Low humidity & cool nights' }
+        ];
+      }
+    } else if (lower.includes('miami') || lower.includes('cancun') || lower.includes('orlando') || lower.includes('hawaii') || lower.includes('bali')) {
+      if (isWinter) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 78, tempLowF: 65, rainChance: 20, uvIndex: 7, summary: 'Mild warm sunshine' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 79, tempLowF: 66, rainChance: 15, uvIndex: 7, summary: 'Pleasant coastal breeze' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 77, tempLowF: 64, rainChance: 25, uvIndex: 6, summary: 'Scattered clouds & comfort' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 78, tempLowF: 65, rainChance: 20, uvIndex: 7, summary: `Average ${travelMonth}: 78°F / 65°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 79, tempLowF: 66, rainChance: 15, uvIndex: 7, summary: 'Dry winter season' }
+        ];
+      } else {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 89, tempLowF: 79, rainChance: 40, uvIndex: 11, summary: 'Intense tropical sun' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 88, tempLowF: 78, rainChance: 65, uvIndex: 10, summary: 'Afternoon coastal storm' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 90, tempLowF: 80, rainChance: 35, uvIndex: 11, summary: 'High heat & humidity' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'THUNDERSTORM', tempHighF: 89, tempLowF: 79, rainChance: 50, uvIndex: 11, summary: `Average ${travelMonth}: 89°F / 79°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 88, tempLowF: 78, rainChance: 60, uvIndex: 10, summary: 'Wet season daily showers' }
+        ];
+      }
+    } else {
+      // Default global norms
+      if (isWinter) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 49, tempLowF: 35, rainChance: 30, uvIndex: 3, summary: 'Crisp seasonal chill' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 47, tempLowF: 34, rainChance: 35, uvIndex: 3, summary: 'Overcast & cool breeze' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 48, tempLowF: 33, rainChance: 25, uvIndex: 3, summary: 'Cold mornings & frost' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'CHILLY', tempHighF: 48, tempLowF: 34, rainChance: 30, uvIndex: 3, summary: `Average ${travelMonth}: 48°F / 34°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 49, tempLowF: 35, rainChance: 30, uvIndex: 3, summary: 'Typical winter conditions' }
+        ];
+      } else if (isSummer) {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 82, tempLowF: 65, rainChance: 25, uvIndex: 8, summary: 'Warm & sunny travel days' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 80, tempLowF: 64, rainChance: 35, uvIndex: 7, summary: 'Pleasant summer skies' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 84, tempLowF: 66, rainChance: 20, uvIndex: 8, summary: 'Warm afternoon warmth' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 82, tempLowF: 65, rainChance: 25, uvIndex: 8, summary: `Average ${travelMonth}: 82°F / 65°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 81, tempLowF: 64, rainChance: 25, uvIndex: 8, summary: 'Typical summer norms' }
+        ];
+      } else {
+        return [
+          { dayName: periodLabels[0], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 66, tempLowF: 50, rainChance: 30, uvIndex: 5, summary: 'Mild seasonal temperatures' },
+          { dayName: periodLabels[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 69, tempLowF: 52, rainChance: 25, uvIndex: 6, summary: 'Bright & temperate days' },
+          { dayName: periodLabels[2], date: 'Historical Norm', condition: 'RAIN', tempHighF: 64, tempLowF: 48, rainChance: 45, uvIndex: 4, summary: 'Occasional light showers' },
+          { dayName: periodLabels[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 66, tempLowF: 50, rainChance: 30, uvIndex: 5, summary: `Average ${travelMonth}: 66°F / 50°F` },
+          { dayName: periodLabels[4], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 67, tempLowF: 51, rainChance: 30, uvIndex: 5, summary: 'Typical moderate weather' }
+        ];
+      }
+    }
   };
 
   const forecast = getSimulatedForecast(city);
@@ -323,8 +503,12 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
               <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300">
                 Destination Weather & Clothing Advisor
               </span>
-              <span className="text-[9px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-2 py-0.2 rounded-full">
-                5-Day Intel
+              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                isForecastMode 
+                  ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                  : 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
+              }`}>
+                {isForecastMode ? '5-Day Forecast' : `Typical ${travelMonth}`}
               </span>
               <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400">
                 {city}: {forecast[0]?.summary} ({formatTemp(forecast[0]?.tempHighF)} / {formatTemp(forecast[0]?.tempLowF)})
@@ -417,8 +601,25 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
             </form>
           )}
 
-      {/* 5-Day Weather Forecast Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 my-4">
+      {/* Forecast or Climate Norms Banner */}
+      {!isForecastMode ? (
+        <div className="flex items-center gap-2 p-3 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-xs text-purple-900 dark:text-purple-200 mb-3">
+          <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+          <span className="font-semibold">
+            Typical for {travelMonth} in {city} — not a forecast
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 text-xs text-sky-900 dark:text-sky-200 mb-3">
+          <Info className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+          <span className="font-semibold">
+            5-Day departure forecast for {city} starting {forecast[0]?.date || 'soon'}
+          </span>
+        </div>
+      )}
+
+      {/* 5-Day Weather Forecast or Climate Norms Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 my-3">
         {forecast.map((day, idx) => {
           let Icon = Sun;
           let iconColor = 'text-amber-500';
@@ -444,11 +645,18 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
               className={`p-3 rounded-2xl border border-slate-100 dark:border-slate-800 ${bgColor} flex flex-col justify-between`}
             >
               <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                    {day.dayName}
-                  </span>
-                  <Icon className={`w-4 h-4 ${iconColor}`} />
+                <div className="flex items-center justify-between gap-1">
+                  <div className="min-w-0 pr-1">
+                    <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate">
+                      {day.dayName}
+                    </span>
+                    {day.date && (
+                      <span className="block text-[9px] text-slate-400 font-medium truncate">
+                        {day.date}
+                      </span>
+                    )}
+                  </div>
+                  <Icon className={`w-4 h-4 shrink-0 ${iconColor}`} />
                 </div>
                 <div className="mt-2">
                   <span className="text-base font-black text-slate-900 dark:text-white">

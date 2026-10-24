@@ -209,7 +209,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
           {getEffectiveOrigin() === 'referral' && (
             <div className="mb-2 p-2 rounded-xl bg-amber-400 text-purple-950 font-black text-xs flex items-center gap-2 shadow-sm animate-pulse">
               <Gift className="w-4 h-4 text-purple-900 shrink-0" />
-              <span>🎁 Referral Active: 1 Free Month of Platinum ($9.99 value) will be applied upon account creation!</span>
+              <span>🎁 Referral Active: 1 Free Month of Platinum ($4.99 value) will be applied upon account creation!</span>
             </div>
           )}
 
@@ -492,6 +492,12 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
                   </span>
                 </label>
               </div>
+            )}
+
+            {mode === 'signup' && (
+              <p className="text-[11px] text-purple-900 dark:text-purple-300 font-medium leading-relaxed text-center px-1 py-1">
+                Free account — includes a 7-day full Platinum trial, automatically activated. No credit card required. Returns to Free after 7 days.
+              </p>
             )}
 
             <button
