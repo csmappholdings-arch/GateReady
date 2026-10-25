@@ -653,6 +653,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             const dispEmpty = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(emptyLbs) : emptyLbs;
             const limit = getBagWeightCap(bag);
             const bagMat: BagMaterial = bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
+            const bagHasNoWeightLimit = bag.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit;
 
             return (
               <div
@@ -720,9 +721,18 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 {/* Weight & Progress */}
                 <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                   <div>
-                    <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300 block">
-                      {dispWeight.toFixed(1)} / {limit} {weightUnit}
-                    </span>
+                    {bagHasNoWeightLimit ? (
+                      <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300 block">
+                        {dispWeight.toFixed(1)} {weightUnit}{' '}
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                          (No airline weight limit · {trip.companyName || 'Carrier'})
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300 block">
+                        {dispWeight.toFixed(1)} / {limit} {weightUnit}
+                      </span>
+                    )}
                     <span className="text-[9px] text-slate-400 font-medium">
                       incl. {dispEmpty.toFixed(1)} {weightUnit.toLowerCase()} bag
                     </span>

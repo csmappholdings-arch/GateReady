@@ -121,8 +121,13 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           )}
         </div>
 
-        {/* 3 Real Product Visual Previews (Interactive & Authentic Design) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 pt-4 text-left">
+        {/* 3 Real Product Visual Previews with semantic H2 */}
+        <div className="pt-2 text-center">
+          <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-purple-700/90 dark:text-purple-300/90">
+            Trip Packing Checklist, Overweight Baggage Calculator & Luggage Allowances
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 pt-2 text-left">
           
           {/* Visual 1: Smart Luggage Scale & Tare Meter */}
           <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/80 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-3">

@@ -4,6 +4,7 @@ import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
 import { computeTripWeightStatus } from '../utils/bagWeightAnalysis';
 import { PrintPackingListModal } from './PrintPackingListModal';
+import { airlineLimits } from '../data/allowances';
 import { 
   CheckCircle2, 
   AlertCircle, 
@@ -288,13 +289,16 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
               ? DefaultSuggestions.convertLbsToKg(bagWeightLbs).toFixed(1) + ' kg'
               : bagWeightLbs.toFixed(1) + ' lbs';
 
+            const carrierLimit = airlineLimits.find(a => a.company.toLowerCase() === (trip.companyName || '').toLowerCase());
+            const hasNoWeightLimit = bag.type === 'CARRY_ON' && Boolean(carrierLimit && /no weight limit/i.test(carrierLimit.carryOnWeightLimit || ''));
+
             const limitLbs = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
             const displayLimit = weightUnit === 'KG'
               ? DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0) + ' kg'
               : limitLbs + ' lbs';
 
-            const pct = Math.min(Math.round((bagWeightLbs / limitLbs) * 100), 120);
-            const isBagOverweight = bagWeightLbs > limitLbs;
+            const pct = hasNoWeightLimit ? Math.min(Math.round((bagWeightLbs / 22) * 100), 100) : Math.min(Math.round((bagWeightLbs / limitLbs) * 100), 120);
+            const isBagOverweight = !hasNoWeightLimit && bagWeightLbs > limitLbs;
 
             return (
               <div
@@ -317,16 +321,27 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                     )}
                   </div>
                   <div className="text-right">
-                    <span
-                      className={`text-xs font-bold tabular-nums ${
-                        isBagOverweight ? 'text-rose-500' : 'text-slate-800 dark:text-slate-200'
-                      }`}
-                    >
-                      {displayBagWeight}
-                    </span>
-                    <span className="text-[10px] text-slate-400 ml-1">
-                      / {displayLimit}
-                    </span>
+                    {hasNoWeightLimit ? (
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {displayBagWeight}{' '}
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                          (No airline limit)
+                        </span>
+                      </span>
+                    ) : (
+                      <>
+                        <span
+                          className={`text-xs font-bold tabular-nums ${
+                            isBagOverweight ? 'text-rose-500' : 'text-slate-800 dark:text-slate-200'
+                          }`}
+                        >
+                          {displayBagWeight}
+                        </span>
+                        <span className="text-[10px] text-slate-400 ml-1">
+                          / {displayLimit}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 

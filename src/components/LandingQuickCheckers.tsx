@@ -19,6 +19,7 @@ import {
   calculateTripBaggageFees, 
   BagFeeCalculationResult 
 } from '../data/baggageFeeData';
+import { AdPlacement } from './AdPlacement';
 import { 
   ENTRY_REQUIREMENTS_DATABASE, 
   getEntryRequirements, 
@@ -173,7 +174,7 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
           <span>Standalone Travel Checkers · No Account Needed</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          Instant Baggage Fees & Country Entry Checkers
+          Baggage Fees by Airline, Luggage Allowances & Entry Requirements
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
           Look up published airline checked luggage fees and passport validity rules right now before creating a trip.
@@ -603,6 +604,9 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Non-intrusive ad slot below standalone fee checker result */}
+      <AdPlacement slotId="ad-slot-landing-fee-checker" format="inline" className="mt-8" />
     </section>
   );
 };

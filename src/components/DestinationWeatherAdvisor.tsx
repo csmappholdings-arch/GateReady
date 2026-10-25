@@ -158,8 +158,11 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
     daysUntilDep = Math.round((depMidnight.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   }
 
+  // Check if a departure date is configured on the trip
+  const hasDepartureDate = Boolean(trip.departureDate && trip.departureDate.trim() && departureDateObj);
+
   // Active forecast mode if trip departs within 0 to 14 days
-  const isForecastMode = daysUntilDep !== null && daysUntilDep >= 0 && daysUntilDep <= 14;
+  const isForecastMode = hasDepartureDate && daysUntilDep !== null && daysUntilDep >= 0 && daysUntilDep <= 14;
 
   const travelMonth = departureDateObj
     ? departureDateObj.toLocaleString('en-US', { month: 'long' })
@@ -504,14 +507,18 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
                 Destination Weather & Clothing Advisor
               </span>
               <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                isForecastMode 
+                !hasDepartureDate
                   ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
-                  : 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
+                  : isForecastMode 
+                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                    : 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
               }`}>
-                {isForecastMode ? '5-Day Forecast' : `Typical ${travelMonth}`}
+                {!hasDepartureDate ? `Example (${travelMonth})` : isForecastMode ? '5-Day Forecast' : `Typical ${travelMonth}`}
               </span>
               <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400">
-                {city}: {forecast[0]?.summary} ({formatTemp(forecast[0]?.tempHighF)} / {formatTemp(forecast[0]?.tempLowF)})
+                {!hasDepartureDate 
+                  ? `${city}: Example weather preview (${formatTemp(forecast[0]?.tempHighF)} / ${formatTemp(forecast[0]?.tempLowF)})`
+                  : `${city}: ${forecast[0]?.summary} (${formatTemp(forecast[0]?.tempHighF)} / ${formatTemp(forecast[0]?.tempLowF)})`}
               </span>
             </div>
             
@@ -602,7 +609,19 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
           )}
 
       {/* Forecast or Climate Norms Banner */}
-      {!isForecastMode ? (
+      {!hasDepartureDate ? (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/60 text-xs text-amber-950 dark:text-amber-200 mb-3">
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span className="font-semibold">
+              Example: typical {travelMonth} in {city} — set your departure date for your trip's weather
+            </span>
+          </div>
+          <span className="text-[11px] text-amber-800/90 dark:text-amber-300/90 font-medium shrink-0">
+            Add a departure date to see the forecast or typical weather for your travel month
+          </span>
+        </div>
+      ) : !isForecastMode ? (
         <div className="flex items-center gap-2 p-3 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-xs text-purple-900 dark:text-purple-200 mb-3">
           <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
           <span className="font-semibold">

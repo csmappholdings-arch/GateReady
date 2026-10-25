@@ -28,7 +28,20 @@ import { ReferralModal } from './components/ReferralModal';
 import { AirlineGuidesModal } from './components/AirlineGuidesModal';
 import { LandingQuickCheckers } from './components/LandingQuickCheckers';
 import { FreeLimitCheckerModal } from './components/FreeLimitCheckerModal';
+import { AdPlacement } from './components/AdPlacement';
 import { TravelType, BagType, BagMaterial, getUserPresetWeightLbs } from './types/travel';
+import { AboutPage } from './pages/AboutPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { TermsPage } from './pages/TermsPage';
+import { ContactPage } from './pages/ContactPage';
+import { FaqPage } from './pages/FaqPage';
+import { PricingPage } from './pages/PricingPage';
+import { HowItWorksPage } from './pages/HowItWorksPage';
+import { CookiesPage } from './pages/CookiesPage';
+import { RefundsPage } from './pages/RefundsPage';
+import { ChangelogPage } from './pages/ChangelogPage';
+import { SecurityPage } from './pages/SecurityPage';
+import { ReviewsPage } from './pages/ReviewsPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -74,7 +87,8 @@ function PackingAppContent() {
     checkedCount: number;
     carryOnCount: number;
   } | null>(null);
-  const [tripNotice, setTripNotice] = useState<string | null>(null);
+  const [tripNotice, setTripNotice] = useState<{ tripId: string; message: string } | null>(null);
+  const [dismissedNoticeTripIds, setDismissedNoticeTripIds] = useState<Set<string>>(new Set());
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddBagModal, setShowAddBagModal] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
@@ -129,6 +143,16 @@ function PackingAppContent() {
       localStorage.removeItem('gateready_organic_save_gate_dismissed');
     } catch {}
   }, []);
+
+  // Fix 1: Plan-limit notice must die with its trip. Deleting a trip clears its notice immediately.
+  useEffect(() => {
+    if (tripNotice) {
+      const tripStillExists = trips.some((t) => t.id === tripNotice.tripId);
+      if (!tripStillExists) {
+        setTripNotice(null);
+      }
+    }
+  }, [trips, tripNotice]);
 
   // Fix 1: Trigger Save Gate once per session when anonymous user builds a real list (e.g. 3rd item added)
   useEffect(() => {
@@ -280,7 +304,7 @@ function PackingAppContent() {
     const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
     const finalBags = allowedBags.map((b) => ({ ...b, assignedTo: defaultUser }));
     const tripTitle = `${pendingCheckerConfig.carrier} Journey`;
-    addTrip(
+    const createdTrip = addTrip(
       tripTitle,
       'PLANE',
       pendingCheckerConfig.carrier,
@@ -289,7 +313,9 @@ function PackingAppContent() {
       [defaultUser],
       {}
     );
-    setTripNotice(leftOutNote);
+    if (createdTrip && createdTrip.id) {
+      setTripNotice({ tripId: createdTrip.id, message: leftOutNote });
+    }
     setPendingCheckerConfig(null);
   };
 
@@ -330,20 +356,23 @@ function PackingAppContent() {
         onOpenReferral={() => setShowReferralModal(true)}
       />
 
-      {/* Free Plan Bag Limit Trip Notice (e.g. When extra bags were left out) */}
-      {tripNotice && (
+      {/* Free Plan Bag Limit Trip Notice (strictly scoped to currentTrip; never on landing or other trips) */}
+      {tripNotice && currentTrip && tripNotice.tripId === currentTrip.id && !dismissedNoticeTripIds.has(tripNotice.tripId) && (
         <div className="bg-purple-950 text-white px-4 py-3 shadow-lg flex items-center justify-between gap-3 text-xs border-b border-purple-800 relative z-30 animate-in fade-in duration-200">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-6 h-6 rounded-lg bg-amber-400 text-purple-950 flex items-center justify-center shrink-0 font-bold shadow-xs">
               <Info className="w-3.5 h-3.5" />
             </div>
             <p className="font-semibold text-purple-100 leading-snug">
-              {tripNotice}
+              {tripNotice.message}
             </p>
           </div>
           <button
             type="button"
-            onClick={() => setTripNotice(null)}
+            onClick={() => {
+              setDismissedNoticeTripIds((prev) => new Set(prev).add(tripNotice.tripId));
+              setTripNotice(null);
+            }}
             className="p-1 rounded-lg text-purple-300 hover:text-white hover:bg-purple-900 transition-colors cursor-pointer shrink-0"
             aria-label="Dismiss notice"
           >
@@ -807,6 +836,11 @@ function PackingAppContent() {
         }}
       />
 
+      {/* Non-intrusive ad placement slot above footer on guest landing page */}
+      {!currentTrip && (
+        <AdPlacement slotId="ad-slot-landing-footer" format="footer" className="px-4 mb-4" />
+      )}
+
       {/* Conversion Marketing & Navigation Footer */}
       <AppFooter
         onOpenPricing={() => openPaywall()}
@@ -818,6 +852,34 @@ function PackingAppContent() {
 }
 
 export default function App() {
+  const [pathname, setPathname] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.replace(/\/+$/, '') || '/';
+    }
+    return '/';
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPathname(window.location.pathname.replace(/\/+$/, '') || '/');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  if (pathname === '/about') return <AboutPage />;
+  if (pathname === '/privacy') return <PrivacyPage />;
+  if (pathname === '/terms') return <TermsPage />;
+  if (pathname === '/contact') return <ContactPage />;
+  if (pathname === '/faq') return <FaqPage />;
+  if (pathname === '/pricing') return <PricingPage />;
+  if (pathname === '/how-it-works') return <HowItWorksPage />;
+  if (pathname === '/cookies') return <CookiesPage />;
+  if (pathname === '/refunds') return <RefundsPage />;
+  if (pathname === '/changelog') return <ChangelogPage />;
+  if (pathname === '/security') return <SecurityPage />;
+  if (pathname === '/reviews') return <ReviewsPage />;
+
   return (
     <AuthProvider>
       <SubscriptionProvider>

@@ -1,6 +1,6 @@
 {
   "name": "GateReady.ca",
-  "description": "Smart travel packing checklist, luggage weight estimator, and airline baggage allowance guide.",
+  "description": "Calculate baggage fees by airline, check carry-on size and weight limits, audit TSA 3-1-1 liquids, and pack with an intelligent overweight baggage calculator.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { getPageHtmlContent } from './src/pages/serverPagesHtml';
 
 dotenv.config();
 
@@ -177,13 +179,100 @@ app.post('/api/send-packing-list', async (req: Request, res: Response) => {
 
 // Setup Vite middleware in dev or static files in production
 async function startServer() {
+  let viteDevServer: any = null;
+
   if (!isProduction) {
     const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
+    viteDevServer = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
     });
-    app.use(vite.middlewares);
+  }
+
+  // Pre-rendered HTML routes for all 12 trust, compliance, and legal pages
+  const STATIC_PAGE_ROUTES = [
+    '/about',
+    '/privacy',
+    '/terms',
+    '/contact',
+    '/faq',
+    '/pricing',
+    '/how-it-works',
+    '/cookies',
+    '/refunds',
+    '/changelog',
+    '/security',
+    '/reviews'
+  ];
+
+  STATIC_PAGE_ROUTES.forEach((routePath) => {
+    app.get([routePath, `${routePath}/`], async (req: Request, res: Response, next) => {
+      try {
+        const pageData = getPageHtmlContent(routePath);
+        if (!pageData) {
+          return next();
+        }
+
+        const { meta, bodyHtml } = pageData;
+        const indexPath = isProduction
+          ? path.resolve(__dirname, 'dist', 'index.html')
+          : path.resolve(__dirname, 'index.html');
+
+        if (!fs.existsSync(indexPath)) {
+          return next();
+        }
+
+        let template = fs.readFileSync(indexPath, 'utf-8');
+
+        // Inject page metadata
+        template = template.replace(
+          /<title>.*?<\/title>/,
+          `<title>${meta.title}</title>`
+        );
+        template = template.replace(
+          /<meta\s+name="description"\s+content=".*?"\s*\/?>/,
+          `<meta name="description" content="${meta.description}" />`
+        );
+        template = template.replace(
+          /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/,
+          `<meta property="og:title" content="${meta.title}" />`
+        );
+        template = template.replace(
+          /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
+          `<meta property="og:description" content="${meta.description}" />`
+        );
+        template = template.replace(
+          /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/,
+          `<meta name="twitter:title" content="${meta.title}" />`
+        );
+        template = template.replace(
+          /<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/,
+          `<meta name="twitter:description" content="${meta.description}" />`
+        );
+        template = template.replace(
+          /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
+          `<link rel="canonical" href="https://gateready.ca${meta.path}" />`
+        );
+
+        // Inject pre-rendered semantic HTML inside #root
+        template = template.replace(
+          '<div id="root"></div>',
+          `<div id="root">${bodyHtml}</div>`
+        );
+
+        if (!isProduction && viteDevServer) {
+          template = await viteDevServer.transformIndexHtml(req.originalUrl, template);
+        }
+
+        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(template);
+      } catch (e) {
+        next(e);
+      }
+    });
+  });
+
+  if (!isProduction && viteDevServer) {
+    app.use(viteDevServer.middlewares);
   } else {
     app.use(express.static(path.resolve(__dirname, 'dist')));
     app.get('*', (_req, res) => {

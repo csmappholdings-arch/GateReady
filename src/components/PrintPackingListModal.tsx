@@ -35,6 +35,7 @@ import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { AccountSyncModal } from './AccountSyncModal';
 import { recordCapturedEmail } from '../lib/firebase';
+import { airlineLimits } from '../data/allowances';
 
 interface PrintPackingListModalProps {
   isOpen: boolean;
@@ -703,6 +704,9 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                 ? `${DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0)} kg`
                 : `${limitLbs} lbs`;
 
+              const carrierLimit = airlineLimits.find(a => a.company.toLowerCase() === (trip.companyName || '').toLowerCase());
+              const bagHasNoWeightLimit = bag.type === 'CARRY_ON' && Boolean(carrierLimit && /no weight limit/i.test(carrierLimit.carryOnWeightLimit || ''));
+
               return (
                 <div 
                   key={bag.id}
@@ -730,7 +734,11 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                     <div className="flex items-center gap-3 text-xs font-bold text-slate-700 dark:text-slate-300 self-end sm:self-center">
                       <span className="flex items-center gap-1">
                         <Scale className="w-3.5 h-3.5 text-purple-600" />
-                        <span>{displayBagWeight} / {displayLimit} cap</span>
+                        {bagHasNoWeightLimit ? (
+                          <span>{displayBagWeight} (No airline limit · {trip.companyName || 'Carrier'})</span>
+                        ) : (
+                          <span>{displayBagWeight} / {displayLimit} cap</span>
+                        )}
                       </span>
                       <span className="text-slate-400">•</span>
                       <span className="text-purple-700 dark:text-purple-300 font-extrabold">
