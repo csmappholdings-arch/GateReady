@@ -134,7 +134,7 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
             />
           </div>
 
-          {/* TSA 3-1-1 Liquid Scanner Live Feedback */}
+          {/* TSA 3-1-1 Liquid Checker Live Feedback */}
           {liquidScan.isLiquid && (
             <div className={`p-2.5 rounded-xl border text-xs flex items-start gap-2 ${
               liquidScan.status === 'NON_COMPLIANT'

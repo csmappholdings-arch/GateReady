@@ -41,7 +41,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
   // Auto-switch to Return countdown for Pro users if departure date/time has already passed
   useEffect(() => {
     if (!isPro || !trip.departureDate) return;
-    const depRes = computeCountdown(trip.departureDate, trip.departureTime || '09:00');
+    const depRes = computeCountdown(trip.departureDate, trip.departureTime || '');
     if (trip.returnTripDate && depRes.isPast) {
       setActiveLeg('return');
     }
@@ -56,7 +56,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
   }, []);
 
   const targetDateStr = activeLeg === 'departure' ? trip.departureDate : trip.returnTripDate;
-  const targetTimeStr = activeLeg === 'departure' ? trip.departureTime || '09:00' : trip.returnTripTime || '17:00';
+  const targetTimeStr = activeLeg === 'departure' ? (trip.departureTime || '') : (trip.returnTripTime || '');
   const hasTargetDate = Boolean(targetDateStr && targetDateStr.trim());
 
   // Compute countdown on every render via single source of truth
@@ -68,22 +68,24 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
     if (!dateStr) return 'Not set';
     try {
       const cleanDate = dateStr.trim();
-      const cleanTime = (timeStr || '09:00').trim();
+      const hasTime = Boolean(timeStr && timeStr.trim());
+      const cleanTime = hasTime ? timeStr!.trim() : '00:00';
       let d: Date;
       if (/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
         const [y, m, day] = cleanDate.split('-').map(Number);
         const [h, min] = cleanTime.split(':').map((v) => parseInt(v, 10) || 0);
         d = new Date(y, m - 1, day, h || 0, min || 0, 0, 0);
       } else {
-        d = new Date(`${cleanDate}T${cleanTime}:00`);
+        d = hasTime ? new Date(`${cleanDate}T${cleanTime}:00`) : new Date(cleanDate);
       }
       if (isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString(undefined, { 
+      const formattedDate = d.toLocaleDateString(undefined, { 
         weekday: 'short', 
         month: 'short', 
         day: 'numeric', 
         year: 'numeric'
-      }) + (timeStr ? ` at ${timeStr}` : '');
+      });
+      return hasTime ? `${formattedDate} at ${cleanTime}` : formattedDate;
     } catch {
       return dateStr;
     }

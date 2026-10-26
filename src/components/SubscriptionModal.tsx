@@ -326,7 +326,7 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <ul className="pl-4 space-y-1 text-[11px] text-slate-600 dark:text-slate-400 list-disc">
                     <li>Smart Luggage Scales</li>
-                    <li>TSA 3-1-1 liquids scanner</li>
+                    <li>TSA 3-1-1 liquids checker</li>
                     <li>1-click presets & bag kits</li>
                     <li>Printable PDF packing lists</li>
                     <li>Departure countdown & alerts</li>

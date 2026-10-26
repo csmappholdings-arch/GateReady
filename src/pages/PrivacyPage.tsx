@@ -123,7 +123,6 @@ export const PrivacyPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1 font-mono">
             <div>Owner: CSM App Holdings</div>
             <div>Support & Privacy Contact: <a href="mailto:csmappholdings@gmail.com" className="text-purple-600 dark:text-purple-400 underline font-bold">csmappholdings@gmail.com</a></div>
-            <div className="text-slate-400 text-[11px] font-sans">Business Address: [TO BE PROVIDED BY OWNER]</div>
           </div>
         </section>
       </div>

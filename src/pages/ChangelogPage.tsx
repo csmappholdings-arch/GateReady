@@ -14,13 +14,135 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Release Oct 24, 2026 */}
+      {/* Release Oct 26, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-mono text-xs font-bold">
+            October 26, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Accuracy & Interface Alignment Release</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Overweight Surcharges Warning Typography</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Verified and corrected the spelling of "Surcharges" across all luggage overweight warning alerts, threshold banners, and checklist notices.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Canonical Plan Limits & Pricing Alignment</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Aligned the /pricing page and documentation with the canonical in-app pricing dialog: Gold is designated as MOST POPULAR, Silver includes unlimited bags, and Gold includes unlimited active trips.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Displayed Weight Headroom Percentage Synchronization</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Weight headroom percentages across meters, banners, and readiness are now computed directly from the displayed rounded weight (e.g. 21.9 / 22 lbs shows 99.5%, and 22.5 / 22 lbs shows 102.3%).
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Readiness Carrier-Specific Limit Enforcement</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Unified departure readiness with carrier policy logic: where the carrier states no weight limit (such as Air Canada carry-on), no weight-based overweight flags appear in readiness, meters, banners, or details.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Mobile Header Responsiveness (~390px Viewport)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Re-architected the header layout for mobile screens so logo, trial status, user profile, and settings buttons never crowd, clip, or overlap on narrow devices.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>TSA 3-1-1 "Checker" Terminology Audit</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Standardized terminology throughout the entire application and documentation: the rule-based liquids audit is consistently referred to as the TSA 3-1-1 Liquids Checker.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Accurate Departure Time & Countdown Display</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              When a traveler creates a trip with no departure time, GateReady displays date only or "time not set" rather than defaulting to an unentered 09:00 flight time.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Hidden Ad Placeholders & Monetization Architecture</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Ad placement slots render nothing visible until a live ad network ID is configured in settings. Paid plans (Silver, Gold, Platinum) remain 100% ad-free, with a master toggle to disable ads site-wide instantly.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Multi-Open FAQ Accordion & Landing CTA Hierarchy</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              The FAQ accordion now allows multiple items to remain open simultaneously. On the guest landing page, the "Create Your Trip (Free)" hero CTA is visually primary, with all secondary entry points styled with appropriate utility weight.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Bing Site Scan, Title Length & Semantic H1 Alignment</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Shortened the homepage title tag to 44 characters to prevent search display truncation and added a server-rendered H1 tag carrying the hero message, ensuring every route has exactly one H1 and displayable title length.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Realistic Marketing Copy Alignment</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Softened absolute guarantee phrasing to match the published airline estimates disclaimer, focusing on helping travelers avoid unexpected airport fees.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Release Oct 24, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold">
             October 24, 2026
           </span>
-          <span className="text-xs text-slate-500 font-medium">Compliance & Polish Release</span>
+          <span className="text-xs text-slate-500 font-medium">Compliance & Foundation Release</span>
         </div>
 
         <div className="space-y-3">
@@ -30,7 +152,7 @@ export const ChangelogPage: React.FC = () => {
               <span>Plan-Limit Notice Trip Scoping</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Free plan bag limit alerts are now strictly scoped to the trip that triggered them. Deleting a trip immediately dismisses all associated limit notices, preventing warning persistence on other trips or the guest landing page.
+              Free plan bag limit alerts are now strictly scoped to the trip that triggered them. Deleting a trip immediately dismisses all associated limit notices.
             </p>
           </div>
 
@@ -40,17 +162,7 @@ export const ChangelogPage: React.FC = () => {
               <span>Air Canada Carry-On Limit Synchronization</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Resolved a display contradiction on Air Canada trips. The bag list card now correctly shows "No airline weight limit · Air Canada" matching the bag detail view, rather than displaying an erroneous generic 22-lb cap.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
-            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Overweight Surcharges Warning Typography</span>
-            </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Corrected the spelling of "Surcharges" across all baggage weight threshold alerts and proofread all notification banners.
+              Bag list cards now correctly show "No airline weight limit · Air Canada" matching the bag detail view.
             </p>
           </div>
 
@@ -60,7 +172,7 @@ export const ChangelogPage: React.FC = () => {
               <span>Climate Forecast No-Date Guidance State</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Replaced unselected default month weather assumptions with an informative placeholder explaining that setting a trip departure date activates destination climate norms and near-term forecasts.
+              Replaced unselected default month weather assumptions with informative placeholder guidance.
             </p>
           </div>
 
@@ -80,7 +192,7 @@ export const ChangelogPage: React.FC = () => {
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold">
-            October 2026
+            Earlier October 2026
           </span>
           <span className="text-xs text-slate-500 font-medium">Core Limits & Allowance Update</span>
         </div>
@@ -103,16 +215,6 @@ export const ChangelogPage: React.FC = () => {
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Prominently labeled the "$4.99 value" of the friend referral program and added a clear 7-day Platinum trial indicator on the user account screen with exact trial expiration details.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
-            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
-              <Droplets className="w-4 h-4 text-sky-500" />
-              <span>TSA 3-1-1 Rule Engine & 42-Airline Allowance Matrix</span>
-            </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Integrated automatic 3.4 oz bottle volume checking across carry-on bags and updated baggage allowance dimensions for 42+ global airlines.
             </p>
           </div>
         </div>

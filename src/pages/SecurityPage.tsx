@@ -78,12 +78,6 @@ export const SecurityPage: React.FC = () => {
           We appreciate responsible disclosure and aim to acknowledge all security reports promptly.
         </p>
       </section>
-
-      {/* Placeholders */}
-      <section className="pt-2 text-[11px] text-slate-400 space-y-1">
-        <div>Security Lead / DPO: [TO BE PROVIDED BY OWNER]</div>
-        <div>Security Compliance Certifications: [TO BE PROVIDED BY OWNER]</div>
-      </section>
     </PageLayout>
   );
 };

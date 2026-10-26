@@ -58,11 +58,12 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
   const [dateInput, setDateInput] = useState(trip.departureDate || '');
-  const [timeInput, setTimeInput] = useState(trip.departureTime || '09:00');
+  const [timeInput, setTimeInput] = useState(trip.departureTime || '');
 
   useEffect(() => {
     setDateInput(trip.departureDate || '');
-  }, [trip.departureDate]);
+    setTimeInput(trip.departureTime || '');
+  }, [trip.departureDate, trip.departureTime]);
   
   // Custom reminder modal state
   const [showAddReminderModal, setShowAddReminderModal] = useState(false);
@@ -89,7 +90,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
         return;
       }
 
-      const res = computeCountdown(trip.departureDate, trip.departureTime || '09:00');
+      const res = computeCountdown(trip.departureDate, trip.departureTime || '');
       setTimeLeft({
         days: res.days,
         hours: res.hours,
@@ -215,7 +216,14 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
             </div>
             <p className="text-xs text-purple-200/80 mt-0.5">
               {trip.departureDate ? (
-                <span>Scheduled: <strong>{trip.departureDate}</strong> at <strong>{trip.departureTime || '09:00'}</strong></span>
+                <span>
+                  Scheduled: <strong>{trip.departureDate}</strong>
+                  {trip.departureTime && trip.departureTime.trim() ? (
+                    <> at <strong>{trip.departureTime.trim()}</strong></>
+                  ) : (
+                    <span className="text-purple-300 font-normal"> (time not set)</span>
+                  )}
+                </span>
               ) : (
                 <span>Set your departure date & time for live countdown</span>
               )}

@@ -256,7 +256,7 @@ async function startServer() {
 
         // Inject pre-rendered semantic HTML inside #root
         template = template.replace(
-          '<div id="root"></div>',
+          /<div id="root">[\s\S]*?<\/div>/,
           `<div id="root">${bodyHtml}</div>`
         );
 

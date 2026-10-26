@@ -93,39 +93,35 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
         {/* 3-Column Command Deck Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
-          {/* Column 1: Primary Trip Launcher Card (4 cols) */}
-          <div className="lg:col-span-4 p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-slate-900/95 via-purple-950/90 to-slate-950/95 border-2 border-fuchsia-400/80 shadow-[0_0_35px_rgba(217,70,239,0.35)] backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group">
-            {/* Pulsing ambient aura */}
-            <div className="absolute -top-20 -left-20 w-44 h-44 bg-fuchsia-500/20 rounded-full blur-2xl pointer-events-none" />
-            
+          {/* Column 1: Trip Launcher Card (4 cols) - Subordinate to the main Hero CTA */}
+          <div className="lg:col-span-4 p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-slate-900/95 via-purple-950/90 to-slate-950/95 border border-purple-800/60 shadow-md backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/90 border border-fuchsia-400/50 text-[10px] font-black uppercase tracking-wider text-fuchsia-200 shadow-xs mb-3">
-                <Sparkles className="w-3 h-3 text-fuchsia-300 animate-pulse" />
-                <span>Zero Overweight Guarantee</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/90 border border-purple-500/40 text-[10px] font-black uppercase tracking-wider text-purple-200 shadow-xs mb-3">
+                <Sparkles className="w-3 h-3 text-purple-300" />
+                <span>Smart Overweight Protection</span>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
                 Create Your Next Trip
               </h3>
               <p className="text-xs text-purple-200/90 mt-2 mb-6 leading-relaxed">
                 Configure your baggage tare limits, liquids checklist, and packing distribution across airline, rail, or cruise networks with real-time audit tools.
               </p>
 
-              {/* Big Primary CTA Button */}
-              <div className="relative w-full mb-4">
-                <div className="absolute -inset-1 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 rounded-2xl blur-xs opacity-90 animate-pulse pointer-events-none" />
+              {/* Secondary Entry Button - cleanly subordinate to the primary hero CTA */}
+              <div className="w-full mb-4">
                 <button
                   type="button"
                   onClick={() => onOpenAddTrip()}
-                  className="relative w-full h-13 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-98 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl shadow-fuchsia-600/40 transition-all cursor-pointer border border-fuchsia-200/50"
+                  className="w-full h-11 px-5 rounded-2xl bg-purple-700/80 hover:bg-purple-600 active:scale-98 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer border border-purple-400/30"
                 >
-                  <Plus className="w-5 h-5 stroke-[3]" />
-                  <span>Start New Trip Planner</span>
+                  <Plus className="w-4 h-4" />
+                  <span>Start Trip Planner</span>
                 </button>
               </div>
             </div>
 
-            {/* Quick Guarantees & Stats */}
+            {/* Quick Benefits & Stats */}
             <div className="pt-4 border-t border-purple-800/40 space-y-2 text-[11px] text-purple-200/80 font-medium">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -133,7 +129,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>TSA 3-1-1 toiletry scan & volume converter</span>
+                <span>TSA 3-1-1 toiletry checker & volume converter</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />

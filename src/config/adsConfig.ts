@@ -20,14 +20,15 @@ export const ADS_CONFIG = {
 
   /**
    * Ad network publisher account ID (e.g., 'ca-pub-XXXXXXXXXXXXXXXX').
-   * Left blank for development / placeholder mode.
+   * Left blank for development / placeholder mode. When empty, all ad slots render null (completely hidden).
    */
   publisherId: '',
 
   /**
    * Whether to render visual placement frames when running in placeholder mode without network IDs.
+   * STRICT: Must remain false unless explicitly developing ad layout. Slots render nothing visible when unconfigured.
    */
-  showPlaceholderFrames: true,
+  showPlaceholderFrames: false,
 
   /**
    * Non-intrusive placement slots definition.

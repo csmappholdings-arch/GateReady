@@ -133,10 +133,18 @@ const FAQS: FaqItem[] = [
 ];
 
 export const FaqPage: React.FC = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndices, setOpenIndices] = useState<Set<number>>(() => new Set([0]));
 
   const toggle = (idx: number) => {
-    setOpenIndex(openIndex === idx ? null : idx);
+    setOpenIndices((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
+      return next;
+    });
   };
 
   return (
@@ -153,7 +161,7 @@ export const FaqPage: React.FC = () => {
       {/* Accordion FAQ list */}
       <section className="space-y-3 pt-2">
         {FAQS.map((faq, idx) => {
-          const isOpen = openIndex === idx;
+          const isOpen = openIndices.has(idx);
           return (
             <div 
               key={idx}

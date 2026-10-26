@@ -30,7 +30,8 @@ export function computeCountdown(dateStr?: string, timeStr?: string): CountdownR
   }
 
   const cleanDate = dateStr.trim();
-  const cleanTime = (timeStr || '09:00').trim();
+  const hasTime = Boolean(timeStr && timeStr.trim());
+  const cleanTime = hasTime ? timeStr!.trim() : '00:00';
 
   let targetDate: Date;
 
@@ -40,7 +41,7 @@ export function computeCountdown(dateStr?: string, timeStr?: string): CountdownR
     const [h, min] = cleanTime.split(':').map((v) => parseInt(v, 10) || 0);
     targetDate = new Date(y, m - 1, d, h || 0, min || 0, 0, 0);
   } else {
-    targetDate = new Date(`${cleanDate}T${cleanTime}:00`);
+    targetDate = hasTime ? new Date(`${cleanDate}T${cleanTime}:00`) : new Date(cleanDate);
     if (isNaN(targetDate.getTime())) {
       targetDate = new Date(`${cleanDate} ${cleanTime}`);
     }

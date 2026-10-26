@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePacking } from '../context/PackingContext';
 import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
-import { computeTripWeightStatus } from '../utils/bagWeightAnalysis';
+import { computeTripWeightStatus, getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { airlineLimits } from '../data/allowances';
 import { 
@@ -289,16 +289,27 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
               ? DefaultSuggestions.convertLbsToKg(bagWeightLbs).toFixed(1) + ' kg'
               : bagWeightLbs.toFixed(1) + ' lbs';
 
-            const carrierLimit = airlineLimits.find(a => a.company.toLowerCase() === (trip.companyName || '').toLowerCase());
-            const hasNoWeightLimit = bag.type === 'CARRY_ON' && Boolean(carrierLimit && /no weight limit/i.test(carrierLimit.carryOnWeightLimit || ''));
+            const carrierPolicy = getCarrierCarryOnPolicy(trip.companyName);
+            const hasNoWeightLimit = bag.type === 'CARRY_ON' && carrierPolicy.hasNoWeightLimit;
+            const displayedBagWeightLbs = Number(bagWeightLbs.toFixed(1));
 
-            const limitLbs = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
-            const displayLimit = weightUnit === 'KG'
-              ? DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0) + ' kg'
-              : limitLbs + ' lbs';
+            const limitLbs = hasNoWeightLimit
+              ? null
+              : (bag.type === 'CARRY_ON'
+                  ? (carrierPolicy.limitLbs ?? 22)
+                  : (bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : 15)));
 
-            const pct = hasNoWeightLimit ? Math.min(Math.round((bagWeightLbs / 22) * 100), 100) : Math.min(Math.round((bagWeightLbs / limitLbs) * 100), 120);
-            const isBagOverweight = !hasNoWeightLimit && bagWeightLbs > limitLbs;
+            const displayLimit = limitLbs
+              ? (weightUnit === 'KG'
+                  ? DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0) + ' kg'
+                  : limitLbs + ' lbs')
+              : 'No airline limit';
+
+            const rawPct = (limitLbs && limitLbs > 0 && !hasNoWeightLimit)
+              ? (displayedBagWeightLbs / limitLbs) * 100
+              : 0;
+            const pct = Number(rawPct.toFixed(1));
+            const isBagOverweight = !hasNoWeightLimit && limitLbs !== null && displayedBagWeightLbs > limitLbs;
 
             return (
               <div
@@ -350,7 +361,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                     className={`h-full rounded-full transition-all duration-300 ${
                       isBagOverweight ? 'bg-rose-500' : pct > 80 ? 'bg-amber-500' : 'bg-purple-600'
                     }`}
-                    style={{ width: `${Math.min(pct, 100)}%` }}
+                    style={{ width: `${hasNoWeightLimit ? 25 : Math.min(pct, 100)}%` }}
                   />
                 </div>
 

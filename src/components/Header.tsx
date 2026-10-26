@@ -227,8 +227,8 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Pro / Referral / Trial / Free Plan Badge */}
-          <div className="flex items-center">
+          {/* Pro / Referral / Trial / Free Plan Badge (Desktop row) */}
+          <div className="hidden sm:flex items-center">
             {isReferralPlatinumActive ? (
               <button
                 type="button"
@@ -275,13 +275,13 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center / Right: Streamlined Action Buttons, Free Month Pill, Sync Account & Settings */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Pro Upgrade / Badge Button */}
           {!isPro ? (
             <button
               type="button"
               onClick={() => openPaywall("Upgrade to Silver ($1.99/mo), Gold, or Platinum to unlock unlimited bags, active trips, and multi-traveler packing.")}
-              className="h-9 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
+              className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
               title="Upgrade GateReady Plan"
             >
               <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
@@ -292,7 +292,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={() => openPaywall()}
-              className="h-9 px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-1 hover:bg-amber-900/60 transition-colors cursor-pointer shadow-xs"
+              className="h-8.5 sm:h-9 px-2 sm:px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-1 hover:bg-amber-900/60 transition-colors cursor-pointer shadow-xs"
               title={`${tier} Plan Active`}
             >
               <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -300,12 +300,12 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account for signed-in users */}
+          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account for signed-in users (Desktop) */}
           {onOpenReferral && user && (
             <button
               type="button"
               onClick={onOpenReferral}
-              className="h-9 px-3 rounded-full bg-gradient-to-r from-purple-700 via-fuchsia-600 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer border border-fuchsia-300/40"
+              className="hidden sm:flex h-9 px-3 rounded-full bg-gradient-to-r from-purple-700 via-fuchsia-600 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-black items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer border border-fuchsia-300/40"
               title="Refer a Friend · Get 1 Month Free"
             >
               <Gift className="w-3.5 h-3.5 text-amber-300 shrink-0" />
@@ -1070,6 +1070,61 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Mobile Sub-Header: Dedicated, uncrowded secondary badge & action row (~390px phone width) */}
+      {(isTrialActive || isReferralPlatinumActive || hasPendingReferralCode || (user && onOpenReferral)) && (
+        <div className="sm:hidden w-full bg-purple-950/95 border-t border-purple-800/40 px-3 py-1.5 flex items-center justify-between gap-2 z-10 relative">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {isReferralPlatinumActive ? (
+              <button
+                type="button"
+                onClick={() => openPaywall("You have an active 1-Month Free Platinum Referral access! All Platinum features are unlocked.")}
+                className="inline-flex items-center gap-1 text-[11px] font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-fuchsia-300/40 cursor-pointer min-h-[32px]"
+              >
+                <Gift className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                <span className="truncate">Referral Platinum · {referralTimeLeftText}</span>
+              </button>
+            ) : isTrialActive ? (
+              <button
+                type="button"
+                onClick={() => openPaywall("You are on a 7-day Platinum trial with full access. Choose a plan to lock in uninterrupted access.")}
+                className="inline-flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40 cursor-pointer min-h-[32px]"
+              >
+                <Crown className="w-3.5 h-3.5 fill-amber-200 text-amber-200 shrink-0" />
+                <span className="truncate">Platinum Trial · {trialTimeLeftText}</span>
+              </button>
+            ) : hasPendingReferralCode ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenAccountSync) onOpenAccountSync();
+                  else setAccountSyncModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-amber-500 via-fuchsia-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/50 cursor-pointer min-h-[32px]"
+              >
+                <Gift className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+                <span className="truncate">Claim 1-Mo Platinum</span>
+              </button>
+            ) : isPro ? (
+              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs">
+                <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier} Active
+              </span>
+            ) : null}
+          </div>
+
+          {onOpenReferral && user && (
+            <button
+              type="button"
+              onClick={onOpenReferral}
+              className="inline-flex items-center gap-1 text-[11px] font-black bg-gradient-to-r from-purple-700 via-fuchsia-600 to-indigo-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-fuchsia-300/40 cursor-pointer shrink-0 min-h-[32px]"
+              title="Refer a Friend · Get 1 Month Free"
+            >
+              <Gift className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+              <span>Free Month</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Cross-Device Universal Account Sync Modal */}
       <AccountSyncModal

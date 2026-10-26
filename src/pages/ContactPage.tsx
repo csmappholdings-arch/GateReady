@@ -101,8 +101,6 @@ export const ContactPage: React.FC = () => {
           <div><strong>Operating Company:</strong> CSM App Holdings</div>
           <div><strong>Official Website:</strong> gateready.ca</div>
           <div><strong>Support Email:</strong> csmappholdings@gmail.com</div>
-          <div><strong>Business Address:</strong> [TO BE PROVIDED BY OWNER]</div>
-          <div><strong>Corporate Registration:</strong> [TO BE PROVIDED BY OWNER]</div>
         </div>
       </section>
 

@@ -10,7 +10,6 @@ import {
   ArrowRight, 
   Zap, 
   ShieldCheck, 
-  Star,
   Plane,
   ChevronDown,
   Cloud
@@ -59,7 +58,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         {/* Headline & Supporting Subhead */}
         <div className="space-y-4 w-full max-w-6xl mx-auto">
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08]">
-            Never pay an overweight baggage fee again.
+            Help avoid unexpected overweight baggage fees.
             <span className="block mt-2.5 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-600 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-normal">
               Audit suitcase tare weight, liquids & overhead limits before you arrive at the airport.
             </span>
@@ -167,13 +166,13 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             </div>
           </div>
 
-          {/* Visual 2: TSA 3-1-1 Liquids Compliance Scanner */}
+          {/* Visual 2: TSA 3-1-1 Liquids Compliance Checker */}
           <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/80 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
                   <Droplets className="w-3.5 h-3.5 text-sky-500" />
-                  TSA 3-1-1 Scanner
+                  TSA 3-1-1 Checker
                 </span>
                 <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
                   Security Guard
@@ -242,52 +241,6 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
         </div>
 
-        {/* Row of Short Verified Traveler Testimonials */}
-        <div className="pt-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-left shadow-xs">
-              <div className="flex items-center gap-1 text-amber-400 mb-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-xs text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed">
-                &ldquo;Avoided an unexpected $75 overweight fee at Pearson airport. Best $1.99 I spent this trip.&rdquo;
-              </p>
-              <div className="mt-2 text-[11px] font-bold text-slate-900 dark:text-white">
-                — Sarah M., <span className="text-slate-400 font-normal">Family Vacationer</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-left shadow-xs">
-              <div className="flex items-center gap-1 text-amber-400 mb-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-xs text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed">
-                &ldquo;The TSA 3-1-1 liquids detector caught my oversized cologne before security tossed it.&rdquo;
-              </p>
-              <div className="mt-2 text-[11px] font-bold text-slate-900 dark:text-white">
-                — David K., <span className="text-slate-400 font-normal">Frequent Flyer</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-left shadow-xs">
-              <div className="flex items-center gap-1 text-amber-400 mb-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-xs text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed">
-                &ldquo;Finally a packing app that actually calculates empty suitcase tare weight into the limit!&rdquo;
-              </p>
-              <div className="mt-2 text-[11px] font-bold text-slate-900 dark:text-white">
-                — Elena R., <span className="text-slate-400 font-normal">Solo Traveler</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Subtle indicator leading immediately to the interactive app below */}
         <div className="pt-2 flex flex-col items-center justify-center text-xs text-slate-400">

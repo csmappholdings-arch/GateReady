@@ -400,7 +400,7 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
             )}
           </div>
 
-          {/* Bottom Action Footer with single primary CTA */}
+          {/* Bottom Action Footer with secondary utility CTA */}
           <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-950/60 border-t border-purple-100 dark:border-purple-900/40">
             <button
               type="button"
@@ -412,7 +412,7 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
                   carryOnCount
                 });
               }}
-              className="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-600/20 transition-all cursor-pointer"
+              className="w-full h-11 px-5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border border-slate-700/30"
             >
               <span>Build my full packing list →</span>
             </button>
@@ -592,12 +592,12 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
             </div>
           </div>
 
-          {/* Bottom Action Footer with single primary CTA */}
+          {/* Bottom Action Footer with secondary utility CTA */}
           <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-950/60 border-t border-purple-100 dark:border-purple-900/40">
             <button
               type="button"
               onClick={() => onPlanTrip(destinationCountry)}
-              className="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-600/20 transition-all cursor-pointer"
+              className="w-full h-11 px-5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border border-slate-700/30"
             >
               <span>Plan this trip →</span>
             </button>

@@ -57,15 +57,15 @@ export const TermsPage: React.FC = () => {
           </div>
           <div className="p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
             <div className="font-bold text-purple-900 dark:text-purple-200">Silver Plan ($1.99/mo or $19.99/yr)</div>
-            <div className="text-xs text-slate-600 dark:text-slate-400">Up to 4 bags, tare deduction, QR emergency bag tag, terminal maps.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">1 traveler, 2 active trips, unlimited bags, tare deduction, QR emergency bag tag, terminal maps.</div>
           </div>
           <div className="p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
-            <div className="font-bold text-purple-900 dark:text-purple-200">Gold Plan ($3.99/mo or $29.99/yr)</div>
-            <div className="text-xs text-slate-600 dark:text-slate-400">Up to 8 bags, 3 active trips, PDF export & print manifests, climate forecasts.</div>
+            <div className="font-bold text-purple-900 dark:text-purple-200">Gold Plan ($3.99/mo or $29.99/yr) — Most Popular</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">2 travelers, unlimited active trips, unlimited bags & scales, multi-device sync, PDF export & print manifests.</div>
           </div>
           <div className="p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
             <div className="font-bold text-purple-900 dark:text-purple-200">Platinum Plan ($4.99/mo or $39.99/yr)</div>
-            <div className="text-xs text-slate-600 dark:text-slate-400">Unlimited bags, unlimited trips, unlimited travelers, priority baggage fee updates.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">Unlimited travelers, unlimited devices, unlimited active trips, unlimited bags & scales, priority fee updates.</div>
           </div>
         </div>
 

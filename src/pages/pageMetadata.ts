@@ -10,7 +10,7 @@
  * - Free signup = 7-day full Platinum trial, no card, returns to Free at day 7
  * - Guest trips in localStorage, Firebase for accounts, no data sale
  * - Referrals: 1 free month of Platinum for friend & referrer
- * - No invented addresses/phones -> [TO BE PROVIDED BY OWNER]
+ * - No invented addresses/phones: omitted from public pages until provided by owner
  */
 
 export interface StaticPageMeta {

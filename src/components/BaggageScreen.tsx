@@ -175,6 +175,8 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         0
       );
       const totalWeightLbs = emptyLbs + itemsLbs;
+      const displayedWeightNum = Number(totalWeightLbs.toFixed(1));
+      const formattedWeight = displayedWeightNum.toFixed(1);
       const isCarryOn = b.type === 'CARRY_ON';
       const hasNoLimit = isCarryOn && carrierCarryOnPolicy.hasNoWeightLimit;
 
@@ -184,15 +186,14 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           ? (carrierCarryOnPolicy.limitLbs ?? 22) 
           : 15;
 
-      const rawPct = capLbs > 0 ? (totalWeightLbs / capLbs) * 100 : 0;
-      const isOverweight = !hasNoLimit && totalWeightLbs > capLbs;
-      const isNearLimit = !hasNoLimit && totalWeightLbs >= capLbs * 0.85 && !isOverweight;
+      const rawPct = (capLbs > 0 && !hasNoLimit) ? (displayedWeightNum / capLbs) * 100 : 0;
+      const isOverweight = !hasNoLimit && displayedWeightNum > capLbs;
+      const isNearLimit = !hasNoLimit && displayedWeightNum >= capLbs * 0.85 && !isOverweight;
 
-      // Fix 5: True weight (21.9 lbs) and true percentage (99.5%). Never round a below-limit weight up to 100% or to the cap.
-      const formattedWeight = totalWeightLbs % 1 === 0 ? totalWeightLbs.toFixed(1) : totalWeightLbs.toFixed(1);
+      // Fix 3: Compute percentage FROM displayed weight so 21.9 / 22 = 99.5%, 22.5 / 22 = 102.3%
       let formattedPct = '0%';
-      if (!isOverweight && rawPct >= 99.95) {
-        formattedPct = '99.9%';
+      if (hasNoLimit) {
+        formattedPct = 'No limit';
       } else {
         formattedPct = `${rawPct.toFixed(1)}%`;
       }
@@ -202,6 +203,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         emptyLbs,
         itemsLbs,
         totalWeightLbs,
+        displayedWeightNum,
         capLbs,
         pct: rawPct,
         formattedPct,

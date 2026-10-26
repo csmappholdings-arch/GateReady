@@ -45,7 +45,13 @@ export const AdPlacement: React.FC<AdPlacementProps> = ({
     return null;
   }
 
-  // 3. Keep critical rendering path unblocked
+  // 3. Keep unconfigured slots completely hidden (Fix 9 & Fix 15: no label, no box, no text)
+  const hasConfiguredNetwork = Boolean(ADS_CONFIG.publisherId && ADS_CONFIG.publisherId.trim());
+  if (!hasConfiguredNetwork && !ADS_CONFIG.showPlaceholderFrames) {
+    return null;
+  }
+
+  // 4. Keep critical rendering path unblocked (lazy load after initial paint)
   if (!isMounted) {
     return null;
   }

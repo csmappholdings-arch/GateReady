@@ -69,7 +69,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'bags',
     title: '2. Smart Luggage Scales & TSA 3-1-1 Liquids',
     tagline: 'Eliminate surprise overweight fees & security confiscations',
-    description: 'Pack bag-by-bag with real-time digital weight meters calibrated to airline caps (50 lbs / 23 kg checked, 22 lbs carry-on). Color-coded warning bars alert you before you hit steep overweight fees, while the automated TSA 3-1-1 scanner ensures every toiletry bottle is compliant.',
+    description: 'Pack bag-by-bag with real-time digital weight meters calibrated to airline caps (50 lbs / 23 kg checked, 22 lbs carry-on). Color-coded warning bars alert you before you hit steep overweight fees, while the automated TSA 3-1-1 checker ensures every toiletry bottle is compliant.',
     duration: 7,
     icon: Luggage,
     color: 'from-blue-600 to-indigo-600',

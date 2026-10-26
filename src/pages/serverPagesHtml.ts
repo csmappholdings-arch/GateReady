@@ -154,8 +154,6 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       <section class="space-y-2 pt-6 border-t border-slate-200 text-xs text-slate-600">
         <h3 class="font-bold text-slate-900 text-sm">Operating Company:</h3>
         <div>CSM App Holdings · gateready.ca</div>
-        <div>Business Address: [TO BE PROVIDED BY OWNER]</div>
-        <div>Registration Number: [TO BE PROVIDED BY OWNER]</div>
       </section>
     `;
   } else if (pathname === '/faq') {
@@ -202,23 +200,24 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">Free ($0)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 bags max (max 1 checked), 1 active trip list, 42-airline allowance reference.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (1 checked + 1 carry-on), Smart Scales, TSA 3-1-1 checker.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-purple-900">Silver ($1.99/mo · $19.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">Up to 4 bags, empty suitcase tare weight deduction, emergency QR recovery tag, terminal maps.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, emergency QR recovery tag, terminal maps.</p>
           </div>
-          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-purple-900">Gold ($3.99/mo · $29.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">Up to 8 bags, 3 active trips, printable PDF manifests, destination climate forecasts.</p>
+          <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
+            <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
+            <h3 class="font-bold text-slate-900 mt-0.5">Gold ($3.99/mo · $29.99/yr)</h3>
+            <p class="text-xs text-slate-600 mt-1">2 travelers, unlimited active trips, unlimited bags & scales, multi-device sync, printable PDF manifests.</p>
           </div>
-          <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-600">
-            <h3 class="font-bold text-purple-900">Platinum ($4.99/mo · $39.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">Unlimited bags, unlimited active trips, unlimited travelers, priority fee update requests.</p>
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+            <h3 class="font-bold text-indigo-900">Platinum ($4.99/mo · $39.99/yr)</h3>
+            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited devices, unlimited active trips, unlimited bags & scales, priority fee updates.</p>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-slate-100 text-xs text-slate-600 space-y-1">
-          <div><strong>7-Day Free Platinum Trial:</strong> Free signup includes 7 days full Platinum, no credit card required. Drops to Free on day 7.</div>
+          <div><strong>7-Day Free Platinum Trial:</strong> Free signup includes 7 days full Platinum, no credit card required. Drops back to Free on day 7.</div>
           <div><strong>14-Day Guarantee:</strong> 100% money-back guarantee on paid plans via Lemon Squeezy. Contact csmappholdings@gmail.com.</div>
         </div>
       </section>
@@ -275,11 +274,26 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <div class="font-bold text-purple-900 text-sm">October 24, 2026</div>
+            <div class="font-bold text-purple-900 text-sm">October 26, 2026</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li>Overweight warning typography: verified "Surcharges may apply" across all alert and banner strings.</li>
+              <li>Canonical plan limits alignment: synchronized /pricing with in-app dialog (Gold MOST POPULAR, Silver unlimited bags, Gold unlimited active trips).</li>
+              <li>Displayed weight percentage synchronization: headroom percentage is computed directly from displayed rounded weight (21.9 / 22 lbs shows 99.5%, 22.5 / 22 lbs shows 102.3%).</li>
+              <li>Carrier limits in readiness: Air Canada carry-on bags (no weight limit) are never flagged as overweight.</li>
+              <li>Mobile header optimization: eliminated crowding and pill overlap on narrow phone screens (~390px).</li>
+              <li>Public policy cleanup: removed unconfigured owner placeholder text and removed landing testimonials.</li>
+              <li>TSA 3-1-1 "Checker" terminology audit: standardized rule-based liquids audit naming across all app views.</li>
+              <li>Unset departure time handling: trips without an entered time display date only or "time not set" without defaulting to 09:00.</li>
+              <li>Hidden ad placeholders: ad placement slots render zero visible markup until an ad network ID is configured.</li>
+              <li>FAQ multi-open accordion & CTA hierarchy: multiple FAQ items can expand simultaneously; primary hero CTA is prominent over secondary tools.</li>
+              <li>Bing scan & SEO alignment: shortened title to 44 characters, added server-rendered H1 tag, and optimized search metadata.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">October 24, 2026</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li>Plan-limit notice trip scoping: limit notices clear immediately when trips are deleted.</li>
               <li>Air Canada limit synchronization: list card unified with detail view ("No airline weight limit · Air Canada").</li>
-              <li>Typo fix: corrected "Surcharges" spelling in luggage warning alerts.</li>
               <li>Climate no-date state: clear placeholder guidance before travel dates are picked.</li>
               <li>Full trust & compliance center: 12 dedicated pages for About, Privacy, Terms, Contact, FAQ, Pricing, How It Works, Cookies, Refunds, Changelog, Security, and Reviews standby.</li>
             </ul>
