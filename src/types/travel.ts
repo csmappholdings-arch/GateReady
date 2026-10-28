@@ -192,6 +192,13 @@ export interface LuggageTagInfo {
   updatedAt?: string;
 }
 
+export interface GateCheckItem {
+  id: string;
+  text: string;
+  completed: boolean;
+  required: boolean;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -215,12 +222,7 @@ export interface Trip {
   souvenirBufferEnabled?: boolean; // alert when bag weight exceeds threshold to leave room for souvenirs
   souvenirBufferLbs?: number; // reserved weight buffer in lbs (default 5.0 lbs)
   luggageTags?: Record<string, LuggageTagInfo>;
-  gateChecklist?: {
-    id: string;
-    text: string;
-    completed: boolean;
-    required: boolean;
-  }[];
+  gateChecklist?: GateCheckItem[];
 }
 
 export interface BaggageLimitInfo {

@@ -70,8 +70,8 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
         {/* Primary Call to Action & Subordinate Sample Demo Link */}
         <div className="space-y-3 pt-1">
-          <div className="flex flex-col items-center justify-center gap-3">
-            {/* ONE Primary CTA above the fold */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            {/* Primary CTA */}
             <button
               type="button"
               onClick={onOpenAddTrip}
@@ -81,17 +81,30 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               <ArrowRight className="w-4.5 h-4.5" />
             </button>
 
-            {/* Clearly secondary, visually quieter demo option with clear explanation */}
-            <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-              <span>Want to preview how it works?</span>
+            {/* Create Free Account CTA */}
+            {onOpenAccountSync && (
               <button
                 type="button"
-                onClick={onLoadDemo}
-                className="text-purple-700 dark:text-purple-300 font-bold hover:underline cursor-pointer inline-flex items-center gap-0.5 transition-colors"
+                onClick={onOpenAccountSync}
+                className="w-full sm:w-auto h-13 px-6 rounded-2xl bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 border-2 border-purple-300 dark:border-purple-600 active:scale-98 text-purple-900 dark:text-purple-100 font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                title="Sign up for free — includes 7-day Platinum trial, no card required"
               >
-                <span>or see a sample trip first →</span>
+                <Cloud className="w-4.5 h-4.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                <span>Create Free Account</span>
               </button>
-            </div>
+            )}
+          </div>
+
+          {/* Clearly secondary, visually quieter demo option with clear explanation */}
+          <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span>Want to preview how it works?</span>
+            <button
+              type="button"
+              onClick={onLoadDemo}
+              className="text-purple-700 dark:text-purple-300 font-bold hover:underline cursor-pointer inline-flex items-center gap-0.5 transition-colors"
+            >
+              <span>or see a sample trip first →</span>
+            </button>
           </div>
         </div>
 

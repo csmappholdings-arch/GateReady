@@ -189,6 +189,27 @@ async function startServer() {
     });
   }
 
+  // Explicit route for robots.txt
+  app.get('/robots.txt', (_req: Request, res: Response) => {
+    const robotsPath = path.resolve(__dirname, 'public', 'robots.txt');
+    if (fs.existsSync(robotsPath)) {
+      res.setHeader('Content-Type', 'text/plain');
+      return res.sendFile(robotsPath);
+    }
+    res.setHeader('Content-Type', 'text/plain');
+    res.send("User-agent: *\nAllow: /\nSitemap: https://gateready.ca/sitemap.xml\n");
+  });
+
+  // Explicit route for sitemap.xml
+  app.get('/sitemap.xml', (_req: Request, res: Response) => {
+    const sitemapPath = path.resolve(__dirname, 'public', 'sitemap.xml');
+    if (fs.existsSync(sitemapPath)) {
+      res.setHeader('Content-Type', 'application/xml');
+      return res.sendFile(sitemapPath);
+    }
+    res.status(404).send('Not Found');
+  });
+
   // Pre-rendered HTML routes for all 12 trust, compliance, and legal pages
   const STATIC_PAGE_ROUTES = [
     '/about',
@@ -234,12 +255,20 @@ async function startServer() {
           `<meta name="description" content="${meta.description}" />`
         );
         template = template.replace(
+          /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/,
+          `<meta name="keywords" content="${meta.keywords}" />`
+        );
+        template = template.replace(
           /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/,
           `<meta property="og:title" content="${meta.title}" />`
         );
         template = template.replace(
           /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
           `<meta property="og:description" content="${meta.description}" />`
+        );
+        template = template.replace(
+          /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/,
+          `<meta property="og:url" content="https://gateready.ca${meta.path}" />`
         );
         template = template.replace(
           /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/,
@@ -252,6 +281,49 @@ async function startServer() {
         template = template.replace(
           /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
           `<link rel="canonical" href="https://gateready.ca${meta.path}" />`
+        );
+
+        // Inject page-specific JSON-LD structured data for rich snippets
+        const pageStructuredData = {
+          '@context': 'https://schema.org',
+          '@type': meta.schemaType || 'WebPage',
+          'name': meta.title,
+          'headline': meta.heading,
+          'description': meta.description,
+          'keywords': meta.keywords,
+          'url': `https://gateready.ca${meta.path}`,
+          'publisher': {
+            '@type': 'Organization',
+            'name': 'CSM App Holdings',
+            'url': 'https://gateready.ca',
+            'contactPoint': {
+              '@type': 'ContactPoint',
+              'email': 'csmappholdings@gmail.com',
+              'contactType': 'customer support'
+            }
+          },
+          'breadcrumb': {
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+              {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': 'Home',
+                'item': 'https://gateready.ca/'
+              },
+              {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': meta.heading,
+                'item': `https://gateready.ca${meta.path}`
+              }
+            ]
+          }
+        };
+
+        template = template.replace(
+          '</head>',
+          `<script type="application/ld+json">${JSON.stringify(pageStructuredData)}</script>\n  </head>`
         );
 
         // Inject pre-rendered semantic HTML inside #root

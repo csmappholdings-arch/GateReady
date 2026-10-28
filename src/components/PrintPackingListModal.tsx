@@ -147,7 +147,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
       summary += `Departure: ${trip.departureDate} ${trip.departureTime || ''}\n`;
     }
     summary += `Travelers: ${familyMembers.join(', ')}\n`;
-    summary += `Total Luggage: ${trip.bags.length} bags • ${displayTotalWeight} • ${packedItemsCount}/${totalItemsCount} items packed (${packingPct}%)\n\n`;
+    summary += `Total Luggage: ${trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'} • ${displayTotalWeight} • ${packedItemsCount}/${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'} packed (${packingPct}%)\n\n`;
 
     filteredBags.forEach((bag) => {
       summary += `🎒 BAG: ${bag.label} (${bag.type})\n`;
@@ -540,7 +540,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
               <option value="all">All Bags ({trip.bags.length})</option>
               {trip.bags.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.label} ({b.items.length} items)
+                  {b.label} ({b.items.length} {b.items.length === 1 ? 'item' : 'items'})
                 </option>
               ))}
             </select>

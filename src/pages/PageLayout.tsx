@@ -18,20 +18,89 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children }) =>
 
   useEffect(() => {
     document.title = meta.title;
-    const descMeta = document.querySelector('meta[name="description"]');
-    if (descMeta) {
-      descMeta.setAttribute('content', meta.description);
+
+    // Helper to safely set or create meta tags
+    const setMetaTag = (attrName: string, attrVal: string, content: string) => {
+      let el = document.querySelector(`meta[${attrName}="${attrVal}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attrName, attrVal);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    setMetaTag('name', 'description', meta.description);
+    setMetaTag('name', 'keywords', meta.keywords || 'GateReady, baggage fees, travel packing');
+    setMetaTag('property', 'og:title', meta.title);
+    setMetaTag('property', 'og:description', meta.description);
+    setMetaTag('property', 'og:url', `https://gateready.ca${meta.path || pathname}`);
+    setMetaTag('name', 'twitter:title', meta.title);
+    setMetaTag('name', 'twitter:description', meta.description);
+
+    // Canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
     }
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-      ogTitle.setAttribute('content', meta.title);
+    canonical.setAttribute('href', `https://gateready.ca${meta.path || pathname}`);
+
+    // Dynamic JSON-LD structured data
+    let jsonLdScript = document.getElementById('page-jsonld') as HTMLScriptElement | null;
+    if (!jsonLdScript) {
+      jsonLdScript = document.createElement('script');
+      jsonLdScript.id = 'page-jsonld';
+      jsonLdScript.type = 'application/ld+json';
+      document.head.appendChild(jsonLdScript);
     }
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) {
-      ogDesc.setAttribute('content', meta.description);
-    }
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': meta.schemaType || 'WebPage',
+      'name': meta.title,
+      'headline': meta.heading,
+      'description': meta.description,
+      'url': `https://gateready.ca${meta.path || pathname}`,
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'CSM App Holdings',
+        'url': 'https://gateready.ca',
+        'contactPoint': {
+          '@type': 'ContactPoint',
+          'email': 'csmappholdings@gmail.com',
+          'contactType': 'customer support'
+        }
+      },
+      'breadcrumb': {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Home',
+            'item': 'https://gateready.ca/'
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': meta.heading,
+            'item': `https://gateready.ca${meta.path || pathname}`
+          }
+        ]
+      }
+    };
+    jsonLdScript.textContent = JSON.stringify(structuredData);
+
     window.scrollTo(0, 0);
-  }, [meta]);
+
+    return () => {
+      // Cleanup page-specific JSON-LD when unmounting
+      const el = document.getElementById('page-jsonld');
+      if (el) el.remove();
+    };
+  }, [meta, pathname]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">

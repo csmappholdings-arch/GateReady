@@ -46,6 +46,10 @@ import {
   CheckCircle2, 
   Info, 
   PlaneTakeoff, 
+  Train,
+  Car,
+  Ship,
+  Bus,
   Plus, 
   Luggage,
   Users,
@@ -137,6 +141,22 @@ function PackingAppContent() {
   const packedItems = currentTrip?.bags.reduce((acc, b) => acc + b.items.filter((i) => i.isPacked).length, 0) ?? 0;
   const isAllPacked = totalItems > 0 && packedItems === totalItems;
 
+  const currentTravelType: TravelType = currentTrip?.travelType || 'PLANE';
+  const isFlight = (currentTravelType === 'PLANE' || !currentTravelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(currentTravelType || '');
+  const isCar = currentTravelType === 'CAR';
+  const isTrain = currentTravelType === 'TRAIN';
+  const isCruise = currentTravelType === 'CRUISE';
+  const isBus = currentTravelType === 'BUS';
+
+  const tab1Title = isCar ? 'Luggage & Trunk Manifest' : 'Luggage & Packing Manifest';
+  const tab2Title = isTrain ? 'Station & Rail Intel' : isBus ? 'Terminal & Bus Intel' : isCruise ? 'Port & Cruise Intel' : isCar ? 'Route & Road Trip Intel' : 'Airport & Trip Intel';
+  const tab3Title = isTrain ? 'Train Coach & In-Seat Power' : isBus ? 'Bus Seating & Amenities' : isCruise ? 'Stateroom & Ship Amenities' : isCar ? 'Vehicle Cargo & 12V Power' : 'Aircraft Cabin & In-Seat Power';
+  const tab4Title = isTrain ? 'Rail Baggage Guidelines' : isBus ? 'Bus Luggage Guidelines' : isCruise ? 'Cruise Baggage Policies' : isCar ? 'Road Trip Packing Guide' : '42+ Airline Allowances';
+  const tab5Title = isTrain ? 'Train Departure Checklist' : isBus ? 'Bus Departure Checklist' : isCruise ? 'Embarkation Checklist' : isCar ? 'Road Departure Checklist' : 'Gate Clearance Checklist';
+
+  const tab5MobileLabel = isCruise ? 'Embark' : isFlight ? 'Gate Ready' : 'Departure';
+  const Tab5IconComponent = isTrain ? Train : isBus ? Bus : isCruise ? Ship : isCar ? Car : PlaneTakeoff;
+
   // Cleanup legacy localStorage key so it never permanently blocks session save gate
   useEffect(() => {
     try {
@@ -173,8 +193,8 @@ function PackingAppContent() {
       return;
     }
 
-    // Trigger during normal list-building after user has built a real list (3 or more items added)
-    if (totalItems >= 3) {
+    // Trigger during normal list-building when user adds item(s) to a trip (totalItems >= 1)
+    if (totalItems >= 1) {
       const timer = setTimeout(() => {
         const stillDismissed = 
           sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
@@ -470,7 +490,7 @@ function PackingAppContent() {
                 }`}
               >
                 <Luggage className="w-4 h-4 shrink-0" />
-                <span className="truncate">Luggage & Packing Manifest</span>
+                <span className="truncate">{tab1Title}</span>
                 <span
                   className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 transition-colors ${
                     currentScreen === 'Bags'
@@ -498,7 +518,7 @@ function PackingAppContent() {
                 }`}
               >
                 <CloudSun className="w-4 h-4 shrink-0 text-amber-400" />
-                <span className="truncate">Airport & Trip Intel</span>
+                <span className="truncate">{tab2Title}</span>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
                   <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                 </span>
@@ -509,7 +529,7 @@ function PackingAppContent() {
                 type="button"
                 onClick={() => {
                   if (!isPro) {
-                    openPaywall("Upgrade to Silver, Gold, or Platinum to unlock Aircraft Cabin & In-Seat Plugs Intel.");
+                    openPaywall("Upgrade to Silver, Gold, or Platinum to unlock In-Seat Power & Seating Intel.");
                   }
                   setCurrentScreen('CabinIntel');
                 }}
@@ -520,7 +540,7 @@ function PackingAppContent() {
                 }`}
               >
                 <Zap className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="truncate">Aircraft Cabin & In-Seat Power</span>
+                <span className="truncate">{tab3Title}</span>
                 <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
                   <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
                 </span>
@@ -537,7 +557,7 @@ function PackingAppContent() {
                 }`}
               >
                 <Info className="w-4 h-4 shrink-0" />
-                <span className="truncate">42+ Airline Allowances</span>
+                <span className="truncate">{tab4Title}</span>
                 <span
                   className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 transition-colors ${
                     currentScreen === 'Allowances'
@@ -545,7 +565,7 @@ function PackingAppContent() {
                       : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
                   }`}
                 >
-                  Rules
+                  {isFlight ? 'Rules' : 'Guide'}
                 </span>
               </button>
 
@@ -559,8 +579,8 @@ function PackingAppContent() {
                     : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
                 }`}
               >
-                <PlaneTakeoff className="w-4 h-4 shrink-0" />
-                <span className="truncate">Gate Clearance Checklist</span>
+                <Tab5IconComponent className="w-4 h-4 shrink-0" />
+                <span className="truncate">{tab5Title}</span>
                 <span
                   className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 transition-colors ${
                     isAllPacked
@@ -670,7 +690,7 @@ function PackingAppContent() {
               <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Bags' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
                 <Luggage className="w-4 h-4" />
               </div>
-              <span className="text-[10px] tracking-tight mt-0.5">Bags</span>
+              <span className="text-[10px] tracking-tight mt-0.5">{isCar ? 'Trunk' : 'Luggage'}</span>
               {totalBags > 0 && (
                 <span className="absolute top-1 right-2 text-[9px] font-extrabold px-1 rounded-full bg-purple-600 text-white">
                   {totalBags}
@@ -703,7 +723,7 @@ function PackingAppContent() {
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Silver, Gold, or Platinum to unlock Aircraft Cabin & In-Seat Plugs Intel.");
+                  openPaywall("Upgrade to Silver, Gold, or Platinum to unlock In-Seat Power & Seating Intel.");
                 }
                 setCurrentScreen('CabinIntel');
               }}
@@ -716,7 +736,7 @@ function PackingAppContent() {
               <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'CabinIntel' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
                 <Zap className="w-4 h-4 text-amber-500" />
               </div>
-              <span className="text-[10px] tracking-tight mt-0.5">Plugs</span>
+              <span className="text-[10px] tracking-tight mt-0.5">{isCar ? 'Power' : isCruise ? 'Cabin' : 'Plugs'}</span>
               <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
             </button>
 
@@ -732,10 +752,10 @@ function PackingAppContent() {
               <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Allowances' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
                 <Info className="w-4 h-4" />
               </div>
-              <span className="text-[10px] tracking-tight mt-0.5">Limits</span>
+              <span className="text-[10px] tracking-tight mt-0.5">{isFlight ? 'Limits' : 'Rules'}</span>
             </button>
 
-            {/* Mobile Tab 5: Gate Ready */}
+            {/* Mobile Tab 5: Departure Ready */}
             <button
               onClick={() => setCurrentScreen('GateReady')}
               className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
@@ -745,9 +765,9 @@ function PackingAppContent() {
               }`}
             >
               <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'GateReady' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-                <PlaneTakeoff className="w-4 h-4" />
+                <Tab5IconComponent className="w-4 h-4" />
               </div>
-              <span className="text-[10px] tracking-tight mt-0.5">Gate Ready</span>
+              <span className="text-[10px] tracking-tight mt-0.5">{tab5MobileLabel}</span>
             </button>
           </div>
         </nav>

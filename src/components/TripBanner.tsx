@@ -32,6 +32,7 @@ import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
 import { TripCountdownBanner } from './TripCountdownBanner';
 import { DatePickerInput } from './DatePickerInput';
+import { getDefaultChecklistForMode } from '../data/allowances';
 
 interface TripBannerProps {
   currentTrip: Trip | null;
@@ -146,14 +147,25 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       return;
     }
 
-    // Safely preserve existing values so we never write empty values over existing trip data
-    const resolvedCarrier = editCarrier.trim() || currentTrip.companyName || '';
-    const resolvedSeatClass = editSeatClass.trim() || currentTrip.seatClassOrCarSize || '';
+    // When mode changes, do not carry over previous mode's carrier or seat class verbatim
+    const modeChanged = editTravelType !== currentTrip.travelType;
+    const resolvedCarrier = modeChanged ? editCarrier.trim() : (editCarrier.trim() || currentTrip.companyName || '');
+    const resolvedSeatClass = modeChanged ? editSeatClass.trim() : (editSeatClass.trim() || currentTrip.seatClassOrCarSize || '');
     const resolvedOriginCity = editOriginCity.trim() || currentTrip.originCity || '';
     const resolvedDestinationCity = editDestinationCity.trim() || currentTrip.destinationCity || '';
-    const resolvedAircraft = editAircraft.trim() || currentTrip.aircraftType || '';
+    const resolvedAircraft = editTravelType === 'PLANE' ? (modeChanged ? editAircraft.trim() : (editAircraft.trim() || currentTrip.aircraftType || '')) : '';
     const resolvedDepartureDate = editDate.trim() || currentTrip.departureDate || '';
     const resolvedDepartureTime = editTime.trim() || currentTrip.departureTime || '';
+
+    let updatedGateChecklist = currentTrip.gateChecklist;
+    let updatedBags = currentTrip.bags;
+    if (modeChanged) {
+      updatedGateChecklist = getDefaultChecklistForMode(editTravelType);
+      updatedBags = currentTrip.bags.map((b) => ({
+        ...b,
+        maxWeightLimitLbs: editTravelType === 'CAR' ? undefined : (editTravelType !== 'PLANE' && b.type === 'CARRY_ON') ? 50 : b.maxWeightLimitLbs
+      }));
+    }
 
     updateTripDetails(currentTrip.id, {
       name: trimmedName,
@@ -166,7 +178,8 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       departureTime: resolvedDepartureTime,
       returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
       returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
-      aircraftType: resolvedAircraft
+      aircraftType: resolvedAircraft,
+      ...(modeChanged ? { gateChecklist: updatedGateChecklist, bags: updatedBags } : {})
     });
     setEditError(null);
     setIsEditing(false);
@@ -312,7 +325,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                                 <strong>Seat:</strong> {t.seatClassOrCarSize || 'Not specified'}
                               </p>
                               <p className="text-[10px] text-purple-600 dark:text-purple-400">
-                                {t.bags.length} bags · {packedItems}/{totalItems} items packed
+                                {t.bags.length} {t.bags.length === 1 ? 'bag' : 'bags'} · {packedItems}/{totalItems} {totalItems === 1 ? 'item' : 'items'} packed
                               </p>
                             </div>
                           </div>
@@ -413,15 +426,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                     key={type}
                     type="button"
                     onClick={() => {
-                      setEditTravelType(type);
-                      if (type === 'CAR' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
-                        setEditSeatClass('Mid-Size SUV / Car');
-                      } else if (type === 'CRUISE' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
-                        setEditSeatClass('Balcony Stateroom');
-                      } else if (type === 'TRAIN' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
-                        setEditSeatClass('Standard Coach');
-                      } else if (type === 'BUS' && (!editSeatClass || editSeatClass === 'Main Cabin')) {
-                        setEditSeatClass('Standard Reserved Seat');
+                      if (type !== editTravelType) {
+                        setEditTravelType(type);
+                        setEditCarrier('');
+                        setEditSeatClass('');
+                        setEditAircraft('');
                       }
                     }}
                     className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${

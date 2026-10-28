@@ -30,9 +30,52 @@ export interface TripWeightSummary {
 }
 
 /**
- * Resolves the carrier's carry-on weight policy for a given airline name.
+ * Resolves the carrier's carry-on weight policy for a given airline or travel mode.
  */
-export function getCarrierCarryOnPolicy(companyName?: string) {
+export function getCarrierCarryOnPolicy(companyName?: string, travelType?: string) {
+  if (travelType && travelType !== 'PLANE') {
+    if (travelType === 'CAR') {
+      return {
+        hasNoWeightLimit: true,
+        limitLbs: null,
+        label: 'No vehicle limit',
+        dimensions: 'Vehicle cargo space',
+        note: null,
+        isDefault: false
+      };
+    }
+    if (travelType === 'TRAIN') {
+      return {
+        hasNoWeightLimit: true,
+        limitLbs: null,
+        label: 'No airline limit (Rail Coach)',
+        dimensions: 'Standard overhead rack',
+        note: 'Rail coach carry-on (up to 50 lbs)',
+        isDefault: false
+      };
+    }
+    if (travelType === 'CRUISE') {
+      return {
+        hasNoWeightLimit: true,
+        limitLbs: null,
+        label: 'No airline limit (Cruise Stateroom)',
+        dimensions: 'Terminal security clearance sizer',
+        note: null,
+        isDefault: false
+      };
+    }
+    if (travelType === 'BUS') {
+      return {
+        hasNoWeightLimit: true,
+        limitLbs: null,
+        label: 'No airline limit (Bus Overhead)',
+        dimensions: 'Overhead luggage shelf',
+        note: null,
+        isDefault: false
+      };
+    }
+  }
+
   if (!companyName || !companyName.trim()) {
     return {
       hasNoWeightLimit: false,
@@ -97,11 +140,13 @@ export function getCarrierCarryOnPolicy(companyName?: string) {
  * Single Source of Truth for computing a bag's weight vs carrier limit.
  * Fix 3: Headroom percentage is computed directly FROM displayed (rounded) weight.
  * Fix 4: Carrier carry-on policies with "no weight limit" (e.g. Air Canada) are respected.
+ * Fix 1: Mode-aware (Car, Train, Cruise, Bus do not enforce flight 22-lb limits).
  */
 export function computeBagWeightStatus(
   bag: Bag,
   weightUnit: 'LBS' | 'KG' = 'LBS',
-  companyName?: string
+  companyName?: string,
+  travelType: string = 'PLANE'
 ): BagWeightStatus {
   const emptyLbs = getBagEmptyWeightLbs(bag);
   const itemsLbs = (bag.items || []).reduce((sum, item) => {
@@ -112,20 +157,26 @@ export function computeBagWeightStatus(
   const totalWeightLbs = emptyLbs + itemsLbs;
   const displayedWeightLbs = Number(totalWeightLbs.toFixed(1));
 
+  const isCar = travelType === 'CAR';
+  const isTrain = travelType === 'TRAIN';
+  const isCruise = travelType === 'CRUISE';
+  const isBus = travelType === 'BUS';
+  const isFlight = !isCar && !isTrain && !isCruise && !isBus;
+
   const isCarryOn = bag.type === 'CARRY_ON';
-  const carryOnPolicy = isCarryOn ? getCarrierCarryOnPolicy(companyName) : null;
-  const hasNoWeightLimit = isCarryOn && Boolean(carryOnPolicy?.hasNoWeightLimit);
+  const carryOnPolicy = isCarryOn ? getCarrierCarryOnPolicy(companyName, travelType) : null;
+  const hasNoWeightLimit = isCar || (isCarryOn && Boolean(carryOnPolicy?.hasNoWeightLimit)) || (!isFlight && bag.type !== 'CHECKED');
 
   let limitLbs: number | null = null;
-  if (hasNoWeightLimit) {
+  if (hasNoWeightLimit || isCar) {
     limitLbs = null;
   } else if (isCarryOn) {
-    limitLbs = carryOnPolicy?.limitLbs ?? (bag.maxWeightLimitLbs || 22);
+    limitLbs = carryOnPolicy?.limitLbs ?? (isFlight ? (bag.maxWeightLimitLbs || 22) : (bag.maxWeightLimitLbs || 50));
   } else if (bag.type === 'CHECKED') {
     limitLbs = bag.maxWeightLimitLbs || 50;
   } else {
     // Personal item default
-    limitLbs = bag.maxWeightLimitLbs || 15;
+    limitLbs = isFlight ? (bag.maxWeightLimitLbs || 15) : (bag.maxWeightLimitLbs || 50);
   }
 
   let pct = 0;
@@ -137,11 +188,11 @@ export function computeBagWeightStatus(
 
   if (hasNoWeightLimit || limitLbs === null) {
     pct = 0;
-    formattedPct = 'No limit';
+    formattedPct = isCar ? 'No vehicle limit' : 'No limit';
     isOverweight = false;
     isNearLimit = false;
     overweightAmountLbs = 0;
-    displayLimit = 'No airline limit';
+    displayLimit = isCar ? 'No vehicle limit' : isTrain ? 'No rail limit' : isCruise ? 'No cruise limit' : 'No airline limit';
   } else {
     // Fix 3: Compute percentage FROM the displayed (rounded) weight (e.g. 21.9 / 22 = 99.5%, 22.5 / 22 = 102.3%)
     const rawPct = limitLbs > 0 ? (displayedWeightLbs / limitLbs) * 100 : 0;
@@ -187,7 +238,7 @@ export function computeTripWeightStatus(
   weightUnit: 'LBS' | 'KG' = 'LBS'
 ): TripWeightSummary {
   const bags = trip.bags || [];
-  const bagStatuses = bags.map((b) => computeBagWeightStatus(b, weightUnit, trip.companyName));
+  const bagStatuses = bags.map((b) => computeBagWeightStatus(b, weightUnit, trip.companyName, trip.travelType));
 
   const overweightBags = bagStatuses.filter((b) => b.isOverweight);
   const nearLimitBags = bagStatuses.filter((b) => b.isNearLimit);

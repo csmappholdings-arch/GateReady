@@ -1,0 +1,6 @@
+# robots.txt for GateReady (https://gateready.ca)
+User-agent: *
+Allow: /
+
+# Canonical Sitemap
+Sitemap: https://gateready.ca/sitemap.xml

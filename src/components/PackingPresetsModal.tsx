@@ -79,7 +79,7 @@ export const PackingPresetsModal: React.FC<PackingPresetsModalProps> = ({
     const newTemplate: PackingTemplate = {
       id: `custom-${Date.now()}`,
       name: customName.trim(),
-      description: `Saved from "${targetBag.label}" with ${targetBag.items.length} items.`,
+      description: `Saved from "${targetBag.label}" with ${targetBag.items.length} ${targetBag.items.length === 1 ? 'item' : 'items'}.`,
       recommendedBagType: targetBag.type,
       idealTripLengthDays: 3,
       badge: 'Custom',
@@ -235,7 +235,7 @@ export const PackingPresetsModal: React.FC<PackingPresetsModalProps> = ({
           {!showSaveCustom ? (
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400">
-                Want to save {targetBag.label}'s {targetBag.items.length} current items as a template?
+                Want to save {targetBag.label}'s {targetBag.items.length} current {targetBag.items.length === 1 ? 'item' : 'items'} as a template?
               </span>
               <button
                 type="button"

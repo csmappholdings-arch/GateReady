@@ -464,7 +464,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                         <div>
                           <p className="text-xs font-bold">All Travelers</p>
                           <p className="text-[10px] text-slate-400">
-                            {travelerStats.all.packed} of {travelerStats.all.total} items packed
+                            {travelerStats.all.packed} of {travelerStats.all.total} {travelerStats.all.total === 1 ? 'item' : 'items'} packed
                           </p>
                         </div>
                       </div>
@@ -526,7 +526,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                               <p className="text-xs font-bold truncate leading-tight">{member}</p>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <span className="text-[10px] text-slate-400">
-                                  {stats.packed}/{stats.total} items
+                                  {stats.packed}/{stats.total} {stats.total === 1 ? 'item' : 'items'}
                                 </span>
                                 {/* Mini progress bar */}
                                 <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -978,7 +978,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     </div>
                   )}
                   <p className="text-xs text-slate-500 mt-0.5">
-                    {currentBag.items.filter((i) => i.isPacked).length} of {currentBag.items.length} items packed
+                    {currentBag.items.filter((i) => i.isPacked).length} of {currentBag.items.length} {currentBag.items.length === 1 ? 'item' : 'items'} packed
                   </p>
                 </div>
               </div>

@@ -49,7 +49,7 @@ export const SharePackingListModal: React.FC<SharePackingListModalProps> = ({
   const packedItems = trip.bags.reduce((acc, b) => acc + b.items.filter(i => i.isPacked).length, 0);
 
   const shareSummaryText = `🧳 GateReady.ca Packing List for ${trip.name}${trip.destinationCity ? ` to ${trip.destinationCity}` : ''}
-Bags: ${trip.bags.length} bags | Progress: ${packedItems}/${totalItems} items packed
+Bags: ${trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'} | Progress: ${packedItems}/${totalItems} ${totalItems === 1 ? 'item' : 'items'} packed
 Collaborate & verify luggage weight limits before the gate: ${shareUrl}`;
 
   const handleCopyLink = () => {
@@ -123,7 +123,7 @@ Collaborate & verify luggage weight limits before the gate: ${shareUrl}`;
                 {trip.name}
               </p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                {trip.destinationCity ? `Destination: ${trip.destinationCity} · ` : ''}{trip.bags.length} bags · {packedItems}/{totalItems} items packed
+                {trip.destinationCity ? `Destination: ${trip.destinationCity} · ` : ''}{trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'} · {packedItems}/{totalItems} {totalItems === 1 ? 'item' : 'items'} packed
               </p>
             </div>
             <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">

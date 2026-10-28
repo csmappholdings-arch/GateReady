@@ -43,6 +43,7 @@ import { EntryRequirementsCard } from './EntryRequirementsCard';
 import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { SharePackingListModal } from './SharePackingListModal';
+import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 
 interface BaggageScreenProps {
   trip: Trip;
@@ -92,79 +93,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     return found || trip.bags[0];
   }, [trip.bags, selectedBagId]);
 
-  // Carrier carry-on allowance intelligence (Fix 8: Air Canada etc. have no weight limit)
+  const isCar = trip.travelType === 'CAR';
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
+
+  // Carrier carry-on allowance intelligence (Air Canada, Trains, Car, etc.)
   const carrierCarryOnPolicy = useMemo(() => {
-    if (!trip.companyName) {
-      return {
-        hasNoWeightLimit: false,
-        limitLbs: 22,
-        label: '22 lbs limit (app default)',
-        dimensions: '22 x 14 x 9 in (56 x 36 x 23 cm)',
-        note: null,
-        isDefault: true
-      };
-    }
-    const q = trip.companyName.toLowerCase().trim();
-    const match = airlineLimits.find(
-      (a) =>
-        a.company.toLowerCase().includes(q) ||
-        q.includes(a.company.toLowerCase()) ||
-        a.id.toLowerCase() === q
-    );
-    if (!match || !match.carryOnWeightLimit) {
-      return {
-        hasNoWeightLimit: false,
-        limitLbs: 22,
-        label: '22 lbs limit (app default)',
-        dimensions: match?.carryOnLimit || '22 x 14 x 9 in (56 x 36 x 23 cm)',
-        note: null,
-        isDefault: true
-      };
-    }
-    const txt = match.carryOnWeightLimit.toLowerCase();
-    if (txt.includes('no weight limit') || txt.includes('no official weight limit')) {
-      return {
-        hasNoWeightLimit: true,
-        limitLbs: null as number | null,
-        label: `No weight limit (${match.company})`,
-        dimensions: match.carryOnLimit || '21.5 x 15.5 x 9 in (must store overhead without assistance)',
-        note: match.carryOnWeightLimit,
-        isDefault: false
-      };
-    }
-    const lbsM = match.carryOnWeightLimit.match(/(\d+(?:\.\d+)?)\s*lbs/i);
-    if (lbsM) {
-      const lbs = parseFloat(lbsM[1]);
-      return {
-        hasNoWeightLimit: false,
-        limitLbs: lbs,
-        label: `${lbs} lbs limit (${match.company})`,
-        dimensions: match.carryOnLimit || '22 x 14 x 9 in',
-        note: match.carryOnWeightLimit,
-        isDefault: false
-      };
-    }
-    const kgM = match.carryOnWeightLimit.match(/(\d+(?:\.\d+)?)\s*kg/i);
-    if (kgM) {
-      const lbs = Math.round(parseFloat(kgM[1]) * 2.20462 * 10) / 10;
-      return {
-        hasNoWeightLimit: false,
-        limitLbs: lbs,
-        label: `${lbs} lbs limit (${match.company})`,
-        dimensions: match.carryOnLimit || '22 x 14 x 9 in',
-        note: match.carryOnWeightLimit,
-        isDefault: false
-      };
-    }
-    return {
-      hasNoWeightLimit: false,
-      limitLbs: 22,
-      label: '22 lbs limit (app default)',
-      dimensions: match.carryOnLimit || '22 x 14 x 9 in',
-      note: match.carryOnWeightLimit,
-      isDefault: true
-    };
-  }, [trip.companyName]);
+    return getCarrierCarryOnPolicy(trip.companyName, trip.travelType);
+  }, [trip.companyName, trip.travelType]);
 
   // Overweight fee avoidance radar (incorporates empty luggage tare weight + packed items)
   const bagWeightAnalysis = useMemo(() => {
@@ -178,13 +113,17 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       const displayedWeightNum = Number(totalWeightLbs.toFixed(1));
       const formattedWeight = displayedWeightNum.toFixed(1);
       const isCarryOn = b.type === 'CARRY_ON';
-      const hasNoLimit = isCarryOn && carrierCarryOnPolicy.hasNoWeightLimit;
+      const hasNoLimit = isCar || (isCarryOn && carrierCarryOnPolicy.hasNoWeightLimit) || (!isFlight && b.type !== 'CHECKED');
 
-      const capLbs = b.type === 'CHECKED' 
-        ? 50 
-        : isCarryOn 
-          ? (carrierCarryOnPolicy.limitLbs ?? 22) 
-          : 15;
+      const capLbs = isCar
+        ? 0
+        : b.type === 'CHECKED' 
+          ? 50 
+          : !isFlight
+            ? 50
+            : isCarryOn 
+              ? (carrierCarryOnPolicy.limitLbs ?? 22) 
+              : 15;
 
       const rawPct = (capLbs > 0 && !hasNoLimit) ? (displayedWeightNum / capLbs) * 100 : 0;
       const isOverweight = !hasNoLimit && displayedWeightNum > capLbs;
@@ -193,7 +132,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       // Fix 3: Compute percentage FROM displayed weight so 21.9 / 22 = 99.5%, 22.5 / 22 = 102.3%
       let formattedPct = '0%';
       if (hasNoLimit) {
-        formattedPct = 'No limit';
+        formattedPct = isCar ? 'No vehicle limit' : 'No limit';
       } else {
         formattedPct = `${rawPct.toFixed(1)}%`;
       }
@@ -213,7 +152,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         hasNoLimit
       };
     });
-  }, [trip.bags, carrierCarryOnPolicy]);
+  }, [trip.bags, carrierCarryOnPolicy, isCar, isFlight]);
 
   const overweightRiskBag = bagWeightAnalysis.find((b) => b.isOverweight || b.isNearLimit);
   const lightestBag = useMemo(() => {
@@ -290,6 +229,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   };
 
   const getBagWeightCap = (bag: Bag): number => {
+    if (isCar) {
+      return 0;
+    }
+    if (!isFlight) {
+      const capLbs = bag.maxWeightLimitLbs || 50;
+      return weightUnit === 'KG' ? Math.round(capLbs * 0.45359237) : capLbs;
+    }
     if (bag.type === 'CARRY_ON' && carrierCarryOnPolicy.limitLbs) {
       return weightUnit === 'KG'
         ? Math.round(carrierCarryOnPolicy.limitLbs * 0.45359237)
@@ -304,6 +250,14 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       return Math.round(rawLimitLbs * 0.45359237);
     }
     return rawLimitLbs;
+  };
+
+  const getNoLimitNote = () => {
+    if (isCar) return 'No vehicle weight limit';
+    if (trip.travelType === 'TRAIN') return 'No airline weight limit · Rail coach';
+    if (trip.travelType === 'CRUISE') return 'No airline weight limit · Cruise stateroom';
+    if (trip.travelType === 'BUS') return 'No airline weight limit · Bus overhead';
+    return `No airline weight limit · ${trip.companyName || 'Air Canada'}`;
   };
 
   // Safe Add Bag check (strictly limits Free to 2 bags)
@@ -395,7 +349,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     ? DefaultSuggestions.convertLbsToKg(activeBagItemsWeightLbs)
     : activeBagItemsWeightLbs;
 
-  const activeBagHasNoWeightLimit = activeBag?.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit;
+  const activeBagHasNoWeightLimit = isCar || (activeBag?.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit) || (!isFlight && activeBag?.type !== 'CHECKED');
   const activeWeightCap = activeBag ? getBagWeightCap(activeBag) : (weightUnit === 'KG' ? 10 : 22);
   const isOverweight = !activeBagHasNoWeightLimit && activeDisplayWeight > activeWeightCap;
   const isNearLimit = !activeBagHasNoWeightLimit && activeDisplayWeight > activeWeightCap * 0.85 && !isOverweight;
@@ -597,14 +551,18 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black uppercase tracking-wider">
-                  {overweightRiskBag.isOverweight ? 'High Overweight Risk (Steep Airline Overweight Penalty)' : 'Airline Overweight Warning (85%+ Capacity)'}
+                  {overweightRiskBag.isOverweight 
+                    ? (isFlight ? 'High Overweight Risk (Steep Airline Overweight Penalty)' : 'Luggage Limit Warning (Exceeds Allowance)') 
+                    : (isFlight ? 'Airline Overweight Warning (85%+ Capacity)' : 'Luggage Weight Warning (85%+ Capacity)')}
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-white/70 dark:bg-black/40">
                   {overweightRiskBag.bag.label}: {overweightRiskBag.formattedWeight} / {overweightRiskBag.capLbs} lbs ({overweightRiskBag.formattedPct}) · incl. {overweightRiskBag.emptyLbs.toFixed(1)} lbs {overweightRiskBag.bag.material === 'FABRIC' ? 'fabric' : 'hard shell'} bag tare
                 </span>
               </div>
               <p className="text-xs mt-0.5 opacity-90 leading-relaxed">
-                Major airlines charge steep fees for bags over limits. Shift dense items into {lightestBag?.bag.label || 'another bag'} to travel free of fees.
+                {isFlight 
+                  ? `Major airlines charge steep fees for bags over limits. Shift dense items into ${lightestBag?.bag.label || 'another bag'} to travel free of fees.`
+                  : `Shift dense items into ${lightestBag?.bag.label || 'another bag'} to keep your luggage easy to manage and within limits.`}
               </p>
               {rebalanceToast && (
                 <p className="text-xs font-black text-purple-700 dark:text-purple-300 mt-1.5 flex items-center gap-1">
@@ -655,7 +613,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             const dispEmpty = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(emptyLbs) : emptyLbs;
             const limit = getBagWeightCap(bag);
             const bagMat: BagMaterial = bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
-            const bagHasNoWeightLimit = bag.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit;
+            const bagHasNoWeightLimit = isCar || (bag.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit) || (!isFlight && bag.type !== 'CHECKED');
 
             return (
               <div
@@ -727,7 +685,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                       <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300 block">
                         {dispWeight.toFixed(1)} {weightUnit}{' '}
                         <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                          (No airline weight limit · {trip.companyName || 'Carrier'})
+                          ({getNoLimitNote()})
                         </span>
                       </span>
                     ) : (
@@ -886,7 +844,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                   <>
                     {activeDisplayWeight.toFixed(1)} {weightUnit}{' '}
                     <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                      (No airline weight limit · {trip.companyName || 'Carrier'})
+                      ({getNoLimitNote()})
                     </span>
                   </>
                 ) : (
@@ -1206,7 +1164,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           {activeBag.items.length > 0 && (
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
               <span className="text-slate-500 dark:text-slate-400">
-                {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length} items checked
+                {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length} {activeBag.items.length === 1 ? 'item' : 'items'} checked
               </span>
 
               <button

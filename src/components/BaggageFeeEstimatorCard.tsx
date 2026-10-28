@@ -27,6 +27,11 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Non-flight trips (Train, Bus, Cruise, Car) do not have airline baggage fees
+  if (trip.travelType && trip.travelType !== 'PLANE') {
+    return null;
+  }
+
   // Calculate weights for each bag
   const bagsWithWeights = useMemo(() => {
     return (trip.bags || []).map((bag) => {

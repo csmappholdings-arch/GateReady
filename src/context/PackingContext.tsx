@@ -64,7 +64,7 @@ interface PackingContextType {
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags'>>
   ) => void;
   updateLuggageTag: (
     tripId: string,
@@ -860,7 +860,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateTripDetails = (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags'>>
   ) => {
     let updatedTripToSave: Trip | null = null;
 
@@ -883,7 +883,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ...(details.returnTripDate !== undefined ? { returnTripDate: details.returnTripDate } : {}),
           ...(details.returnTripTime !== undefined ? { returnTripTime: details.returnTripTime } : {}),
           ...(details.souvenirBufferEnabled !== undefined ? { souvenirBufferEnabled: details.souvenirBufferEnabled } : {}),
-          ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {})
+          ...(details.souvenirBufferLbs !== undefined ? { souvenirBufferLbs: details.souvenirBufferLbs } : {}),
+          ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {}),
+          ...(details.gateChecklist !== undefined ? { gateChecklist: details.gateChecklist } : {}),
+          ...(details.bags !== undefined ? { bags: details.bags } : {})
         };
         updatedTripToSave = updated;
         return updated;

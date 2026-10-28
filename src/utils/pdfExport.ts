@@ -119,7 +119,7 @@ export function exportTripToPDF(trip: Trip, weightUnit: WeightUnit = 'LBS') {
   doc.setFontSize(8.5);
   doc.setTextColor(109, 40, 217);
   doc.text(
-    `Pack Progress: ${packedItems} of ${totalItems} items packed (${pct}%) across ${trip.bags.length} bags`,
+    `Pack Progress: ${packedItems} of ${totalItems} ${totalItems === 1 ? 'item' : 'items'} packed (${pct}%) across ${trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'}`,
     margin + 4,
     y + 6
   );

@@ -300,8 +300,8 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account for signed-in users (Desktop) */}
-          {onOpenReferral && user && (
+          {/* Item 7: Direct Free Month Referral Pill surfaced next to Sync Account (Desktop) */}
+          {onOpenReferral && (
             <button
               type="button"
               onClick={onOpenReferral}
@@ -348,7 +348,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
                 <ChevronDown className="w-3 h-3 text-emerald-400 shrink-0 ml-0.5" />
               </button>
-            ) : trips.length > 0 ? (
+            ) : (
               /* Sync Account button: surfaced for guests ONLY when they have saved trips worth syncing */
               <button
                 type="button"
@@ -364,9 +364,8 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Cloud className="w-4 h-4 text-fuchsia-300 shrink-0" />
                 <span className="hidden sm:inline">Sync Account</span>
-                <span className="sm:hidden text-[11px]">Sync</span>
               </button>
-            ) : null}
+            )}
 
             {/* User Account Popover */}
             {userMenuOpen && user && (
@@ -1072,7 +1071,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Mobile Sub-Header: Dedicated, uncrowded secondary badge & action row (~390px phone width) */}
-      {(isTrialActive || isReferralPlatinumActive || hasPendingReferralCode || (user && onOpenReferral)) && (
+      {(isTrialActive || isReferralPlatinumActive || hasPendingReferralCode || onOpenReferral) && (
         <div className="sm:hidden w-full bg-purple-950/95 border-t border-purple-800/40 px-3 py-1.5 flex items-center justify-between gap-2 z-10 relative">
           <div className="flex items-center gap-1.5 min-w-0">
             {isReferralPlatinumActive ? (
@@ -1109,10 +1108,14 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier} Active
               </span>
-            ) : null}
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-300/80">
+                100% Free · No Card Needed
+              </span>
+            )}
           </div>
 
-          {onOpenReferral && user && (
+          {onOpenReferral && (
             <button
               type="button"
               onClick={onOpenReferral}

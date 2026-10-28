@@ -12,6 +12,10 @@ import {
   Printer, 
   Check, 
   PlaneTakeoff, 
+  Train,
+  Car,
+  Ship,
+  Bus,
   Scale, 
   Briefcase,
   Plus,
@@ -77,8 +81,24 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
 
   const familyMembers = trip.familyMembers && trip.familyMembers.length > 0 ? trip.familyMembers : ['Travelers'];
 
+  // Mode awareness
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
+  const isTrain = trip.travelType === 'TRAIN';
+  const isCar = trip.travelType === 'CAR';
+  const isCruise = trip.travelType === 'CRUISE';
+  const isBus = trip.travelType === 'BUS';
+
+  const WatermarkIcon = isTrain ? Train : isBus ? Bus : isCruise ? Ship : isCar ? Car : PlaneTakeoff;
+  const statusHeadline = isGateReady
+    ? (isTrain ? 'You Are Departure Ready! 🚆' : isBus ? 'You Are Departure Ready! 🚌' : isCruise ? 'You Are Embarkation Ready! 🚢' : isCar ? 'You Are Road Trip Ready! 🚗' : 'You Are Gate Ready! ✈️')
+    : (isTrain ? 'Preparing for Train Departure' : isBus ? 'Preparing for Bus Departure' : isCruise ? 'Preparing for Cruise Embarkation' : isCar ? 'Preparing for Road Departure' : 'Preparing for Gate Departure');
+
+  const checkpointsLabel = isFlight ? 'Gate Checkpoints' : isCruise ? 'Embarkation Checkpoints' : 'Departure Checkpoints';
+  const verificationSectionTitle = isTrain ? 'Train Day Travel & Boarding Verification' : isBus ? 'Bus Day Travel & Boarding Verification' : isCruise ? 'Embarkation & Port Security Verification' : isCar ? 'Road Trip Safety & Departure Verification' : 'Gate Day Security & Departure Verification';
+  const verificationSectionSubtitle = isTrain ? 'Essential station & boarding safeguards for a smooth rail journey' : isBus ? 'Essential terminal & departure safeguards for your bus route' : isCruise ? 'Essential port embarkation, stateroom & customs safeguards' : isCar ? 'Essential vehicle safety, offline maps & emergency prep safeguards' : 'Essential pre-boarding safeguards required by TSA, carriers & border agents';
+
   const handleCopySummary = () => {
-    let summary = `✈️ GATE READY PACKING SUMMARY: ${trip.name}\n`;
+    let summary = `${isFlight ? '✈️ GATE READY' : 'DEPARTURE READY'} PACKING SUMMARY: ${trip.name}\n`;
     summary += `Carrier: ${trip.companyName || trip.travelType} (${trip.seatClassOrCarSize || 'Standard'})\n`;
     summary += `Travelers: ${familyMembers.join(', ')}\n`;
     summary += `Total Weight: ${displayTotalWeight}\n`;
@@ -103,7 +123,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
       summary += '\n';
     });
 
-    summary += `✅ Gate Verification Checkpoints:\n`;
+    summary += `✅ ${isFlight ? 'Gate' : 'Departure'} Verification Checkpoints:\n`;
     gateChecks.forEach((gc) => {
       summary += `   ${gc.completed ? '[x]' : '[ ]'} ${gc.text}\n`;
     });
@@ -122,7 +142,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
       {/* Gate Readiness Scorecard (Purple Theme) */}
       <div className="rounded-3xl bg-gradient-to-br from-purple-950 via-purple-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-500/20 relative overflow-hidden">
         <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-10 pointer-events-none flex items-center justify-end pr-8">
-          <PlaneTakeoff className="w-64 h-64 text-white" />
+          <WatermarkIcon className="w-64 h-64 text-white" />
         </div>
 
         <div className="relative z-10">
@@ -132,7 +152,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                 Departure Readiness Status
               </span>
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight mt-1">
-                {isGateReady ? 'You Are Gate Ready! ✈️' : 'Preparing for Gate Departure'}
+                {statusHeadline}
               </h2>
               <p className="text-xs sm:text-sm text-purple-200 mt-1 max-w-md">
                 {trip.name} · {trip.companyName || trip.travelType} · {trip.bags.length} bags tracked
@@ -170,11 +190,11 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
               <p className="text-base font-bold text-white mt-0.5 tabular-nums">
                 {displayTotalWeight}
               </p>
-              <p className="text-[10px] text-purple-300 mt-0.5">{trip.bags.length} bags combined</p>
+              <p className="text-[10px] text-purple-300 mt-0.5">{trip.bags.length} {trip.bags.length === 1 ? 'bag' : 'bags'} combined</p>
             </div>
 
             <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-              <p className="text-[11px] text-purple-200 font-medium">Gate Checkpoints</p>
+              <p className="text-[11px] text-purple-200 font-medium">{checkpointsLabel}</p>
               <p className="text-base font-bold text-white mt-0.5 tabular-nums">
                 {completedGateChecks} / {gateChecks.length}
               </p>
@@ -182,7 +202,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
             </div>
 
             <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-              <p className="text-[11px] text-purple-200 font-medium">Carrier Limit Status</p>
+              <p className="text-[11px] text-purple-200 font-medium">{isCar ? 'Vehicle Weight Status' : 'Carrier Limit Status'}</p>
               <p className={`text-base font-bold mt-0.5 ${
                 tripWeightSummary.hasOverweightBag
                   ? 'text-rose-400'
@@ -198,7 +218,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
               </p>
               <p className="text-[10px] text-purple-200 mt-0.5">
                 {tripWeightSummary.hasOverweightBag
-                  ? 'Exceeds carrier luggage limit'
+                  ? (isCar ? 'Exceeds recommended luggage threshold' : 'Exceeds carrier luggage limit')
                   : tripWeightSummary.hasNearLimitBag
                   ? 'Approaching threshold'
                   : 'No overweight flags'}
@@ -213,10 +233,10 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
         <div className="flex items-center justify-between pb-3 border-b border-purple-50 dark:border-purple-950/60">
           <div>
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              Gate Day Security & Departure Verification
+              {verificationSectionTitle}
             </h3>
             <p className="text-xs text-slate-500">
-              Essential pre-boarding safeguards required by TSA, carriers & border agents
+              {verificationSectionSubtitle}
             </p>
           </div>
           <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">

@@ -1,4 +1,4 @@
-import { BaggageLimitInfo } from '../types/travel';
+import { BaggageLimitInfo, TravelType, GateCheckItem } from '../types/travel';
 
 export const airlineLimits: BaggageLimitInfo[] = [
   // ================= USA AIRLINES =================
@@ -636,6 +636,84 @@ export const carCapacities: CarSpaceCapacity[] = [
   }
 ];
 
+export const busLimits: BaggageLimitInfo[] = [
+  {
+    id: 'greyhound',
+    company: 'Greyhound',
+    type: 'BUS',
+    region: 'USA',
+    personalLimit: '1 personal item (25 lbs max) to fit under seat or overhead shelf',
+    carryOnLimit: '1 carry-on bag (up to 25 lbs) inside cabin',
+    checkedLimit: '1 checked bag under the coach free (up to 50 lbs, max 62 linear inches)',
+    carryOnWeightLimit: '25 lbs (11.3 kg)',
+    checkedWeightLimit: '50 lbs (22.6 kg) - 2nd bag $20 fee',
+    notes: 'No airport security liquid checks. Free Wi-Fi and power outlets on modern coaches.'
+  },
+  {
+    id: 'flixbus',
+    company: 'FlixBus',
+    type: 'BUS',
+    region: 'USA',
+    personalLimit: '1 personal item max 16 x 12 x 7 in (max 15 lbs / 7 kg)',
+    carryOnLimit: 'Under seat or overhead parcel shelf storage',
+    checkedLimit: '1 hold luggage piece max 31 x 20 x 12 in (up to 50 lbs / 20 kg) included free',
+    carryOnWeightLimit: '15 lbs (7 kg)',
+    checkedWeightLimit: '50 lbs (20 kg)',
+    notes: 'Additional luggage can be booked online in advance. E-tickets accepted on smartphones.'
+  },
+  {
+    id: 'megabus',
+    company: 'Megabus',
+    type: 'BUS',
+    region: 'USA',
+    personalLimit: '1 small item (purse, brief case, laptop bag) to fit on lap or under seat',
+    carryOnLimit: 'Small personal bag inside cabin',
+    checkedLimit: '1 piece of luggage per ticket (up to 50 lbs / 23 kg, max 62 linear inches)',
+    carryOnWeightLimit: 'Lap/underseat size',
+    checkedWeightLimit: '50 lbs (23 kg)',
+    notes: 'Luggage must not exceed 62 inches (length + width + height). Drivers assist with baggage hold loading.'
+  }
+];
+
+export const cruiseLimits: BaggageLimitInfo[] = [
+  {
+    id: 'royalcaribbean',
+    company: 'Royal Caribbean',
+    type: 'CRUISE',
+    region: 'USA',
+    personalLimit: 'Carry-on daypack with passport, meds, jewelry, swimsuits, and valuables',
+    carryOnLimit: 'Must fit through port terminal security x-ray scanner (approx 24 x 16 in)',
+    checkedLimit: 'No strict numerical limit (recommend 2 checked bags per guest, max 50 lbs each)',
+    carryOnWeightLimit: 'No weight limit (must be guest-carried)',
+    checkedWeightLimit: '50 lbs (23 kg) per bag recommended for porter safety',
+    notes: 'CRITICAL: Surge-protected power strips, clothes irons, and candles strictly confiscated at port security.'
+  },
+  {
+    id: 'carnival',
+    company: 'Carnival Cruise Line',
+    type: 'CRUISE',
+    region: 'USA',
+    personalLimit: 'Personal carry-on bag with boarding pass, passports, and essential items',
+    carryOnLimit: '24 x 16 in scanner clearance',
+    checkedLimit: 'Up to 2 bags per guest (50 lbs each) checked with curbside porters',
+    carryOnWeightLimit: 'No weight limit',
+    checkedWeightLimit: '50 lbs (23 kg) per piece',
+    notes: 'Guests may bring 1 unopened 750ml bottle of wine/champagne per adult in carry-on on embarkation day.'
+  },
+  {
+    id: 'norwegian',
+    company: 'Norwegian Cruise Line',
+    type: 'CRUISE',
+    region: 'USA',
+    personalLimit: 'Day bag for embarkation afternoon until stateroom luggage arrives',
+    carryOnLimit: 'Fits through terminal scanners',
+    checkedLimit: '2 bags per passenger (up to 50 lbs each) handed to terminal porters',
+    carryOnWeightLimit: 'No weight limit',
+    checkedWeightLimit: '50 lbs (23 kg)',
+    notes: 'Luggage tags must be stapled onto all checked bags before arriving at the cruise terminal.'
+  }
+];
+
 export const tsa311Rules = {
   title: 'TSA 3-1-1 Liquids Rule (Security Checkpoint)',
   rule34oz: 'Containers must be 3.4 ounces (100 milliliters) or less per item.',
@@ -652,6 +730,55 @@ export const tsa311Rules = {
 export const TravelAllowanceData = {
   airlineLimits,
   trainLimits,
+  busLimits,
+  cruiseLimits,
   carCapacities,
   tsa311Rules
 };
+
+export function getDefaultChecklistForMode(travelType: TravelType): GateCheckItem[] {
+  const ts = Date.now();
+  switch (travelType) {
+    case 'TRAIN':
+      return [
+        { id: `gc-${ts}-1`, text: 'Valid Government Photo ID or Rail Ticket ready for all travelers', completed: false, required: true },
+        { id: `gc-${ts}-2`, text: 'Train e-ticket / confirmation barcode saved offline', completed: false, required: true },
+        { id: `gc-${ts}-3`, text: 'Luggage tagged with owner name and destination station', completed: false, required: true },
+        { id: `gc-${ts}-4`, text: 'Valuables & laptop chargers packed in personal bag', completed: false, required: true },
+        { id: `gc-${ts}-5`, text: 'Travel pillow, water bottle, and snacks easily accessible', completed: false, required: false }
+      ];
+    case 'BUS':
+      return [
+        { id: `gc-${ts}-1`, text: 'Valid Government Photo ID & Bus Ticket QR code ready', completed: false, required: true },
+        { id: `gc-${ts}-2`, text: 'Bus transfer schedule and terminal address saved offline', completed: false, required: true },
+        { id: `gc-${ts}-3`, text: 'Luggage tagged for undercarriage bus cargo hold', completed: false, required: true },
+        { id: `gc-${ts}-4`, text: 'Medications, headphones, and power bank in personal carry bag', completed: false, required: true },
+        { id: `gc-${ts}-5`, text: 'Reusable water bottle and travel blanket packed', completed: false, required: false }
+      ];
+    case 'CRUISE':
+      return [
+        { id: `gc-${ts}-1`, text: 'Valid Passport, cruise boarding pass & embarkation docs ready', completed: false, required: true },
+        { id: `gc-${ts}-2`, text: 'Ship luggage tags printed and stapled to checked bags', completed: false, required: true },
+        { id: `gc-${ts}-3`, text: 'Carry-on bag packed with Day 1 swimsuits & change of clothes', completed: false, required: true },
+        { id: `gc-${ts}-4`, text: 'All prescriptions, jewelry, and travel insurance docs in carry-on', completed: false, required: true },
+        { id: `gc-${ts}-5`, text: 'Port arrival appointment time confirmed offline', completed: false, required: false }
+      ];
+    case 'CAR':
+      return [
+        { id: `gc-${ts}-1`, text: "Valid Driver's License, vehicle registration & auto insurance ready", completed: false, required: true },
+        { id: `gc-${ts}-2`, text: 'Offline GPS maps downloaded for cellular dead zones', completed: false, required: true },
+        { id: `gc-${ts}-3`, text: 'Emergency roadside kit, tire pressure gauge & jumper cables verified', completed: false, required: true },
+        { id: `gc-${ts}-4`, text: 'Road trip snacks, hydration cooler & trash bags within reach', completed: false, required: true },
+        { id: `gc-${ts}-5`, text: 'First-aid kit, flashlight, and sunglasses packed in center console', completed: false, required: false }
+      ];
+    case 'PLANE':
+    default:
+      return [
+        { id: `gc-${ts}-1`, text: 'Valid Government Photo ID or Passport ready for all travelers', completed: false, required: true },
+        { id: `gc-${ts}-2`, text: 'Boarding pass / reservation ticket saved offline', completed: false, required: true },
+        { id: `gc-${ts}-3`, text: 'Power banks & spare lithium batteries in Carry-On', completed: false, required: true },
+        { id: `gc-${ts}-4`, text: 'Luggage liquids under 3.4oz (100ml) in 1 quart bag', completed: false, required: true },
+        { id: `gc-${ts}-5`, text: 'Kids / Family formula and medications declared at security', completed: false, required: false }
+      ];
+  }
+}
