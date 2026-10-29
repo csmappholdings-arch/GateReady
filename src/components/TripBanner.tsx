@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Trip, TravelType } from '../types/travel';
+import { Trip, TravelType, ModeProfile } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
@@ -72,10 +72,30 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   const [editReturnDate, setEditReturnDate] = useState(currentTrip?.returnTripDate || '');
   const [editReturnTime, setEditReturnTime] = useState(currentTrip?.returnTripTime || '');
   const [editAircraft, setEditAircraft] = useState(currentTrip?.aircraftType || '');
+  const [editModeProfiles, setEditModeProfiles] = useState<Partial<Record<TravelType, ModeProfile>>>(() => {
+    if (!currentTrip) return {};
+    return {
+      ...(currentTrip.modeProfiles || {}),
+      [currentTrip.travelType || 'PLANE']: {
+        companyName: currentTrip.companyName || '',
+        seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
+        aircraftType: currentTrip.aircraftType || ''
+      }
+    };
+  });
 
   // Keep edit fields prefilled whenever isEditing opens or currentTrip updates
   useEffect(() => {
     if (currentTrip && isEditing) {
+      const initialProfiles: Partial<Record<TravelType, ModeProfile>> = {
+        ...(currentTrip.modeProfiles || {}),
+        [currentTrip.travelType || 'PLANE']: {
+          companyName: currentTrip.companyName || '',
+          seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
+          aircraftType: currentTrip.aircraftType || ''
+        }
+      };
+      setEditModeProfiles(initialProfiles);
       setEditName(currentTrip.name || '');
       setEditCarrier(currentTrip.companyName || '');
       setEditSeatClass(currentTrip.seatClassOrCarSize || '');
@@ -122,6 +142,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
 
   const handleStartEdit = () => {
     if (!currentTrip) return;
+    const initialProfiles: Partial<Record<TravelType, ModeProfile>> = {
+      ...(currentTrip.modeProfiles || {}),
+      [currentTrip.travelType || 'PLANE']: {
+        companyName: currentTrip.companyName || '',
+        seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
+        aircraftType: currentTrip.aircraftType || ''
+      }
+    };
+    setEditModeProfiles(initialProfiles);
     setEditName(currentTrip.name || '');
     setEditCarrier(currentTrip.companyName || '');
     setEditSeatClass(currentTrip.seatClassOrCarSize || '');
@@ -147,15 +176,23 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       return;
     }
 
-    // When mode changes, do not carry over previous mode's carrier or seat class verbatim
     const modeChanged = editTravelType !== currentTrip.travelType;
-    const resolvedCarrier = modeChanged ? editCarrier.trim() : (editCarrier.trim() || currentTrip.companyName || '');
-    const resolvedSeatClass = modeChanged ? editSeatClass.trim() : (editSeatClass.trim() || currentTrip.seatClassOrCarSize || '');
+    const resolvedCarrier = editCarrier.trim();
+    const resolvedSeatClass = editSeatClass.trim();
     const resolvedOriginCity = editOriginCity.trim() || currentTrip.originCity || '';
     const resolvedDestinationCity = editDestinationCity.trim() || currentTrip.destinationCity || '';
-    const resolvedAircraft = editTravelType === 'PLANE' ? (modeChanged ? editAircraft.trim() : (editAircraft.trim() || currentTrip.aircraftType || '')) : '';
+    const resolvedAircraft = editTravelType === 'PLANE' ? editAircraft.trim() : '';
     const resolvedDepartureDate = editDate.trim() || currentTrip.departureDate || '';
     const resolvedDepartureTime = editTime.trim() || currentTrip.departureTime || '';
+
+    const finalModeProfiles: Partial<Record<TravelType, ModeProfile>> = {
+      ...editModeProfiles,
+      [editTravelType]: {
+        companyName: resolvedCarrier,
+        seatClassOrCarSize: resolvedSeatClass,
+        aircraftType: resolvedAircraft
+      }
+    };
 
     let updatedGateChecklist = currentTrip.gateChecklist;
     let updatedBags = currentTrip.bags;
@@ -179,6 +216,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
       returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
       aircraftType: resolvedAircraft,
+      modeProfiles: finalModeProfiles,
       ...(modeChanged ? { gateChecklist: updatedGateChecklist, bags: updatedBags } : {})
     });
     setEditError(null);
@@ -396,7 +434,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                   Edit & Re-enter Trip Details
                 </span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Update any flight, route, or baggage info you skipped during setup
+                  {editTravelType === 'PLANE'
+                    ? 'Update any flight, route, or baggage info you skipped during setup'
+                    : editTravelType === 'TRAIN'
+                      ? 'Update any train, rail route, or baggage info you skipped during setup'
+                      : editTravelType === 'CRUISE'
+                        ? 'Update any cruise, port, or baggage info you skipped during setup'
+                        : editTravelType === 'BUS'
+                          ? 'Update any bus, route, or baggage info you skipped during setup'
+                          : 'Update any vehicle, road route, or baggage info you skipped during setup'}
                 </span>
               </div>
               <button
@@ -427,10 +473,26 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                     type="button"
                     onClick={() => {
                       if (type !== editTravelType) {
+                        const updatedProfiles: Partial<Record<TravelType, ModeProfile>> = {
+                          ...editModeProfiles,
+                          [editTravelType]: {
+                            companyName: editCarrier.trim(),
+                            seatClassOrCarSize: editSeatClass.trim(),
+                            aircraftType: editAircraft.trim()
+                          }
+                        };
+                        setEditModeProfiles(updatedProfiles);
                         setEditTravelType(type);
-                        setEditCarrier('');
-                        setEditSeatClass('');
-                        setEditAircraft('');
+                        const targetProfile = updatedProfiles[type];
+                        if (targetProfile) {
+                          setEditCarrier(targetProfile.companyName || '');
+                          setEditSeatClass(targetProfile.seatClassOrCarSize || '');
+                          setEditAircraft(type === 'PLANE' ? (targetProfile.aircraftType || '') : '');
+                        } else {
+                          setEditCarrier('');
+                          setEditSeatClass('');
+                          setEditAircraft('');
+                        }
                       }
                     }}
                     className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${

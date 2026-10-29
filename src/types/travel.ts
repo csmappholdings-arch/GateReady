@@ -199,6 +199,12 @@ export interface GateCheckItem {
   required: boolean;
 }
 
+export interface ModeProfile {
+  companyName?: string;
+  seatClassOrCarSize?: string;
+  aircraftType?: string;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -223,6 +229,7 @@ export interface Trip {
   souvenirBufferLbs?: number; // reserved weight buffer in lbs (default 5.0 lbs)
   luggageTags?: Record<string, LuggageTagInfo>;
   gateChecklist?: GateCheckItem[];
+  modeProfiles?: Partial<Record<TravelType, ModeProfile>>;
 }
 
 export interface BaggageLimitInfo {

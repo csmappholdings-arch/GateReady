@@ -64,7 +64,7 @@ interface PackingContextType {
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
   ) => void;
   updateLuggageTag: (
     tripId: string,
@@ -459,7 +459,14 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       departureReminders: getDefaultDepartureReminders(),
       familyMembers: resolvedFamily,
       bags: newBags,
-      gateChecklist: defaultGateChecks
+      gateChecklist: defaultGateChecks,
+      modeProfiles: {
+        [deducedType]: {
+          companyName: company.trim(),
+          seatClassOrCarSize: seatOrSize.trim(),
+          aircraftType: extraDetails?.aircraftType?.trim() || ''
+        }
+      }
     };
 
     setTrips((prev) => [newTrip, ...prev]);
@@ -860,7 +867,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateTripDetails = (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
   ) => {
     let updatedTripToSave: Trip | null = null;
 
@@ -886,7 +893,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ...(details.souvenirBufferLbs !== undefined ? { souvenirBufferLbs: details.souvenirBufferLbs } : {}),
           ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {}),
           ...(details.gateChecklist !== undefined ? { gateChecklist: details.gateChecklist } : {}),
-          ...(details.bags !== undefined ? { bags: details.bags } : {})
+          ...(details.bags !== undefined ? { bags: details.bags } : {}),
+          ...(details.modeProfiles !== undefined ? { modeProfiles: details.modeProfiles } : {})
         };
         updatedTripToSave = updated;
         return updated;

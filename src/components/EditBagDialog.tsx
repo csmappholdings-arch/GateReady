@@ -84,15 +84,14 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
       );
 
       setAssignedTo(bag.assignedTo || '');
-      if (bag.maxWeightLimitLbs) {
+      if (isBagNoLimit) {
+        setMaxWeight('');
+      } else if (bag.maxWeightLimitLbs) {
         setMaxWeight(
           weightUnit === 'KG'
             ? String(Math.round(bag.maxWeightLimitLbs * 0.45359237))
             : String(bag.maxWeightLimitLbs)
         );
-      } else if (isBagNoLimit) {
-        // Fix 5: Never prefill misleading 22 lbs on carriers with no strict weight limit (e.g. Air Canada)
-        setMaxWeight('');
       } else {
         setMaxWeight(
           bag.type === 'CHECKED'
@@ -169,7 +168,7 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
     }
 
     const parsedWeight = parseFloat(maxWeight);
-    const weightLbs = !isNaN(parsedWeight) && parsedWeight > 0
+    const weightLbs = !isNoLimit && !isNaN(parsedWeight) && parsedWeight > 0
       ? (weightUnit === 'KG' ? parsedWeight / 0.45359237 : parsedWeight)
       : undefined;
 
@@ -446,42 +445,42 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                 <Scale className="w-3.5 h-3.5 text-purple-600" />
-                <span>Airline / Carrier Weight Limit ({weightUnit})</span>
+                <span>Airline / Carrier Weight Limit {isNoLimit ? '' : `(${weightUnit})`}</span>
               </label>
               {isNoLimit && (
-                <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-full">
-                  Ignored / No Limit
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full">
+                  No Weight Limit
                 </span>
               )}
             </div>
 
-            {isNoLimit && (
-              <div className="mb-2 p-2.5 rounded-xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-[11px] text-purple-950 dark:text-purple-200">
-                <p className="font-semibold flex items-center gap-1.5">
-                  <Info className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+            {isNoLimit ? (
+              <div className="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-xs text-purple-950 dark:text-purple-200">
+                <p className="font-bold flex items-center gap-1.5 text-purple-900 dark:text-purple-100">
+                  <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                   <span>{carrierPolicy.label} — No official weight limit</span>
                 </p>
-                <p className="text-[10px] text-purple-800/80 dark:text-purple-300/80 mt-0.5">
-                  {carrierPolicy.note || `${activeTrip?.companyName || 'This carrier'} allows carry-ons without a strict weight cap (must be light enough to lift into overhead bin unassisted). Any number entered here is optional and ignored by default.`}
+                <p className="text-[11px] text-purple-800/85 dark:text-purple-300/85 mt-1 leading-relaxed">
+                  {carrierPolicy.note || `${activeTrip?.companyName || 'This carrier'} allows carry-ons without a strict weight cap. Items must simply fit in the overhead bin and be light enough to lift into the bin unassisted.`}
                 </p>
               </div>
+            ) : (
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="200"
+                  placeholder={`Standard limit (e.g. ${weightUnit === 'KG' ? '10' : '22'})`}
+                  value={maxWeight}
+                  onChange={(e) => setMaxWeight(e.target.value)}
+                  className="w-full h-10 pl-3.5 pr-12 text-xs font-semibold rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"
+                />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                  {weightUnit}
+                </span>
+              </div>
             )}
-
-            <div className="relative">
-              <input
-                type="number"
-                step="0.5"
-                min="1"
-                max="200"
-                placeholder={isNoLimit ? 'No weight limit (optional custom cap)' : `Standard limit (e.g. ${weightUnit === 'KG' ? '10' : '22'})`}
-                value={maxWeight}
-                onChange={(e) => setMaxWeight(e.target.value)}
-                className="w-full h-10 pl-3.5 pr-12 text-xs font-semibold rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"
-              />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                {weightUnit}
-              </span>
-            </div>
           </div>
 
           {/* Action Buttons */}
