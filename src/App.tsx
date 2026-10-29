@@ -42,6 +42,11 @@ import { RefundsPage } from './pages/RefundsPage';
 import { ChangelogPage } from './pages/ChangelogPage';
 import { SecurityPage } from './pages/SecurityPage';
 import { ReviewsPage } from './pages/ReviewsPage';
+import { AirlineGuidePage } from './pages/AirlineGuidePage';
+import { AirlineIndexPage } from './pages/AirlineIndexPage';
+import { BaggageFeeCalculatorPage } from './pages/BaggageFeeCalculatorPage';
+import { TareWeightPage } from './pages/TareWeightPage';
+import { EntryRequirementsPage } from './pages/EntryRequirementsPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -125,6 +130,20 @@ function PackingAppContent() {
       const refCode = params.get('ref') || params.get('referral');
       if (refCode && refCode.trim()) {
         localStorage.setItem('gateready_referred_by_code', refCode.trim().toUpperCase());
+      }
+
+      // Feature: Allow deep links from Airline Guides or Standalone Calculator to start a trip
+      if (params.get('action') === 'new_trip') {
+        const mode = (params.get('mode') as TravelType) || 'PLANE';
+        const carrier = params.get('carrier') || undefined;
+        setSelectedTravelTypeForAdd(mode);
+        if (carrier) {
+          setAddTripPreFill({ carrier });
+        }
+        setAddTripKey((prev) => prev + 1);
+        setShowAddTripModal(true);
+        // Clean query parameters so modal dismissal doesn't re-trigger
+        window.history.replaceState({}, '', window.location.pathname);
       }
     } catch {}
   }, []);
@@ -899,6 +918,11 @@ export default function App() {
   if (pathname === '/changelog') return <ChangelogPage />;
   if (pathname === '/security') return <SecurityPage />;
   if (pathname === '/reviews') return <ReviewsPage />;
+  if (pathname === '/airlines') return <AirlineIndexPage />;
+  if (pathname.startsWith('/airlines/')) return <AirlineGuidePage />;
+  if (pathname === '/baggage-fee-calculator') return <BaggageFeeCalculatorPage />;
+  if (pathname === '/tare-weight') return <TareWeightPage />;
+  if (pathname === '/entry-requirements') return <EntryRequirementsPage />;
 
   return (
     <AuthProvider>

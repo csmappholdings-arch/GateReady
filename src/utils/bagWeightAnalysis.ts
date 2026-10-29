@@ -109,8 +109,10 @@ export function getCarrierCarryOnPolicy(companyName?: string, travelType?: strin
   const weightNote = (match.carryOnWeightLimit || '').toLowerCase();
   const hasNoLimit =
     weightNote.includes('no weight limit') ||
+    weightNote.includes('no maximum weight limit') ||
     weightNote.includes('no strict weight limit') ||
-    weightNote.includes('no official weight limit');
+    weightNote.includes('no official weight limit') ||
+    /no\s+(?:maximum\s+|strict\s+|official\s+)?weight\s+limit/i.test(weightNote);
 
   if (hasNoLimit) {
     return {

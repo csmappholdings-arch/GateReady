@@ -1,43 +1,112 @@
 import { STATIC_PAGES, StaticPageMeta } from './pageMetadata';
+import { AIRLINE_GUIDES, getAirlineGuideBySlug } from '../data/airlineGuidesData';
+import { 
+  getAirlinePageHtml, 
+  getAirlineIndexPageHtml, 
+  getBaggageFeeCalculatorHtml, 
+  getTareWeightHtml, 
+  getEntryRequirementsHtml 
+} from './serverGuidesHtml';
 
 export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bodyHtml: string } | null {
-  const meta = STATIC_PAGES[pathname];
-  if (!meta) return null;
+  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
 
-  const footerLinksHtml = `
-    <footer class="w-full bg-slate-900 text-slate-400 py-12 px-4 sm:px-6 lg:px-8 border-t border-slate-800 text-xs">
-      <div class="max-w-[1550px] mx-auto space-y-8">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
-          <div class="flex items-center gap-3">
-            <span class="font-black text-lg tracking-tight text-white">Gate<span class="text-purple-400">Ready</span></span>
-            <span class="text-slate-600">|</span>
-            <span class="text-slate-400">Smart Trip Packing & Baggage Limits</span>
-          </div>
-          <div class="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-            <a href="/about" class="hover:text-purple-300">About</a>
-            <a href="/how-it-works" class="hover:text-purple-300">How It Works</a>
-            <a href="/pricing" class="hover:text-purple-300">Pricing & Plans</a>
-            <a href="/faq" class="hover:text-purple-300">FAQ</a>
-            <a href="/contact" class="hover:text-purple-300">Contact Support</a>
-            <a href="/privacy" class="hover:text-purple-300">Privacy Policy</a>
-            <a href="/terms" class="hover:text-purple-300">Terms of Service</a>
-            <a href="/cookies" class="hover:text-purple-300">Cookies & Storage</a>
-            <a href="/refunds" class="hover:text-purple-300">14-Day Refunds</a>
-            <a href="/security" class="hover:text-purple-300">Security Safeguards</a>
-            <a href="/changelog" class="hover:text-purple-300">Changelog</a>
-          </div>
-        </div>
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-          <div>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</div>
-          <div>Sole official contact: <a href="mailto:csmappholdings@gmail.com" class="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></div>
-        </div>
-      </div>
-    </footer>
-  `;
+  // 1. Check if path is an airline guide (e.g. /airlines/westjet-baggage)
+  if (normalizedPath.startsWith('/airlines/')) {
+    const slug = normalizedPath.replace(/^\/airlines\//, '');
+    const guide = getAirlineGuideBySlug(slug);
+    if (guide) {
+      const meta: StaticPageMeta = {
+        path: guide.canonicalPath,
+        title: guide.title,
+        description: guide.metaDescription,
+        keywords: guide.keywords,
+        heading: guide.h1,
+        subheading: `Verified carry-on dimensions, weight limits, and baggage fees for ${guide.name} travelers.`,
+        schemaType: 'WebPage'
+      };
+
+      const innerContentHtml = getAirlinePageHtml(guide);
+      const bodyHtml = renderPageShell(meta, innerContentHtml);
+      return { meta, bodyHtml };
+    }
+  }
+
+  // 2. Check if path is the Airline Directory Index (/airlines)
+  if (normalizedPath === '/airlines') {
+    const meta: StaticPageMeta = {
+      path: '/airlines',
+      title: 'Airline Baggage Allowance Guides (42 Airlines) – GateReady',
+      description: 'Verified carry-on dimensions, weight limits, and checked luggage fee tables for all 42 major airlines across Canada, the US, Europe, and Asia.',
+      keywords: 'airline baggage allowance, carry on dimensions by airline, checked baggage fees by airline, airline baggage limits 2026, luggage scale',
+      heading: 'Airline Baggage Allowance & Fee Directory',
+      subheading: 'Verified carry-on sizers, weight caps, and baggage fees for 42 global airlines.',
+      schemaType: 'CollectionPage'
+    };
+
+    const innerContentHtml = getAirlineIndexPageHtml();
+    const bodyHtml = renderPageShell(meta, innerContentHtml);
+    return { meta, bodyHtml };
+  }
+
+  // 3. Intent Page: Baggage Fee Calculator (/baggage-fee-calculator)
+  if (normalizedPath === '/baggage-fee-calculator') {
+    const meta: StaticPageMeta = {
+      path: '/baggage-fee-calculator',
+      title: 'Baggage Fee Calculator – Check Airline Luggage Fees | GateReady',
+      description: 'Calculate checked bag fees, carry-on charges, and overweight surcharges across 42 global airlines with our standalone baggage fee calculator.',
+      keywords: 'baggage fee calculator, airline luggage fees, calculate baggage fees by airline, overweight baggage cost, carry on fee calculator',
+      heading: 'Airline Baggage Fee Calculator',
+      subheading: 'Instant baggage fee calculations across 42 airlines before heading to the airport.',
+      schemaType: 'WebApplication'
+    };
+
+    const innerContentHtml = getBaggageFeeCalculatorHtml();
+    const bodyHtml = renderPageShell(meta, innerContentHtml);
+    return { meta, bodyHtml };
+  }
+
+  // 4. Intent Page: Tare Weight Explainer (/tare-weight)
+  if (normalizedPath === '/tare-weight') {
+    const meta: StaticPageMeta = {
+      path: '/tare-weight',
+      title: 'What is Tare Weight? Empty Suitcase Weight Guide – GateReady',
+      description: 'Learn what luggage tare weight is, why empty suitcases consume up to 25% of baggage allowances, and how GateReady stops overweight fees.',
+      keywords: 'what is tare weight, luggage tare weight, empty suitcase weight, baggage weight scale, overweight luggage fee prevention',
+      heading: 'What is Tare Weight in Luggage & Travel?',
+      subheading: 'Why your empty suitcase consumes up to 25% of your airline baggage allowance.',
+      schemaType: 'Article'
+    };
+
+    const innerContentHtml = getTareWeightHtml();
+    const bodyHtml = renderPageShell(meta, innerContentHtml);
+    return { meta, bodyHtml };
+  }
+
+  // 5. Intent Page: Entry Requirements Hub (/entry-requirements)
+  if (normalizedPath === '/entry-requirements') {
+    const meta: StaticPageMeta = {
+      path: '/entry-requirements',
+      title: 'International Travel Entry Requirements Hub – GateReady',
+      description: 'Essential passport validity rules, 6-month rule, electronic travel authorizations (ESTA, eTA), and direct links to official government entry portals.',
+      keywords: 'travel entry requirements, 6 month passport rule, ESTA eTA requirements, international travel advisories, TSA 3-1-1 rules',
+      heading: 'International Travel Entry Requirements Hub',
+      subheading: 'Official government intelligence and cross-border checklist rules before departure.',
+      schemaType: 'WebPage'
+    };
+
+    const innerContentHtml = getEntryRequirementsHtml();
+    const bodyHtml = renderPageShell(meta, innerContentHtml);
+    return { meta, bodyHtml };
+  }
+
+  // 6. Check if path is one of the 12 existing static pages
+  const meta = STATIC_PAGES[normalizedPath];
+  if (!meta) return null;
 
   let innerContentHtml = '';
 
-  if (pathname === '/about') {
+  if (normalizedPath === '/about') {
     innerContentHtml = `
       <section class="space-y-4">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">Who GateReady Is For</h2>
@@ -345,7 +414,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <div class="pt-2 text-xs text-slate-600">Report vulnerabilities to <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a>.</div>
       </section>
     `;
-  } else if (pathname === '/reviews') {
+  } else if (normalizedPath === '/reviews') {
     // STANDBY ONLY - EXACT COPY - ZERO FAKE REVIEWS
     innerContentHtml = `
       <section class="text-center py-8 space-y-4 max-w-xl mx-auto">
@@ -357,7 +426,47 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     `;
   }
 
-  const bodyHtml = `
+  const bodyHtml = renderPageShell(meta, innerContentHtml);
+  return { meta, bodyHtml };
+}
+
+export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string): string {
+  const footerLinksHtml = `
+    <footer class="w-full bg-slate-900 text-slate-400 py-12 px-4 sm:px-6 lg:px-8 border-t border-slate-800 text-xs">
+      <div class="max-w-[1550px] mx-auto space-y-8">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <span class="font-black text-lg tracking-tight text-white">Gate<span class="text-purple-400">Ready</span></span>
+            <span class="text-slate-600">|</span>
+            <span class="text-slate-400">Smart Trip Packing & Baggage Limits</span>
+          </div>
+          <div class="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
+            <a href="/airlines" class="hover:text-purple-300">Airline Baggage Guides</a>
+            <a href="/baggage-fee-calculator" class="hover:text-purple-300">Baggage Fee Calculator</a>
+            <a href="/tare-weight" class="hover:text-purple-300">Tare Weight Guide</a>
+            <a href="/entry-requirements" class="hover:text-purple-300">Entry Requirements</a>
+            <a href="/pricing" class="hover:text-purple-300">Pricing & Plans</a>
+            <a href="/how-it-works" class="hover:text-purple-300">How It Works</a>
+            <a href="/about" class="hover:text-purple-300">About</a>
+            <a href="/faq" class="hover:text-purple-300">FAQ</a>
+            <a href="/contact" class="hover:text-purple-300">Contact Support</a>
+            <a href="/privacy" class="hover:text-purple-300">Privacy Policy</a>
+            <a href="/terms" class="hover:text-purple-300">Terms of Service</a>
+            <a href="/cookies" class="hover:text-purple-300">Cookies & Storage</a>
+            <a href="/refunds" class="hover:text-purple-300">14-Day Refunds</a>
+            <a href="/security" class="hover:text-purple-300">Security Safeguards</a>
+            <a href="/changelog" class="hover:text-purple-300">Changelog</a>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+          <div>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</div>
+          <div>Sole official contact: <a href="mailto:csmappholdings@gmail.com" class="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></div>
+        </div>
+      </div>
+    </footer>
+  `;
+
+  return `
     <header class="w-full bg-white border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5">
       <div class="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
@@ -366,6 +475,8 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           <a href="/" class="font-black text-base tracking-tight text-slate-900">Gate<span class="text-purple-600">Ready</span></a>
         </div>
         <div class="flex items-center gap-2">
+          <a href="/airlines" class="hidden md:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">42 Airline Guides</a>
+          <a href="/baggage-fee-calculator" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Fee Calculator</a>
           <a href="/pricing" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Plans from $1.99</a>
           <a href="/" class="h-9 px-4 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center justify-center">Create Your Trip (Free)</a>
         </div>
@@ -385,6 +496,4 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     </main>
     ${footerLinksHtml}
   `;
-
-  return { meta, bodyHtml };
 }

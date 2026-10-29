@@ -210,137 +210,159 @@ async function startServer() {
     res.status(404).send('Not Found');
   });
 
-  // Pre-rendered HTML routes for all 12 trust, compliance, and legal pages
-  const STATIC_PAGE_ROUTES = [
-    '/about',
-    '/privacy',
-    '/terms',
-    '/contact',
-    '/faq',
-    '/pricing',
-    '/how-it-works',
-    '/cookies',
-    '/refunds',
-    '/changelog',
-    '/security',
-    '/reviews'
-  ];
+  // Pre-rendered HTML routes for all 12 informational pages, 42 airline guides, and intent hubs
+  app.get('*', async (req: Request, res: Response, next) => {
+    // Only intercept GET requests that might be pre-rendered HTML (not /api or static assets like .js, .css, .jpg, etc.)
+    const pathname = req.path.replace(/\/+$/, '') || '/';
+    if (pathname.startsWith('/api') || pathname.includes('.')) {
+      return next();
+    }
 
-  STATIC_PAGE_ROUTES.forEach((routePath) => {
-    app.get([routePath, `${routePath}/`], async (req: Request, res: Response, next) => {
-      try {
-        const pageData = getPageHtmlContent(routePath);
-        if (!pageData) {
-          return next();
-        }
+    const pageData = getPageHtmlContent(pathname);
+    if (!pageData) {
+      return next();
+    }
 
-        const { meta, bodyHtml } = pageData;
-        const indexPath = isProduction
-          ? path.resolve(__dirname, 'dist', 'index.html')
-          : path.resolve(__dirname, 'index.html');
+    try {
+      const { meta, bodyHtml } = pageData;
+      const indexPath = isProduction
+        ? path.resolve(__dirname, 'dist', 'index.html')
+        : path.resolve(__dirname, 'index.html');
 
-        if (!fs.existsSync(indexPath)) {
-          return next();
-        }
-
-        let template = fs.readFileSync(indexPath, 'utf-8');
-
-        // Inject page metadata
-        template = template.replace(
-          /<title>.*?<\/title>/,
-          `<title>${meta.title}</title>`
-        );
-        template = template.replace(
-          /<meta\s+name="description"\s+content=".*?"\s*\/?>/,
-          `<meta name="description" content="${meta.description}" />`
-        );
-        template = template.replace(
-          /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/,
-          `<meta name="keywords" content="${meta.keywords}" />`
-        );
-        template = template.replace(
-          /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/,
-          `<meta property="og:title" content="${meta.title}" />`
-        );
-        template = template.replace(
-          /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
-          `<meta property="og:description" content="${meta.description}" />`
-        );
-        template = template.replace(
-          /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/,
-          `<meta property="og:url" content="https://gateready.ca${meta.path}" />`
-        );
-        template = template.replace(
-          /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/,
-          `<meta name="twitter:title" content="${meta.title}" />`
-        );
-        template = template.replace(
-          /<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/,
-          `<meta name="twitter:description" content="${meta.description}" />`
-        );
-        template = template.replace(
-          /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
-          `<link rel="canonical" href="https://gateready.ca${meta.path}" />`
-        );
-
-        // Inject page-specific JSON-LD structured data for rich snippets
-        const pageStructuredData = {
-          '@context': 'https://schema.org',
-          '@type': meta.schemaType || 'WebPage',
-          'name': meta.title,
-          'headline': meta.heading,
-          'description': meta.description,
-          'keywords': meta.keywords,
-          'url': `https://gateready.ca${meta.path}`,
-          'publisher': {
-            '@type': 'Organization',
-            'name': 'CSM App Holdings',
-            'url': 'https://gateready.ca',
-            'contactPoint': {
-              '@type': 'ContactPoint',
-              'email': 'csmappholdings@gmail.com',
-              'contactType': 'customer support'
-            }
-          },
-          'breadcrumb': {
-            '@type': 'BreadcrumbList',
-            'itemListElement': [
-              {
-                '@type': 'ListItem',
-                'position': 1,
-                'name': 'Home',
-                'item': 'https://gateready.ca/'
-              },
-              {
-                '@type': 'ListItem',
-                'position': 2,
-                'name': meta.heading,
-                'item': `https://gateready.ca${meta.path}`
-              }
-            ]
-          }
-        };
-
-        template = template.replace(
-          '</head>',
-          `<script type="application/ld+json">${JSON.stringify(pageStructuredData)}</script>\n  </head>`
-        );
-
-        // Inject pre-rendered semantic HTML inside #root
-        template = template.replace(
-          /<div id="root">[\s\S]*?<\/div>/,
-          `<div id="root">${bodyHtml}</div>`
-        );
-
-        if (!isProduction && viteDevServer) {
-          template = await viteDevServer.transformIndexHtml(req.originalUrl, template);
-        }
-
-        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(template);
-      } catch (e) {
-        next(e);
+      if (!fs.existsSync(indexPath)) {
+        return next();
       }
-    });
+
+      let template = fs.readFileSync(indexPath, 'utf-8');
+
+      // Inject page metadata
+      template = template.replace(
+        /<title>.*?<\/title>/,
+        `<title>${meta.title}</title>`
+      );
+      template = template.replace(
+        /<meta\s+name="description"\s+content=".*?"\s*\/?>/,
+        `<meta name="description" content="${meta.description}" />`
+      );
+      template = template.replace(
+        /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/,
+        `<meta name="keywords" content="${meta.keywords}" />`
+      );
+      template = template.replace(
+        /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/,
+        `<meta property="og:title" content="${meta.title}" />`
+      );
+      template = template.replace(
+        /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
+        `<meta property="og:description" content="${meta.description}" />`
+      );
+      template = template.replace(
+        /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/,
+        `<meta property="og:url" content="https://gateready.ca${meta.path}" />`
+      );
+      template = template.replace(
+        /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/,
+        `<meta property="og:image" content="https://gateready.ca/thumbnail.jpg" />`
+      );
+      template = template.replace(
+        /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/,
+        `<meta name="twitter:title" content="${meta.title}" />`
+      );
+      template = template.replace(
+        /<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/,
+        `<meta name="twitter:description" content="${meta.description}" />`
+      );
+      template = template.replace(
+        /<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/,
+        `<meta name="twitter:image" content="https://gateready.ca/thumbnail.jpg" />`
+      );
+      template = template.replace(
+        /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
+        `<link rel="canonical" href="https://gateready.ca${meta.path}" />`
+      );
+
+      const isAirlineGuide = meta.path.startsWith('/airlines/');
+
+      const breadcrumbItems = isAirlineGuide
+        ? [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Home',
+              'item': 'https://gateready.ca/'
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': 'Airline Baggage Guides',
+              'item': 'https://gateready.ca/airlines'
+            },
+            {
+              '@type': 'ListItem',
+              'position': 3,
+              'name': meta.heading,
+              'item': `https://gateready.ca${meta.path}`
+            }
+          ]
+        : [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Home',
+              'item': 'https://gateready.ca/'
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': meta.heading,
+              'item': `https://gateready.ca${meta.path}`
+            }
+          ];
+
+      // Inject page-specific JSON-LD structured data for rich snippets
+      const pageStructuredData = {
+        '@context': 'https://schema.org',
+        '@type': meta.schemaType || 'WebPage',
+        'name': meta.title,
+        'headline': meta.heading,
+        'description': meta.description,
+        'keywords': meta.keywords,
+        'url': `https://gateready.ca${meta.path}`,
+        'publisher': {
+          '@type': 'Organization',
+          'name': 'CSM App Holdings',
+          'url': 'https://gateready.ca',
+          'contactPoint': {
+            '@type': 'ContactPoint',
+            'email': 'csmappholdings@gmail.com',
+            'contactType': 'customer support'
+          }
+        },
+        'breadcrumb': {
+          '@type': 'BreadcrumbList',
+          'itemListElement': breadcrumbItems
+        }
+      };
+
+      template = template.replace(
+        '</head>',
+        `<script type="application/ld+json">${JSON.stringify(pageStructuredData)}</script>\n  </head>`
+      );
+
+      // Inject pre-rendered semantic HTML inside #root
+      template = template.replace(
+        /<div id="root">[\s\S]*?<\/div>/,
+        `<div id="root">${bodyHtml}</div>`
+      );
+
+      if (!isProduction && viteDevServer) {
+        template = await viteDevServer.transformIndexHtml(req.originalUrl, template);
+      }
+
+      res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(template);
+    } catch (e) {
+      next(e);
+    }
   });
 
   if (!isProduction && viteDevServer) {

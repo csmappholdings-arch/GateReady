@@ -104,13 +104,25 @@ export const AppFooter: React.FC<AppFooterProps> = ({
           <a href="/changelog" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
             Changelog
           </a>
+          <a href="/airlines" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            Airline Guides (42)
+          </a>
+          <a href="/baggage-fee-calculator" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            Fee Calculator
+          </a>
+          <a href="/tare-weight" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            Tare Weight
+          </a>
+          <a href="/entry-requirements" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            Entry Requirements
+          </a>
           {onOpenAirlineGuides && (
             <button
               type="button"
               onClick={onOpenAirlineGuides}
-              className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+              className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer text-purple-600 dark:text-purple-400 font-bold"
             >
-              Airline Guides
+              Quick Intel Modal
             </button>
           )}
         </div>

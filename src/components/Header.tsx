@@ -227,6 +227,22 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
+          {/* Desktop Direct Links to Guides & Calculator (hidden on mobile to protect two-row layout) */}
+          <nav className="hidden xl:flex items-center gap-2 ml-2" aria-label="Quick travel links">
+            <a
+              href="/airlines"
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Airline Guides
+            </a>
+            <a
+              href="/baggage-fee-calculator"
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Fee Calculator
+            </a>
+          </nav>
+
           {/* Pro / Referral / Trial / Free Plan Badge (Desktop row) */}
           <div className="hidden sm:flex items-center">
             {isReferralPlatinumActive ? (
@@ -1013,6 +1029,53 @@ export const Header: React.FC<HeaderProps> = ({
                     </button>
                   </div>
                 )}
+
+                {/* Travel Guides & Public Directory Tools */}
+                <div className="py-1 border-b border-slate-100 dark:border-slate-800">
+                  <div className="px-3.5 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Travel Guides & Tools
+                  </div>
+                  <a
+                    href="/airlines"
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Plane className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                      42+ Airline Guides
+                    </span>
+                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Browse</span>
+                  </a>
+                  <a
+                    href="/baggage-fee-calculator"
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Scale className="w-3.5 h-3.5 text-amber-500" />
+                      Baggage Fee Calculator
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">Calc</span>
+                  </a>
+                  <a
+                    href="/tare-weight"
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Luggage className="w-3.5 h-3.5 text-indigo-500" />
+                      Tare Weight Luggage Guide
+                    </span>
+                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Guide</span>
+                  </a>
+                  <a
+                    href="/entry-requirements"
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                      Official Entry Requirements
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Gov Info</span>
+                  </a>
+                </div>
 
                 {/* Batch Actions for Current Trip */}
                 {currentTrip && (
