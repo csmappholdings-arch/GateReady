@@ -59,6 +59,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
   const [dateInput, setDateInput] = useState(trip.departureDate || '');
   const [timeInput, setTimeInput] = useState(trip.departureTime || '');
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
 
   useEffect(() => {
     setDateInput(trip.departureDate || '');
@@ -314,7 +315,9 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                   Set your departure date to start the countdown
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Pick your travel date to track takeoff and receive day-of alerts.
+                  {isFlight
+                    ? 'Pick your travel date to track takeoff and receive day-of alerts.'
+                    : 'Pick your travel date to track departure and receive day-of alerts.'}
                 </p>
                 <button
                   type="button"

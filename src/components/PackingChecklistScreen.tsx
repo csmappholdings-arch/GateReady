@@ -81,6 +81,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
   } = usePacking();
 
   const { isPro, tier, canAddTraveler, canAddBag, openPaywall } = useSubscription();
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
 
   const [showPresetsModal, setShowPresetsModal] = useState(false);
   const [showLuggageQrModal, setShowLuggageQrModal] = useState(false);
@@ -768,9 +769,9 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       </div>
 
       {/* ============================================================== */}
-      {/* CARRY-ON LIQUID DISCLAIMER (Always shown for carry-on luggage) */}
+      {/* CARRY-ON LIQUID DISCLAIMER (Only shown for flight carry-on luggage) */}
       {/* ============================================================== */}
-      {currentBag && currentBag.type === 'CARRY_ON' && (
+      {currentBag && currentBag.type === 'CARRY_ON' && isFlight && (
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 w-full">
           <div className="rounded-2xl border border-purple-300 dark:border-purple-800 bg-linear-to-r from-purple-50 via-fuchsia-50/40 to-white dark:from-purple-950/50 dark:via-purple-900/30 dark:to-slate-900 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-start gap-3">

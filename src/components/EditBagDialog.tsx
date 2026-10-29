@@ -10,6 +10,7 @@ import {
   getUserPresetWeightLbs,
   setUserPresetWeightLbs
 } from '../types/travel';
+import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { 
@@ -46,13 +47,22 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
   const { updateBag, trips } = usePacking();
   const { isPro, canAddBag, openPaywall } = useSubscription();
 
+  const activeTrip = trips.find((t) => t.id === tripId);
+  const carrierPolicy = getCarrierCarryOnPolicy(activeTrip?.companyName, activeTrip?.travelType);
+
   const [label, setLabel] = useState('');
   const [type, setType] = useState<BagType>('CARRY_ON');
   const [material, setMaterial] = useState<BagMaterial>('HARD_SHELL');
   const [emptyBagWeight, setEmptyBagWeight] = useState<string>('7.0');
   const [saveAsDefaultPreset, setSaveAsDefaultPreset] = useState(false);
   const [assignedTo, setAssignedTo] = useState<string>('');
-  const [maxWeight, setMaxWeight] = useState<string>('50');
+  const [maxWeight, setMaxWeight] = useState<string>('');
+
+  const isNoLimit = Boolean(
+    activeTrip?.travelType === 'CAR' ||
+    (type === 'CARRY_ON' && carrierPolicy.hasNoWeightLimit) ||
+    (activeTrip?.travelType && activeTrip.travelType !== 'PLANE' && type !== 'CHECKED')
+  );
 
   useEffect(() => {
     if (bag) {
@@ -67,14 +77,31 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
         : emptyLbs.toFixed(1);
       setEmptyBagWeight(displayEmpty);
 
-      setAssignedTo(bag.assignedTo || '');
-      setMaxWeight(
-        bag.maxWeightLimitLbs 
-          ? (weightUnit === 'KG' ? String(Math.round(bag.maxWeightLimitLbs * 0.45359237)) : String(bag.maxWeightLimitLbs))
-          : (bag.type === 'CHECKED' ? (weightUnit === 'KG' ? '23' : '50') : (weightUnit === 'KG' ? '10' : '22'))
+      const isBagNoLimit = Boolean(
+        activeTrip?.travelType === 'CAR' ||
+        (bag.type === 'CARRY_ON' && carrierPolicy.hasNoWeightLimit) ||
+        (activeTrip?.travelType && activeTrip.travelType !== 'PLANE' && bag.type !== 'CHECKED')
       );
+
+      setAssignedTo(bag.assignedTo || '');
+      if (bag.maxWeightLimitLbs) {
+        setMaxWeight(
+          weightUnit === 'KG'
+            ? String(Math.round(bag.maxWeightLimitLbs * 0.45359237))
+            : String(bag.maxWeightLimitLbs)
+        );
+      } else if (isBagNoLimit) {
+        // Fix 5: Never prefill misleading 22 lbs on carriers with no strict weight limit (e.g. Air Canada)
+        setMaxWeight('');
+      } else {
+        setMaxWeight(
+          bag.type === 'CHECKED'
+            ? (weightUnit === 'KG' ? '23' : '50')
+            : (weightUnit === 'KG' ? '10' : '22')
+        );
+      }
     }
-  }, [bag, weightUnit]);
+  }, [bag, weightUnit, activeTrip?.travelType, carrierPolicy.hasNoWeightLimit]);
 
   if (!isOpen || !bag) return null;
   if (typeof document === 'undefined') return null;
@@ -92,7 +119,6 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
   // When changing bag type, adjust material preset default and update max weight limit
   const handleSelectType = (newType: BagType) => {
     if (!isPro && newType !== bag.type) {
-      const activeTrip = trips.find((t) => t.id === tripId);
       const otherBags = (activeTrip?.bags || []).filter((b) => b.id !== bag.id);
       const bagCheck = canAddBag(otherBags, newType);
       if (!bagCheck.allowed) {
@@ -109,12 +135,22 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
     setEmptyBagWeight(displayVal);
 
     // Automatically update the max weight limit to the standard cap for the new bag type
-    const defaultWeight = newType === 'CHECKED' 
-      ? (weightUnit === 'KG' ? '23' : '50') 
-      : newType === 'CARRY_ON'
-        ? (weightUnit === 'KG' ? '10' : '22')
-        : (weightUnit === 'KG' ? '7' : '15');
-    setMaxWeight(defaultWeight);
+    const isNewTypeNoLimit = Boolean(
+      activeTrip?.travelType === 'CAR' ||
+      (newType === 'CARRY_ON' && carrierPolicy.hasNoWeightLimit) ||
+      (activeTrip?.travelType && activeTrip.travelType !== 'PLANE' && newType !== 'CHECKED')
+    );
+
+    if (isNewTypeNoLimit) {
+      setMaxWeight('');
+    } else {
+      const defaultWeight = newType === 'CHECKED' 
+        ? (weightUnit === 'KG' ? '23' : '50') 
+        : newType === 'CARRY_ON'
+          ? (weightUnit === 'KG' ? '10' : '22')
+          : (weightUnit === 'KG' ? '7' : '15');
+      setMaxWeight(defaultWeight);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -407,16 +443,37 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
 
           {/* Weight Limit */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-              <Scale className="w-3.5 h-3.5 text-purple-600" />
-              <span>Airline / Carrier Weight Limit ({weightUnit})</span>
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5 text-purple-600" />
+                <span>Airline / Carrier Weight Limit ({weightUnit})</span>
+              </label>
+              {isNoLimit && (
+                <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-full">
+                  Ignored / No Limit
+                </span>
+              )}
+            </div>
+
+            {isNoLimit && (
+              <div className="mb-2 p-2.5 rounded-xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-[11px] text-purple-950 dark:text-purple-200">
+                <p className="font-semibold flex items-center gap-1.5">
+                  <Info className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  <span>{carrierPolicy.label} — No official weight limit</span>
+                </p>
+                <p className="text-[10px] text-purple-800/80 dark:text-purple-300/80 mt-0.5">
+                  {carrierPolicy.note || `${activeTrip?.companyName || 'This carrier'} allows carry-ons without a strict weight cap (must be light enough to lift into overhead bin unassisted). Any number entered here is optional and ignored by default.`}
+                </p>
+              </div>
+            )}
+
             <div className="relative">
               <input
                 type="number"
                 step="0.5"
                 min="1"
                 max="200"
+                placeholder={isNoLimit ? 'No weight limit (optional custom cap)' : `Standard limit (e.g. ${weightUnit === 'KG' ? '10' : '22'})`}
                 value={maxWeight}
                 onChange={(e) => setMaxWeight(e.target.value)}
                 className="w-full h-10 pl-3.5 pr-12 text-xs font-semibold rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"

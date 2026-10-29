@@ -27,10 +27,9 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Non-flight trips (Train, Bus, Cruise, Car) do not have airline baggage fees
-  if (trip.travelType && trip.travelType !== 'PLANE') {
-    return null;
-  }
+  const isFlight = (trip.travelType === 'PLANE' || !trip.travelType) && !['CAR', 'TRAIN', 'CRUISE', 'BUS'].includes(trip.travelType || '');
+  const airlineName = trip.companyName?.trim() || '';
+  const hasAirline = Boolean(airlineName && airlineName.length > 1);
 
   // Calculate weights for each bag
   const bagsWithWeights = useMemo(() => {
@@ -51,14 +50,48 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
     });
   }, [trip.bags]);
 
-  const airlineName = trip.companyName?.trim();
-  const hasAirline = Boolean(airlineName && airlineName.length > 1);
-
   // Fee calculation from static published fee table
   const feeResult: BagFeeCalculationResult | null = useMemo(() => {
-    if (!hasAirline) return null;
+    if (!isFlight || !hasAirline) return null;
     return calculateTripBaggageFees(airlineName, bagsWithWeights, trip.seatClassOrCarSize);
-  }, [airlineName, hasAirline, bagsWithWeights, trip.seatClassOrCarSize]);
+  }, [isFlight, hasAirline, airlineName, bagsWithWeights, trip.seatClassOrCarSize]);
+
+  // Dynamic USD approximation calculated directly from the active total fee
+  const approxUsd = useMemo(() => {
+    if (!feeResult || feeResult.currency === 'USD') return null;
+    if (feeResult.totalEstimatedFee === 0) return '≈ US$0';
+    if (feeResult.currency === 'CAD') {
+      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 0.73)}`;
+    }
+    if (feeResult.currency === 'EUR') {
+      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.08)}`;
+    }
+    if (feeResult.currency === 'GBP') {
+      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.30)}`;
+    }
+    return null;
+  }, [feeResult]);
+
+  // Bags that actually carry a fee (base fee or overweight penalty)
+  const feeBearingBags = useMemo(() => {
+    if (!feeResult) return [];
+    return feeResult.breakdown.filter((b) => b.subtotal > 0 || (b.bagType === 'CHECKED' && b.baseFee > 0));
+  }, [feeResult]);
+
+  const feeSummaryBagCountText = useMemo(() => {
+    const count = feeBearingBags.length;
+    if (count === 0) return 'no fee-bearing bags';
+    const allChecked = feeBearingBags.every((b) => b.bagType === 'CHECKED');
+    if (count === 1) {
+      return allChecked ? '1 checked bag' : '1 bag';
+    }
+    return allChecked ? `${count} checked bags` : `${count} fee-bearing bags`;
+  }, [feeBearingBags]);
+
+  // Non-flight trips (Train, Bus, Cruise, Car) do not have airline baggage fees
+  if (!isFlight) {
+    return null;
+  }
 
   // If no airline has been selected yet
   if (!hasAirline) {
@@ -143,37 +176,6 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
 
   const checkedBags = feeResult.breakdown.filter((b) => b.bagType === 'CHECKED');
   const carryOnBags = feeResult.breakdown.filter((b) => b.bagType === 'CARRY_ON');
-
-  // Dynamic USD approximation calculated directly from the active total fee
-  const approxUsd = useMemo(() => {
-    if (feeResult.currency === 'USD') return null;
-    if (feeResult.totalEstimatedFee === 0) return '≈ US$0';
-    if (feeResult.currency === 'CAD') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 0.73)}`;
-    }
-    if (feeResult.currency === 'EUR') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.08)}`;
-    }
-    if (feeResult.currency === 'GBP') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.30)}`;
-    }
-    return null;
-  }, [feeResult.currency, feeResult.totalEstimatedFee]);
-
-  // Bags that actually carry a fee (base fee or overweight penalty)
-  const feeBearingBags = useMemo(() => {
-    return feeResult.breakdown.filter((b) => b.subtotal > 0 || (b.bagType === 'CHECKED' && b.baseFee > 0));
-  }, [feeResult.breakdown]);
-
-  const feeSummaryBagCountText = useMemo(() => {
-    const count = feeBearingBags.length;
-    if (count === 0) return 'no fee-bearing bags';
-    const allChecked = feeBearingBags.every((b) => b.bagType === 'CHECKED');
-    if (count === 1) {
-      return allChecked ? '1 checked bag' : '1 bag';
-    }
-    return allChecked ? `${count} checked bags` : `${count} fee-bearing bags`;
-  }, [feeBearingBags]);
 
   return (
     <div className={`rounded-2xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/60 shadow-sm overflow-hidden transition-all ${className}`}>

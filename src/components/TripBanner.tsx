@@ -163,7 +163,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       updatedGateChecklist = getDefaultChecklistForMode(editTravelType);
       updatedBags = currentTrip.bags.map((b) => ({
         ...b,
-        maxWeightLimitLbs: editTravelType === 'CAR' ? undefined : (editTravelType !== 'PLANE' && b.type === 'CARRY_ON') ? 50 : b.maxWeightLimitLbs
+        maxWeightLimitLbs: editTravelType === 'CAR' ? undefined : (editTravelType !== 'PLANE' && b.type === 'CARRY_ON') ? 50 : (editTravelType === 'PLANE' && b.type === 'CARRY_ON' ? (b.maxWeightLimitLbs && b.maxWeightLimitLbs <= 30 ? b.maxWeightLimitLbs : 22) : b.maxWeightLimitLbs)
       }));
     }
 
@@ -518,7 +518,13 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                   type="text"
                   value={editSeatClass}
                   onChange={(e) => setEditSeatClass(e.target.value)}
-                  placeholder="e.g. Main Cabin, Balcony Stateroom, Coach"
+                  placeholder={
+                    editTravelType === 'TRAIN' ? 'e.g. Coach, Quiet Car, Roomette' :
+                    editTravelType === 'CRUISE' ? 'e.g. Balcony Stateroom, Interior Cabin' :
+                    editTravelType === 'BUS' ? 'e.g. Standard Coach Seating' :
+                    editTravelType === 'CAR' ? 'e.g. Mid-Size SUV, Sedan, Minivan' :
+                    'e.g. Main Cabin, Economy, Business'
+                  }
                   className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-purple-50/30 dark:bg-slate-900 text-slate-900 dark:text-white"
                 />
               </div>
@@ -666,14 +672,20 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  'Airline'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
-                {currentTrip.companyName || (isCar ? 'Personal / Rental Vehicle' : 'Carrier Unspecified')}
+                {currentTrip.companyName || (isCar ? 'Personal / Rental Vehicle' : 'Not set')}
               </p>
               <p className="text-[11px] text-indigo-600 dark:text-indigo-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.flightNumber
                   ? `Flight / Route #${currentTrip.flightNumber}`
-                  : isCar
-                    ? 'Highway & Road Navigation'
-                    : 'Standard Carrier Allowances'}
+                  : isFlight
+                    ? 'Standard Carrier Allowances'
+                    : isTrain
+                      ? 'Standard Rail Allowances'
+                      : isCruise
+                        ? 'Standard Cruise Policies'
+                        : isBus
+                          ? 'Standard Bus Allowances'
+                          : 'Highway & Road Navigation'}
               </p>
             </div>
           </div>
@@ -692,7 +704,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  'Cabin'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
-                {currentTrip.seatClassOrCarSize || (isCar ? 'Mid-Size SUV / Car' : 'Standard Main Cabin')}
+                {currentTrip.seatClassOrCarSize || 'Not set'}
               </p>
               <p className="text-[11px] text-fuchsia-600 dark:text-fuchsia-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.aircraftType

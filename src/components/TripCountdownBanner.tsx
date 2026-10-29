@@ -186,7 +186,9 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
                   Set your departure date to start the countdown
                 </p>
                 <p className="text-[11px] text-purple-200/80 mt-0.5">
-                  Pick your travel date to track takeoff and start the live countdown clock.
+                  {isFlight
+                    ? 'Pick your travel date to track takeoff and start the live countdown clock.'
+                    : 'Pick your travel date to track departure and start the live countdown clock.'}
                 </p>
               </div>
             </div>

@@ -254,9 +254,9 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
   const getNoLimitNote = () => {
     if (isCar) return 'No vehicle weight limit';
-    if (trip.travelType === 'TRAIN') return 'No airline weight limit · Rail coach';
-    if (trip.travelType === 'CRUISE') return 'No airline weight limit · Cruise stateroom';
-    if (trip.travelType === 'BUS') return 'No airline weight limit · Bus overhead';
+    if (trip.travelType === 'TRAIN') return 'No rail weight limit · Rail coach';
+    if (trip.travelType === 'CRUISE') return 'No cruise weight limit · Cruise stateroom';
+    if (trip.travelType === 'BUS') return 'No bus weight limit · Bus overhead';
     return `No airline weight limit · ${trip.companyName || 'Air Canada'}`;
   };
 
@@ -430,7 +430,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 </span>
                 <span className="text-slate-300 dark:text-slate-700">·</span>
                 <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                  TSA 3-1-1 & Tare Verified
+                  {isFlight ? 'TSA 3-1-1 & Tare Verified' : 'Tare & Weight Verified'}
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -442,7 +442,9 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
-            Real-time weight meters, empty luggage tare deductions, TSA liquid regulation compliance, and airline overhead sizer auditing.
+            {isFlight
+              ? 'Real-time weight meters, empty luggage tare deductions, TSA liquid regulation compliance, and airline overhead sizer auditing.'
+              : 'Real-time weight meters, empty luggage tare deductions, and carrier baggage policy auditing.'}
           </p>
         </div>
 
@@ -906,7 +908,17 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
                   <p>
-                    <strong className="text-purple-900 dark:text-purple-100 font-bold">{trip.companyName || 'Airline'} Carry-On Allowance: </strong>
+                    <strong className="text-purple-900 dark:text-purple-100 font-bold">
+                      {trip.travelType === 'TRAIN'
+                        ? 'Rail Carry-On Allowance: '
+                        : trip.travelType === 'BUS'
+                          ? 'Bus Luggage Allowance: '
+                          : trip.travelType === 'CRUISE'
+                            ? 'Cruise Baggage Allowance: '
+                            : trip.travelType === 'CAR'
+                              ? 'Vehicle Cargo Allowance: '
+                              : `${trip.companyName || 'Airline'} Carry-On Allowance: `}
+                    </strong>
                     {carrierCarryOnPolicy.note || 'No weight limit'}.
                   </p>
                   <p className="text-purple-800/80 dark:text-purple-300/80 text-[10px]">
@@ -923,7 +935,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               </p>
             )}
 
-            {activeBag.type === 'CARRY_ON' && (
+            {activeBag.type === 'CARRY_ON' && isFlight && (
               <p className="text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1 pt-0.5 font-medium">
                 <Droplets className="w-3.5 h-3.5 text-purple-600" />
                 <span>TSA 3-1-1 Rule: Liquids, gels, and aerosols must be 3.4oz (100ml) or less in a clear quart-sized bag.</span>
@@ -1080,7 +1092,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                         }`}>
                           {item.name}
                         </p>
-                        {(() => {
+                        {isFlight && (() => {
                           const lq = scanItemForLiquids(item.name, activeBag.type);
                           if (!lq.isLiquid) return null;
                           if (lq.status === 'NON_COMPLIANT') {

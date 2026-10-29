@@ -274,7 +274,18 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <div class="font-bold text-purple-900 text-sm">October 26, 2026</div>
+            <div class="font-bold text-purple-900 text-sm">October 28, 2026 — Multi-Modal Travel Integrity & Stability Release</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li>Trip editor save stability: resolved hook order in baggage fee calculators so switching modes (Train, Bus, Cruise, Road Trip) or carriers (e.g. Air Canada) saves and persists with zero ErrorBoundary crashes.</li>
+              <li>Strict mode value isolation: airline values and aircraft types are never carried over into rail/bus/cruise/car itineraries, and empty seat/cabin classes show "Not set" rather than defaulting to "Standard Main Cabin".</li>
+              <li>Mode-aware allowance headers: allowance titles reflect the travel mode ("Rail Carry-On Allowance:", "Bus Luggage Allowance:", "Cruise Baggage Allowance:", "Vehicle Cargo Allowance:").</li>
+              <li>Residual flight terminology clearance: removed flight wording on non-flight itineraries (countdown prompts use "track departure", transit hub descriptions omit airport-only notes, and TSA 3-1-1 liquids rule is flight-only).</li>
+              <li>No-limit carrier bag spec editor: for carriers with no strict carry-on weight limit (e.g. Air Canada), the bag editor no longer pre-fills 22 lbs and displays an "Ignored / No Limit" indicator.</li>
+              <li>Save-gate trigger scope confirmation: verified anonymous user save-gate trigger as strictly once-per-session (sessionStorage).</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">October 26, 2026</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li>Overweight warning typography: verified "Surcharges may apply" across all alert and banner strings.</li>
               <li>Canonical plan limits alignment: synchronized /pricing with in-app dialog (Gold MOST POPULAR, Silver unlimited bags, Gold unlimited active trips).</li>

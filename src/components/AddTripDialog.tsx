@@ -779,7 +779,15 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     <span>Locations & Transit Hubs ({travelType})</span>
                   </span>
                   <span className="text-[10px] text-slate-400 font-normal">
-                    Includes Toronto Island (YTZ), regional hubs & international terminals
+                    {travelType === 'PLANE'
+                      ? 'Includes Toronto Island (YTZ), regional hubs & international terminals'
+                      : travelType === 'TRAIN'
+                        ? 'Includes Union Station, regional rail networks & international routes'
+                        : travelType === 'CRUISE'
+                          ? 'Includes cruise ports, harbor terminals & embarkation points'
+                          : travelType === 'BUS'
+                            ? 'Includes city transit hubs, coach terminals & regional stations'
+                            : 'Includes cities, highway waypoints & road trip stops'}
                   </span>
                 </div>
 
@@ -966,7 +974,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                         </span>
                       </div>
                       <p className="text-[10px] text-indigo-700/80 dark:text-indigo-300/80">
-                        Track return flight countdowns, 2-way baggage allowances & return day alerts
+                        {travelType === 'PLANE'
+                          ? 'Track return flight countdowns, 2-way baggage allowances & return day alerts'
+                          : 'Track return departure countdowns, 2-way baggage allowances & return day alerts'}
                       </p>
                     </div>
                   </div>
@@ -974,7 +984,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   {!isPro ? (
                     <button
                       type="button"
-                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Track return flights, 2-way weight limits, and return day departure alerts.")}
+                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Track return departure schedules, 2-way weight limits, and return day departure alerts.")}
                       className="h-7 px-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-[10px] flex items-center justify-center gap-1 shadow-xs cursor-pointer active:scale-95 transition-all shrink-0 self-start sm:self-auto"
                     >
                       <Lock className="w-3 h-3" />

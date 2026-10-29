@@ -48,7 +48,7 @@ export function getCarrierCarryOnPolicy(companyName?: string, travelType?: strin
       return {
         hasNoWeightLimit: true,
         limitLbs: null,
-        label: 'No airline limit (Rail Coach)',
+        label: 'No rail limit (Rail Coach)',
         dimensions: 'Standard overhead rack',
         note: 'Rail coach carry-on (up to 50 lbs)',
         isDefault: false
@@ -58,7 +58,7 @@ export function getCarrierCarryOnPolicy(companyName?: string, travelType?: strin
       return {
         hasNoWeightLimit: true,
         limitLbs: null,
-        label: 'No airline limit (Cruise Stateroom)',
+        label: 'No cruise limit (Cruise Stateroom)',
         dimensions: 'Terminal security clearance sizer',
         note: null,
         isDefault: false
@@ -68,7 +68,7 @@ export function getCarrierCarryOnPolicy(companyName?: string, travelType?: strin
       return {
         hasNoWeightLimit: true,
         limitLbs: null,
-        label: 'No airline limit (Bus Overhead)',
+        label: 'No bus limit (Bus Overhead)',
         dimensions: 'Overhead luggage shelf',
         note: null,
         isDefault: false

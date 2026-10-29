@@ -14,6 +14,78 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Oct 28, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-mono text-xs font-bold">
+            October 28, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Multi-Modal Travel Integrity & Stability Release</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Trip Editor Multi-Modal Save Stability</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Resolved hook execution ordering in baggage fee calculation cards so editing a flight trip to Train, Bus, Cruise, or Car, or selecting no-limit carriers (e.g. Air Canada) saves cleanly, updates mode immediately, and preserves all bags and items without ErrorBoundary interruptions.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Strict Mode Value Isolation</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              When changing travel modes, airline names and aircraft models are never carried over into rail, bus, cruise, or car operator fields, and empty seat/cabin classes display "Not set" rather than defaulting to "Standard Main Cabin".
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Mode-Aware Allowance Headers</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Allowance section headers match the active mode exactly: "Rail Carry-On Allowance:" (Train), "Bus Luggage Allowance:" (Bus), "Cruise Baggage Allowance:" (Cruise), "Vehicle Cargo Allowance:" (Car), and "Airline Carry-On Allowance:" (Flight).
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Residual Flight Terminology Clearance</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Cleared residual flight wording on non-flight itineraries: countdown prompts use "track departure", transit hub descriptions omit airport-only references (e.g. Toronto Island YTZ), and TSA 3-1-1 liquids rule notices and item badges only appear on flight legs.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>No-Limit Carrier Bag Spec Editor</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              For carriers with no strict carry-on weight limit (e.g. Air Canada or vehicle cargo), the bag editor no longer pre-fills a misleading 22-lb limit and displays an "Ignored / No Limit" indicator.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Save-Gate Trigger Scope Confirmation</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Confirmed and verified the anonymous user save-gate trigger as strictly once-per-session (sessionStorage), ensuring guests are politely invited to save their packing list without repeated interruptions.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Oct 26, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
