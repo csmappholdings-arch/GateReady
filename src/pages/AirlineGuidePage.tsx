@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AIRLINE_GUIDES, AirlineGuideItem, getAirlineGuideBySlug } from '../data/airlineGuidesData';
+import { AIRLINE_GUIDES, AirlineGuideItem, getAirlineGuideBySlug, getAirlineGuideByAnySlug } from '../data/airlineGuidesData';
 import { 
   Plane, 
   ArrowLeft, 
@@ -29,11 +29,23 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
   onOpenTripBuilder 
 }) => {
   const currentSlug = propSlug || (typeof window !== 'undefined' ? window.location.pathname.replace(/^\/airlines\//, '').replace(/\/$/, '') : '');
-  const guide = propGuide || getAirlineGuideBySlug(currentSlug) || AIRLINE_GUIDES[0];
+  const slugMatch = getAirlineGuideByAnySlug(currentSlug);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && slugMatch && !slugMatch.isCanonical) {
+      window.location.replace(slugMatch.guide.canonicalPath);
+    }
+  }, [slugMatch]);
+
+  const guide = propGuide || (slugMatch ? slugMatch.guide : getAirlineGuideBySlug(currentSlug)) || AIRLINE_GUIDES[0];
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.title = guide.title;
+      const canonicalTag = document.querySelector('link[rel="canonical"]');
+      if (canonicalTag) {
+        canonicalTag.setAttribute('href', `https://gateready.ca${guide.canonicalPath}`);
+      }
       // Scroll to top
       window.scrollTo(0, 0);
     }

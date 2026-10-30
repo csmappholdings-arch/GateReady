@@ -33,6 +33,7 @@ import { CarrierSearchInput } from './CarrierSearchInput';
 import { TripCountdownBanner } from './TripCountdownBanner';
 import { DatePickerInput } from './DatePickerInput';
 import { getDefaultChecklistForMode } from '../data/allowances';
+import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 
 interface TripBannerProps {
   currentTrip: Trip | null;
@@ -63,7 +64,8 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   // Edit fields - initialized with currentTrip values
   const [editName, setEditName] = useState(currentTrip?.name || '');
   const [editCarrier, setEditCarrier] = useState(currentTrip?.companyName || '');
-  const [editSeatClass, setEditSeatClass] = useState(currentTrip?.seatClassOrCarSize || '');
+  const [editSeatClass, setEditSeatClass] = useState(currentTrip?.seatClassOrCarSize || 'Main Cabin');
+  const [editFareFamily, setEditFareFamily] = useState(currentTrip?.fareFamily || '');
   const [editTravelType, setEditTravelType] = useState<TravelType>(currentTrip?.travelType || 'PLANE');
   const [editOriginCity, setEditOriginCity] = useState(currentTrip?.originCity || '');
   const [editDestinationCity, setEditDestinationCity] = useState(currentTrip?.destinationCity || '');
@@ -79,10 +81,25 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       [currentTrip.travelType || 'PLANE']: {
         companyName: currentTrip.companyName || '',
         seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
-        aircraftType: currentTrip.aircraftType || ''
+        aircraftType: currentTrip.aircraftType || '',
+        fareFamily: currentTrip.fareFamily || ''
       }
     };
   });
+
+  const editAirlineFareFamilies = React.useMemo(() => {
+    if (editTravelType !== 'PLANE' || !editCarrier) return [];
+    return getAirlineFareFamilies(editCarrier);
+  }, [editTravelType, editCarrier]);
+
+  useEffect(() => {
+    if (editTravelType === 'PLANE' && editAirlineFareFamilies.length > 0) {
+      if (!editFareFamily || !editAirlineFareFamilies.some((f) => f.id === editFareFamily)) {
+        const defaultFam = editAirlineFareFamilies.find((f) => f.isDefault) || editAirlineFareFamilies[0];
+        setEditFareFamily(defaultFam ? defaultFam.id : '');
+      }
+    }
+  }, [editAirlineFareFamilies, editTravelType, editFareFamily]);
 
   // Keep edit fields prefilled whenever isEditing opens or currentTrip updates
   useEffect(() => {
@@ -92,13 +109,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         [currentTrip.travelType || 'PLANE']: {
           companyName: currentTrip.companyName || '',
           seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
-          aircraftType: currentTrip.aircraftType || ''
+          aircraftType: currentTrip.aircraftType || '',
+          fareFamily: currentTrip.fareFamily || ''
         }
       };
       setEditModeProfiles(initialProfiles);
       setEditName(currentTrip.name || '');
       setEditCarrier(currentTrip.companyName || '');
-      setEditSeatClass(currentTrip.seatClassOrCarSize || '');
+      setEditSeatClass(currentTrip.seatClassOrCarSize || 'Main Cabin');
+      setEditFareFamily(currentTrip.fareFamily || '');
       setEditTravelType(currentTrip.travelType || 'PLANE');
       setEditOriginCity(currentTrip.originCity || '');
       setEditDestinationCity(currentTrip.destinationCity || '');
@@ -147,13 +166,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       [currentTrip.travelType || 'PLANE']: {
         companyName: currentTrip.companyName || '',
         seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
-        aircraftType: currentTrip.aircraftType || ''
+        aircraftType: currentTrip.aircraftType || '',
+        fareFamily: currentTrip.fareFamily || ''
       }
     };
     setEditModeProfiles(initialProfiles);
     setEditName(currentTrip.name || '');
     setEditCarrier(currentTrip.companyName || '');
-    setEditSeatClass(currentTrip.seatClassOrCarSize || '');
+    setEditSeatClass(currentTrip.seatClassOrCarSize || 'Main Cabin');
+    setEditFareFamily(currentTrip.fareFamily || '');
     setEditTravelType(currentTrip.travelType || 'PLANE');
     setEditOriginCity(currentTrip.originCity || '');
     setEditDestinationCity(currentTrip.destinationCity || '');
@@ -190,7 +211,8 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       [editTravelType]: {
         companyName: resolvedCarrier,
         seatClassOrCarSize: resolvedSeatClass,
-        aircraftType: resolvedAircraft
+        aircraftType: resolvedAircraft,
+        fareFamily: editTravelType === 'PLANE' ? editFareFamily : ''
       }
     };
 
@@ -208,6 +230,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       name: trimmedName,
       companyName: resolvedCarrier,
       seatClassOrCarSize: resolvedSeatClass,
+      fareFamily: editTravelType === 'PLANE' ? editFareFamily : '',
       travelType: editTravelType,
       originCity: resolvedOriginCity,
       destinationCity: resolvedDestinationCity,
@@ -576,20 +599,95 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                    editTravelType === 'BUS' ? 'Bus Seat Type' :
                    'Seat / Cabin Class'}
                 </label>
-                <input
-                  type="text"
-                  value={editSeatClass}
-                  onChange={(e) => setEditSeatClass(e.target.value)}
-                  placeholder={
-                    editTravelType === 'TRAIN' ? 'e.g. Coach, Quiet Car, Roomette' :
-                    editTravelType === 'CRUISE' ? 'e.g. Balcony Stateroom, Interior Cabin' :
-                    editTravelType === 'BUS' ? 'e.g. Standard Coach Seating' :
-                    editTravelType === 'CAR' ? 'e.g. Mid-Size SUV, Sedan, Minivan' :
-                    'e.g. Main Cabin, Economy, Business'
-                  }
-                  className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-purple-50/30 dark:bg-slate-900 text-slate-900 dark:text-white"
-                />
+                {editTravelType === 'PLANE' ? (
+                  <select
+                    value={editSeatClass}
+                    onChange={(e) => setEditSeatClass(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                  >
+                    <option value="Main Cabin">Main Cabin / Standard Economy</option>
+                    <option value="Basic Economy">Basic Economy (Restricted Bin)</option>
+                    <option value="Comfort+ / Extra Legroom">Comfort+ / Premium Economy</option>
+                    <option value="Business / First Class">First / Business Class</option>
+                  </select>
+                ) : editTravelType === 'CAR' ? (
+                  <select
+                    value={editSeatClass}
+                    onChange={(e) => setEditSeatClass(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                  >
+                    <option value="Mid-Size SUV / Car">Mid-Size SUV / Crossover</option>
+                    <option value="Large SUV / Suburban">Large 3-Row SUV / Minivan</option>
+                    <option value="Compact Sedan">Compact Sedan</option>
+                    <option value="Truck / Pickup">Pickup Truck</option>
+                    <option value="RV / Campervan">RV / Campervan</option>
+                  </select>
+                ) : editTravelType === 'CRUISE' ? (
+                  <select
+                    value={editSeatClass}
+                    onChange={(e) => setEditSeatClass(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                  >
+                    <option value="Balcony Stateroom">Balcony Ocean View Stateroom</option>
+                    <option value="Interior Cabin">Interior Stateroom</option>
+                    <option value="Ocean View Porthole">Ocean View Window / Porthole</option>
+                    <option value="Suite / Concierge">Suite / Concierge Level</option>
+                  </select>
+                ) : editTravelType === 'TRAIN' ? (
+                  <select
+                    value={editSeatClass}
+                    onChange={(e) => setEditSeatClass(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                  >
+                    <option value="Standard Coach">Standard Coach / Economy</option>
+                    <option value="Business Class">Business Class / Quiet Car</option>
+                    <option value="First Class">First Class</option>
+                    <option value="Sleeper Roomette">Sleeper Cabin / Roomette</option>
+                  </select>
+                ) : editTravelType === 'BUS' ? (
+                  <select
+                    value={editSeatClass}
+                    onChange={(e) => setEditSeatClass(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                  >
+                    <option value="Standard Reserved Seat">Standard Reserved Seat</option>
+                    <option value="Front Row / Extra Legroom">Front Row / Extra Legroom</option>
+                    <option value="Panoramic View (Upper Deck)">Upper Deck Panoramic</option>
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={editSeatClass}
+                    onChange={(e) => setEditSeatClass(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-purple-50/30 dark:bg-slate-900 text-slate-900 dark:text-white"
+                  />
+                )}
               </div>
+
+              {/* Published Fare Family for flight mode */}
+              {editTravelType === 'PLANE' && editAirlineFareFamilies.length > 0 && (
+                <div className="sm:col-span-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300">
+                      Published Fare Family / Ticket Tier
+                    </label>
+                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
+                      Sets checked bag allowances & carry-on rules
+                    </span>
+                  </div>
+                  <select
+                    value={editFareFamily}
+                    onChange={(e) => setEditFareFamily(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden"
+                  >
+                    {editAirlineFareFamilies.map((fam) => (
+                      <option key={fam.id} value={fam.id}>
+                        {fam.name} {fam.isDefault ? '(Standard)' : ''} — {fam.includedCheckedBags > 0 ? `${fam.includedCheckedBags} checked included` : '0 checked included'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Flight Schedule: Departure & Return Dates */}

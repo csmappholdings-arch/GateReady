@@ -38,6 +38,7 @@ import {
 import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
 import { DatePickerInput } from './DatePickerInput';
+import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 
 interface AddTripDialogProps {
   isOpen: boolean;
@@ -46,6 +47,7 @@ interface AddTripDialogProps {
   initialDestinationCity?: string;
   initialCarrier?: string;
   initialSeatClass?: string;
+  initialFareFamily?: string;
   initialBags?: Array<{ 
     type: BagType; 
     label: string; 
@@ -62,6 +64,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   initialDestinationCity,
   initialCarrier,
   initialSeatClass,
+  initialFareFamily,
   initialBags
 }) => {
   const { addTrip } = usePacking();
@@ -104,6 +107,23 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   const [returnTripDate, setReturnTripDate] = useState('');
   const [returnTripTime, setReturnTripTime] = useState('');
   const [aircraftType, setAircraftType] = useState('');
+  const [fareFamily, setFareFamily] = useState<string>(initialFareFamily || '');
+
+  const airlineFareFamilies = React.useMemo(() => {
+    if (travelType !== 'PLANE' || !companyName) return [];
+    return getAirlineFareFamilies(companyName);
+  }, [travelType, companyName]);
+
+  useEffect(() => {
+    if (airlineFareFamilies.length > 0) {
+      if (!fareFamily || !airlineFareFamilies.some((f) => f.id === fareFamily)) {
+        const defaultFam = airlineFareFamilies.find((f) => f.isDefault) || airlineFareFamilies[0];
+        setFareFamily(defaultFam ? defaultFam.id : '');
+      }
+    } else {
+      setFareFamily('');
+    }
+  }, [airlineFareFamilies, fareFamily]);
 
   // Tab 2: Traveler & Baggage State
   const defaultTraveler = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
@@ -473,7 +493,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         departureTime,
         returnTripDate,
         returnTripTime,
-        aircraftType
+        aircraftType,
+        fareFamily
       }
     );
 
@@ -907,6 +928,35 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   )}
                 </div>
               </div>
+
+              {/* Published Airline Fare Family (for flights) */}
+              {travelType === 'PLANE' && airlineFareFamilies.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className={`block font-bold text-purple-950 dark:text-purple-300 uppercase tracking-wider ${
+                      isExpanded ? 'text-xs' : 'text-[11px]'
+                    }`}>
+                      Published Fare Family / Ticket Tier
+                    </label>
+                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
+                      Sets checked bag allowances & carry-on rules
+                    </span>
+                  </div>
+                  <select
+                    value={fareFamily}
+                    onChange={(e) => setFareFamily(e.target.value)}
+                    className={`w-full rounded-xl border border-purple-200/80 dark:border-purple-900/60 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden ${
+                      isExpanded ? 'h-10 px-3.5 text-sm' : 'h-10 px-3 text-xs'
+                    }`}
+                  >
+                    {airlineFareFamilies.map((fam) => (
+                      <option key={fam.id} value={fam.id}>
+                        {fam.name} {fam.isDefault ? '(Standard)' : ''} — {fam.includedCheckedBags > 0 ? `${fam.includedCheckedBags} checked included` : '0 checked included'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Popular Carrier Suggestions */}
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">

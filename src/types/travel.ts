@@ -203,6 +203,7 @@ export interface ModeProfile {
   companyName?: string;
   seatClassOrCarSize?: string;
   aircraftType?: string;
+  fareFamily?: string;
 }
 
 export interface Trip {
@@ -211,6 +212,7 @@ export interface Trip {
   travelType: TravelType;
   companyName: string;
   seatClassOrCarSize: string;
+  fareFamily?: string;
   originCity?: string;
   destinationCity?: string;
   destinationCountry?: string;

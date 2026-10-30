@@ -46,6 +46,7 @@ interface PackingContextType {
       returnTripDate?: string;
       returnTripTime?: string;
       aircraftType?: string;
+      fareFamily?: string;
     }
   ) => Trip;
   loadDemoTrip: () => Trip;
@@ -64,7 +65,7 @@ interface PackingContextType {
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
   ) => void;
   updateLuggageTag: (
     tripId: string,
@@ -391,6 +392,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       returnTripDate?: string;
       returnTripTime?: string;
       aircraftType?: string;
+      fareFamily?: string;
     }
   ): Trip => {
     const newTripId = 'trip-' + Date.now();
@@ -451,6 +453,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       destinationCity: extraDetails?.destinationCity?.trim() || '',
       destinationCountry: extraDetails?.destinationCountry?.trim() || '',
       aircraftType: extraDetails?.aircraftType?.trim() || '',
+      fareFamily: extraDetails?.fareFamily?.trim() || '',
       departureDate: extraDetails?.departureDate?.trim() || '',
       departureTime: extraDetails?.departureTime?.trim() || '',
       returnTripDate: extraDetails?.returnTripDate?.trim() || '',
@@ -464,7 +467,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         [deducedType]: {
           companyName: company.trim(),
           seatClassOrCarSize: seatOrSize.trim(),
-          aircraftType: extraDetails?.aircraftType?.trim() || ''
+          aircraftType: extraDetails?.aircraftType?.trim() || '',
+          fareFamily: extraDetails?.fareFamily?.trim() || ''
         }
       }
     };
@@ -867,7 +871,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateTripDetails = (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
   ) => {
     let updatedTripToSave: Trip | null = null;
 
@@ -879,6 +883,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ...(details.name !== undefined ? { name: details.name.trim() } : {}),
           ...(details.companyName !== undefined ? { companyName: details.companyName.trim() } : {}),
           ...(details.seatClassOrCarSize !== undefined ? { seatClassOrCarSize: details.seatClassOrCarSize.trim() } : {}),
+          ...(details.fareFamily !== undefined ? { fareFamily: details.fareFamily.trim() } : {}),
           ...(details.travelType !== undefined ? { travelType: details.travelType } : {}),
           ...(details.originCity !== undefined ? { originCity: details.originCity.trim() } : {}),
           ...(details.destinationCity !== undefined ? { destinationCity: details.destinationCity.trim() } : {}),

@@ -5,6 +5,7 @@ import fs from 'fs';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import { getPageHtmlContent } from './src/pages/serverPagesHtml';
+import { getAirlineGuideByAnySlug } from './src/data/airlineGuidesData';
 
 dotenv.config();
 
@@ -216,6 +217,17 @@ async function startServer() {
     const pathname = req.path.replace(/\/+$/, '') || '/';
     if (pathname.startsWith('/api') || pathname.includes('.')) {
       return next();
+    }
+
+    // 301 Permanent Redirect for non-canonical airline guide URLs / aliases
+    if (pathname.startsWith('/airlines/')) {
+      const slug = pathname.replace(/^\/airlines\//, '');
+      if (slug) {
+        const match = getAirlineGuideByAnySlug(slug);
+        if (match && !match.isCanonical) {
+          return res.redirect(301, match.guide.canonicalPath);
+        }
+      }
     }
 
     const pageData = getPageHtmlContent(pathname);

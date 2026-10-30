@@ -703,9 +703,22 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
 
 export function getAirlineGuideBySlug(slug: string): AirlineGuideItem | undefined {
   const cleanSlug = slug.toLowerCase().trim().replace(/^\/airlines\//, '').replace(/\/$/, '');
-  return AIRLINE_GUIDES.find(
-    (a) => a.slug === cleanSlug || a.aliases.includes(cleanSlug) || `${a.id}-baggage` === cleanSlug
+  return AIRLINE_GUIDES.find((a) => a.slug === cleanSlug);
+}
+
+export function getAirlineGuideByAnySlug(slug: string): { guide: AirlineGuideItem; isCanonical: boolean } | undefined {
+  const cleanSlug = slug.toLowerCase().trim().replace(/^\/airlines\//, '').replace(/\/$/, '');
+  const canonical = AIRLINE_GUIDES.find((a) => a.slug === cleanSlug);
+  if (canonical) {
+    return { guide: canonical, isCanonical: true };
+  }
+  const aliasMatch = AIRLINE_GUIDES.find(
+    (a) => a.aliases.includes(cleanSlug) || `${a.id}-baggage` === cleanSlug
   );
+  if (aliasMatch) {
+    return { guide: aliasMatch, isCanonical: false };
+  }
+  return undefined;
 }
 
 export function getAirlineGuideById(id: string): AirlineGuideItem | undefined {

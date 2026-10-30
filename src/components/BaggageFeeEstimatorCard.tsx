@@ -53,23 +53,13 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
   // Fee calculation from static published fee table
   const feeResult: BagFeeCalculationResult | null = useMemo(() => {
     if (!isFlight || !hasAirline) return null;
-    return calculateTripBaggageFees(airlineName, bagsWithWeights, trip.seatClassOrCarSize);
-  }, [isFlight, hasAirline, airlineName, bagsWithWeights, trip.seatClassOrCarSize]);
+    return calculateTripBaggageFees(airlineName, bagsWithWeights, trip.seatClassOrCarSize, trip.fareFamily);
+  }, [isFlight, hasAirline, airlineName, bagsWithWeights, trip.seatClassOrCarSize, trip.fareFamily]);
 
   // Dynamic USD approximation calculated directly from the active total fee
   const approxUsd = useMemo(() => {
     if (!feeResult || feeResult.currency === 'USD') return null;
-    if (feeResult.totalEstimatedFee === 0) return '≈ US$0';
-    if (feeResult.currency === 'CAD') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 0.73)}`;
-    }
-    if (feeResult.currency === 'EUR') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.08)}`;
-    }
-    if (feeResult.currency === 'GBP') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.30)}`;
-    }
-    return null;
+    return feeResult.usdEquivalentNote || null;
   }, [feeResult]);
 
   // Bags that actually carry a fee (base fee or overweight penalty)
@@ -195,6 +185,14 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   {feeResult.airlineName}
                 </span>
+                {feeResult.fareFamilyName && (
+                  <>
+                    <span className="text-slate-300 dark:text-slate-700">·</span>
+                    <span className="text-[11px] font-semibold text-purple-700 dark:text-purple-300">
+                      {feeResult.fareFamilyName}
+                    </span>
+                  </>
+                )}
                 {approxUsd && (
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                     ({approxUsd})
@@ -211,6 +209,14 @@ export const BaggageFeeEstimatorCard: React.FC<BaggageFeeEstimatorCardProps> = (
                   estimated total · {feeSummaryBagCountText}
                 </span>
               </div>
+
+              {/* Carry-on restriction banner if any */}
+              {feeResult.carryOnRestrictionNotice && (
+                <div className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-900/60">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
+                  <span>{feeResult.carryOnRestrictionNotice}</span>
+                </div>
+              )}
 
               {/* Overweight flag if any */}
               {feeResult.overweightBagCount > 0 && (

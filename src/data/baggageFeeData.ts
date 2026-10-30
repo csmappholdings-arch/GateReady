@@ -2,6 +2,8 @@
 // Brand rule: NEVER present static reference data as live.
 // Every estimate carries a last_verified date and official sources disclaimer.
 
+import { getAirlineFareFamilies, AirlineFareFamily } from './airlineFareFamilies';
+
 export interface AirlineFeeData {
   airlineId: string;
   airlineName: string;
@@ -687,6 +689,11 @@ export interface BagFeeCalculationResult {
   officialBaggagePageUrl?: string;
   totalEstimatedFee: number;
   totalEstimatedFeeFormatted: string;
+  fareFamilyName?: string;
+  fareFamilyId?: string;
+  carryOnAllowed?: boolean;
+  carryOnRestrictionNotice?: string;
+  includedCheckedBags?: number;
   breakdown: Array<{
     bagId: string;
     bagLabel: string;
@@ -705,9 +712,63 @@ export interface BagFeeCalculationResult {
   disclaimer: string;
 }
 
+const APPROX_USD_RATES: Record<string, number> = {
+  CAD: 0.74,
+  EUR: 1.09,
+  GBP: 1.29,
+  AUD: 0.66,
+  SGD: 0.76,
+  JPY: 0.0067,
+  TRY: 0.029,
+  AED: 0.27,
+  QAR: 0.27,
+  INR: 0.012,
+  KRW: 0.00073
+};
+
 /**
- * Calculates bag fees strictly from the static fee table.
- * If bags exceed weight limits (50 lbs / 23 kg standard, or airline limit), applies overweight fee and flags it.
+ * Robust airline fee record finder avoiding substring collisions (e.g. 'sas' matching Alaska Airlines 'as').
+ */
+export function findAirlineFeeRecord(companyName: string | undefined): AirlineFeeData | undefined {
+  if (!companyName || !companyName.trim()) return undefined;
+  const query = companyName.toLowerCase().trim();
+
+  // 1. Direct ID match
+  const byId = AIRLINE_BAGGAGE_FEES.find((item) => item.airlineId.toLowerCase() === query);
+  if (byId) return byId;
+
+  // 2. Direct exact name match
+  const byExactName = AIRLINE_BAGGAGE_FEES.find((item) => item.airlineName.toLowerCase() === query);
+  if (byExactName) return byExactName;
+
+  // 3. Direct exact alias match (e.g. 'sas', 'dl', 'ua', 'aa', 'ac', 'ws')
+  const byExactAlias = AIRLINE_BAGGAGE_FEES.find((item) => item.aliases.includes(query));
+  if (byExactAlias) return byExactAlias;
+
+  // 4. Starts with match
+  const byStartsWith = AIRLINE_BAGGAGE_FEES.find((item) => 
+    item.airlineName.toLowerCase().startsWith(query) || query.startsWith(item.airlineName.toLowerCase())
+  );
+  if (byStartsWith) return byStartsWith;
+
+  // 5. Word boundary or long-alias match
+  return AIRLINE_BAGGAGE_FEES.find((item) => {
+    if (item.airlineName.toLowerCase().includes(query) || query.includes(item.airlineName.toLowerCase())) {
+      return true;
+    }
+    return item.aliases.some((alias) => {
+      if (alias.length <= 2) {
+        const words = query.split(/[\s-_]+/);
+        return words.includes(alias);
+      }
+      return query.includes(alias) || alias.includes(query);
+    });
+  });
+}
+
+/**
+ * Calculates bag fees strictly from the static fee table and published fare-family tiers.
+ * If bags exceed weight limits (50 lbs / 23 kg standard, or 70 lbs for Business/First), applies overweight fee and flags it.
  * Never invents numbers.
  */
 export function calculateTripBaggageFees(
@@ -719,20 +780,14 @@ export function calculateTripBaggageFees(
     currentWeightLbs: number;
     maxWeightLimitLbs?: number;
   }>,
-  cabinOrSeatClass?: string
+  cabinOrSeatClass?: string,
+  fareFamilyId?: string
 ): BagFeeCalculationResult | null {
   if (!companyName || !companyName.trim()) {
     return null;
   }
 
-  const query = companyName.toLowerCase().trim();
-  const feeRecord = AIRLINE_BAGGAGE_FEES.find((item) => {
-    return (
-      item.airlineName.toLowerCase().includes(query) ||
-      query.includes(item.airlineName.toLowerCase()) ||
-      item.aliases.some((alias) => query.includes(alias) || alias.includes(query))
-    );
-  });
+  const feeRecord = findAirlineFeeRecord(companyName);
 
   if (!feeRecord) {
     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(companyName.trim() + ' baggage fee policy official')}`;
@@ -752,6 +807,26 @@ export function calculateTripBaggageFees(
     };
   }
 
+  // Retrieve published fare families for this airline
+  const families = getAirlineFareFamilies(feeRecord.airlineId || feeRecord.airlineName);
+  let activeFamily: AirlineFareFamily | undefined;
+  if (fareFamilyId) {
+    activeFamily = families.find((f) => f.id === fareFamilyId);
+  }
+  if (!activeFamily) {
+    activeFamily = families.find((f) => f.isDefault) || families[0];
+  }
+
+  const isBusinessOrFirst = Boolean(
+    (cabinOrSeatClass && /business|first|polaris|delta one|signature|mint|club/i.test(cabinOrSeatClass)) ||
+    (activeFamily && /business|first|mint|signature|club/i.test(activeFamily.name))
+  );
+
+  // Combine inclusions: bag is free if either cabin class OR fare family includes it
+  const cabinIncludedCheckedBags = isBusinessOrFirst ? 2 : 0;
+  const familyIncludedCheckedBags = activeFamily ? activeFamily.includedCheckedBags : 0;
+  const effectiveIncludedCheckedBags = Math.max(cabinIncludedCheckedBags, familyIncludedCheckedBags);
+
   let checkedBagIndex = 0;
   let totalFee = 0;
   let totalOverweight = 0;
@@ -765,20 +840,18 @@ export function calculateTripBaggageFees(
     let isOverweight = false;
     let overweightReason: string | undefined;
 
-    const isBusinessOrFirst = Boolean(cabinOrSeatClass && /business|first|polaris|delta one|signature/i.test(cabinOrSeatClass));
-
-    // Determine weight cap (default 50 lbs / 23 kg for checked, 22 lbs for carry-on; 70 lbs for Business/First)
+    // Weight cap: 70 lbs (32 kg) for Business/First; standard 50 lbs (23 kg) for checked
     const weightCap = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? (isBusinessOrFirst ? 70 : 50) : bag.type === 'CARRY_ON' ? 22 : 15);
     const weightLbs = bag.currentWeightLbs || 0;
 
     if (bag.type === 'CHECKED') {
       checkedBagIndex += 1;
-      if (isBusinessOrFirst && checkedBagIndex <= 2) {
-        baseFee = 0; // Standard Business & First class ticket includes 2 free checked bags
-      } else if (checkedBagIndex === 1) {
-        baseFee = feeRecord.firstCheckedFee;
+      if (checkedBagIndex <= effectiveIncludedCheckedBags) {
+        baseFee = 0; // Included in fare / cabin class
+      } else if (checkedBagIndex === effectiveIncludedCheckedBags + 1) {
+        baseFee = activeFamily ? activeFamily.firstCheckedFee : feeRecord.firstCheckedFee;
       } else {
-        baseFee = feeRecord.secondCheckedFee;
+        baseFee = activeFamily ? activeFamily.secondCheckedFee : feeRecord.secondCheckedFee;
       }
 
       // Check if overweight
@@ -790,8 +863,13 @@ export function calculateTripBaggageFees(
         overweightReason = `${weightLbs.toFixed(1)} lbs exceeds ${weightCap} lbs limit`;
       }
     } else if (bag.type === 'CARRY_ON') {
-      baseFee = feeRecord.carryOnFee;
-      if (weightLbs > weightCap && feeRecord.carryOnFee > 0) {
+      if (activeFamily && !activeFamily.carryOnAllowed) {
+        baseFee = activeFamily.carryOnFee > 0 ? activeFamily.carryOnFee : 25;
+      } else {
+        baseFee = activeFamily ? activeFamily.carryOnFee : feeRecord.carryOnFee;
+      }
+
+      if (weightLbs > weightCap && (feeRecord.carryOnFee > 0 || (activeFamily && activeFamily.carryOnFee > 0))) {
         isOverweight = true;
         overweightFee = 25; // standard gate check fee
         overweightCount += 1;
@@ -811,18 +889,30 @@ export function calculateTripBaggageFees(
       bagLabel: bag.label,
       bagType: bag.type,
       baseFee,
-      baseFeeFormatted: baseFee === 0 ? 'Free ($0)' : `${feeRecord.currencySymbol}${baseFee}`,
+      baseFeeFormatted: baseFee === 0 ? 'Included in fare ($0)' : `${feeRecord.currencySymbol}${baseFee}`,
       isOverweight,
       overweightFee,
       overweightReason,
       subtotal,
-      subtotalFormatted: subtotal === 0 ? 'Free ($0)' : `${feeRecord.currencySymbol}${subtotal}`
+      subtotalFormatted: subtotal === 0 ? 'Included ($0)' : `${feeRecord.currencySymbol}${subtotal}`
     });
   }
 
   const totalFormatted = totalFee === 0 
     ? `${feeRecord.currencySymbol}0` 
     : `${feeRecord.currencySymbol}${totalFee}`;
+
+  // Dynamic USD equivalent note based on actual totalFee (never showing static non-zero USD when total is $0)
+  let usdEquivalentNote: string | undefined = undefined;
+  if (feeRecord.currency !== 'USD') {
+    if (totalFee === 0) {
+      usdEquivalentNote = 'approx ~$0 USD';
+    } else {
+      const rate = APPROX_USD_RATES[feeRecord.currency] || 1;
+      const approxUsd = Math.round(totalFee * rate);
+      usdEquivalentNote = `approx ~$${approxUsd} USD`;
+    }
+  }
 
   const disclaimer = `Estimate from published airline fee tables, last verified ${feeRecord.lastVerified}. Airlines change fees — confirm at booking.`;
 
@@ -831,15 +921,20 @@ export function calculateTripBaggageFees(
     airlineName: feeRecord.airlineName,
     currency: feeRecord.currency,
     currencySymbol: feeRecord.currencySymbol,
-    usdEquivalentNote: feeRecord.usdEquivalentNote,
+    usdEquivalentNote,
     lastVerified: feeRecord.lastVerified,
     officialBaggagePageUrl: feeRecord.officialBaggagePageUrl,
     totalEstimatedFee: totalFee,
     totalEstimatedFeeFormatted: totalFormatted,
+    fareFamilyName: activeFamily?.name,
+    fareFamilyId: activeFamily?.id,
+    carryOnAllowed: activeFamily?.carryOnAllowed ?? true,
+    carryOnRestrictionNotice: activeFamily?.carryOnRestrictionNotice,
+    includedCheckedBags: effectiveIncludedCheckedBags,
     breakdown,
     overweightBagCount: overweightCount,
     totalOverweightFee: totalOverweight,
-    feeNotes: feeRecord.feeNotes,
+    feeNotes: activeFamily?.fareNote || feeRecord.feeNotes,
     disclaimer
   };
 }

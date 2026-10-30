@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { AIRLINE_BAGGAGE_FEES, calculateTripBaggageFees, BagFeeCalculationResult } from '../data/baggageFeeData';
+import { getAirlineFareFamilies, AirlineFareFamily } from '../data/airlineFareFamilies';
 import { AIRLINE_GUIDES, getAirlineGuideById } from '../data/airlineGuidesData';
 import { 
   Calculator, 
@@ -47,21 +48,20 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
   const [checkedWeight1, setCheckedWeight1] = useState<number>(45);
   const [checkedWeight2, setCheckedWeight2] = useState<number>(48);
 
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = 'Baggage Fee Calculator – Check Airline Luggage Fees | GateReady';
-      window.scrollTo(0, 0);
-    }
-  }, []);
-
-  // Sorted list of airlines for select dropdown
-  const sortedAirlines = useMemo(() => {
-    return [...AIRLINE_BAGGAGE_FEES].sort((a, b) => a.airlineName.localeCompare(b.airlineName));
-  }, []);
-
   const activeRecord = useMemo(() => {
     return AIRLINE_BAGGAGE_FEES.find((a) => a.airlineName === selectedAirlineName) || AIRLINE_BAGGAGE_FEES[0];
   }, [selectedAirlineName]);
+
+  const fareFamilies = useMemo(() => {
+    return getAirlineFareFamilies(activeRecord.airlineId || activeRecord.airlineName);
+  }, [activeRecord]);
+
+  const [selectedFareFamilyId, setSelectedFareFamilyId] = useState<string>('');
+
+  useEffect(() => {
+    const defaultFam = fareFamilies.find((f) => f.isDefault) || fareFamilies[0];
+    setSelectedFareFamilyId(defaultFam ? defaultFam.id : '');
+  }, [fareFamilies]);
 
   const activeGuide = useMemo(() => {
     return AIRLINE_GUIDES.find((g) => g.name === activeRecord.airlineName);
@@ -108,15 +108,26 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
     return bags;
   }, [checkedCount, carryOnCount, checkedWeight1, checkedWeight2, selectedCabin]);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = 'Baggage Fee Calculator – Check Airline Luggage Fees | GateReady';
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  const sortedAirlines = useMemo(() => {
+    return [...AIRLINE_BAGGAGE_FEES].sort((a, b) => a.airlineName.localeCompare(b.airlineName));
+  }, []);
+
   const calculationResult: BagFeeCalculationResult | null = useMemo(() => {
-    return calculateTripBaggageFees(activeRecord.airlineName, simulatedBags, selectedCabin);
-  }, [activeRecord, simulatedBags, selectedCabin]);
+    return calculateTripBaggageFees(activeRecord.airlineName, simulatedBags, selectedCabin, selectedFareFamilyId);
+  }, [activeRecord, simulatedBags, selectedCabin, selectedFareFamilyId]);
 
   const handleStartTripWithBags = () => {
     if (onOpenTripBuilder) {
       onOpenTripBuilder(activeRecord.airlineName, checkedCount, carryOnCount);
     } else {
-      window.location.href = `/?action=new_trip&mode=PLANE&carrier=${encodeURIComponent(activeRecord.airlineName)}&checked=${checkedCount}&carryon=${carryOnCount}`;
+      window.location.href = `/?action=new_trip&mode=PLANE&carrier=${encodeURIComponent(activeRecord.airlineName)}&checked=${checkedCount}&carryon=${carryOnCount}&fare=${encodeURIComponent(selectedFareFamilyId)}`;
     }
   };
 
@@ -210,6 +221,35 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Published Fare Family Selector */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+                  Fare Family / Ticket Tier
+                </label>
+                <span className="text-[11px] font-semibold text-purple-700">Published Policy</span>
+              </div>
+              <select
+                value={selectedFareFamilyId}
+                onChange={(e) => setSelectedFareFamilyId(e.target.value)}
+                className="w-full h-11 px-3.5 text-xs font-bold rounded-2xl border border-purple-200 bg-white text-slate-900 focus:outline-hidden focus:border-purple-600 shadow-2xs"
+              >
+                {fareFamilies.map((fam) => (
+                  <option key={fam.id} value={fam.id}>
+                    {fam.name} {fam.isDefault ? '(Standard)' : ''} — {fam.includedCheckedBags > 0 ? `${fam.includedCheckedBags} checked included` : '0 checked included'}
+                  </option>
+                ))}
+              </select>
+
+              {/* Carry-on restriction notice (e.g. UltraBasic / Basic Economy) */}
+              {calculationResult?.carryOnRestrictionNotice && (
+                <div className="mt-2.5 p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900 font-medium">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <span>{calculationResult.carryOnRestrictionNotice}</span>
+                </div>
+              )}
             </div>
 
             {/* Cabin Class Selector */}
@@ -374,9 +414,9 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
                 <div className="text-4xl font-black text-purple-950 tracking-tight">
                   {calculationResult?.totalEstimatedFeeFormatted || '$0'}
                 </div>
-                {activeRecord.usdEquivalentNote && activeRecord.currency !== 'USD' && (
+                {calculationResult?.usdEquivalentNote && activeRecord.currency !== 'USD' && (
                   <span className="text-[11px] text-purple-800 font-semibold block">
-                    ({activeRecord.usdEquivalentNote})
+                    ({calculationResult.usdEquivalentNote})
                   </span>
                 )}
               </div>

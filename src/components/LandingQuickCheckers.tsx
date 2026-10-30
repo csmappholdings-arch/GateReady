@@ -19,6 +19,7 @@ import {
   calculateTripBaggageFees, 
   BagFeeCalculationResult 
 } from '../data/baggageFeeData';
+import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { AdPlacement } from './AdPlacement';
 import { 
   ENTRY_REQUIREMENTS_DATABASE, 
@@ -49,6 +50,17 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
   const [selectedCabin, setSelectedCabin] = useState<string>('Main Cabin / Economy');
   const [checkedCount, setCheckedCount] = useState<number>(2); // Default 2 to reproduce WestJet $35 + $50 = CAD $85 immediately
   const [carryOnCount, setCarryOnCount] = useState<number>(1);
+
+  const airlineFareFamilies = useMemo(() => {
+    return getAirlineFareFamilies(selectedAirline);
+  }, [selectedAirline]);
+
+  const [selectedFareFamilyId, setSelectedFareFamilyId] = useState<string>('');
+
+  React.useEffect(() => {
+    const defaultFam = airlineFareFamilies.find((f) => f.isDefault) || airlineFareFamilies[0];
+    setSelectedFareFamilyId(defaultFam ? defaultFam.id : '');
+  }, [airlineFareFamilies]);
 
   // Build synthetic bag manifest for the fee calculation engine
   const simulatedBags = useMemo(() => {
@@ -85,26 +97,15 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
     return list;
   }, [checkedCount, carryOnCount]);
 
-  // Run official published airline calculation
+  // Run official published airline calculation with fare family
   const feeResult: BagFeeCalculationResult | null = useMemo(() => {
-    return calculateTripBaggageFees(selectedAirline, simulatedBags, selectedCabin);
-  }, [selectedAirline, simulatedBags, selectedCabin]);
+    return calculateTripBaggageFees(selectedAirline, simulatedBags, selectedCabin, selectedFareFamilyId);
+  }, [selectedAirline, simulatedBags, selectedCabin, selectedFareFamilyId]);
 
   // Dynamic USD approximation based on active total fee
   const approxUsd = useMemo(() => {
     if (!feeResult) return null;
-    if (feeResult.currency === 'USD') return null;
-    if (feeResult.totalEstimatedFee === 0) return '≈ US$0';
-    if (feeResult.currency === 'CAD') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 0.73)}`;
-    }
-    if (feeResult.currency === 'EUR') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.08)}`;
-    }
-    if (feeResult.currency === 'GBP') {
-      return `≈ US$${Math.round(feeResult.totalEstimatedFee * 1.30)}`;
-    }
-    return null;
+    return feeResult.usdEquivalentNote || null;
   }, [feeResult]);
 
   // Fee-bearing bag count (strictly bags that incur fees)
@@ -256,26 +257,34 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = ({
                 {/* Cabin / Fare Class */}
                 <div>
                   <label
-                    htmlFor="landing-cabin-select"
+                    htmlFor="landing-fare-family-select"
                     className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 dark:text-purple-300 mb-1 cursor-pointer select-none"
                   >
-                    Cabin / Fare Tier
+                    Fare Family / Ticket Tier
                   </label>
                   <select
-                    id="landing-cabin-select"
-                    name="cabin"
-                    value={selectedCabin}
-                    onChange={(e) => setSelectedCabin(e.target.value)}
+                    id="landing-fare-family-select"
+                    name="fareFamily"
+                    value={selectedFareFamilyId}
+                    onChange={(e) => setSelectedFareFamilyId(e.target.value)}
                     className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs relative z-10 pointer-events-auto"
                   >
-                    <option value="Main Cabin / Economy">Main Cabin / Standard Economy</option>
-                    <option value="UltraBasic / Basic Economy">UltraBasic / Basic Economy</option>
-                    <option value="Premium Economy">Premium Economy</option>
-                    <option value="Business Class">Business Class</option>
-                    <option value="First Class">First Class</option>
+                    {airlineFareFamilies.map((fam) => (
+                      <option key={fam.id} value={fam.id}>
+                        {fam.name} {fam.isDefault ? '(Standard)' : ''}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
+
+              {/* Carry-on restriction banner if active fare family prohibits overhead bags */}
+              {feeResult?.carryOnRestrictionNotice && (
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-start gap-2 text-xs text-amber-900 dark:text-amber-200">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <span>{feeResult.carryOnRestrictionNotice}</span>
+                </div>
+              )}
 
               {/* Bag Count Selectors: Checked Bags (0-3) and Carry-Ons (0-2) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
