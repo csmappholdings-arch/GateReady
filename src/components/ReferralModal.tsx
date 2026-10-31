@@ -97,7 +97,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
             Give 1 Month Platinum, Get 1 Month Platinum
           </h3>
           <p className="text-xs text-purple-200/90 mt-1 max-w-sm mx-auto leading-relaxed">
-            Give a friend 1 free month of GateReady Platinum. When they create an account and sign in, you both get 1 month of Platinum automatically credited and tracked!
+            Give a friend 1 free month of GateReady Platinum ($4.99 value). When they create an account and sign in, you both get 1 month of Platinum automatically credited ($4.99 value each) and tracked!
           </p>
         </div>
 
@@ -270,13 +270,13 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                   <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     2
                   </span>
-                  <span><strong>Mandatory Account Creation:</strong> When they create a free account and sign in, their 1 Free Month of Platinum is immediately applied.</span>
+                  <span><strong>Mandatory Account Creation:</strong> When they create a free account and sign in, their 1 Free Month of Platinum ($4.99 value) is immediately applied.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     3
                   </span>
-                  <span>You automatically receive 1 Month of Free Platinum per signup, tracked with an accurate live countdown until the month ends and is removed.</span>
+                  <span>You automatically receive 1 Month of Free Platinum ($4.99 value) per signup, tracked with an accurate live countdown until the month ends and is removed.</span>
                 </div>
               </div>
 
@@ -288,7 +288,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                     <span>Test Referral Tracking (Live Simulator)</span>
                   </p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                    Simulate a friend using your code and subscribing to verify the live credit calculation.
+                    Simulate a friend using your code to create a free account to verify the instant credit calculation.
                   </p>
                 </div>
                 <button

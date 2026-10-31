@@ -204,6 +204,10 @@ export interface ModeProfile {
   seatClassOrCarSize?: string;
   aircraftType?: string;
   fareFamily?: string;
+  originCity?: string;
+  destinationCity?: string;
+  departureDate?: string;
+  departureTime?: string;
 }
 
 export interface Trip {

@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
+import { deleteUserAccountAndData } from '../lib/firebase';
 
 interface HeaderProps {
   onOpenAddTrip: () => void;
@@ -101,6 +102,9 @@ export const Header: React.FC<HeaderProps> = ({
   const [accountSyncModalOpen, setAccountSyncModalOpen] = useState(false);
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [tripToDeleteFromSettings, setTripToDeleteFromSettings] = useState<Trip | null>(null);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
 
   // Manual Pro license input state
   const [licenseInput, setLicenseInput] = useState('');
@@ -278,6 +282,8 @@ export const Header: React.FC<HeaderProps> = ({
                 <Gift className="w-3 h-3 text-amber-200 shrink-0" />
                 <span className="whitespace-nowrap">Claim 1-Mo Platinum</span>
               </button>
+            ) : authLoading ? (
+              <span className="w-16 h-5 bg-white/10 rounded-full animate-pulse inline-block" />
             ) : isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
@@ -293,7 +299,9 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Center / Right: Streamlined Action Buttons, Free Month Pill, Sync Account & Settings */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Pro Upgrade / Badge Button */}
-          {!isPro ? (
+          {authLoading ? (
+            <div className="h-8.5 sm:h-9 w-20 rounded-xl bg-white/10 border border-white/15 animate-pulse" />
+          ) : !isPro ? (
             <button
               type="button"
               onClick={() => openPaywall("Upgrade to Silver ($1.99/mo), Gold, or Platinum to unlock unlimited bags, active trips, and multi-traveler packing.")}
@@ -331,7 +339,12 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Google Account & Cloud Sync Dropdown */}
           <div className="relative z-50" ref={userRef}>
-            {user ? (
+            {authLoading ? (
+              <div className="h-9 sm:h-10 px-3 rounded-xl border border-white/20 bg-white/10 text-white/70 text-xs flex items-center gap-2 animate-pulse">
+                <div className="w-5 h-5 rounded-full bg-white/20" />
+                <span className="hidden sm:inline text-[11px] font-semibold">Loading...</span>
+              </div>
+            ) : user ? (
               <button
                 type="button"
                 onClick={() => {
@@ -461,7 +474,46 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  {isPro ? (
+                  {isTrialActive ? (
+                    <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-200 text-[11px]">
+                        <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                        <span>Platinum trial · {trialTimeLeftText} left</span>
+                      </div>
+                      <p className="text-[10px] text-amber-800/90 dark:text-amber-300/90 leading-snug">
+                        Returns to Free automatically on day 7. No card, no charge.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          openPaywall("Choose a plan to keep uninterrupted Platinum features after day 7.");
+                        }}
+                        className="w-full h-7 mt-1 rounded-lg bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-600 hover:to-purple-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer"
+                      >
+                        <Crown className="w-3 h-3 fill-amber-200 text-amber-200" />
+                        <span>Upgrade to Keep Platinum</span>
+                      </button>
+                    </div>
+                  ) : isReferralPlatinumActive ? (
+                    <div className="p-2.5 rounded-xl bg-fuchsia-50/70 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800/80 text-xs space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-bold text-fuchsia-900 dark:text-fuchsia-200 text-[11px]">
+                        <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
+                        <span>Referral Platinum · {referralTimeLeftText} left</span>
+                      </div>
+                      <p className="text-[10px] text-fuchsia-800/90 dark:text-fuchsia-300/90 leading-snug">
+                        1 Month Free Platinum unlocked via referral. No card, no charge.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          openPaywall();
+                        }}
+                        className="w-full h-7 mt-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer"
+                      >
+                        <span>View Plans</span>
+                      </button>
+                    </div>
+                  ) : isPro ? (
                     <div className="p-2 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs">
                       <p className="font-semibold text-amber-950 dark:text-amber-200 text-[11px]">
                         {tier === 'SILVER'
@@ -1127,6 +1179,24 @@ export const Header: React.FC<HeaderProps> = ({
                     </button>
                   </div>
                 )}
+
+                {/* Danger Zone: Delete Account for signed-in users */}
+                {user && (
+                  <div className="p-1.5 border-t border-rose-100 dark:border-rose-950/40">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowDeleteAccountModal(true);
+                        setSettingsOpen(false);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-lg text-left text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center gap-2 transition-colors cursor-pointer"
+                      title="Permanently delete account and erase all cloud data"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Delete Account & Erase Cloud Data</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1247,6 +1317,91 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Yes, Delete Trip</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteAccountModal && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150 min-h-screen cursor-pointer"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isDeletingAccount) setShowDeleteAccountModal(false);
+          }}
+        >
+          <div 
+            className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-rose-200 dark:border-rose-900/60 animate-in zoom-in-95 duration-150 relative z-[100000] cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-900/40">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Permanently Delete Account?
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/60 text-xs text-rose-900 dark:text-rose-200 space-y-2 mb-5">
+              <p className="font-bold">
+                Warning: This action is permanent and cannot be undone.
+              </p>
+              <ul className="list-disc pl-4 space-y-1 text-[11px] text-rose-800 dark:text-rose-300">
+                <li>All trips and luggage checklists in Cloud Firestore will be permanently erased.</li>
+                <li>Your user account profile will be permanently deleted.</li>
+                <li>You will be immediately signed out on this device.</li>
+              </ul>
+            </div>
+
+            {deleteAccountError && (
+              <div className="p-3 mb-4 rounded-xl bg-rose-100 dark:bg-rose-950 border border-rose-300 text-rose-700 dark:text-rose-300 text-xs font-semibold">
+                {deleteAccountError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                disabled={isDeletingAccount}
+                onClick={() => setShowDeleteAccountModal(false)}
+                className="h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingAccount}
+                onClick={async () => {
+                  if (!user) return;
+                  setIsDeletingAccount(true);
+                  setDeleteAccountError(null);
+                  try {
+                    await deleteUserAccountAndData(user.uid);
+                    try {
+                      localStorage.removeItem('gateready_trips_data_v2');
+                      localStorage.removeItem('gateready_deleted_trip_ids_v1');
+                    } catch {}
+                    await signOut();
+                    setShowDeleteAccountModal(false);
+                  } catch (err: any) {
+                    console.error('Account deletion error:', err);
+                    setDeleteAccountError(err?.message || 'Failed to delete account. Please try again or re-authenticate.');
+                  } finally {
+                    setIsDeletingAccount(false);
+                  }
+                }}
+                className="h-10 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-rose-600/30 cursor-pointer disabled:opacity-50"
+              >
+                <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{isDeletingAccount ? 'Deleting Account...' : 'Permanently Delete Account'}</span>
               </button>
             </div>
           </div>

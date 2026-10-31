@@ -101,34 +101,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     }
   }, [editAirlineFareFamilies, editTravelType, editFareFamily]);
 
-  // Keep edit fields prefilled whenever isEditing opens or currentTrip updates
-  useEffect(() => {
-    if (currentTrip && isEditing) {
-      const initialProfiles: Partial<Record<TravelType, ModeProfile>> = {
-        ...(currentTrip.modeProfiles || {}),
-        [currentTrip.travelType || 'PLANE']: {
-          companyName: currentTrip.companyName || '',
-          seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
-          aircraftType: currentTrip.aircraftType || '',
-          fareFamily: currentTrip.fareFamily || ''
-        }
-      };
-      setEditModeProfiles(initialProfiles);
-      setEditName(currentTrip.name || '');
-      setEditCarrier(currentTrip.companyName || '');
-      setEditSeatClass(currentTrip.seatClassOrCarSize || 'Main Cabin');
-      setEditFareFamily(currentTrip.fareFamily || '');
-      setEditTravelType(currentTrip.travelType || 'PLANE');
-      setEditOriginCity(currentTrip.originCity || '');
-      setEditDestinationCity(currentTrip.destinationCity || '');
-      setEditDate(currentTrip.departureDate || '');
-      setEditTime(currentTrip.departureTime || '');
-      setEditReturnDate(currentTrip.returnTripDate || '');
-      setEditReturnTime(currentTrip.returnTripTime || '');
-      setEditAircraft(currentTrip.aircraftType || '');
-      setEditError(null);
-    }
-  }, [currentTrip, isEditing]);
+  const currentFareFamilyObj = React.useMemo(() => {
+    if (!currentTrip || currentTrip.travelType !== 'PLANE' || !currentTrip.companyName || !currentTrip.fareFamily) return null;
+    const families = getAirlineFareFamilies(currentTrip.companyName);
+    return families.find((f) => f.id === currentTrip.fareFamily) || null;
+  }, [currentTrip?.travelType, currentTrip?.companyName, currentTrip?.fareFamily]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -167,13 +144,17 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         companyName: currentTrip.companyName || '',
         seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
         aircraftType: currentTrip.aircraftType || '',
-        fareFamily: currentTrip.fareFamily || ''
+        fareFamily: currentTrip.fareFamily || '',
+        originCity: currentTrip.originCity || '',
+        destinationCity: currentTrip.destinationCity || '',
+        departureDate: currentTrip.departureDate || '',
+        departureTime: currentTrip.departureTime || ''
       }
     };
     setEditModeProfiles(initialProfiles);
     setEditName(currentTrip.name || '');
     setEditCarrier(currentTrip.companyName || '');
-    setEditSeatClass(currentTrip.seatClassOrCarSize || 'Main Cabin');
+    setEditSeatClass(currentTrip.seatClassOrCarSize || (currentTrip.travelType === 'CAR' ? 'Mid-Size SUV / Car' : currentTrip.travelType === 'CRUISE' ? 'Balcony Stateroom' : currentTrip.travelType === 'TRAIN' ? 'Standard Coach' : 'Main Cabin'));
     setEditFareFamily(currentTrip.fareFamily || '');
     setEditTravelType(currentTrip.travelType || 'PLANE');
     setEditOriginCity(currentTrip.originCity || '');
@@ -200,11 +181,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     const modeChanged = editTravelType !== currentTrip.travelType;
     const resolvedCarrier = editCarrier.trim();
     const resolvedSeatClass = editSeatClass.trim();
-    const resolvedOriginCity = editOriginCity.trim() || currentTrip.originCity || '';
-    const resolvedDestinationCity = editDestinationCity.trim() || currentTrip.destinationCity || '';
+    const resolvedOriginCity = editOriginCity.trim();
+    const resolvedDestinationCity = editDestinationCity.trim();
     const resolvedAircraft = editTravelType === 'PLANE' ? editAircraft.trim() : '';
-    const resolvedDepartureDate = editDate.trim() || currentTrip.departureDate || '';
-    const resolvedDepartureTime = editTime.trim() || currentTrip.departureTime || '';
+    const resolvedDepartureDate = editDate.trim();
+    const resolvedDepartureTime = editTime.trim();
 
     const finalModeProfiles: Partial<Record<TravelType, ModeProfile>> = {
       ...editModeProfiles,
@@ -212,7 +193,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         companyName: resolvedCarrier,
         seatClassOrCarSize: resolvedSeatClass,
         aircraftType: resolvedAircraft,
-        fareFamily: editTravelType === 'PLANE' ? editFareFamily : ''
+        fareFamily: editTravelType === 'PLANE' ? editFareFamily : '',
+        originCity: resolvedOriginCity,
+        destinationCity: resolvedDestinationCity,
+        departureDate: resolvedDepartureDate,
+        departureTime: resolvedDepartureTime
       }
     };
 
@@ -501,7 +486,12 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                           [editTravelType]: {
                             companyName: editCarrier.trim(),
                             seatClassOrCarSize: editSeatClass.trim(),
-                            aircraftType: editAircraft.trim()
+                            aircraftType: editAircraft.trim(),
+                            fareFamily: editTravelType === 'PLANE' ? editFareFamily.trim() : '',
+                            originCity: editOriginCity.trim(),
+                            destinationCity: editDestinationCity.trim(),
+                            departureDate: editDate.trim(),
+                            departureTime: editTime.trim()
                           }
                         };
                         setEditModeProfiles(updatedProfiles);
@@ -509,12 +499,20 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                         const targetProfile = updatedProfiles[type];
                         if (targetProfile) {
                           setEditCarrier(targetProfile.companyName || '');
-                          setEditSeatClass(targetProfile.seatClassOrCarSize || '');
+                          setEditSeatClass(targetProfile.seatClassOrCarSize || (type === 'PLANE' ? 'Main Cabin' : type === 'CAR' ? 'Mid-Size SUV / Car' : type === 'CRUISE' ? 'Balcony Stateroom' : type === 'TRAIN' ? 'Standard Coach' : 'Standard Coach'));
                           setEditAircraft(type === 'PLANE' ? (targetProfile.aircraftType || '') : '');
+                          setEditFareFamily(type === 'PLANE' ? (targetProfile.fareFamily || '') : '');
+                          setEditOriginCity(targetProfile.originCity || '');
+                          setEditDestinationCity(targetProfile.destinationCity || '');
+                          if (targetProfile.departureDate) setEditDate(targetProfile.departureDate);
+                          if (targetProfile.departureTime) setEditTime(targetProfile.departureTime);
                         } else {
                           setEditCarrier('');
-                          setEditSeatClass('');
+                          setEditSeatClass(type === 'PLANE' ? 'Main Cabin' : type === 'CAR' ? 'Mid-Size SUV / Car' : type === 'CRUISE' ? 'Balcony Stateroom' : 'Standard Coach');
                           setEditAircraft('');
+                          setEditFareFamily('');
+                          setEditOriginCity('');
+                          setEditDestinationCity('');
                         }
                       }
                     }}
@@ -863,9 +861,16 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  isBus ? 'Seat Type' :
                  'Cabin'}
               </span>
-              <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
-                {currentTrip.seatClassOrCarSize || 'Not set'}
-              </p>
+              <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
+                  {currentTrip.seatClassOrCarSize || 'Not set'}
+                </p>
+                {isFlight && currentFareFamilyObj && (
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
+                    {currentFareFamilyObj.name}
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-fuchsia-600 dark:text-fuchsia-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.aircraftType
                   ? `Aircraft: ${currentTrip.aircraftType}`

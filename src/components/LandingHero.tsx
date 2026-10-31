@@ -241,7 +241,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
             <div className="p-2.5 rounded-xl bg-purple-50/70 dark:bg-slate-800/80 border border-purple-100 dark:border-slate-700 text-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Departure Countdown:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Departure Countdown:</span>
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">Sample trip</span>
+                </div>
                 <span className="font-mono font-black text-purple-950 dark:text-purple-200 text-sm">
                   04d : 18h : 32m
                 </span>

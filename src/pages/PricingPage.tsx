@@ -138,6 +138,10 @@ export const PricingPage: React.FC = () => {
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>Printable PDF packing lists</span>
               </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-purple-600 shrink-0" />
+                <span>Travel wallet (loyalty numbers, TSA PreCheck, PNRs)</span>
+              </div>
             </div>
           </div>
           <a

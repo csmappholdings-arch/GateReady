@@ -50,7 +50,7 @@ interface PackingContextType {
     }
   ) => Trip;
   loadDemoTrip: () => Trip;
-  deleteTrip: (tripId: string) => void;
+  deleteTrip: (tripId: string) => Promise<void>;
   addItemToBag: (
     tripId: string,
     bagId: string,
@@ -112,9 +112,31 @@ interface PackingContextType {
 const PackingContext = createContext<PackingContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'gateready_trips_data_v2';
+const DELETED_TRIPS_KEY = 'gateready_deleted_trip_ids_v1';
 const UNIT_KEY = 'gateready_weight_unit';
 const TEMP_UNIT_KEY = 'gateready_temp_unit_v1';
 const THEME_KEY = 'gateready_dark_mode';
+
+export function getDeletedTripIds(): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const raw = localStorage.getItem(DELETED_TRIPS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return new Set(parsed);
+    }
+  } catch {}
+  return new Set();
+}
+
+export function recordDeletedTripId(id: string): void {
+  if (typeof window === 'undefined' || !id) return;
+  try {
+    const current = getDeletedTripIds();
+    current.add(id);
+    localStorage.setItem(DELETED_TRIPS_KEY, JSON.stringify(Array.from(current)));
+  } catch {}
+}
 
 export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -126,13 +148,15 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       localStorage.removeItem('gateready_seed_trips');
       localStorage.removeItem('gateready_seed_initialized');
 
+      const deletedIds = getDeletedTripIds();
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Strictly filter out any old demo preset trips
+          // Strictly filter out any old demo preset trips and deleted trips
           const filtered = parsed.filter(
             (t: Trip) =>
+              !deletedIds.has(t.id) &&
               t.id !== 'trip-nyc-delta' &&
               t.id !== 'trip-1' &&
               t.id !== 'trip-orlando' &&
@@ -249,9 +273,20 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const unsubscribe = subscribeToUserTrips(
       user.uid,
       async (cloudTrips) => {
-        if (cloudTrips.length === 0) {
-          // New account or empty cloud: migrate local trips up to Firestore
-          const localToSync = tripsRef.current;
+        const deletedIds = getDeletedTripIds();
+        const activeCloudTrips = cloudTrips.filter((ct) => !deletedIds.has(ct.id));
+
+        // If Cloud returned trips that are in local deleted list, ensure they are purged
+        const zombies = cloudTrips.filter((ct) => deletedIds.has(ct.id));
+        if (zombies.length > 0) {
+          for (const z of zombies) {
+            deleteTripFromCloud(user.uid, z.id).catch(console.warn);
+          }
+        }
+
+        if (activeCloudTrips.length === 0) {
+          // New account or empty cloud: migrate local trips up to Firestore (excluding deleted ones)
+          const localToSync = tripsRef.current.filter((lt) => !deletedIds.has(lt.id));
           if (localToSync.length > 0) {
             try {
               await syncLocalTripsToCloud(user.uid, localToSync);
@@ -262,14 +297,17 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               setCloudSyncStatus('offline');
             }
           } else {
+            setTrips([]);
+            setCurrentTripId('');
+            setSelectedBagId(null);
             setCloudSyncStatus('synced');
             setLastSyncedAt(new Date());
           }
         } else {
           // Cloud has trips. Check if current device has any locally created trips that aren't in the cloud yet
-          const localToSync = tripsRef.current;
+          const localToSync = tripsRef.current.filter((lt) => !deletedIds.has(lt.id));
           const missingInCloud = localToSync.filter(
-            (lt) => !cloudTrips.some((ct) => ct.id === lt.id)
+            (lt) => !activeCloudTrips.some((ct) => ct.id === lt.id)
           );
 
           if (missingInCloud.length > 0) {
@@ -280,10 +318,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           }
 
-          setTrips(cloudTrips);
+          setTrips(activeCloudTrips);
           setCurrentTripId((prev) => {
-            if (prev && cloudTrips.some((t) => t.id === prev)) return prev;
-            return cloudTrips[0]?.id || '';
+            if (prev && activeCloudTrips.some((t) => t.id === prev)) return prev;
+            return activeCloudTrips[0]?.id || '';
           });
           setCloudSyncStatus('synced');
           setLastSyncedAt(new Date());
@@ -563,7 +601,19 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return demoTrip;
   };
 
-  const deleteTrip = (tripId: string) => {
+  const deleteTrip = async (tripId: string): Promise<void> => {
+    recordDeletedTripId(tripId);
+
+    // Clean local storage immediately so reload cannot restore it
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed: Trip[] = JSON.parse(saved);
+        const remaining = parsed.filter((t) => t.id !== tripId);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+      }
+    } catch {}
+
     setTrips((prev) => {
       const remaining = prev.filter((t) => t.id !== tripId);
       if (remaining.length > 0) {
@@ -579,7 +629,18 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return remaining;
     });
 
-    persistTripDeleteToCloud(tripId);
+    if (user) {
+      setCloudSyncStatus('syncing');
+      try {
+        await deleteTripFromCloud(user.uid, tripId);
+        setCloudSyncStatus('synced');
+        setLastSyncedAt(new Date());
+      } catch (err) {
+        console.error('Error deleting trip from cloud:', err);
+        setCloudSyncStatus('offline');
+        throw err;
+      }
+    }
   };
 
   const addItemToBag = (

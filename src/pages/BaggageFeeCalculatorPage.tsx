@@ -449,7 +449,7 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
 
               {/* Policy Note */}
               <p className="text-[11px] text-slate-500 leading-relaxed pt-2">
-                {activeRecord.feeNotes}
+                {calculationResult?.feeNotes || activeRecord.feeNotes}
               </p>
             </div>
 

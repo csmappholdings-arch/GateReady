@@ -444,7 +444,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
             {isFlight
               ? 'Real-time weight meters, empty luggage tare deductions, TSA liquid regulation compliance, and airline overhead sizer auditing.'
-              : 'Real-time weight meters, empty luggage tare deductions, and carrier baggage policy auditing.'}
+              : trip.travelType === 'CAR'
+                ? 'Real-time weight meters, empty luggage tare deductions, and vehicle trunk & cargo space limits.'
+                : trip.travelType === 'TRAIN'
+                  ? 'Real-time weight meters, empty luggage tare deductions, and rail coach luggage allowances.'
+                  : trip.travelType === 'CRUISE'
+                    ? 'Real-time weight meters, empty luggage tare deductions, and cruise stateroom baggage allowances.'
+                    : 'Real-time weight meters, empty luggage tare deductions, and coach bus baggage limits.'}
           </p>
         </div>
 
@@ -922,7 +928,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                     {carrierCarryOnPolicy.note || 'No weight limit'}.
                   </p>
                   <p className="text-purple-800/80 dark:text-purple-300/80 text-[10px]">
-                    Dimensional guidance: <strong>{carrierCarryOnPolicy.dimensions}</strong> (must be light enough to store in overhead without assistance).
+                    Dimensional guidance: <strong>{carrierCarryOnPolicy.dimensions}</strong> {isFlight ? '(must be light enough to store in overhead without assistance).' : trip.travelType === 'CAR' ? '(vehicle trunk / cargo space).' : '(must be liftable into coach luggage rack unassisted).'}
                   </p>
                 </div>
               </div>

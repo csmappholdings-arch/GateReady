@@ -333,7 +333,7 @@ export const SubscriptionModal: React.FC = () => {
                     <li>Emergency QR bag tags</li>
                     <li>Worldwide terminal maps</li>
                     <li>Aircraft cabin intel</li>
-                    <li>Travel wallet & loyalty #s</li>
+                    <li>Travel wallet (loyalty numbers, TSA PreCheck, PNRs)</li>
                     <li>Cash vs card guides</li>
                     <li>42+ airline allowance engine</li>
                     <li>Round-trip tracking</li>

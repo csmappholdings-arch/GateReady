@@ -5,11 +5,29 @@ import {
   getAirlineIndexPageHtml, 
   getBaggageFeeCalculatorHtml, 
   getTareWeightHtml, 
-  getEntryRequirementsHtml 
+  getEntryRequirementsHtml,
+  getHomepageHtml
 } from './serverGuidesHtml';
 
 export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bodyHtml: string } | null {
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+
+  // 0. Check if path is Homepage (/)
+  if (normalizedPath === '/') {
+    const meta: StaticPageMeta = {
+      path: '/',
+      title: 'GateReady – Smart Trip Packing & Airline Baggage Intelligence',
+      description: 'Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42+ airlines with GateReady.',
+      keywords: 'travel packing app, airline baggage fee calculator, luggage weight checker, TSA liquids rule, carry on size limit, suitcase tare weight, 42 airlines baggage',
+      heading: 'Smart Trip Packing & Airline Baggage Intelligence',
+      subheading: 'Stop paying unexpected airport baggage fees. Model tare weights, verify carry-on dimensions, and audit luggage policies for 42+ airlines.',
+      schemaType: 'WebApplication'
+    };
+
+    const innerContentHtml = getHomepageHtml();
+    const bodyHtml = renderPageShell(meta, innerContentHtml);
+    return { meta, bodyHtml };
+  }
 
   // 1. Check if path is an airline guide (e.g. /airlines/westjet-baggage)
   if (normalizedPath.startsWith('/airlines/')) {
@@ -273,7 +291,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-purple-900">Silver ($1.99/mo · $19.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, emergency QR recovery tag, terminal maps.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, emergency QR recovery tag, terminal maps, travel wallet (loyalty numbers, TSA PreCheck, PNRs).</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>

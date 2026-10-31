@@ -19,6 +19,7 @@ import {
   doc, 
   setDoc, 
   getDoc, 
+  getDocs,
   collection, 
   onSnapshot, 
   deleteDoc, 
@@ -422,6 +423,7 @@ export function subscribeToUserTrips(
         travelType: data.travelType,
         companyName: data.companyName || '',
         seatClassOrCarSize: data.seatClassOrCarSize || '',
+        fareFamily: data.fareFamily || '',
         originCity: data.originCity || '',
         destinationCity: data.destinationCity || '',
         destinationCountry: data.destinationCountry || '',
@@ -437,7 +439,8 @@ export function subscribeToUserTrips(
         returnTripTime: data.returnTripTime || '',
         souvenirBufferEnabled: data.souvenirBufferEnabled ?? true,
         gateChecklist: data.gateChecklist || [],
-        luggageTags: data.luggageTags || {}
+        luggageTags: data.luggageTags || {},
+        modeProfiles: data.modeProfiles || {}
       });
     });
     onSuccess(cloudTrips);
@@ -458,6 +461,7 @@ export async function saveTripToCloud(userId: string, trip: Trip): Promise<void>
       travelType: trip.travelType,
       companyName: trip.companyName || '',
       seatClassOrCarSize: trip.seatClassOrCarSize || '',
+      fareFamily: trip.fareFamily || '',
       originCity: trip.originCity || '',
       destinationCity: trip.destinationCity || '',
       destinationCountry: trip.destinationCountry || '',
@@ -474,6 +478,7 @@ export async function saveTripToCloud(userId: string, trip: Trip): Promise<void>
       souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
       gateChecklist: trip.gateChecklist || [],
       luggageTags: trip.luggageTags || {},
+      modeProfiles: trip.modeProfiles || {},
       updatedAt: new Date().toISOString()
     }, { merge: true });
   } catch (err) {
@@ -506,6 +511,7 @@ export async function syncLocalTripsToCloud(userId: string, localTrips: Trip[]):
         travelType: trip.travelType,
         companyName: trip.companyName || '',
         seatClassOrCarSize: trip.seatClassOrCarSize || '',
+        fareFamily: trip.fareFamily || '',
         originCity: trip.originCity || '',
         destinationCity: trip.destinationCity || '',
         destinationCountry: trip.destinationCountry || '',
@@ -522,12 +528,43 @@ export async function syncLocalTripsToCloud(userId: string, localTrips: Trip[]):
         souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
         gateChecklist: trip.gateChecklist || [],
         luggageTags: trip.luggageTags || {},
+        modeProfiles: trip.modeProfiles || {},
         updatedAt: new Date().toISOString()
       }, { merge: true });
     }
     await batch.commit();
   } catch (err) {
     console.error('Failed to batch sync local trips to cloud:', err);
+    throw err;
+  }
+}
+
+export async function deleteUserAccountAndData(userId: string): Promise<void> {
+  if (!userId) return;
+  try {
+    // 1. Delete all trips in users/{userId}/trips
+    const tripsColl = collection(db, 'users', userId, 'trips');
+    const snapshot = await getDocs(tripsColl);
+    const batch = writeBatch(db);
+    snapshot.forEach((docSnap) => {
+      batch.delete(docSnap.ref);
+    });
+    // 2. Delete user profile doc in users/{userId}
+    const userDocRef = doc(db, 'users', userId);
+    batch.delete(userDocRef);
+    await batch.commit();
+
+    // 3. Delete Firebase Auth user account if matching active current user
+    if (auth.currentUser && auth.currentUser.uid === userId) {
+      try {
+        await auth.currentUser.delete();
+      } catch (authErr) {
+        console.warn('Auth user delete note (e.g. requires fresh login):', authErr);
+        await firebaseSignOut(auth);
+      }
+    }
+  } catch (err) {
+    console.error(`Failed to delete account and data for user ${userId}:`, err);
     throw err;
   }
 }

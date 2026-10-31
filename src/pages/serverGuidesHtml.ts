@@ -491,3 +491,168 @@ export function getEntryRequirementsHtml(): string {
     </div>
   `;
 }
+
+export function getHomepageHtml(): string {
+  const airlineLinks = AIRLINE_GUIDES.map((g) => `
+    <a href="${g.canonicalPath}" class="p-3 rounded-xl bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-300 transition-colors flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">${g.flag}</span>
+        <span class="font-bold text-slate-900">${g.name}</span>
+      </div>
+      <span class="text-purple-600 font-semibold text-[11px]">View Rules →</span>
+    </a>
+  `).join('');
+
+  return `
+    <div class="space-y-8">
+      <!-- Hero Intro -->
+      <section class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Smart Luggage Packing, Sizer Verification & Baggage Fee Engine</h2>
+        <p class="text-base text-slate-700 leading-relaxed">
+          GateReady is the dedicated travel packing platform that models empty suitcase tare weights, verifies luggage dimensions against airline gate sizers, audits TSA 3-1-1 liquids compliance, and calculates baggage fees across 42+ global airlines.
+        </p>
+        <div class="flex flex-wrap gap-3 pt-2">
+          <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">
+            Calculate Baggage Fees →
+          </a>
+          <a href="/airlines" class="h-10 px-4 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+            Browse 42 Airline Guides
+          </a>
+          <a href="/tare-weight" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+            Tare Weight Guide
+          </a>
+          <a href="/entry-requirements" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+            Entry Requirements
+          </a>
+        </div>
+      </section>
+
+      <!-- Quick Checkers -->
+      <section class="space-y-4 pt-6 border-t border-slate-200">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Free Travel Intelligence Tools & Checkers</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-2">
+            <h3 class="font-bold text-purple-950 text-base">Airline Baggage Allowance Guides</h3>
+            <p class="text-xs text-slate-600">Verified carry-on dimensions, weight caps, and checked fee tables for 42 major airlines across North America, Europe, Asia, and worldwide.</p>
+            <a href="/airlines" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">Explore all 42 airlines →</a>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-2">
+            <h3 class="font-bold text-purple-950 text-base">Standalone Baggage Fee Calculator</h3>
+            <p class="text-xs text-slate-600">Model carry-on charges, first and second checked bag fees, fare families, and overweight surcharges before heading to the airport.</p>
+            <a href="/baggage-fee-calculator" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">Open fee calculator →</a>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <h3 class="font-bold text-slate-900 text-base">Luggage Tare Weight Explainer</h3>
+            <p class="text-xs text-slate-600">Learn why empty suitcases consume 15% to 25% of your airline weight allowance, and how tare deduction prevents airport counter fees.</p>
+            <a href="/tare-weight" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">Read tare weight guide →</a>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <h3 class="font-bold text-slate-900 text-base">International Entry Requirements Hub</h3>
+            <p class="text-xs text-slate-600">Check the 6-month passport validity rule, electronic travel authorizations (ESTA, eTA, ETIAS), and official government advisories.</p>
+            <a href="/entry-requirements" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">View entry requirements →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 42 Airline Directory Links -->
+      <section class="space-y-4 pt-6 border-t border-slate-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-black text-slate-900 tracking-tight">42 Major Airlines Baggage Policy Directory</h2>
+          <a href="/airlines" class="text-xs font-bold text-purple-600 hover:text-purple-800">View Full Directory →</a>
+        </div>
+        <p class="text-xs text-slate-600">Select any airline below to view exact carry-on dimensions, overhead sizer limits, checked baggage rates, and fare families:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          ${airlineLinks}
+        </div>
+      </section>
+
+      <!-- Core Features -->
+      <section class="space-y-4 pt-6 border-t border-slate-200">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Key Packing & Baggage Capabilities</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">Per-Bag Weight Meters with Tare Calibration</h3>
+            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (e.g., 7.2 lbs carry-on, 10.4 lbs checked roller) to track true airline scale totals.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">TSA 3-1-1 Liquids Compliance Rule</h3>
+            <p class="text-xs text-slate-600 mt-1">Detects containers over 3.4 oz (100ml) packed in carry-on bags and prompts you to move them to checked luggage.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">Multi-Mode Travel Support</h3>
+            <p class="text-xs text-slate-600 mt-1">Configure trips for Flight, Train, Bus, Cruise, or Road Trip with tailored vehicle allowances and baggage guidance.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">Travel Wallet & Departure Readiness</h3>
+            <p class="text-xs text-slate-600 mt-1">Store loyalty numbers, TSA PreCheck, PNRs, departure countdowns, and printable PDF packing manifests.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing Summary -->
+      <section class="space-y-4 pt-6 border-t border-slate-200">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Simple, Transparent Pricing</h2>
+        <p class="text-xs text-slate-600">Free forever starter tier with affordable upgrades. 14-day money-back guarantee on all paid plans via Lemon Squeezy.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-slate-500 uppercase">Starter</div>
+            <h3 class="font-black text-lg text-slate-900">Free ($0)</h3>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (max 1 checked), TSA liquids rule check.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+            <div class="text-xs font-bold text-purple-700 uppercase">Solo Pro</div>
+            <h3 class="font-black text-lg text-purple-900">Silver ($1.99/mo)</h3>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, suitcase tare deduction, travel wallet (loyalty numbers, TSA PreCheck, PNRs).</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
+            <div class="text-[10px] font-black uppercase text-amber-800">MOST POPULAR</div>
+            <h3 class="font-black text-lg text-slate-900">Gold ($3.99/mo)</h3>
+            <p class="text-xs text-slate-600 mt-1">2 travelers, unlimited active trips, unlimited bags & scales, multi-device sync, printable PDF manifests ($29.99/yr).</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+            <div class="text-xs font-bold text-indigo-700 uppercase">Family & Frequent</div>
+            <h3 class="font-black text-lg text-indigo-900">Platinum ($4.99/mo)</h3>
+            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited devices, unlimited trips, unlimited bags & scales, priority fee updates ($39.99/yr).</p>
+          </div>
+        </div>
+        <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 text-xs text-purple-950 space-y-1">
+          <div><strong>7-Day Free Platinum Trial:</strong> Free signup automatically activates 7 days of full Platinum features. No credit card required. Returns to Free on day 7.</div>
+          <div><strong>14-Day Refund Guarantee:</strong> 100% money-back guarantee on all paid plans. Contact <a href="mailto:csmappholdings@gmail.com" class="text-purple-700 underline font-semibold">csmappholdings@gmail.com</a>.</div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="space-y-4 pt-6 border-t border-slate-200">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+        <div class="space-y-3">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">How does the 7-day free trial work?</h3>
+            <p class="text-xs text-slate-600 mt-1">Creating a free account immediately grants full Platinum access for 7 days without requiring a payment method. At day 7, your account automatically returns to the Free plan with all saved lists intact.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">Are baggage fees guaranteed?</h3>
+            <p class="text-xs text-slate-600 mt-1">Baggage fees are estimates derived from published airline baggage tables. Because carriers adjust fees dynamically by route, fare family, and booking channel, always confirm with your operating airline prior to travel.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">What is tare weight and why does it matter?</h3>
+            <p class="text-xs text-slate-600 mt-1">Tare weight is the weight of an empty suitcase. Hardcase checked luggage typically weighs 8 to 11 lbs empty, which consumes up to 22% of a standard 50-lb baggage allowance before a single item is packed.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 text-sm">How does the TSA 3-1-1 checker work?</h3>
+            <p class="text-xs text-slate-600 mt-1">The TSA checker is a list-based rule audit comparing packed toiletries in carry-on bags against the 3.4 oz (100ml) limitation. It is not an optical or hardware scanner.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Verified Truths Notice -->
+      <section class="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1.5">
+        <strong class="font-bold block text-sm text-amber-900">GateReady Honesty Policy & Disclaimers:</strong>
+        <p>GateReady is a trip planning assistant. Baggage fee figures are estimates based on published tables, not carrier guarantees. The TSA checker is rule-based, not an x-ray or hardware scanner. GateReady does not provide real-time flight telemetry, gate change alerts, GPS bag beacons, or hardware scales.</p>
+        <p>Operated by <strong>CSM App Holdings</strong> · Sole official support contact: <a href="mailto:csmappholdings@gmail.com" class="font-semibold underline">csmappholdings@gmail.com</a>.</p>
+      </section>
+    </div>
+  `;
+}

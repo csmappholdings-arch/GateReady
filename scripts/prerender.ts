@@ -20,6 +20,8 @@ async function prerender() {
 
   // Collect all static routes
   const routes: string[] = [
+    // Homepage
+    '/',
     // 12 Informational pages
     ...Object.keys(STATIC_PAGES),
     // Directory index
