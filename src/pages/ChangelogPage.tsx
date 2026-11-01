@@ -14,6 +14,124 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Oct 31, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            October 31, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Head-Tag Verification, Search Architecture & Multi-Modal Mode Integrity Audit</span>
+        </div>
+
+        <div className="space-y-3">
+          {/* Head-Tag & Meta Verification Report */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/60 space-y-3">
+            <div className="font-black text-slate-900 dark:text-white text-sm flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>Head-Tag & Meta Verification Report (6 Sampled Core Routes)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              Verified live server responses for canonical tag hrefs, unique meta descriptions, and absolute og:image/twitter:image URLs across 6 sampled routes:
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border border-purple-200 dark:border-purple-900/60 rounded-xl overflow-hidden">
+                <thead className="bg-purple-100/70 dark:bg-purple-900/50 text-purple-950 dark:text-purple-200 font-bold">
+                  <tr>
+                    <th className="p-2 border-b border-purple-200 dark:border-purple-900">Route</th>
+                    <th className="p-2 border-b border-purple-200 dark:border-purple-900">Canonical Tag (HREF)</th>
+                    <th className="p-2 border-b border-purple-200 dark:border-purple-900">Meta Description</th>
+                    <th className="p-2 border-b border-purple-200 dark:border-purple-900">og:image & twitter:image</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-purple-100 dark:divide-purple-950/50 text-[11px] text-slate-700 dark:text-slate-300">
+                  <tr className="hover:bg-purple-50/40">
+                    <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/ (Homepage)</td>
+                    <td className="p-2 font-mono">https://gateready.ca/</td>
+                    <td className="p-2">Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42+ airlines with GateReady.</td>
+                    <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
+                  </tr>
+                  <tr className="hover:bg-purple-50/40">
+                    <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/airlines/westjet-baggage</td>
+                    <td className="p-2 font-mono">https://gateready.ca/airlines/westjet-baggage</td>
+                    <td className="p-2">Verified WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no maximum carry-on weight limit (must lift unassisted), checked fees ($35 CAD 1st, $50 CAD 2nd).</td>
+                    <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
+                  </tr>
+                  <tr className="hover:bg-purple-50/40">
+                    <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/airlines/porter-airlines-baggage</td>
+                    <td className="p-2 font-mono">https://gateready.ca/airlines/porter-airlines-baggage</td>
+                    <td className="p-2">Porter Airlines baggage rules: carry-on size (21.5 x 15.5 x 9 in, max 20 lbs / 9 kg), personal item allowances, PorterClassic Basic vs Standard carry-on, and checked fees.</td>
+                    <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
+                  </tr>
+                  <tr className="hover:bg-purple-50/40">
+                    <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/airlines/delta-baggage</td>
+                    <td className="p-2 font-mono">https://gateready.ca/airlines/delta-air-lines-baggage (301 canonical target)</td>
+                    <td className="p-2">Delta Air Lines baggage limits: carry-on dimensions (22 x 14 x 9 in), no maximum carry-on weight on domestic routes, $35 first checked bag fee, and Delta One allowances.</td>
+                    <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
+                  </tr>
+                  <tr className="hover:bg-purple-50/40">
+                    <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/baggage-fee-calculator</td>
+                    <td className="p-2 font-mono">https://gateready.ca/baggage-fee-calculator</td>
+                    <td className="p-2">Calculate checked bag fees, carry-on charges, and overweight surcharges across 42 global airlines with our standalone baggage fee calculator.</td>
+                    <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
+                  </tr>
+                  <tr className="hover:bg-purple-50/40">
+                    <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/entry-requirements</td>
+                    <td className="p-2 font-mono">https://gateready.ca/entry-requirements</td>
+                    <td className="p-2">Essential passport validity rules, 6-month rule, electronic travel authorizations (ESTA, eTA), and direct links to official government entry portals.</td>
+                    <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mode-Aware Entry Rules */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Mode-Aware Cross-Border Entry Notices</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Resolved travel mode propagation to entry requirement evaluations: Road Trip, Train, and Bus itineraries never display air-arrival rules (e.g. "by air with a valid US passport"). Land border crossings and rail entries show verified mode-specific or mode-neutral rules without transport-mode claims.
+            </p>
+          </div>
+
+          {/* Bus Subtitle Wording */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Bus Luggage Storage Terminology</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Updated bus bag subtitles to use verified coach storage wording ("Under-seat / cargo hold" and "No bus limit") completely clearing aircraft "overhead" cabin wording on bus itineraries. Re-verified Road, Train, and Cruise bag subtitles remain completely clean.
+            </p>
+          </div>
+
+          {/* Silver Feature List Parity */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Silver Feature List Exact Parity</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Synchronized the Silver plan feature list across the plans dialog, /pricing page, and server HTML to match item for item, in the exact same words: 1 traveler, 2 active trips, unlimited bags, suitcase tare weight deduction, emergency QR luggage recovery tag, terminal maps & cabin intel, printable PDF packing lists, and Travel wallet (loyalty numbers, TSA PreCheck, PNRs).
+            </p>
+          </div>
+
+          {/* Post-Reload Flash Elimination */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Post-Reload Zero-Flash Authenticated State</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Implemented synchronous local authentication state holding so signed-in page reloads and new browser tabs immediately display the user's authenticated header and active plan tier without flashing "Loading...", "Saved in this browser only" banners, or Free Plan 2-bag limit badges.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Oct 28, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Trip, Bag, BagType, BagMaterial, getBagEmptyWeightLbs, getUserPresetWeightLbs } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
+import { useAuth } from '../context/AuthContext';
 import { DefaultSuggestions } from '../data/suggestions';
 import { scanItemForLiquids } from '../utils/liquidScanner';
 import { 
@@ -71,6 +72,9 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     resetAllPacked
   } = usePacking();
   const { isPro, canAddBag, openPaywall } = useSubscription();
+  const { loading: authLoading, hasCachedAuth } = useAuth();
+
+  const isProOrLoading = isPro || authLoading || hasCachedAuth;
 
   const [bagToEdit, setBagToEdit] = useState<Bag | null>(null);
   const [showQrModalForBag, setShowQrModalForBag] = useState<Bag | null>(null);
@@ -256,7 +260,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     if (isCar) return 'No vehicle weight limit';
     if (trip.travelType === 'TRAIN') return 'No rail weight limit · Rail coach';
     if (trip.travelType === 'CRUISE') return 'No cruise weight limit · Cruise stateroom';
-    if (trip.travelType === 'BUS') return 'No bus weight limit · Bus overhead';
+    if (trip.travelType === 'BUS') return 'No bus weight limit · Under-seat / cargo hold';
     return `No airline weight limit · ${trip.companyName || 'Air Canada'}`;
   };
 
@@ -503,7 +507,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Add Bag</span>
-            {!isPro && trip.bags.length >= 2 && (
+            {!isProOrLoading && trip.bags.length >= 2 && (
               <span className="text-[9px] bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md font-black flex items-center gap-0.5 ml-0.5">
                 <Crown className="w-2.5 h-2.5 fill-purple-950" /> Max
               </span>
@@ -513,7 +517,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       </div>
 
       {/* Free Plan 2-Bag Limit Notice / Pro Upgrade Banner */}
-      {!isPro && (
+      {!isProOrLoading && (
         <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2.5">
             <Luggage className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />

@@ -121,7 +121,7 @@ export const MAX_FREE_BAGS_TOTAL = 2;
 export const MAX_FREE_ACTIVE_TRIPS = 1;
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading, hasCachedAuth } = useAuth();
 
   // 7-day Platinum trial state - strictly tied to account creation
   const [trialExpiresAt, setTrialExpiresAt] = useState<string | null>(null);
@@ -247,6 +247,10 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
         return saved;
       }
+      const cachedTier = localStorage.getItem('gateready_cached_user_tier');
+      if (cachedTier === 'PLATINUM' || cachedTier === 'GOLD' || cachedTier === 'SILVER') {
+        return cachedTier as SubscriptionTier;
+      }
       if (saved === 'FREE') return 'FREE';
     } catch {
       // Ignore
@@ -318,22 +322,36 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     if (hasPaidLicense) return;
 
+    if (authLoading && hasCachedAuth) {
+      // Hold previously confirmed tier while authentication is actively restoring
+      return;
+    }
+
     if (!user) {
-      setTier('FREE');
-      setTrialExpiresAt(null);
-      setReferralFreeMonthExpiresAt(null);
+      if (!authLoading) {
+        setTier('FREE');
+        setTrialExpiresAt(null);
+        setReferralFreeMonthExpiresAt(null);
+        try {
+          localStorage.removeItem('gateready_cached_user_tier');
+        } catch {}
+      }
       return;
     }
 
     if (isReferralPlatinumActive || isTrialActive) {
       setTier('PLATINUM');
+      try {
+        localStorage.setItem('gateready_cached_user_tier', 'PLATINUM');
+      } catch {}
     } else {
       setTier('FREE');
       try {
         localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
+        localStorage.removeItem('gateready_cached_user_tier');
       } catch {}
     }
-  }, [user, hasPaidLicense, isReferralPlatinumActive, isTrialActive]);
+  }, [user, authLoading, hasCachedAuth, hasPaidLicense, isReferralPlatinumActive, isTrialActive]);
 
   // Referral program state (Feature 3: tied strictly to authenticated accounts)
   const [referralCode, setReferralCode] = useState<string>(() => {

@@ -48,7 +48,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
 }) => {
   const { trips, selectTrip, updateTripDetails, deleteTrip } = usePacking();
   const { isPro, openPaywall } = useSubscription();
-  const { user } = useAuth();
+  const { user, loading: authLoading, hasCachedAuth } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
@@ -247,7 +247,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     <div className="w-full bg-gradient-to-r from-purple-50/90 via-white to-purple-50/60 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs transition-colors">
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-2.5 sm:py-3">
         {/* Item 5: Small, honest, dismissible disclosure in workspace for anonymous users */}
-        {!user && !browserNoticeDismissed && (
+        {!user && !authLoading && !hasCachedAuth && !browserNoticeDismissed && (
           <div className="mb-2 py-1.5 px-3 rounded-xl bg-purple-100/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-900/60 flex items-center justify-between gap-2 text-xs text-purple-950 dark:text-purple-200 animate-in fade-in duration-200">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />

@@ -74,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
     manualSync
   } = usePacking();
 
-  const { user, signIn, signOut, loading: authLoading, error: authError, clearError, resendVerificationEmail } = useAuth();
+  const { user, signIn, signOut, loading: authLoading, cachedUser, hasCachedAuth, error: authError, clearError, resendVerificationEmail } = useAuth();
   const [resentVerification, setResentVerification] = useState(false);
   const { 
     isPro, 
@@ -339,12 +339,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Google Account & Cloud Sync Dropdown */}
           <div className="relative z-50" ref={userRef}>
-            {authLoading ? (
-              <div className="h-9 sm:h-10 px-3 rounded-xl border border-white/20 bg-white/10 text-white/70 text-xs flex items-center gap-2 animate-pulse">
-                <div className="w-5 h-5 rounded-full bg-white/20" />
-                <span className="hidden sm:inline text-[11px] font-semibold">Loading...</span>
-              </div>
-            ) : user ? (
+            {user || (authLoading && cachedUser) ? (
               <button
                 type="button"
                 onClick={() => {
@@ -354,21 +349,21 @@ export const Header: React.FC<HeaderProps> = ({
                 className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-emerald-500/40 bg-emerald-950/50 text-emerald-200 flex items-center gap-2 hover:bg-emerald-900/60 transition-colors cursor-pointer"
                 title="Google Account & Cloud Sync"
               >
-                {user.photoURL ? (
+                {(user?.photoURL || cachedUser?.photoURL) ? (
                   <img
-                    src={user.photoURL}
-                    alt={user.displayName || 'Google Account'}
+                    src={user?.photoURL || cachedUser?.photoURL || ''}
+                    alt={user?.displayName || cachedUser?.displayName || 'Google Account'}
                     className="w-6 h-6 rounded-full border border-emerald-400 shrink-0 object-cover"
                   />
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
-                    {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                    {((user?.displayName || cachedUser?.displayName || user?.email || cachedUser?.email || 'U')[0]).toUpperCase()}
                   </div>
                 )}
 
                 <div className="hidden lg:flex flex-col text-left">
                   <span className="text-[11px] font-bold leading-none truncate max-w-[85px] text-white">
-                    {user.displayName?.split(' ')[0] || 'Synced'}
+                    {(user?.displayName || cachedUser?.displayName)?.split(' ')[0] || 'Synced'}
                   </span>
                   <span className="text-[9px] text-emerald-400 flex items-center gap-0.5 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
@@ -377,6 +372,10 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
                 <ChevronDown className="w-3 h-3 text-emerald-400 shrink-0 ml-0.5" />
               </button>
+            ) : authLoading ? (
+              <div className="h-9 sm:h-10 px-3 rounded-xl border border-white/20 bg-white/10 text-white/70 text-xs flex items-center gap-2 animate-pulse">
+                <div className="w-5 h-5 rounded-full bg-white/20" />
+              </div>
             ) : (
               /* Sync Account button: surfaced for guests ONLY when they have saved trips worth syncing */
               <button

@@ -322,22 +322,24 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-600 dark:text-slate-400">All core packing tools:</span>
+                    <span className="text-slate-700 dark:text-slate-300">Suitcase tare weight deduction</span>
                   </div>
-                  <ul className="pl-4 space-y-1 text-[11px] text-slate-600 dark:text-slate-400 list-disc">
-                    <li>Smart Luggage Scales</li>
-                    <li>TSA 3-1-1 liquids checker</li>
-                    <li>1-click presets & bag kits</li>
-                    <li>Printable PDF packing lists</li>
-                    <li>Departure countdown & alerts</li>
-                    <li>Emergency QR bag tags</li>
-                    <li>Worldwide terminal maps</li>
-                    <li>Aircraft cabin intel</li>
-                    <li>Travel wallet (loyalty numbers, TSA PreCheck, PNRs)</li>
-                    <li>Cash vs card guides</li>
-                    <li>42+ airline allowance engine</li>
-                    <li>Round-trip tracking</li>
-                  </ul>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Emergency QR luggage recovery tag</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Terminal maps & cabin intel</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Printable PDF packing lists</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Travel wallet (loyalty numbers, TSA PreCheck, PNRs)</span>
+                  </div>
                 </div>
               </div>
 

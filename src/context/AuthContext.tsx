@@ -11,8 +11,19 @@ import {
   resendVerificationEmail as fbResendVerificationEmail
 } from '../lib/firebase';
 
+export interface CachedAuthUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+}
+
+const CACHED_AUTH_KEY = 'gateready_cached_auth_state';
+
 interface AuthContextType {
   user: User | null;
+  cachedUser: CachedAuthUser | null;
+  hasCachedAuth: boolean;
   loading: boolean;
   signIn: () => Promise<{ user: User; isNewUser: boolean }>;
   signInWithGithub: () => Promise<void>;
@@ -28,6 +39,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [cachedUser, setCachedUser] = useState<CachedAuthUser | null>(() => {
+    try {
+      const saved = localStorage.getItem(CACHED_AUTH_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return null;
+  });
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +54,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const cached: CachedAuthUser = {
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL
+        };
+        setCachedUser(cached);
+        try {
+          localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify(cached));
+        } catch {}
+      } else {
+        setCachedUser(null);
+        try {
+          localStorage.removeItem(CACHED_AUTH_KEY);
+          localStorage.removeItem('gateready_cached_user_tier');
+        } catch {}
+      }
       setLoading(false);
     }, (err) => {
       console.error('Auth state error:', err);
@@ -164,6 +201,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     setError(null);
     try {
+      setCachedUser(null);
+      try {
+        localStorage.removeItem(CACHED_AUTH_KEY);
+        localStorage.removeItem('gateready_cached_user_tier');
+      } catch {}
       await signOutUser();
     } catch (err: any) {
       console.error('Sign-out failed:', err);
@@ -172,10 +214,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const clearError = () => setError(null);
+  const hasCachedAuth = Boolean(user || cachedUser);
 
   return (
     <AuthContext.Provider value={{ 
       user, 
+      cachedUser,
+      hasCachedAuth,
       loading, 
       signIn, 
       signInWithGithub,

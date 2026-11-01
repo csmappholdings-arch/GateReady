@@ -360,6 +360,68 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       <section class="space-y-3">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
+          <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
+            <div class="font-bold text-purple-900 text-sm">October 31, 2026 — Head-Tag Verification, Search Architecture & Multi-Modal Mode Integrity Audit</div>
+            <div class="text-xs text-slate-700 mt-2 space-y-2">
+              <p>Verified live head tags (canonical URLs, unique meta descriptions, absolute og:image and twitter:image URLs) across 6 sampled routes:</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-[11px] border border-purple-200 rounded-lg">
+                  <thead class="bg-purple-100 font-bold text-purple-950">
+                    <tr>
+                      <th class="p-1.5 border-b border-purple-200">Route</th>
+                      <th class="p-1.5 border-b border-purple-200">Canonical Tag</th>
+                      <th class="p-1.5 border-b border-purple-200">Meta Description</th>
+                      <th class="p-1.5 border-b border-purple-200">Social Images</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-purple-100 text-[10px]">
+                    <tr>
+                      <td class="p-1.5 font-mono font-bold">/</td>
+                      <td class="p-1.5 font-mono">https://gateready.ca/</td>
+                      <td class="p-1.5">Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42+ airlines with GateReady.</td>
+                      <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
+                    </tr>
+                    <tr>
+                      <td class="p-1.5 font-mono font-bold">/airlines/westjet-baggage</td>
+                      <td class="p-1.5 font-mono">https://gateready.ca/airlines/westjet-baggage</td>
+                      <td class="p-1.5">Verified WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no maximum carry-on weight limit (must lift unassisted), checked fees ($35 CAD 1st, $50 CAD 2nd).</td>
+                      <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
+                    </tr>
+                    <tr>
+                      <td class="p-1.5 font-mono font-bold">/airlines/porter-airlines-baggage</td>
+                      <td class="p-1.5 font-mono">https://gateready.ca/airlines/porter-airlines-baggage</td>
+                      <td class="p-1.5">Porter Airlines baggage rules: carry-on size (21.5 x 15.5 x 9 in, max 20 lbs / 9 kg), personal item allowances, PorterClassic Basic vs Standard carry-on, and checked fees.</td>
+                      <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
+                    </tr>
+                    <tr>
+                      <td class="p-1.5 font-mono font-bold">/airlines/delta-baggage</td>
+                      <td class="p-1.5 font-mono">https://gateready.ca/airlines/delta-air-lines-baggage (301 target)</td>
+                      <td class="p-1.5">Delta Air Lines baggage limits: carry-on dimensions (22 x 14 x 9 in), no maximum carry-on weight on domestic routes, $35 first checked bag fee, and Delta One allowances.</td>
+                      <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
+                    </tr>
+                    <tr>
+                      <td class="p-1.5 font-mono font-bold">/baggage-fee-calculator</td>
+                      <td class="p-1.5 font-mono">https://gateready.ca/baggage-fee-calculator</td>
+                      <td class="p-1.5">Calculate checked bag fees, carry-on charges, and overweight surcharges across 42 global airlines with our standalone baggage fee calculator.</td>
+                      <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
+                    </tr>
+                    <tr>
+                      <td class="p-1.5 font-mono font-bold">/entry-requirements</td>
+                      <td class="p-1.5 font-mono">https://gateready.ca/entry-requirements</td>
+                      <td class="p-1.5">Essential passport validity rules, 6-month rule, electronic travel authorizations (ESTA, eTA), and direct links to official government entry portals.</td>
+                      <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ul class="space-y-1 list-disc list-inside mt-2">
+                <li>Mode-aware entry notices: Road Trip, Train, and Bus itineraries display transport-accurate border rules without "by air" claims.</li>
+                <li>Bus storage wording: updated bus bag subtitles to "Under-seat / cargo hold" and "No bus limit" without "overhead" phrasing.</li>
+                <li>Silver feature list parity: synchronized the 8-item feature list identically across the plans dialog and /pricing page.</li>
+                <li>Post-reload authenticated state: eliminated guest header/banner flash on reload for signed-in accounts.</li>
+              </ul>
+            </div>
+          </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <div class="font-bold text-purple-900 text-sm">October 28, 2026 — Multi-Modal Travel Integrity & Stability Release</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">

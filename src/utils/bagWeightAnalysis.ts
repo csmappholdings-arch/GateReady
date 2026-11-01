@@ -68,8 +68,8 @@ export function getCarrierCarryOnPolicy(companyName?: string, travelType?: strin
       return {
         hasNoWeightLimit: true,
         limitLbs: null,
-        label: 'No bus limit (Bus Overhead)',
-        dimensions: 'Overhead luggage shelf',
+        label: 'No bus limit (Under-seat / cargo hold)',
+        dimensions: 'Under-seat or cargo hold storage',
         note: null,
         isDefault: false
       };
@@ -194,7 +194,7 @@ export function computeBagWeightStatus(
     isOverweight = false;
     isNearLimit = false;
     overweightAmountLbs = 0;
-    displayLimit = isCar ? 'No vehicle limit' : isTrain ? 'No rail limit' : isCruise ? 'No cruise limit' : 'No airline limit';
+    displayLimit = isCar ? 'No vehicle limit' : isTrain ? 'No rail limit' : isCruise ? 'No cruise limit' : isBus ? 'No bus limit' : 'No airline limit';
   } else {
     // Fix 3: Compute percentage FROM the displayed (rounded) weight (e.g. 21.9 / 22 = 99.5%, 22.5 / 22 = 102.3%)
     const rawPct = limitLbs > 0 ? (displayedWeightLbs / limitLbs) * 100 : 0;

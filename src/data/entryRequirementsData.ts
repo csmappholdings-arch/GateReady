@@ -1011,12 +1011,129 @@ export interface ResolvedEntryRequirement {
 }
 
 /**
+ * Clean mode-aware formatting for entry advisory notes and passport rules.
+ * Strictly adheres to verified truth: non-air itineraries never state air-arrival rules or airport check-in.
+ */
+function formatNotesForMode(
+  rawNotes: string | undefined, 
+  mode?: string, 
+  destinationCountry?: string, 
+  nationality?: PassportNationality
+): string | undefined {
+  if (!rawNotes) return undefined;
+  if (!mode || mode === 'PLANE') return rawNotes;
+
+  const isCanada = destinationCountry === 'Canada';
+  const isUS = destinationCountry === 'United States';
+
+  // Specific high-frequency border crossings with verified mode rules
+  if (isCanada && nationality === 'US') {
+    if (mode === 'CAR' || mode === 'BUS') {
+      return 'US citizens do not require an eTA to enter Canada with a valid US passport. Present your valid US passport or WHTI-compliant ID at land border crossings.';
+    }
+    if (mode === 'TRAIN') {
+      return 'US citizens do not require an eTA to enter Canada with a valid US passport. Present your passport for cross-border rail clearance.';
+    }
+    if (mode === 'CRUISE') {
+      return 'US citizens do not require an eTA to enter Canada with a valid US passport. Valid passport required for port clearance.';
+    }
+    return 'US citizens do not require an eTA to enter Canada with a valid US passport.';
+  }
+
+  if (isCanada && nationality === 'CA') {
+    if (mode === 'CAR') {
+      return 'Domestic Canadian road travel requires a valid driver license and vehicle registration.';
+    }
+    if (mode === 'TRAIN' || mode === 'BUS') {
+      return 'Domestic Canadian travel requires valid government photo ID for boarding and ticket verification.';
+    }
+    if (mode === 'CRUISE') {
+      return 'Domestic coastal voyages require valid government photo ID or passport for boarding.';
+    }
+    return 'Domestic Canadian travel requires valid government-issued photo ID.';
+  }
+
+  if (isUS && nationality === 'CA') {
+    if (mode === 'CAR' || mode === 'BUS') {
+      return 'Canadian citizens do not need an ESTA to enter the US with a valid Canadian passport. Present your passport at land border checkpoints.';
+    }
+    if (mode === 'TRAIN') {
+      return 'Canadian citizens do not need an ESTA to enter the US with a valid Canadian passport. Present your passport at rail border clearance.';
+    }
+    if (mode === 'CRUISE') {
+      return 'Canadian citizens do not need an ESTA to enter the US with a valid Canadian passport. Valid passport required for port clearance.';
+    }
+    return 'Canadian citizens do not need an ESTA to enter the US with a valid Canadian passport. Ensure return travel proof is available.';
+  }
+
+  if (isUS && nationality === 'US') {
+    if (mode === 'CAR') {
+      return 'Domestic US road travel requires a valid driver license and vehicle registration.';
+    }
+    if (mode === 'TRAIN' || mode === 'BUS') {
+      return 'Domestic US travel requires valid government-issued photo ID for boarding.';
+    }
+    if (mode === 'CRUISE') {
+      return 'Closed-loop domestic cruises require government-issued photo ID and proof of citizenship (or US passport).';
+    }
+    return 'Domestic US travel requires valid government-issued photo ID.';
+  }
+
+  // General fallback for international destinations when mode is non-air
+  return rawNotes
+    .replace(/\bby air\b/gi, '')
+    .replace(/\bfor air travel directly\b/gi, '')
+    .replace(/\bflights require\b/gi, 'travel requires')
+    .replace(/\bprior to airport check-in\b/gi, 'prior to departure')
+    .replace(/\bbefore airport check-in\b/gi, 'before departure')
+    .replace(/\bairport check-in\b/gi, 'departure check-in')
+    .replace(/\bat airport\b/gi, 'upon arrival')
+    .replace(/\bat airports\b/gi, 'upon arrival')
+    .replace(/\bairport immigration clearance\b/gi, 'immigration clearance')
+    .replace(/\bat major international airports\b/gi, 'upon arrival')
+    .replace(/\bprior to flight\b/gi, 'prior to departure')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function formatPassportRuleForMode(
+  rawRule: string, 
+  mode?: string, 
+  destinationCountry?: string, 
+  nationality?: PassportNationality
+): string {
+  if (!mode || mode === 'PLANE') return rawRule;
+
+  const isCanada = destinationCountry === 'Canada';
+  const isUS = destinationCountry === 'United States';
+
+  if (isCanada && nationality === 'CA') {
+    if (mode === 'CAR') return 'Valid driver license required for domestic road travel';
+    return 'Valid government photo ID required for domestic travel';
+  }
+
+  if (isUS && nationality === 'US') {
+    if (mode === 'CAR') return 'Valid driver license required for domestic road travel';
+    if (mode === 'TRAIN' || mode === 'BUS') return 'Valid government photo ID required for domestic boarding';
+    if (mode === 'CRUISE') return 'Valid government photo ID and citizenship proof required';
+    return 'Valid government photo ID required';
+  }
+
+  return rawRule
+    .replace(/\s+for commercial domestic flights/gi, '')
+    .replace(/\s+for domestic boarding/gi, ' for domestic travel')
+    .trim();
+}
+
+/**
  * Resolves static entry requirements for a given destination text and passport.
+ * Supports mode-aware rule resolution (Plane, Train, Bus, Car, Cruise).
  * If destination is not recognized in static database, returns a graceful fallback pointing to travel.gc.ca or travel.state.gov.
  */
 export function getEntryRequirements(
   destinationText: string | undefined,
-  passportNationality: PassportNationality = 'CA'
+  passportNationality: PassportNationality = 'CA',
+  travelMode?: string
 ): ResolvedEntryRequirement {
   const isCa = passportNationality === 'CA';
   const passportLabel = isCa ? 'Canadian Passport' : 'U.S. Passport';
@@ -1076,17 +1193,20 @@ export function getEntryRequirements(
 
   const info = isCa ? match.ca : match.us;
 
+  const formattedNotes = formatNotesForMode(info.notes, travelMode, match.destinationCountry, passportNationality);
+  const formattedValidityRule = formatPassportRuleForMode(info.passportValidityRule, travelMode, match.destinationCountry, passportNationality);
+
   return {
     destinationFound: true,
     matchedDestinationName: match.destinationCountry,
     passportNationality,
     passportLabel,
-    passportValidityRule: info.passportValidityRule,
+    passportValidityRule: formattedValidityRule,
     visaStatusType: info.visaStatusType,
     visaBadgeText: info.visaBadgeText,
     maxStay: info.maxStay,
     officialSourceUrl: info.officialSourceUrl,
-    notes: info.notes,
+    notes: formattedNotes,
     lastVerified: match.lastVerified,
     disclaimer: 'Reference only — entry rules change. Always confirm with official government sources before you travel.'
   };

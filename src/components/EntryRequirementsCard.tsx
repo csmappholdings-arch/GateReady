@@ -73,10 +73,10 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
   const destinationText = destinationCountry || destinationCity;
   const hasDestination = Boolean(destinationText && destinationText.length > 1);
 
-  // Resolve entry requirement data from static database
+  // Resolve entry requirement data from static database with mode awareness
   const entryData: ResolvedEntryRequirement = useMemo(() => {
-    return getEntryRequirements(destinationText, nationality);
-  }, [destinationText, nationality]);
+    return getEntryRequirements(destinationText, nationality, trip.travelType);
+  }, [destinationText, nationality, trip.travelType]);
 
   // Guaranteed matching official source label and URL for the selected passport
   const officialSourceLabel = nationality === 'CA' ? 'travel.gc.ca Advisory' : 'travel.state.gov Advisory';
