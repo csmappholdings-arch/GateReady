@@ -83,7 +83,9 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                 <td class="py-3 px-4 font-black text-purple-700">
                   ${guide.fees.firstCheckedFee === 0 
                     ? 'FREE ($0)' 
-                    : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}
+                    : guide.fees.currencySymbol.includes(guide.fees.currency)
+                      ? `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee}`
+                      : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}
                 </td>
                 <td class="py-3 px-4 text-slate-500 text-[11px]">${guide.fees.usdEquivalentNote || 'Standard economy ticket'}</td>
               </tr>
@@ -93,7 +95,9 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                 <td class="py-3 px-4 font-black text-purple-700">
                   ${guide.fees.secondCheckedFee === 0 
                     ? 'FREE ($0)' 
-                    : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}
+                    : guide.fees.currencySymbol.includes(guide.fees.currency)
+                      ? `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee}`
+                      : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}
                 </td>
                 <td class="py-3 px-4 text-slate-500 text-[11px]">Online prepaid rate</td>
               </tr>
@@ -101,7 +105,9 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                 <td class="py-3 px-4 font-bold text-slate-900">Overweight Surcharge (51–70 lbs)</td>
                 <td class="py-3 px-4">51 to 70 lbs (24–32 kg)</td>
                 <td class="py-3 px-4 font-black text-rose-600">
-                  +${guide.fees.currencySymbol}${guide.fees.overweightFee51to70lbs} ${guide.fees.currency}
+                  ${guide.fees.currencySymbol.includes(guide.fees.currency)
+                    ? `+${guide.fees.currencySymbol}${guide.fees.overweightFee51to70lbs}`
+                    : `+${guide.fees.currencySymbol}${guide.fees.overweightFee51to70lbs} ${guide.fees.currency}`}
                 </td>
                 <td class="py-3 px-4 text-slate-500 text-[11px]">Charged per overweight piece at the airport counter</td>
               </tr>
@@ -110,7 +116,9 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                   <td class="py-3 px-4 font-bold text-slate-900">Oversize Bag (&gt;62 linear in)</td>
                   <td class="py-3 px-4">&gt;62 linear in (158 cm)</td>
                   <td class="py-3 px-4 font-black text-rose-600">
-                    +${guide.fees.currencySymbol}${guide.fees.oversizeFee} ${guide.fees.currency}
+                    ${guide.fees.currencySymbol.includes(guide.fees.currency)
+                      ? `+${guide.fees.currencySymbol}${guide.fees.oversizeFee}`
+                      : `+${guide.fees.currencySymbol}${guide.fees.oversizeFee} ${guide.fees.currency}`}
                   </td>
                   <td class="py-3 px-4 text-slate-500 text-[11px]">Exceeding standard 62 linear inches (L+W+H)</td>
                 </tr>

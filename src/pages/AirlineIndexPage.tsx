@@ -191,7 +191,9 @@ export const AirlineIndexPage: React.FC = () => {
                     <span className="font-black text-purple-700">
                       {item.fees.firstCheckedFee === 0 
                         ? 'FREE ($0)' 
-                        : `${item.fees.currencySymbol}${item.fees.firstCheckedFee} ${item.fees.currency}`}
+                        : item.fees.currencySymbol.includes(item.fees.currency)
+                          ? `${item.fees.currencySymbol}${item.fees.firstCheckedFee}`
+                          : `${item.fees.currencySymbol}${item.fees.firstCheckedFee} ${item.fees.currency}`}
                     </span>
                   </div>
                 </div>

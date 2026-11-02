@@ -45,6 +45,8 @@ import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { SharePackingListModal } from './SharePackingListModal';
 import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
+import { RebalanceBagsModal } from './RebalanceBagsModal';
+import { RebalanceUpgradeModal } from './RebalanceUpgradeModal';
 
 interface BaggageScreenProps {
   trip: Trip;
@@ -164,46 +166,15 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     return [...bagWeightAnalysis].sort((a, b) => a.pct - b.pct)[0];
   }, [bagWeightAnalysis]);
 
-  const [rebalanceToast, setRebalanceToast] = useState<string | null>(null);
+  const [showRebalanceModal, setShowRebalanceModal] = useState(false);
+  const [showRebalanceUpgradeModal, setShowRebalanceUpgradeModal] = useState(false);
 
-  const handleSmartRebalance = () => {
+  const handleOpenRebalance = () => {
     if (!isPro) {
-      openPaywall("Smart Bag Rebalancer is a Silver+ feature. Upgrade to automatically shift items between bags and avoid steep airline overweight penalty fees.");
+      setShowRebalanceUpgradeModal(true);
       return;
     }
-
-    if (!overweightRiskBag || !lightestBag || overweightRiskBag.bag.id === lightestBag.bag.id) {
-      setRebalanceToast("Bags are already safely balanced!");
-      setTimeout(() => setRebalanceToast(null), 3500);
-      return;
-    }
-
-    // Find the heaviest item from the overweight risk bag
-    const candidateItems = [...overweightRiskBag.bag.items].sort((a, b) => {
-      const wA = (a.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(a.name));
-      const wB = (b.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(b.name));
-      return wB - wA;
-    });
-
-    const itemToMove = candidateItems[0];
-    if (!itemToMove) {
-      setRebalanceToast("No items found to rebalance.");
-      setTimeout(() => setRebalanceToast(null), 3000);
-      return;
-    }
-
-    removeItem(trip.id, overweightRiskBag.bag.id, itemToMove.id);
-    addItemToBag(
-      trip.id,
-      lightestBag.bag.id,
-      itemToMove.name,
-      itemToMove.location,
-      itemToMove.quantity,
-      itemToMove.packedFor
-    );
-
-    setRebalanceToast(`Rebalanced! Moved "${itemToMove.name}" to ${lightestBag.bag.label} to avoid airline penalty fees.`);
-    setTimeout(() => setRebalanceToast(null), 4000);
+    setShowRebalanceModal(true);
   };
 
   const getBagIcon = (type: BagType) => {
@@ -576,19 +547,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                   ? `Major airlines charge steep fees for bags over limits. Shift dense items into ${lightestBag?.bag.label || 'another bag'} to travel free of fees.`
                   : `Shift dense items into ${lightestBag?.bag.label || 'another bag'} to keep your luggage easy to manage and within limits.`}
               </p>
-              {rebalanceToast && (
-                <p className="text-xs font-black text-purple-700 dark:text-purple-300 mt-1.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>{rebalanceToast}</span>
-                </p>
-              )}
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
             <button
               type="button"
-              onClick={handleSmartRebalance}
+              onClick={handleOpenRebalance}
               className={`h-9 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 ${
                 isPro
                   ? 'bg-purple-600 hover:bg-purple-700 text-white'
@@ -596,7 +561,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               }`}
             >
               <Scale className="w-4 h-4" />
-              <span>{isPro ? 'Auto-Rebalance Bags' : 'Unlock Rebalance (Silver+)'}</span>
+              <span>{isPro ? 'Rebalance Bags' : 'Unlock Rebalance (Silver+)'}</span>
             </button>
           </div>
         </div>
@@ -606,9 +571,27 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       {/* 2. VISUAL BAG SELECTOR CARDS                                   */}
       {/* ============================================================== */}
       <div className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          Select Bag to Pack & Manage Items:
-        </label>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Select Bag to Pack &amp; Manage Items:
+          </label>
+          {trip.bags.length >= 2 && (
+            <button
+              type="button"
+              onClick={handleOpenRebalance}
+              className="h-8 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 dark:hover:bg-purple-950/50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              title="Review suggested item shifts across your bags"
+            >
+              <Scale className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Rebalance Bags</span>
+              {!isProOrLoading && (
+                <span className="text-[9px] font-black uppercase bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md">
+                  Silver+
+                </span>
+              )}
+            </button>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {trip.bags.map((bag) => {
@@ -932,7 +915,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                     {carrierCarryOnPolicy.note || 'No weight limit'}.
                   </p>
                   <p className="text-purple-800/80 dark:text-purple-300/80 text-[10px]">
-                    Dimensional guidance: <strong>{carrierCarryOnPolicy.dimensions}</strong> {isFlight ? '(must be light enough to store in overhead without assistance).' : trip.travelType === 'CAR' ? '(vehicle trunk / cargo space).' : '(must be liftable into coach luggage rack unassisted).'}
+                    Dimensional guidance: <strong>{carrierCarryOnPolicy.dimensions}</strong> {isFlight ? '(must be light enough to store in overhead without assistance).' : trip.travelType === 'CAR' ? '(vehicle trunk / cargo space).' : trip.travelType === 'CRUISE' ? '(must fit through terminal screening sizer and stow in stateroom).' : trip.travelType === 'BUS' ? '(under-seat or cargo hold storage).' : '(must be liftable into train luggage rack unassisted).'}
                   </p>
                 </div>
               </div>
@@ -1140,6 +1123,16 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                       <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
                         <span>{item.location}</span>
                         {item.packedFor && <span>· For: {item.packedFor}</span>}
+                        {(() => {
+                          const w = (item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name)) * (item.quantity || 1);
+                          if (w <= 0) return null;
+                          const dispW = weightUnit === 'KG' ? (w * 0.45359237).toFixed(1) + ' kg' : w.toFixed(1) + ' lbs';
+                          return (
+                            <span className="font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.2 rounded">
+                              {dispW}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -1266,6 +1259,26 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
         trip={trip}
         onOpenReferral={onOpenReferral}
       />
+
+      {/* Rebalance Bags Modal (Silver+) */}
+      {showRebalanceModal && (
+        <RebalanceBagsModal
+          isOpen={showRebalanceModal}
+          onClose={() => setShowRebalanceModal(false)}
+          trip={trip}
+        />
+      )}
+
+      {/* Feature Upgrade Modal for Free Users */}
+      {showRebalanceUpgradeModal && (
+        <RebalanceUpgradeModal
+          isOpen={showRebalanceUpgradeModal}
+          onClose={() => setShowRebalanceUpgradeModal(false)}
+          onSeePlans={() =>
+            openPaywall('Rebalance Bags is a Silver+ feature ($1.99/mo or $19.99/yr). Upgrade to balance weight across bags and avoid airline overweight baggage fees.')
+          }
+        />
+      )}
     </div>
   );
 };

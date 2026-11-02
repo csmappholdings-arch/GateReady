@@ -61,6 +61,8 @@ interface PackingContextType {
   ) => void;
   toggleItemPacked: (tripId: string, bagId: string, itemId: string) => void;
   removeItem: (tripId: string, bagId: string, itemId: string) => void;
+  moveItemBetweenBags: (tripId: string, sourceBagId: string, destBagId: string, itemId: string) => void;
+  updateItemCustomWeight: (tripId: string, bagId: string, itemId: string, customWeightLbs: number | undefined) => void;
   updateItemQuantity: (tripId: string, bagId: string, itemId: string, quantity: number) => void;
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
@@ -107,6 +109,7 @@ interface PackingContextType {
     dueOffsetHours?: number
   ) => void;
   removeDepartureReminder: (tripId: string, reminderId: string) => void;
+  clearAllTripsLocalAndState: () => void;
 }
 
 const PackingContext = createContext<PackingContextType | undefined>(undefined);
@@ -643,6 +646,19 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const clearAllTripsLocalAndState = (): void => {
+    setTrips([]);
+    setCurrentTripId('');
+    setSelectedBagId(null);
+    tripsRef.current = [];
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(DELETED_TRIPS_KEY);
+      localStorage.removeItem('gateready_active_trip_id');
+      localStorage.removeItem('gateready_trips_history_v1');
+    } catch {}
+  };
+
   const addItemToBag = (
     tripId: string,
     bagId: string,
@@ -731,6 +747,79 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             return {
               ...bag,
               items: bag.items.filter((item) => item.id !== itemId)
+            };
+          })
+        };
+        updatedTripToSave = updated;
+        return updated;
+      })
+    );
+
+    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+  };
+
+  const moveItemBetweenBags = (
+    tripId: string,
+    sourceBagId: string,
+    destBagId: string,
+    itemId: string
+  ) => {
+    let updatedTripToSave: Trip | null = null;
+
+    setTrips((prev) =>
+      prev.map((trip) => {
+        if (trip.id !== tripId) return trip;
+        const sourceBag = trip.bags.find((b) => b.id === sourceBagId);
+        if (!sourceBag) return trip;
+        const itemToMove = sourceBag.items.find((item) => item.id === itemId);
+        if (!itemToMove) return trip;
+
+        const updated = {
+          ...trip,
+          bags: trip.bags.map((bag) => {
+            if (bag.id === sourceBagId) {
+              return {
+                ...bag,
+                items: bag.items.filter((item) => item.id !== itemId)
+              };
+            }
+            if (bag.id === destBagId) {
+              return {
+                ...bag,
+                items: [...bag.items, itemToMove]
+              };
+            }
+            return bag;
+          })
+        };
+        updatedTripToSave = updated;
+        return updated;
+      })
+    );
+
+    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+  };
+
+  const updateItemCustomWeight = (
+    tripId: string,
+    bagId: string,
+    itemId: string,
+    customWeightLbs: number | undefined
+  ) => {
+    let updatedTripToSave: Trip | null = null;
+
+    setTrips((prev) =>
+      prev.map((trip) => {
+        if (trip.id !== tripId) return trip;
+        const updated = {
+          ...trip,
+          bags: trip.bags.map((bag) => {
+            if (bag.id !== bagId) return bag;
+            return {
+              ...bag,
+              items: bag.items.map((item) =>
+                item.id === itemId ? { ...item, customWeightLbs } : item
+              )
             };
           })
         };
@@ -1278,6 +1367,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addItemToBag,
         toggleItemPacked,
         removeItem,
+        moveItemBetweenBags,
+        updateItemCustomWeight,
         updateItemQuantity,
         updateItemPacker,
         updateTripDetails,
@@ -1295,7 +1386,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateDepartureSchedule,
         toggleDepartureReminder,
         addCustomReminder,
-        removeDepartureReminder
+        removeDepartureReminder,
+        clearAllTripsLocalAndState
       }}
     >
       {children}

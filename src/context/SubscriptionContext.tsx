@@ -121,13 +121,28 @@ export const MAX_FREE_BAGS_TOTAL = 2;
 export const MAX_FREE_ACTIVE_TRIPS = 1;
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading: authLoading, hasCachedAuth } = useAuth();
+  const { user, cachedUser, loading: authLoading, hasCachedAuth } = useAuth();
 
   // 7-day Platinum trial state - strictly tied to account creation
-  const [trialExpiresAt, setTrialExpiresAt] = useState<string | null>(null);
+  const [trialExpiresAt, setTrialExpiresAt] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(TRIAL_EXPIRES_KEY);
+    } catch {
+      return null;
+    }
+  });
 
   // 1-month Referral Platinum state - strictly tied to account creation
-  const [referralFreeMonthExpiresAt, setReferralFreeMonthExpiresAt] = useState<string | null>(null);
+  const [referralFreeMonthExpiresAt, setReferralFreeMonthExpiresAt] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(REFERRAL_EXPIRES_KEY);
+    } catch {
+      return null;
+    }
+  });
+
+  // Track if cloud Firestore profile has loaded
+  const [cloudProfileLoaded, setCloudProfileLoaded] = useState<boolean>(false);
 
   // Pending anonymous referral code in URL waiting for account creation
   const [pendingReferralCode, setPendingReferralCode] = useState<string | null>(() => {
@@ -251,6 +266,20 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (cachedTier === 'PLATINUM' || cachedTier === 'GOLD' || cachedTier === 'SILVER') {
         return cachedTier as SubscriptionTier;
       }
+      const trialSaved = localStorage.getItem(TRIAL_EXPIRES_KEY);
+      if (trialSaved) {
+        const trialTime = new Date(trialSaved).getTime();
+        if (Number.isFinite(trialTime) && trialTime > Date.now()) {
+          return 'PLATINUM';
+        }
+      }
+      const refSaved = localStorage.getItem(REFERRAL_EXPIRES_KEY);
+      if (refSaved) {
+        const refTime = new Date(refSaved).getTime();
+        if (Number.isFinite(refTime) && refTime > Date.now()) {
+          return 'PLATINUM';
+        }
+      }
       if (saved === 'FREE') return 'FREE';
     } catch {
       // Ignore
@@ -267,12 +296,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     (tier === 'PLATINUM' && isMasterKey)
   );
 
+  const hasUserAuth = Boolean(user || cachedUser);
+
   // 1-month Referral Platinum countdown calculation
-  const referralDiffMs = (user && referralFreeMonthExpiresAt)
+  const referralDiffMs = (hasUserAuth && referralFreeMonthExpiresAt)
     ? Math.max(0, new Date(referralFreeMonthExpiresAt).getTime() - nowTick)
     : 0;
 
-  const isReferralPlatinumActive = Boolean(user && referralDiffMs > 0);
+  const isReferralPlatinumActive = Boolean(hasUserAuth && referralDiffMs > 0);
   const referralDaysRemaining = Math.floor(referralDiffMs / (24 * 60 * 60 * 1000));
   const referralHoursRemaining = Math.floor((referralDiffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
   const referralMinutesRemaining = Math.floor((referralDiffMs % (60 * 60 * 1000)) / (60 * 1000));
@@ -287,18 +318,18 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const isReferralExpiringSoon = isReferralPlatinumActive && referralDiffMs <= 3 * 24 * 60 * 60 * 1000;
 
   // 7-day Platinum trial countdown calculation (strictly linked to account creation)
-  const trialDiffMs = (user && trialExpiresAt)
+  const trialDiffMs = (hasUserAuth && trialExpiresAt)
     ? Math.max(0, new Date(trialExpiresAt).getTime() - nowTick)
     : 0;
 
   const isTrialActive = Boolean(
-    user && 
+    hasUserAuth && 
     !hasPaidLicense && 
     !isReferralPlatinumActive && 
     trialDiffMs > 0
   );
   const isTrialExpired = Boolean(
-    user && 
+    hasUserAuth && 
     !hasPaidLicense && 
     !isReferralPlatinumActive && 
     trialExpiresAt !== null && 
@@ -328,12 +359,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     if (!user) {
-      if (!authLoading) {
+      if (!authLoading && !cachedUser) {
         setTier('FREE');
         setTrialExpiresAt(null);
         setReferralFreeMonthExpiresAt(null);
         try {
           localStorage.removeItem('gateready_cached_user_tier');
+          localStorage.removeItem(TRIAL_EXPIRES_KEY);
+          localStorage.removeItem(REFERRAL_EXPIRES_KEY);
         } catch {}
       }
       return;
@@ -343,15 +376,25 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setTier('PLATINUM');
       try {
         localStorage.setItem('gateready_cached_user_tier', 'PLATINUM');
+        localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'PLATINUM');
       } catch {}
+    } else if (!cloudProfileLoaded) {
+      // User is authenticated, but cloud profile hasn't loaded yet.
+      // Hold cached tier instead of flashing FREE
+      const cached = localStorage.getItem('gateready_cached_user_tier');
+      if (cached === 'PLATINUM' || cached === 'GOLD' || cached === 'SILVER') {
+        setTier(cached as SubscriptionTier);
+      } else {
+        setTier('FREE');
+      }
     } else {
       setTier('FREE');
       try {
         localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, 'FREE');
-        localStorage.removeItem('gateready_cached_user_tier');
+        localStorage.setItem('gateready_cached_user_tier', 'FREE');
       } catch {}
     }
-  }, [user, authLoading, hasCachedAuth, hasPaidLicense, isReferralPlatinumActive, isTrialActive]);
+  }, [user, cachedUser, authLoading, hasCachedAuth, hasPaidLicense, isReferralPlatinumActive, isTrialActive, cloudProfileLoaded]);
 
   // Referral program state (Feature 3: tied strictly to authenticated accounts)
   const [referralCode, setReferralCode] = useState<string>(() => {
@@ -369,11 +412,13 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Sync persistent referral code, stats, trial, and referral credit from Firestore when signed in
   useEffect(() => {
     if (!user) {
-      setReferralCode('');
-      setReferralsCount(0);
-      setReferralCreditsMonths(0);
-      setTrialExpiresAt(null);
-      setReferralFreeMonthExpiresAt(null);
+      if (!authLoading && !cachedUser) {
+        setReferralCode('');
+        setReferralsCount(0);
+        setReferralCreditsMonths(0);
+        setTrialExpiresAt(null);
+        setReferralFreeMonthExpiresAt(null);
+      }
       return;
     }
 
@@ -394,6 +439,9 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // Listen to real-time user stats, trial, and referral bonus updates
     const userRef = doc(db, 'users', user.uid);
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      if (isMounted) {
+        setCloudProfileLoaded(true);
+      }
       if (snapshot.exists() && isMounted) {
         const data = snapshot.data();
 
@@ -444,7 +492,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       isMounted = false;
       unsubscribe();
     };
-  }, [user]);
+  }, [user, authLoading, cachedUser]);
 
   // Live simulator / claim handler: each referral provides 1 month of free Platinum
   const claimReferralBonus = () => {
@@ -498,6 +546,9 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       try {
         const userRef = doc(db, 'users', user.uid);
         const snapshot = await getDoc(userRef);
+        if (isMounted) {
+          setCloudProfileLoaded(true);
+        }
         if (snapshot.exists()) {
           const data = snapshot.data();
           const rawTier = data.subscriptionTier;

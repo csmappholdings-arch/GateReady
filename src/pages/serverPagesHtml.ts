@@ -179,7 +179,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     `;
   } else if (pathname === '/privacy') {
     innerContentHtml = `
-      <div class="text-xs text-slate-500 font-medium">Last updated: October 24, 2026</div>
+      <div class="text-xs text-slate-500 font-medium">Last updated: November 1, 2026</div>
       <section class="space-y-3 mt-3">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Privacy Policy</h2>
         <p class="text-slate-700 leading-relaxed">
@@ -198,7 +198,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
         <h3 class="text-xl font-bold text-slate-900">3. User Rights & Data Deletion</h3>
-        <p class="text-xs text-slate-600">You may delete any trip list directly inside the app at any time. To permanently delete your account and associated synced data, email our support team at <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a>.</p>
+        <p class="text-xs text-slate-600">You may delete any trip list directly inside the app at any time. You can permanently delete your account and erase all associated cloud data directly within the app at any time via Settings &rarr; Preferences &rarr; &ldquo;Delete Account &amp; Erase Cloud Data&rdquo;, which permanently deletes your user profile, cloud trips, and checklists in Cloud Firestore, and permanently deletes your authentication record. Alternatively, you can email our support team at <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a> from your registered email address as a fallback.</p>
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
         <h3 class="text-xl font-bold text-slate-900">4. Children's Privacy & Contact</h3>
@@ -361,7 +361,16 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">October 31, 2026 — Head-Tag Verification, Search Architecture & Multi-Modal Mode Integrity Audit</div>
+            <div class="font-bold text-purple-900 text-sm">November 1, 2026 — Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li><strong>Server-Side Account Deletion & Local Purge:</strong> Deleting an account enforces complete server-side deletion of Cloud Firestore user profile, all synced trip records, and the Firebase Auth user record before reporting completion. Local device trip state is completely wiped at deletion time, preventing any resurrected trips or subsequent logins with the same credentials.</li>
+              <li><strong>Complete Plan Pill & Tier Badge Zero-Flash:</strong> Synchronized trial expiration timestamps and subscription tier states from local cache on initial render, ensuring the header immediately displays the user's trial countdown and tier without flashing "Free Plan", "Upgrade PLANS", blank pills, or pulse skeletons on reload or new tabs.</li>
+              <li><strong>Cruise Stateroom Storage Copy Cleanup:</strong> Updated cruise carry-on dimensional guidance to use verified cruise-appropriate wording ("Terminal security clearance sizer · must fit through terminal screening sizer and stow in stateroom"), eliminating bus/coach terminology on cruise itineraries.</li>
+              <li><strong>Privacy Policy §5 In-App Deletion Synchronization:</strong> Updated Privacy Policy §5 (User Rights & Data Deletion) to document the in-app "Delete Account & Erase Cloud Data" control as the primary instant deletion mechanism, with email support as the fallback route.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">October 31, 2026 — Head-Tag Verification, Search Architecture & Multi-Modal Mode Integrity Audit</div>
             <div class="text-xs text-slate-700 mt-2 space-y-2">
               <p>Verified live head tags (canonical URLs, unique meta descriptions, absolute og:image and twitter:image URLs) across 6 sampled routes:</p>
               <div class="overflow-x-auto">

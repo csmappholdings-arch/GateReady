@@ -71,7 +71,8 @@ export const Header: React.FC<HeaderProps> = ({
     deleteTrip,
     cloudSyncStatus,
     lastSyncedAt,
-    manualSync
+    manualSync,
+    clearAllTripsLocalAndState
   } = usePacking();
 
   const { user, signIn, signOut, loading: authLoading, cachedUser, hasCachedAuth, error: authError, clearError, resendVerificationEmail } = useAuth();
@@ -282,13 +283,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <Gift className="w-3 h-3 text-amber-200 shrink-0" />
                 <span className="whitespace-nowrap">Claim 1-Mo Platinum</span>
               </button>
-            ) : authLoading ? (
+            ) : (authLoading && !hasCachedAuth) ? (
               <span className="w-16 h-5 bg-white/10 rounded-full animate-pulse inline-block" />
             ) : isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
               </span>
-            ) : user ? (
+            ) : (user || (authLoading && cachedUser)) ? (
               <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2.5 py-1 rounded-full">
                 Free Plan
               </span>
@@ -299,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Center / Right: Streamlined Action Buttons, Free Month Pill, Sync Account & Settings */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Pro Upgrade / Badge Button */}
-          {authLoading ? (
+          {authLoading && !hasCachedAuth ? (
             <div className="h-8.5 sm:h-9 w-20 rounded-xl bg-white/10 border border-white/15 animate-pulse" />
           ) : !isPro ? (
             <button
@@ -1384,15 +1385,17 @@ export const Header: React.FC<HeaderProps> = ({
                   setDeleteAccountError(null);
                   try {
                     await deleteUserAccountAndData(user.uid);
-                    try {
-                      localStorage.removeItem('gateready_trips_data_v2');
-                      localStorage.removeItem('gateready_deleted_trip_ids_v1');
-                    } catch {}
+                    clearAllTripsLocalAndState();
                     await signOut();
                     setShowDeleteAccountModal(false);
                   } catch (err: any) {
                     console.error('Account deletion error:', err);
-                    setDeleteAccountError(err?.message || 'Failed to delete account. Please try again or re-authenticate.');
+                    const isRecentLogin = err?.code === 'auth/requires-recent-login';
+                    setDeleteAccountError(
+                      isRecentLogin
+                        ? 'For security reasons, deleting your account requires a recent sign-in. Please sign out and sign back in, then delete your account.'
+                        : (err?.message || 'Failed to delete account. Server deletion could not be completed.')
+                    );
                   } finally {
                     setIsDeletingAccount(false);
                   }

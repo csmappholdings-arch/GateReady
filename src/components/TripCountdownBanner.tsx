@@ -65,7 +65,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
   const padZero = (n: number) => n.toString().padStart(2, '0');
 
   const formatTargetDate = (dateStr?: string, timeStr?: string) => {
-    if (!dateStr) return 'Not set';
+    if (!dateStr) return '';
     try {
       const cleanDate = dateStr.trim();
       const hasTime = Boolean(timeStr && timeStr.trim());

@@ -12,7 +12,8 @@ import {
   sendPasswordResetEmail,
   updateProfile,
   getAdditionalUserInfo,
-  sendEmailVerification
+  sendEmailVerification,
+  deleteUser
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -140,7 +141,11 @@ export async function resetPassword(email: string): Promise<void> {
 }
 
 export async function signOutUser(): Promise<void> {
-  await firebaseSignOut(auth);
+  try {
+    await firebaseSignOut(auth);
+  } catch (err) {
+    console.warn('Sign-out client warning (e.g. user already deleted):', err);
+  }
 }
 
 export async function syncUserProfile(user: User): Promise<void> {
@@ -541,30 +546,34 @@ export async function syncLocalTripsToCloud(userId: string, localTrips: Trip[]):
 
 export async function deleteUserAccountAndData(userId: string): Promise<void> {
   if (!userId) return;
-  try {
-    // 1. Delete all trips in users/{userId}/trips
-    const tripsColl = collection(db, 'users', userId, 'trips');
-    const snapshot = await getDocs(tripsColl);
-    const batch = writeBatch(db);
-    snapshot.forEach((docSnap) => {
-      batch.delete(docSnap.ref);
-    });
-    // 2. Delete user profile doc in users/{userId}
-    const userDocRef = doc(db, 'users', userId);
-    batch.delete(userDocRef);
-    await batch.commit();
 
-    // 3. Delete Firebase Auth user account if matching active current user
-    if (auth.currentUser && auth.currentUser.uid === userId) {
-      try {
-        await auth.currentUser.delete();
-      } catch (authErr) {
-        console.warn('Auth user delete note (e.g. requires fresh login):', authErr);
-        await firebaseSignOut(auth);
-      }
-    }
-  } catch (err) {
-    console.error(`Failed to delete account and data for user ${userId}:`, err);
-    throw err;
+  const currentUser = auth.currentUser;
+  if (!currentUser || currentUser.uid !== userId) {
+    throw new Error('Authentication mismatch: Cannot delete account without an active authenticated session.');
   }
+
+  // 1. Delete all trips in users/{userId}/trips
+  const tripsColl = collection(db, 'users', userId, 'trips');
+  const snapshot = await getDocs(tripsColl);
+  const batch = writeBatch(db);
+  snapshot.forEach((docSnap) => {
+    batch.delete(docSnap.ref);
+  });
+
+  // 2. Delete user profile doc in users/{userId}
+  const userDocRef = doc(db, 'users', userId);
+  batch.delete(userDocRef);
+
+  // Commit Firestore batch delete first and await server confirmation
+  await batch.commit();
+
+  // 3. Delete Firebase Auth user account - DO NOT swallow error.
+  // Refresh token first to ensure credentials are fresh
+  try {
+    await currentUser.getIdToken(true);
+  } catch (refreshErr) {
+    console.warn('Token refresh warning prior to deletion:', refreshErr);
+  }
+
+  await deleteUser(currentUser);
 }

@@ -7,7 +7,7 @@ export const PrivacyPage: React.FC = () => {
     <PageLayout pathname="/privacy">
       <div className="space-y-6">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-          <span>Last updated: October 25, 2026</span>
+          <span>Last updated: November 1, 2026</span>
           <span className="font-semibold text-purple-600 dark:text-purple-400">CSM App Holdings</span>
         </div>
 
@@ -100,7 +100,7 @@ export const PrivacyPage: React.FC = () => {
           <p>You have complete control over your data:</p>
           <ul className="list-disc list-inside space-y-1 text-xs text-slate-600 dark:text-slate-400">
             <li><strong>Deleting Trips:</strong> You can delete any trip at any time directly in the app by selecting the trip settings menu and choosing &ldquo;Delete Trip&rdquo;. This removes the trip locally and from cloud storage.</li>
-            <li><strong>Account Deletion:</strong> To completely erase your account and all associated data, email us at <a href="mailto:csmappholdings@gmail.com" className="text-purple-600 dark:text-purple-400 font-bold underline">csmappholdings@gmail.com</a> with your registered email address. We will permanently delete your account record within 5 business days.</li>
+            <li><strong>Account Deletion:</strong> You can permanently delete your account and erase all associated cloud data directly within the app at any time by opening Settings &rarr; Preferences and selecting &ldquo;Delete Account &amp; Erase Cloud Data&rdquo;. This immediately and permanently deletes your user profile, trips, and luggage checklists in Cloud Firestore, and permanently deletes your authentication record. Alternatively, you can email our support team at <a href="mailto:csmappholdings@gmail.com" className="text-purple-600 dark:text-purple-400 font-bold underline">csmappholdings@gmail.com</a> from your registered email address as a fallback, and we will manually process permanent deletion.</li>
           </ul>
         </section>
 

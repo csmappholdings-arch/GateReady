@@ -70,9 +70,23 @@ import {
 
 function PackingAppContent() {
   const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip } = usePacking();
-  const { isPro, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
+  const { isPro, isTrialActive, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
   const { user, resendVerificationEmail } = useAuth();
   const [resentEmailNotice, setResentEmailNotice] = useState(false);
+  const [dismissedEmailVerify, setDismissedEmailVerify] = useState(() => {
+    try {
+      return localStorage.getItem('gateready_email_verify_dismissed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleDismissEmailVerify = () => {
+    setDismissedEmailVerify(true);
+    try {
+      localStorage.setItem('gateready_email_verify_dismissed', 'true');
+    } catch {}
+  };
 
   const [currentScreen, setCurrentScreen] = useState<'Bags' | 'Checklist' | 'CabinIntel' | 'Allowances' | 'GateReady'>('Bags');
   const [showAddTripModal, setShowAddTripModal] = useState(false);
@@ -460,27 +474,38 @@ function PackingAppContent() {
       )}
 
       {/* Item 10: Non-blocking email verification prompt */}
-      {user && !user.emailVerified && user.providerData.some((p) => p.providerId === 'password') && (
+      {user && !user.emailVerified && !isTrialActive && !dismissedEmailVerify && user.providerData.some((p) => p.providerId === 'password') && (
         <div className="bg-amber-500/15 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-4 py-2 text-xs flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span>
+            <span className="truncate">
               Please verify your email address (<strong>{user.email}</strong>). We sent a verification link to your inbox.
             </span>
           </div>
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                await resendVerificationEmail();
-                setResentEmailNotice(true);
-                setTimeout(() => setResentEmailNotice(false), 5000);
-              } catch {}
-            }}
-            className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-colors cursor-pointer shrink-0"
-          >
-            {resentEmailNotice ? 'Verification link sent!' : 'Resend link'}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await resendVerificationEmail();
+                  setResentEmailNotice(true);
+                  setTimeout(() => setResentEmailNotice(false), 5000);
+                } catch {}
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-colors cursor-pointer shrink-0"
+            >
+              {resentEmailNotice ? 'Verification link sent!' : 'Resend link'}
+            </button>
+            <button
+              type="button"
+              onClick={handleDismissEmailVerify}
+              className="p-1 rounded-lg hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 transition-colors cursor-pointer"
+              title="Dismiss verification reminder"
+              aria-label="Dismiss verification banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
 

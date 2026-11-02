@@ -282,7 +282,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                   <td className="py-3 px-4 font-black text-purple-700">
                     {guide.fees.firstCheckedFee === 0 
                       ? 'FREE ($0)' 
-                      : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}
+                      : guide.fees.currencySymbol.includes(guide.fees.currency)
+                        ? `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee}`
+                        : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}
                   </td>
                   <td className="py-3 px-4 text-slate-500 text-[11px]">
                     {guide.fees.usdEquivalentNote || 'Standard economy ticket'}
@@ -294,7 +296,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                   <td className="py-3 px-4 font-black text-purple-700">
                     {guide.fees.secondCheckedFee === 0 
                       ? 'FREE ($0)' 
-                      : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}
+                      : guide.fees.currencySymbol.includes(guide.fees.currency)
+                        ? `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee}`
+                        : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}
                   </td>
                   <td className="py-3 px-4 text-slate-500 text-[11px]">Online rate (airport desk fees may be higher)</td>
                 </tr>
@@ -302,7 +306,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                   <td className="py-3 px-4 font-bold text-slate-900">Overweight Surcharge (51–70 lbs)</td>
                   <td className="py-3 px-4">51 to 70 lbs (24–32 kg)</td>
                   <td className="py-3 px-4 font-black text-rose-600">
-                    +{guide.fees.currencySymbol}{guide.fees.overweightFee51to70lbs} {guide.fees.currency}
+                    {guide.fees.currencySymbol.includes(guide.fees.currency)
+                      ? `+${guide.fees.currencySymbol}${guide.fees.overweightFee51to70lbs}`
+                      : `+${guide.fees.currencySymbol}${guide.fees.overweightFee51to70lbs} ${guide.fees.currency}`}
                   </td>
                   <td className="py-3 px-4 text-slate-500 text-[11px]">Charged per overweight piece at the airport counter</td>
                 </tr>
@@ -311,7 +317,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                     <td className="py-3 px-4 font-bold text-slate-900">Oversize Bag (&gt;62 linear in)</td>
                     <td className="py-3 px-4">&gt;62 linear in (158 cm)</td>
                     <td className="py-3 px-4 font-black text-rose-600">
-                      +{guide.fees.currencySymbol}{guide.fees.oversizeFee} {guide.fees.currency}
+                      {guide.fees.currencySymbol.includes(guide.fees.currency)
+                        ? `+${guide.fees.currencySymbol}${guide.fees.oversizeFee}`
+                        : `+${guide.fees.currencySymbol}${guide.fees.oversizeFee} ${guide.fees.currency}`}
                     </td>
                     <td className="py-3 px-4 text-slate-500 text-[11px]">Length + width + height exceeding standard limit</td>
                   </tr>
@@ -396,7 +404,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                 How much does a checked bag cost on {guide.name}?
               </h3>
               <p className="text-slate-600 leading-relaxed">
-                For standard Economy passengers, the first checked bag is {guide.fees.firstCheckedFee === 0 ? 'free ($0)' : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}, and the second checked bag is {guide.fees.secondCheckedFee === 0 ? 'free ($0)' : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}. Premium cabin passengers often receive additional complimentary luggage.
+                For standard Economy passengers, the first checked bag is {guide.fees.firstCheckedFee === 0 ? 'free ($0)' : guide.fees.currencySymbol.includes(guide.fees.currency) ? `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee}` : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}, and the second checked bag is {guide.fees.secondCheckedFee === 0 ? 'free ($0)' : guide.fees.currencySymbol.includes(guide.fees.currency) ? `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee}` : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}. Premium cabin passengers often receive additional complimentary luggage.
               </p>
             </div>
 

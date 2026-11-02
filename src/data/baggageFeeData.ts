@@ -201,7 +201,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    usdEquivalentNote: 'approx ~$26 USD / ~$37 USD',
+    usdEquivalentNote: 'approx ~$26 USD (1st bag) / ~$37 USD (2nd bag)',
     feeNotes: 'Standard domestic & transborder Basic/Standard economy. Aeroplan Elite or premium credit cardholders receive 1-3 free bags. Business Class includes 2 bags (70 lbs).',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.aircanada.com/ca/en/aco/home/plan/baggage/checked.html'
@@ -217,7 +217,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    usdEquivalentNote: 'approx ~$26 USD / ~$37 USD',
+    usdEquivalentNote: 'approx ~$26 USD (1st bag) / ~$37 USD (2nd bag)',
     feeNotes: 'UltraBasic fares do NOT include an overhead carry-on. Standard Econo: $35 CAD first bag, $50 CAD second bag. WestJet RBC World Elite Mastercard includes 1st bag free.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.westjet.com/en-ca/baggage/fees'
@@ -233,7 +233,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    usdEquivalentNote: 'approx ~$26 USD / ~$37 USD',
+    usdEquivalentNote: 'approx ~$26 USD (1st bag) / ~$37 USD (2nd bag)',
     feeNotes: 'PorterClassic Standard includes free carry-on. PorterClassic Basic excludes carry-on ($35 CAD fee to check). 1st checked bag $35-$40 CAD online.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.flyporter.com/en-ca/travel-information/baggage'
@@ -249,7 +249,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    usdEquivalentNote: 'approx ~$30 USD / ~$41 USD',
+    usdEquivalentNote: 'approx ~$30 USD (1st bag) / ~$41 USD (2nd bag)',
     feeNotes: 'Standard Eco Budget fares exclude checked baggage ($40 CAD online). Standard carry-on roller (22 lbs) is free on all fares.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.airtransat.com/en-CA/travel-information/baggage'
@@ -283,7 +283,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 65,
     oversizeFee: 65,
-    usdEquivalentNote: 'approx ~$45 USD / ~$85 USD',
+    usdEquivalentNote: 'approx ~$45 USD (1st bag) / ~$85 USD (2nd bag)',
     feeNotes: 'Economy Standard / Club Europe includes 1-2 checked bags free (51 lbs). Hand Baggage Only (Basic) fares charge £35 first checked bag.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.britishairways.com/en-gb/information/baggage-essentials'
@@ -299,7 +299,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 75,
     oversizeFee: 75,
-    usdEquivalentNote: 'approx ~$33 USD / ~$82 USD',
+    usdEquivalentNote: 'approx ~$33 USD (1st bag) / ~$82 USD (2nd bag)',
     feeNotes: 'Standard economy includes 1 free checked bag (23 kg). "Light" unbundled fares charge €30 online for the 1st checked bag (€70 at airport).',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://wwws.airfrance.us/information/bagages'
@@ -315,7 +315,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 65,
     oversizeFee: 100,
-    usdEquivalentNote: 'approx ~$33 USD / ~$87 USD',
+    usdEquivalentNote: 'approx ~$33 USD (1st bag) / ~$87 USD (2nd bag)',
     feeNotes: 'Economy Classic & Flex include 1 checked bag (23 kg) free. Economy Light charges €30 online for the 1st bag (€60 at airport). Overweight up to 32 kg is €65.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.lufthansa.com/us/en/free-baggage-rules'
@@ -378,7 +378,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 60,
     oversizeFee: 75,
-    usdEquivalentNote: 'approx ~$27 USD / ~$49 USD',
+    usdEquivalentNote: 'approx ~$27 USD (1st bag) / ~$49 USD (2nd bag)',
     feeNotes: 'Standard fares include 1 free checked bag (23 kg). "Basic" unbundled fares charge €25-€35 online for the 1st checked bag. Carry-on + personal item free.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.iberia.com/us/baggage/'
@@ -394,7 +394,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 55,
     oversizeFee: 75,
-    usdEquivalentNote: 'approx ~$33 USD / ~$65 USD',
+    usdEquivalentNote: 'approx ~$33 USD (1st bag) / ~$65 USD (2nd bag)',
     feeNotes: 'SAS Go includes 1 free checked bag (23 kg). SAS Go Light unbundled fare charges €30 online for 1st bag (€60 at gate). SAS Plus/Business includes 2 bags (32 kg).',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.flysas.com/en/travel-info/baggage/'
@@ -410,7 +410,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 65,
     oversizeFee: 65,
-    usdEquivalentNote: 'approx ~$65 USD / ~$85 USD',
+    usdEquivalentNote: 'approx ~$65 USD (1st bag) / ~$85 USD (2nd bag)',
     feeNotes: 'Economy Classic & Delight include 1 free checked bag (23 kg / 50 lbs). Economy Light unbundled charges £50 online for 1st checked bag.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.virginatlantic.com/us/en/travel-information/baggage.html'
@@ -426,7 +426,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 60,
     oversizeFee: 75,
-    usdEquivalentNote: 'approx ~$33 USD / ~$65 USD',
+    usdEquivalentNote: 'approx ~$33 USD (1st bag) / ~$65 USD (2nd bag)',
     feeNotes: 'Classic economy includes 1 free 23 kg bag. Light unbundled fare charges €30 online for the 1st checked bag (€60 airport). Business includes 2 bags (32 kg).',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.ita-airways.com/en_us/fly-ita/baggage.html'
@@ -442,7 +442,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 60,
     oversizeFee: 75,
-    usdEquivalentNote: 'approx ~$33 USD / ~$60 USD',
+    usdEquivalentNote: 'approx ~$33 USD (1st bag) / ~$60 USD (2nd bag)',
     feeNotes: 'Basic / Classic includes 1 free checked bag. "Discount" unbundled fare charges €30 online for 1st checked bag. Executive includes 2 bags (32 kg).',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.flytap.com/en-us/baggage'
@@ -458,7 +458,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 60,
     oversizeFee: 75,
-    usdEquivalentNote: 'approx ~$33 USD / ~$65 USD',
+    usdEquivalentNote: 'approx ~$33 USD (1st bag) / ~$65 USD (2nd bag)',
     feeNotes: 'Classic/Flex includes 1 checked bag (23 kg). "Superlight" / "Light" charges €30 for checked bag and €9-€14 for overhead trolley. Business includes 1-2 bags.',
     lastVerified: 'October 15, 2026',
     officialBaggagePageUrl: 'https://www.finnair.com/en/baggage-on-finnair-flights'

@@ -14,10 +14,62 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Release Oct 31, 2026 */}
+      {/* Release Nov 1, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 1, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Permanent Server-Side Account Deletion & Local Data Purge</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Enforced strict server-side completion of account deletion: the Cloud Firestore user profile, all synced trip records, and the Firebase Authentication user record are all permanently deleted before sign-out is reported. Local device trip state is completely purged at deletion time, preventing any resurrected trips on future visits or subsequent logins.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Complete Plan Pill & Tier Badge Zero-Flash (Reload & New Tab)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Eliminated post-reload and new-tab plan pill flashes for authenticated users: trial expiration timestamps and active subscription tier states are held synchronously from cache, ensuring the header immediately renders "Platinum trial" and "PLATINUM Active" (or paid/free tiers) without ever flashing "Free Plan", "Upgrade PLANS", blank pills, or pulse loading skeletons.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Cruise Stateroom Storage Copy Cleanup</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Updated cruise carry-on dimensional guidance to use verified cruise-appropriate wording ("Terminal security clearance sizer · must fit through terminal screening sizer and stow in stateroom"), completely eliminating bus/coach terminology on cruise itineraries.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Privacy Policy §5 In-App Deletion Synchronization</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Updated Privacy Policy §5 (User Rights & Data Deletion) to document the in-app "Delete Account & Erase Cloud Data" control as the primary instant deletion mechanism, with email support as the fallback route.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Release Oct 31, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-mono text-xs font-bold">
             October 31, 2026
           </span>
           <span className="text-xs text-slate-500 font-medium">Head-Tag Verification, Search Architecture & Multi-Modal Mode Integrity Audit</span>

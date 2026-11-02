@@ -830,7 +830,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                  'Airline'}
               </span>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">
-                {currentTrip.companyName || (isCar ? 'Personal / Rental Vehicle' : 'Not set')}
+                {currentTrip.companyName ? (
+                  currentTrip.companyName
+                ) : isCar ? (
+                  'Personal / Rental Vehicle'
+                ) : (
+                  <span className="text-slate-400 dark:text-slate-500 font-normal italic text-xs">
+                    Add {isCruise ? 'cruise line' : isTrain ? 'rail operator' : isBus ? 'bus operator' : 'airline'}
+                  </span>
+                )}
               </p>
               <p className="text-[11px] text-indigo-600 dark:text-indigo-300 font-semibold leading-tight mt-0.5">
                 {currentTrip.flightNumber
@@ -863,7 +871,13 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               </span>
               <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                 <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                  {currentTrip.seatClassOrCarSize || 'Not set'}
+                  {currentTrip.seatClassOrCarSize ? (
+                    currentTrip.seatClassOrCarSize
+                  ) : (
+                    <span className="text-slate-400 dark:text-slate-500 font-normal italic text-xs">
+                      Add {isCruise ? 'stateroom' : isCar ? 'vehicle size' : isTrain ? 'class of service' : isBus ? 'seat type' : 'cabin class'}
+                    </span>
+                  )}
                 </p>
                 {isFlight && currentFareFamilyObj && (
                   <span className="text-[10px] font-black uppercase tracking-wider bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
