@@ -104,10 +104,29 @@ export const ContactPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Feedback Direct Channel */}
+      <section className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/60 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <div className="font-bold text-slate-900 dark:text-white text-xs">Have a Suggestion, Feature Request, or Bug Report?</div>
+          <div className="text-[11px] text-slate-500">Submit directly through our structured feedback form with instant engineering team delivery.</div>
+        </div>
+        <a 
+          href="/feedback" 
+          className="h-8 px-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <span>Send Feedback</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </a>
+      </section>
+
       {/* Quick Navigation Links */}
       <section className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
         <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Related Legal & Product Information</div>
         <div className="flex flex-wrap gap-2 text-xs">
+          <a href="/feedback" className="px-3 py-1.5 rounded-lg bg-purple-100/70 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:text-purple-900 inline-flex items-center gap-1 font-bold">
+            <span>Feedback & Suggestions</span>
+            <ArrowRight className="w-3 h-3" />
+          </a>
           <a href="/about" className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-purple-600 inline-flex items-center gap-1 font-medium">
             <span>About GateReady</span>
             <ArrowRight className="w-3 h-3" />

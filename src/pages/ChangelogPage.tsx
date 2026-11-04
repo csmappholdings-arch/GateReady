@@ -14,10 +14,82 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Release Nov 1, 2026 */}
+      {/* Release Nov 2, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 2, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Rebalance Bags Luggage Optimizer, Fare-Family Single Source of Truth & Settings Reachability</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Rebalance Bags Luggage Optimizer (Silver+)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Launched the Rebalance Bags Luggage Optimizer for Silver+ travelers. When any suitcase exceeds weight limits or approaches capacity, Rebalance evaluates your luggage manifest and suggests safe item transfers to lighter bags. Built strictly suggest-first with 1-click apply and complete undo. Rigidly enforces airline safety guardrails (never moving keys, passports, medications, or lithium power banks into checked bags) and displays an honest notice when no safe move exists.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Fare-Family Single Source of Truth & Zero-Race Persistence</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Eliminated cloud-sync race conditions when changing fare families (Standard, Comfort/Latitude, Business). Trip banner writes through with server confirmation before the UI treats changes as saved, and re-reads the fresh saved fare whenever switching trips or opening the New Trip dialog.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Settings Modal Layout & Delete Account Button Visibility</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Fixed vertical viewport constraints in Settings & Preferences dropdown (`max-h-[85vh]` with smooth scrolling and sticky title), ensuring "Delete Account & Erase Cloud Data" is immediately visible and clickable by mouse/touch on any screen size.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Luggage Weight Math Unification</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Unified weight calculation math across Rebalance simulation and post-apply luggage state into a single formula (`calculateBagTotalWeightLbs` with consistent 1-decimal rounding), eliminating 0.1 lb prediction discrepancies.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>USD Currency Split Across Airline Guides</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Separated 1st-bag and 2nd-bag USD conversion notes onto their own table rows across Air Canada and WestJet guides in both SPA and server-rendered HTML.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Dedicated User Feedback Channel (/feedback)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Added a dedicated feedback page with categorized topics (Bug report, Feature idea, Pricing or billing, Something else), secure server-side email dispatch to support, rate limiting, and spam protection.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Release Nov 1, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-mono text-xs font-bold">
             November 1, 2026
           </span>
           <span className="text-xs text-slate-500 font-medium">Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</span>
@@ -61,6 +133,26 @@ export const ChangelogPage: React.FC = () => {
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Updated Privacy Policy §5 (User Rights & Data Deletion) to document the in-app "Delete Account & Erase Cloud Data" control as the primary instant deletion mechanism, with email support as the fallback route.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Airline Currency Formatting & USD Equivalence Clarity</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Removed duplicate currency codes across airline guides and search index cards (rendering clean figures like "CAD $35"). Explicitly labelled all USD approximation figures across Canadian and European carrier guides with the exact bag tier they represent ("(1st bag) / (2nd bag)").
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Dismissible Email Verification Banner & Trip Header Placeholders</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Made email verification banners dismissible with persistence and prevented nagging active trial accounts. Removed raw "Not set" labels on optional trip banner fields in favor of clean, neutral prompts.
             </p>
           </div>
         </div>

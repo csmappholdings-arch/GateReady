@@ -560,14 +560,27 @@ export async function deleteUserAccountAndData(userId: string): Promise<void> {
     batch.delete(docSnap.ref);
   });
 
-  // 2. Delete user profile doc in users/{userId}
+  // 2. Inspect user doc to clean up any registered referral code document
   const userDocRef = doc(db, 'users', userId);
+  try {
+    const userSnap = await getDoc(userDocRef);
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      if (data?.referralCode) {
+        batch.delete(doc(db, 'referral_codes', data.referralCode));
+      }
+    }
+  } catch (refErr) {
+    console.warn('Could not inspect referral code before deletion:', refErr);
+  }
+
+  // 3. Delete user profile doc in users/{userId}
   batch.delete(userDocRef);
 
   // Commit Firestore batch delete first and await server confirmation
   await batch.commit();
 
-  // 3. Delete Firebase Auth user account - DO NOT swallow error.
+  // 4. Delete Firebase Auth user account - DO NOT swallow error.
   // Refresh token first to ensure credentials are fresh
   try {
     await currentUser.getIdToken(true);

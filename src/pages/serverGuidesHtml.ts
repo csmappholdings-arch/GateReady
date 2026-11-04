@@ -1,7 +1,9 @@
 import { AIRLINE_GUIDES, AirlineGuideItem } from '../data/airlineGuidesData';
+import { getSplitBagUsdNotes } from '../data/baggageFeeData';
 
 export function getAirlinePageHtml(guide: AirlineGuideItem): string {
   const isNoLimit = (guide.limits.carryOnWeightLimit || '').toLowerCase().includes('no');
+  const { firstBagNote, secondBagNote } = getSplitBagUsdNotes(guide.fees);
 
   return `
     <div class="space-y-8">
@@ -87,7 +89,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                       ? `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee}`
                       : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}
                 </td>
-                <td class="py-3 px-4 text-slate-500 text-[11px]">${guide.fees.usdEquivalentNote || 'Standard economy ticket'}</td>
+                <td class="py-3 px-4 text-slate-500 text-[11px]">${firstBagNote}</td>
               </tr>
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900">2nd Checked Suitcase</td>
@@ -99,7 +101,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                       ? `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee}`
                       : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}
                 </td>
-                <td class="py-3 px-4 text-slate-500 text-[11px]">Online prepaid rate</td>
+                <td class="py-3 px-4 text-slate-500 text-[11px]">${secondBagNote}</td>
               </tr>
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900">Overweight Surcharge (51–70 lbs)</td>

@@ -23,12 +23,12 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       id: 'standard',
       name: 'Standard / Flex Economy',
       isDefault: true,
-      includedCheckedBags: 0,
-      firstCheckedFee: 35,
+      includedCheckedBags: 1,
+      firstCheckedFee: 0,
       secondCheckedFee: 50,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Standard Economy: 1st checked bag $35 CAD, 2nd $50 CAD. Free overhead carry-on included (no weight limit).'
+      fareNote: 'Standard Economy includes 1 free checked bag (up to 50 lbs / 23 kg) + free overhead carry-on (no weight limit). 2nd checked bag is $50 CAD.'
     },
     {
       id: 'basic',
@@ -38,7 +38,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 50,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Basic Economy: non-refundable, 1st checked bag $35 CAD, 2nd $50 CAD. Free carry-on roller included.'
+      fareNote: 'Basic Economy: unbundled non-refundable fare. 1st checked bag $35 CAD, 2nd $50 CAD. Free carry-on roller included.'
     },
     {
       id: 'latitude',
@@ -67,12 +67,12 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       id: 'standard',
       name: 'Econo / EconoFlex',
       isDefault: true,
-      includedCheckedBags: 0,
-      firstCheckedFee: 35,
+      includedCheckedBags: 1,
+      firstCheckedFee: 0,
       secondCheckedFee: 50,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Standard Econo: $35 CAD 1st bag, $50 CAD 2nd bag. Free overhead carry-on included (no maximum weight limit).'
+      fareNote: 'Standard Econo includes 1 free checked bag (up to 50 lbs / 23 kg) + free overhead carry-on. 2nd checked bag is $50 CAD.'
     },
     {
       id: 'ultrabasic',

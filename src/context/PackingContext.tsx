@@ -68,7 +68,8 @@ interface PackingContextType {
   updateTripDetails: (
     tripId: string,
     details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
-  ) => void;
+  ) => Promise<Trip>;
+  refreshActiveTrip: () => void;
   updateLuggageTag: (
     tripId: string,
     bagId: string,
@@ -264,6 +265,9 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     tripsRef.current = trips;
   }, [trips]);
 
+  // Track recent local updates to protect against stale remote onSnapshot races
+  const recentLocalUpdatesRef = useRef<Map<string, { updatedAt: number; trip: Trip }>>(new Map());
+
   // Listen to Firestore real-time trips when authenticated
   useEffect(() => {
     if (!user) {
@@ -321,10 +325,29 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           }
 
-          setTrips(activeCloudTrips);
+          // Merge with any recent local write-through updates that haven't been confirmed yet
+          const safeTrips = activeCloudTrips.map((ct) => {
+            const local = recentLocalUpdatesRef.current.get(ct.id);
+            if (local && Date.now() - local.updatedAt < 8000) {
+              return {
+                ...ct,
+                ...local.trip,
+                fareFamily: local.trip.fareFamily,
+                modeProfiles: local.trip.modeProfiles || ct.modeProfiles
+              };
+            }
+            return ct;
+          });
+
+          setTrips(safeTrips);
+          tripsRef.current = safeTrips;
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(safeTrips));
+          } catch {}
+
           setCurrentTripId((prev) => {
-            if (prev && activeCloudTrips.some((t) => t.id === prev)) return prev;
-            return activeCloudTrips[0]?.id || '';
+            if (prev && safeTrips.some((t) => t.id === prev)) return prev;
+            return safeTrips[0]?.id || '';
           });
           setCloudSyncStatus('synced');
           setLastSyncedAt(new Date());
@@ -397,13 +420,38 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [currentTrip, selectedBagId]);
 
   const selectTrip = (trip: Trip) => {
-    setCurrentTripId(trip.id);
-    if (trip.bags.length > 0) {
-      setSelectedBagId(trip.bags[0].id);
+    // Single source of truth: re-read freshest trip from tripsRef or localStorage
+    let freshTrip = tripsRef.current.find((t) => t.id === trip.id);
+    if (!freshTrip) {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed: Trip[] = JSON.parse(raw);
+          freshTrip = parsed.find((t) => t.id === trip.id);
+        }
+      } catch {}
+    }
+    const target = freshTrip || trip;
+    setCurrentTripId(target.id);
+    if (target.bags && target.bags.length > 0) {
+      setSelectedBagId(target.bags[0].id);
     } else {
       setSelectedBagId(null);
     }
   };
+
+  const refreshActiveTrip = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed: Trip[] = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          tripsRef.current = parsed;
+          setTrips(parsed);
+        }
+      }
+    } catch {}
+  }, []);
 
   const toggleWeightUnit = () => {
     setWeightUnit((prev) => (prev === 'LBS' ? 'KG' : 'LBS'));
@@ -652,7 +700,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSelectedBagId(null);
     tripsRef.current = [];
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, '[]');
       localStorage.removeItem(DELETED_TRIPS_KEY);
       localStorage.removeItem('gateready_active_trip_id');
       localStorage.removeItem('gateready_trips_history_v1');
@@ -1019,44 +1067,89 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
   };
 
-  const updateTripDetails = (
+  const updateTripDetails = async (
     tripId: string,
     details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
-  ) => {
-    let updatedTripToSave: Trip | null = null;
+  ): Promise<Trip> => {
+    let targetTrip = tripsRef.current.find((t) => t.id === tripId);
+    if (!targetTrip) {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed: Trip[] = JSON.parse(raw);
+          targetTrip = parsed.find((t) => t.id === tripId);
+        }
+      } catch {}
+    }
+    if (!targetTrip) {
+      targetTrip = trips.find((t) => t.id === tripId);
+    }
+    if (!targetTrip) {
+      throw new Error(`Trip ${tripId} not found`);
+    }
 
-    setTrips((prev) =>
-      prev.map((trip) => {
-        if (trip.id !== tripId) return trip;
-        const updated = {
-          ...trip,
-          ...(details.name !== undefined ? { name: details.name.trim() } : {}),
-          ...(details.companyName !== undefined ? { companyName: details.companyName.trim() } : {}),
-          ...(details.seatClassOrCarSize !== undefined ? { seatClassOrCarSize: details.seatClassOrCarSize.trim() } : {}),
-          ...(details.fareFamily !== undefined ? { fareFamily: details.fareFamily.trim() } : {}),
-          ...(details.travelType !== undefined ? { travelType: details.travelType } : {}),
-          ...(details.originCity !== undefined ? { originCity: details.originCity.trim() } : {}),
-          ...(details.destinationCity !== undefined ? { destinationCity: details.destinationCity.trim() } : {}),
-          ...(details.destinationCountry !== undefined ? { destinationCountry: details.destinationCountry.trim() } : {}),
-          ...(details.departureDate !== undefined ? { departureDate: details.departureDate } : {}),
-          ...(details.departureTime !== undefined ? { departureTime: details.departureTime } : {}),
-          ...(details.aircraftType !== undefined ? { aircraftType: details.aircraftType.trim() } : {}),
-          ...(details.isReturnRepackMode !== undefined ? { isReturnRepackMode: details.isReturnRepackMode } : {}),
-          ...(details.returnTripDate !== undefined ? { returnTripDate: details.returnTripDate } : {}),
-          ...(details.returnTripTime !== undefined ? { returnTripTime: details.returnTripTime } : {}),
-          ...(details.souvenirBufferEnabled !== undefined ? { souvenirBufferEnabled: details.souvenirBufferEnabled } : {}),
-          ...(details.souvenirBufferLbs !== undefined ? { souvenirBufferLbs: details.souvenirBufferLbs } : {}),
-          ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {}),
-          ...(details.gateChecklist !== undefined ? { gateChecklist: details.gateChecklist } : {}),
-          ...(details.bags !== undefined ? { bags: details.bags } : {}),
-          ...(details.modeProfiles !== undefined ? { modeProfiles: details.modeProfiles } : {})
-        };
-        updatedTripToSave = updated;
-        return updated;
-      })
-    );
+    const updated: Trip = {
+      ...targetTrip,
+      ...(details.name !== undefined ? { name: details.name.trim() } : {}),
+      ...(details.companyName !== undefined ? { companyName: details.companyName.trim() } : {}),
+      ...(details.seatClassOrCarSize !== undefined ? { seatClassOrCarSize: details.seatClassOrCarSize.trim() } : {}),
+      ...(details.fareFamily !== undefined ? { fareFamily: details.fareFamily.trim() } : {}),
+      ...(details.travelType !== undefined ? { travelType: details.travelType } : {}),
+      ...(details.originCity !== undefined ? { originCity: details.originCity.trim() } : {}),
+      ...(details.destinationCity !== undefined ? { destinationCity: details.destinationCity.trim() } : {}),
+      ...(details.destinationCountry !== undefined ? { destinationCountry: details.destinationCountry.trim() } : {}),
+      ...(details.departureDate !== undefined ? { departureDate: details.departureDate } : {}),
+      ...(details.departureTime !== undefined ? { departureTime: details.departureTime } : {}),
+      ...(details.aircraftType !== undefined ? { aircraftType: details.aircraftType.trim() } : {}),
+      ...(details.isReturnRepackMode !== undefined ? { isReturnRepackMode: details.isReturnRepackMode } : {}),
+      ...(details.returnTripDate !== undefined ? { returnTripDate: details.returnTripDate } : {}),
+      ...(details.returnTripTime !== undefined ? { returnTripTime: details.returnTripTime } : {}),
+      ...(details.souvenirBufferEnabled !== undefined ? { souvenirBufferEnabled: details.souvenirBufferEnabled } : {}),
+      ...(details.souvenirBufferLbs !== undefined ? { souvenirBufferLbs: details.souvenirBufferLbs } : {}),
+      ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {}),
+      ...(details.gateChecklist !== undefined ? { gateChecklist: details.gateChecklist } : {}),
+      ...(details.bags !== undefined ? { bags: details.bags } : {}),
+      ...(details.modeProfiles !== undefined ? { modeProfiles: details.modeProfiles } : {})
+    };
 
-    if (updatedTripToSave) persistTripToCloud(updatedTripToSave);
+    // Ensure modeProfiles for PLANE keeps fareFamily strictly in sync
+    if (updated.travelType === 'PLANE' || updated.modeProfiles?.PLANE) {
+      updated.modeProfiles = {
+        ...(updated.modeProfiles || {}),
+        PLANE: {
+          ...(updated.modeProfiles?.PLANE || {}),
+          companyName: updated.companyName || '',
+          seatClassOrCarSize: updated.seatClassOrCarSize || '',
+          aircraftType: updated.aircraftType || '',
+          fareFamily: updated.fareFamily || ''
+        }
+      };
+    }
+
+    // 1. Write immediately to local single source of truth
+    recentLocalUpdatesRef.current.set(tripId, { updatedAt: Date.now(), trip: updated });
+    const nextTrips = tripsRef.current.map((t) => (t.id === tripId ? updated : t));
+    tripsRef.current = nextTrips;
+    setTrips(nextTrips);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextTrips));
+    } catch {}
+
+    // 2. Write-through to server with confirmation if authenticated
+    if (user) {
+      setCloudSyncStatus('syncing');
+      try {
+        await saveTripToCloud(user.uid, updated);
+        setCloudSyncStatus('synced');
+        setLastSyncedAt(new Date());
+      } catch (err) {
+        console.warn('Write-through error saving trip to cloud:', err);
+        setCloudSyncStatus('offline');
+        throw err;
+      }
+    }
+
+    return updated;
   };
 
   const updateLuggageTag = (
@@ -1372,6 +1465,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateItemQuantity,
         updateItemPacker,
         updateTripDetails,
+        refreshActiveTrip,
         updateLuggageTag,
         renameBag,
         updateBag,

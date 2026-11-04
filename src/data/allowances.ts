@@ -145,8 +145,8 @@ export const airlineLimits: BaggageLimitInfo[] = [
     carryOnLimit: '21.5 x 15.5 x 9 in (55 x 40 x 23 cm) including wheels and handles',
     checkedLimit: '62 linear in (158 cm), max 50 lbs (23 kg)',
     carryOnWeightLimit: 'No weight limit (must be light enough to store in overhead without assistance)',
-    checkedWeightLimit: '50 lbs (23 kg) Economy; 70 lbs (32 kg) Signature / Business',
-    notes: 'One standard carry-on plus one personal item allowed free on all flights worldwide.'
+    checkedWeightLimit: '50 lbs (23 kg) Economy (1st bag included on Standard); 70 lbs (32 kg) Signature / Business',
+    notes: 'One standard carry-on plus one personal item allowed free on all flights worldwide. Standard Economy fares include 1 free checked bag up to 50 lbs (23 kg).'
   },
   {
     id: 'westjet',
@@ -157,8 +157,8 @@ export const airlineLimits: BaggageLimitInfo[] = [
     carryOnLimit: '21 x 15 x 9 in (53 x 38 x 23 cm) including wheels/handles',
     checkedLimit: '62 linear in (157 cm), max 50 lbs (23 kg)',
     carryOnWeightLimit: 'No maximum weight limit',
-    checkedWeightLimit: '50 lbs (23 kg) Standard; 70 lbs for Business/Premium',
-    notes: 'UltraBasic fares do NOT include a carry-on bag for flights within Canada/US unless traveling on a transatlantic route.'
+    checkedWeightLimit: '50 lbs (23 kg) Standard (1st bag included on Econo); 70 lbs for Business/Premium',
+    notes: 'Standard Econo fares include 1 free checked bag up to 50 lbs (23 kg) and free overhead carry-on. UltraBasic fares do NOT include an overhead carry-on for flights within Canada/US.'
   },
   {
     id: 'porter',

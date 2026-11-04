@@ -47,6 +47,7 @@ import { AirlineIndexPage } from './pages/AirlineIndexPage';
 import { BaggageFeeCalculatorPage } from './pages/BaggageFeeCalculatorPage';
 import { TareWeightPage } from './pages/TareWeightPage';
 import { EntryRequirementsPage } from './pages/EntryRequirementsPage';
+import { FeedbackPage } from './pages/FeedbackPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -69,7 +70,7 @@ import {
 } from 'lucide-react';
 
 function PackingAppContent() {
-  const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip } = usePacking();
+  const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip, refreshActiveTrip } = usePacking();
   const { isPro, isTrialActive, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
   const { user, resendVerificationEmail } = useAuth();
   const [resentEmailNotice, setResentEmailNotice] = useState(false);
@@ -260,6 +261,7 @@ function PackingAppContent() {
   };
 
   const handleOpenAddTrip = (travelType?: TravelType, destinationCity?: string) => {
+    refreshActiveTrip();
     const safeTravelType = typeof travelType === 'string' ? travelType : undefined;
     const safeDest = typeof destinationCity === 'string' ? destinationCity : undefined;
     const tripCheck = canAddTrip(trips.length);
@@ -948,6 +950,15 @@ export default function App() {
   if (pathname === '/baggage-fee-calculator') return <BaggageFeeCalculatorPage />;
   if (pathname === '/tare-weight') return <TareWeightPage />;
   if (pathname === '/entry-requirements') return <EntryRequirementsPage />;
+  if (pathname === '/feedback') {
+    return (
+      <AuthProvider>
+        <SubscriptionProvider>
+          <FeedbackPage />
+        </SubscriptionProvider>
+      </AuthProvider>
+    );
+  }
 
   return (
     <AuthProvider>

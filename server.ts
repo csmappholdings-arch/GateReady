@@ -178,6 +178,190 @@ app.post('/api/send-packing-list', async (req: Request, res: Response) => {
   }
 });
 
+// In-memory IP rate limiter for feedback: max 3 submissions per hour per IP
+const feedbackRateLimitMap = new Map<string, number[]>();
+
+function checkFeedbackRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+  const timestamps = feedbackRateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < oneHour);
+  if (recent.length >= 3) {
+    feedbackRateLimitMap.set(ip, recent);
+    return false;
+  }
+  recent.push(now);
+  feedbackRateLimitMap.set(ip, recent);
+  return true;
+}
+
+// API Route: Submit Feedback
+app.post('/api/feedback', async (req: Request, res: Response) => {
+  try {
+    const { topic, message, name, email, honeypot, referrer, timestamp, planTier } = req.body;
+
+    // 1. Silent honeypot trap: if bot filled hidden field, drop silently and return 200 OK
+    if (honeypot && String(honeypot).trim() !== '') {
+      return res.json({ success: true, message: 'Feedback received.' });
+    }
+
+    // 2. IP Rate Limit: max 3 submissions per hour per IP
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown-ip';
+    if (!checkFeedbackRateLimit(clientIp)) {
+      return res.status(429).json({
+        error: 'Too many feedback submissions from this IP. Please try again in an hour or email csmappholdings@gmail.com directly.'
+      });
+    }
+
+    // 3. Validation: message must be at least 10 chars, not whitespace-only
+    if (!message || typeof message !== 'string' || message.trim().length < 10) {
+      return res.status(400).json({ error: 'A message of at least 10 characters is required.' });
+    }
+
+    if (email && typeof email === 'string' && email.trim() !== '') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        return res.status(400).json({ error: 'Please enter a valid email address or leave blank.' });
+      }
+    }
+
+    const cleanTopic = (topic || 'Something else').trim();
+    const cleanMessage = message.trim();
+    const cleanName = name ? String(name).trim() : 'Not provided';
+    const cleanEmail = email ? String(email).trim() : 'Not provided';
+    const cleanReferrer = referrer ? String(referrer).trim() : 'Direct';
+    const cleanTier = planTier ? String(planTier).trim() : 'Unknown';
+    const cleanTime = timestamp ? String(timestamp).trim() : new Date().toISOString();
+
+    const subject = `[GateReady Feedback] ${cleanTopic}`;
+    const destination = 'csmappholdings@gmail.com';
+    const sender = process.env.SENDER_EMAIL || 'GateReady Feedback <feedback@gateready.ca>';
+
+    const bodyText = `New GateReady Feedback:
+------------------------------------
+Topic: ${cleanTopic}
+Plan Tier: ${cleanTier}
+Submitted At: ${cleanTime}
+Sender Name: ${cleanName}
+Sender Email: ${cleanEmail}
+Referrer: ${cleanReferrer}
+Client IP: ${clientIp}
+
+Message:
+${cleanMessage}
+------------------------------------
+`;
+
+    const bodyHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <h2 style="color: #7c3aed; margin-top: 0;">GateReady Feedback Received</h2>
+        <div style="background-color: #f8fafc; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+          <p style="margin: 4px 0;"><strong>Topic:</strong> ${cleanTopic}</p>
+          <p style="margin: 4px 0;"><strong>Plan Tier:</strong> ${cleanTier}</p>
+          <p style="margin: 4px 0;"><strong>Sender Name:</strong> ${cleanName}</p>
+          <p style="margin: 4px 0;"><strong>Sender Email:</strong> ${cleanEmail}</p>
+          <p style="margin: 4px 0;"><strong>Referrer:</strong> ${cleanReferrer}</p>
+          <p style="margin: 4px 0;"><strong>Submitted At:</strong> ${cleanTime}</p>
+        </div>
+        <h3 style="font-size: 14px; color: #1e293b; margin-bottom: 8px;">Message:</h3>
+        <div style="background-color: #ffffff; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;">${cleanMessage}</div>
+      </div>
+    `;
+
+    // Dispatch via Resend / SendGrid / Custom SMTP / Ethereal Test fallback
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const resendResp = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: sender,
+            to: [destination],
+            subject,
+            html: bodyHtml,
+            text: bodyText
+          })
+        });
+
+        if (resendResp.ok) {
+          return res.json({ success: true, message: 'Feedback sent successfully.' });
+        }
+      } catch (err) {
+        console.warn('[Feedback Resend Exception]', err);
+      }
+    }
+
+    if (process.env.SENDGRID_API_KEY) {
+      try {
+        const sgResp = await fetch('https://api.sendgrid.com/v3/mail/send', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            personalizations: [{ to: [{ email: destination }] }],
+            from: { email: process.env.SENDGRID_FROM_EMAIL || 'feedback@gateready.ca', name: 'GateReady Feedback' },
+            subject,
+            content: [
+              { type: 'text/plain', value: bodyText },
+              { type: 'text/html', value: bodyHtml }
+            ]
+          })
+        });
+
+        if (sgResp.status === 202 || sgResp.ok) {
+          return res.json({ success: true, message: 'Feedback sent successfully.' });
+        }
+      } catch (err) {
+        console.warn('[Feedback SendGrid Exception]', err);
+      }
+    }
+
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
+
+      await transporter.sendMail({
+        from: sender,
+        to: destination,
+        subject,
+        text: bodyText,
+        html: bodyHtml
+      });
+
+      return res.json({ success: true, message: 'Feedback sent successfully.' });
+    }
+
+    // Real Test Mailer fallback
+    const testTransporter = await getTestTransporter();
+    const info = await testTransporter.sendMail({
+      from: sender,
+      to: destination,
+      subject,
+      text: bodyText,
+      html: bodyHtml
+    });
+
+    console.log(`[Feedback Sent] Topic: ${cleanTopic}, Message ID: ${info.messageId}`);
+    return res.json({ success: true, message: 'Feedback sent successfully.' });
+  } catch (error: any) {
+    console.error('Failed to submit feedback:', error);
+    return res.status(500).json({
+      error: 'Unable to submit feedback. Please try again or email csmappholdings@gmail.com directly.'
+    });
+  }
+});
+
 // Setup Vite middleware in dev or static files in production
 async function startServer() {
   let viteDevServer: any = null;

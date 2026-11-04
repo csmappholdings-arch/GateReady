@@ -33,7 +33,7 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'aircanada')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'aircanada')!,
     title: 'Air Canada Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Complete Air Canada baggage allowance rules: carry-on sizer dimensions (21.5 x 15.5 x 9 in), no maximum carry-on weight limit, checked bag fees ($35 CAD), and overweight fees.',
+    metaDescription: 'Complete Air Canada baggage allowance rules: carry-on sizer dimensions (21.5 x 15.5 x 9 in), no carry-on weight limit, 1st checked bag included on Standard ($35 CAD on Basic), and overweight fees.',
     keywords: 'Air Canada baggage allowance, Air Canada carry on dimensions, Air Canada baggage fees, Air Canada carry on weight limit, Air Canada checked luggage size',
     h1: 'Air Canada Baggage Allowance & Fee Guide'
   },
@@ -49,7 +49,7 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'westjet')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'westjet')!,
     title: 'WestJet Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Verified WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no maximum carry-on weight limit (must lift unassisted), checked fees ($35 CAD 1st, $50 CAD 2nd).',
+    metaDescription: 'Verified WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no carry-on weight limit (must lift unassisted), 1st checked bag included on Standard Econo ($35 CAD on UltraBasic).',
     keywords: 'WestJet baggage allowance, WestJet carry on size, WestJet baggage fees, WestJet carry on weight limit, WestJet checked bag cost, UltraBasic baggage',
     h1: 'WestJet Baggage Allowance & Fee Guide'
   },

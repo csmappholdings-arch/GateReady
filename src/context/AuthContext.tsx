@@ -161,7 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Email sign-in failed:', err);
       let msg = err.message || 'Failed to sign in';
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        msg = 'Incorrect email or password. Please verify your credentials.';
+        msg = 'Incorrect email or password, or no active account exists for this email. If this account was recently deleted, all records were permanently erased.';
       } else if (err.code === 'auth/too-many-requests') {
         msg = 'Too many failed login attempts. Please reset your password or try again later.';
       }

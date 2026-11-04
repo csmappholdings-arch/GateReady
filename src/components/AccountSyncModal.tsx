@@ -28,12 +28,25 @@ interface AccountSyncModalProps {
   onClose: () => void;
   origin?: 'save_gate' | 'header' | 'referral' | 'workspace_banner';
   initialEmail?: string;
+  initialMode?: 'signin' | 'signup';
 }
 
-export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onClose, origin, initialEmail }) => {
+export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  origin, 
+  initialEmail,
+  initialMode 
+}) => {
   const { user, signIn, signInWithGithub, signUpWithEmail, signInWithEmail, resetPassword, error, clearError } = useAuth();
 
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
+  const getEffectiveInitialMode = (): 'signin' | 'signup' => {
+    if (initialMode) return initialMode;
+    if (origin === 'header') return 'signin';
+    return 'signup';
+  };
+
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(getEffectiveInitialMode);
   const [email, setEmail] = useState(initialEmail || '');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -45,6 +58,15 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ isOpen, onCl
   const [localError, setLocalError] = useState<string | null>(null);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [copiedDomain, setCopiedDomain] = useState(false);
+
+  // Sync mode and initialEmail when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMode(getEffectiveInitialMode());
+      setLocalError(null);
+      clearError();
+    }
+  }, [isOpen, initialMode, origin]);
 
   // Sync initialEmail if prop changes
   useEffect(() => {

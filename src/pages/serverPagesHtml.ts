@@ -155,6 +155,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             <h3 class="font-bold text-slate-900">Departure Readiness Tracking</h3>
             <p class="text-xs text-slate-600 mt-1">Item-by-item packing checklists, gate-check safety reminders (power banks, IDs, medications), and departure countdown schedules.</p>
           </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+            <h3 class="font-bold text-slate-900">Rebalance Bags Luggage Optimizer (Silver+)</h3>
+            <p class="text-xs text-slate-600 mt-1">Suggests safe item relocations across your bags when a suitcase is overweight. Strictly suggest-first with 1-click apply and complete undo. Enforces airline safety guardrails (never moving keys, medications, or lithium power banks into checked luggage) and gives an honest notice if no safe move exists.</p>
+          </div>
         </div>
       </section>
 
@@ -361,12 +365,25 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">November 1, 2026 — Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</div>
+            <div class="font-bold text-purple-900 text-sm">November 2, 2026 — Rebalance Bags Luggage Optimizer, Fare-Family Single Source of Truth & Settings Reachability</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li><strong>Rebalance Bags Luggage Optimizer (Silver+):</strong> When any suitcase exceeds weight limits, Rebalance evaluates your packed items to suggest safe transfers to lighter bags. Strictly suggest-first with 1-click apply and complete undo. Rigidly enforces airline safety rules (never moving keys, medications, or lithium power banks into checked luggage) and displays an honest notice when no safe move exists.</li>
+              <li><strong>Fare-Family Single Source of Truth:</strong> Eliminated cloud-sync race conditions when changing fare families. Trip updates write through with server confirmation and re-read the fresh saved fare whenever switching trips or opening the New Trip dialog.</li>
+              <li><strong>Settings Modal Layout & Delete Account Button Visibility:</strong> Optimized vertical scrolling and sticky header in Settings & Preferences (max-h-[85vh]), ensuring "Delete Account & Erase Cloud Data" is visible and clickable by mouse/touch on all screen heights.</li>
+              <li><strong>Weight Math Unification:</strong> Unified simulation and applied luggage weight math into a single formula, eliminating 0.1 lb prediction discrepancies.</li>
+              <li><strong>USD Guide Note Splitting:</strong> Separated 1st-bag and 2nd-bag USD conversion notes onto individual rows for Air Canada and WestJet guides.</li>
+              <li><strong>User Feedback Channel (/feedback):</strong> Added dedicated feedback intake with categorized topics, server-side email dispatch, rate limiting, and spam protection.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">November 1, 2026 — Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li><strong>Server-Side Account Deletion & Local Purge:</strong> Deleting an account enforces complete server-side deletion of Cloud Firestore user profile, all synced trip records, and the Firebase Auth user record before reporting completion. Local device trip state is completely wiped at deletion time, preventing any resurrected trips or subsequent logins with the same credentials.</li>
               <li><strong>Complete Plan Pill & Tier Badge Zero-Flash:</strong> Synchronized trial expiration timestamps and subscription tier states from local cache on initial render, ensuring the header immediately displays the user's trial countdown and tier without flashing "Free Plan", "Upgrade PLANS", blank pills, or pulse skeletons on reload or new tabs.</li>
               <li><strong>Cruise Stateroom Storage Copy Cleanup:</strong> Updated cruise carry-on dimensional guidance to use verified cruise-appropriate wording ("Terminal security clearance sizer · must fit through terminal screening sizer and stow in stateroom"), eliminating bus/coach terminology on cruise itineraries.</li>
               <li><strong>Privacy Policy §5 In-App Deletion Synchronization:</strong> Updated Privacy Policy §5 (User Rights & Data Deletion) to document the in-app "Delete Account & Erase Cloud Data" control as the primary instant deletion mechanism, with email support as the fallback route.</li>
+              <li><strong>Airline Currency Formatting & USD Equivalence Clarity:</strong> Removed duplicate currency codes across airline guides and search index cards (clean "CAD $35"). Explicitly labelled all USD approximation figures across Canadian and European carrier guides with "(1st bag) / (2nd bag)".</li>
+              <li><strong>Dismissible Email Verification Banner & Trip Header Placeholders:</strong> Made email verification banners dismissible with persistence and avoided nagging active trial accounts. Removed raw "Not set" labels on optional trip banner fields in favor of clean, neutral prompts.</li>
             </ul>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
@@ -513,6 +530,25 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
+  } else if (normalizedPath === '/feedback') {
+    innerContentHtml = `
+      <section class="max-w-2xl mx-auto space-y-6">
+        <div class="space-y-2">
+          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Send Us Your Feedback</h2>
+          <p class="text-sm text-slate-600">
+            Encountered a bug, have an idea to improve packing, or want to share your travel experience? We read every submission.
+          </p>
+        </div>
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
+          <p class="text-xs text-slate-600 leading-relaxed">
+            You can submit feedback directly in the interactive form above or email our support and product team directly at <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 font-bold underline">csmappholdings@gmail.com</a>.
+          </p>
+          <div class="p-3.5 rounded-2xl bg-purple-50 border border-purple-100 text-xs text-slate-600 font-medium">
+            Feedback is used only to improve GateReady.
+          </div>
+        </div>
+      </section>
+    `;
   }
 
   const bodyHtml = renderPageShell(meta, innerContentHtml);
@@ -539,6 +575,7 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
             <a href="/about" class="hover:text-purple-300">About</a>
             <a href="/faq" class="hover:text-purple-300">FAQ</a>
             <a href="/contact" class="hover:text-purple-300">Contact Support</a>
+            <a href="/feedback" class="hover:text-purple-300">Feedback</a>
             <a href="/privacy" class="hover:text-purple-300">Privacy Policy</a>
             <a href="/terms" class="hover:text-purple-300">Terms of Service</a>
             <a href="/cookies" class="hover:text-purple-300">Cookies & Storage</a>

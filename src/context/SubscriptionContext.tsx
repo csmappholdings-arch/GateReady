@@ -100,6 +100,8 @@ interface SubscriptionContextType {
   referralsCount: number;
   referralCreditsMonths: number;
   claimReferralBonus: () => void;
+  // Tier resolution state for zero-flash sign up
+  isResolvingTier: boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -348,6 +350,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       : `${trialMinutesRemaining}m ${trialSecondsRemaining}s left`;
 
   const isTrialExpiringSoon = isTrialActive && trialDiffMs <= 2 * 24 * 60 * 60 * 1000;
+  const isResolvingTier = Boolean(user && !cloudProfileLoaded && !isTrialActive && !isReferralPlatinumActive && !hasPaidLicense);
 
   // Active tier arbitration: Paid > Referral Platinum (1 mo) > Account Trial (7 days) > Free
   useEffect(() => {
@@ -1040,7 +1043,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         referralCode,
         referralsCount,
         referralCreditsMonths,
-        claimReferralBonus
+        claimReferralBonus,
+        isResolvingTier
       }}
     >
       {children}

@@ -11,7 +11,8 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   Mail,
-  Building2
+  Building2,
+  ArrowRightLeft
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
@@ -93,6 +94,16 @@ export const AboutPage: React.FC = () => {
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Printable luggage tags containing encoded emergency contact information to help baggage handlers return lost bags without exposing your home address.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 space-y-1.5">
+            <div className="flex items-center gap-2 font-black text-slate-900 dark:text-white">
+              <ArrowRightLeft className="w-4 h-4 text-purple-600" />
+              <span>Rebalance Bags Luggage Optimizer (Silver+)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Suggests safe item relocations across your bags when a suitcase is overweight. Strictly suggest-first with 1-click apply and complete undo. Enforces airline safety guardrails (never moving keys, medications, or lithium power banks into checked luggage) and gives an honest notice if no safe move exists.
             </p>
           </div>
         </div>

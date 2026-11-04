@@ -159,16 +159,25 @@ export function getBagWeightCapLbs(bag: Bag, companyName: string | undefined, tr
   return { limitLbs: policy.limitLbs || null, hasNoLimit: policy.hasNoWeightLimit };
 }
 
+export function calculateBagTotalWeightLbs(bag: Bag): number {
+  const emptyLbs = getBagEmptyWeightLbs(bag);
+  const itemsLbs = (bag.items || []).reduce((sum, item) => {
+    const w = getItemWeightLbs(item);
+    return sum + (w ?? 0);
+  }, 0);
+  return Number((emptyLbs + itemsLbs).toFixed(1));
+}
+
 /**
  * Compute snapshot for a bag.
  */
 export function computeBagSnapshot(bag: Bag, companyName: string | undefined, travelType: Trip['travelType']): BagWeightSnapshot {
   const emptyLbs = getBagEmptyWeightLbs(bag);
-  const itemsLbs = bag.items.reduce((sum, item) => {
+  const itemsLbs = (bag.items || []).reduce((sum, item) => {
     const w = getItemWeightLbs(item);
     return sum + (w ?? 0);
   }, 0);
-  const totalLbs = Number((emptyLbs + itemsLbs).toFixed(2));
+  const totalLbs = calculateBagTotalWeightLbs(bag);
   const { limitLbs, hasNoLimit } = getBagWeightCapLbs(bag, companyName, travelType);
 
   const isOverweight = limitLbs !== null && totalLbs > limitLbs;
@@ -235,16 +244,23 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
 
   let unweightedItemsCount = 0;
   const bagsToLighten = overweightBags.length > 0 ? overweightBags : nearLimitBags;
-  const simulatedWeights = new Map<string, number>(snapshots.map((s) => [s.bagId, s.totalLbs]));
+  
+  // Track simulated items in each bag so predictions and post-apply weights are 1:1 identical
+  const simulatedBagItems = new Map<string, PackingItem[]>(
+    bags.map((b) => [b.id, [...(b.items || [])]])
+  );
   const suggestedMoves: SuggestedMove[] = [];
 
   for (const sourceSnapshot of bagsToLighten) {
     const sourceBag = bags.find((b) => b.id === sourceSnapshot.bagId);
     if (!sourceBag) continue;
 
-    let currentSourceWeight = simulatedWeights.get(sourceSnapshot.bagId) ?? sourceSnapshot.totalLbs;
     const sourceLimit = sourceSnapshot.limitLbs;
     if (sourceLimit === null) continue; // No limit, no need to lighten
+
+    // Check current simulated weight of source bag
+    let currentSourceItems = simulatedBagItems.get(sourceBag.id) || [...sourceBag.items];
+    let currentSourceWeight = calculateBagTotalWeightLbs({ ...sourceBag, items: currentSourceItems });
 
     // If source bag is already under limit in simulation, continue
     if (currentSourceWeight <= sourceLimit) continue;
@@ -255,7 +271,7 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
     // Collect candidate items from source bag with valid weights
     const candidateItems: Array<{ item: PackingItem; weightLbs: number; isEssential: boolean }> = [];
 
-    for (const item of sourceBag.items) {
+    for (const item of currentSourceItems) {
       const w = getItemWeightLbs(item);
       if (w === null || w <= 0) {
         unweightedItemsCount++;
@@ -280,7 +296,8 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
         const destBag = bags.find((b) => b.id === destSnapshot.bagId);
         if (!destBag) continue;
 
-        const currentDestWeight = simulatedWeights.get(destSnapshot.bagId) ?? destSnapshot.totalLbs;
+        const currentDestItems = simulatedBagItems.get(destBag.id) || [...destBag.items];
+        const currentDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: currentDestItems });
         const destLimit = destSnapshot.limitLbs;
 
         // RULE: NEVER suggest an essential item into a CHECKED bag!
@@ -288,14 +305,22 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
           continue; // Disqualified!
         }
 
+        // Test prospective destination bag items & weight
+        const prospectiveDestItems = [...currentDestItems, cand.item];
+        const prospectiveDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: prospectiveDestItems });
+
         // RULE: Destination bag must not exceed limit after move
-        if (destLimit !== null && (currentDestWeight + cand.weightLbs > destLimit)) {
+        if (destLimit !== null && prospectiveDestWeight > destLimit) {
           continue; // Would overload destination bag!
         }
 
+        // Test prospective source bag items & weight
+        const prospectiveSourceItems = currentSourceItems.filter((i) => i.id !== cand.item.id);
+        const prospectiveSourceWeight = calculateBagTotalWeightLbs({ ...sourceBag, items: prospectiveSourceItems });
+
         // This move is valid!
-        const sourceAfter = Number((currentSourceWeight - cand.weightLbs).toFixed(2));
-        const destAfter = Number((currentDestWeight + cand.weightLbs).toFixed(2));
+        const sourceAfter = prospectiveSourceWeight;
+        const destAfter = prospectiveDestWeight;
 
         suggestedMoves.push({
           id: `move-${sourceBag.id}-${destBag.id}-${cand.item.id}`,
@@ -317,10 +342,11 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
           isEssential: cand.isEssential
         });
 
-        // Update simulation
-        currentSourceWeight = sourceAfter;
-        simulatedWeights.set(sourceSnapshot.bagId, sourceAfter);
-        simulatedWeights.set(destSnapshot.bagId, destAfter);
+        // Update simulation states
+        currentSourceItems = prospectiveSourceItems;
+        currentSourceWeight = prospectiveSourceWeight;
+        simulatedBagItems.set(sourceBag.id, prospectiveSourceItems);
+        simulatedBagItems.set(destBag.id, prospectiveDestItems);
         break; // Item moved, go to next item
       }
     }

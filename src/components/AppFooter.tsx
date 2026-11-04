@@ -86,6 +86,9 @@ export const AppFooter: React.FC<AppFooterProps> = ({
           <a href="/contact" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
             Contact
           </a>
+          <a href="/feedback" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            Feedback
+          </a>
           <a href="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
             Privacy Policy
           </a>

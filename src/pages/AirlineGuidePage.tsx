@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { AIRLINE_GUIDES, AirlineGuideItem, getAirlineGuideBySlug, getAirlineGuideByAnySlug } from '../data/airlineGuidesData';
+import { getSplitBagUsdNotes } from '../data/baggageFeeData';
 import { 
   Plane, 
   ArrowLeft, 
@@ -62,6 +63,8 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
   const handleOpenCalculator = () => {
     window.location.href = `/baggage-fee-calculator?airline=${encodeURIComponent(guide.name)}`;
   };
+
+  const { firstBagNote, secondBagNote } = getSplitBagUsdNotes(guide.fees);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
@@ -287,7 +290,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                         : `${guide.fees.currencySymbol}${guide.fees.firstCheckedFee} ${guide.fees.currency}`}
                   </td>
                   <td className="py-3 px-4 text-slate-500 text-[11px]">
-                    {guide.fees.usdEquivalentNote || 'Standard economy ticket'}
+                    {firstBagNote}
                   </td>
                 </tr>
                 <tr>
@@ -300,7 +303,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                         ? `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee}`
                         : `${guide.fees.currencySymbol}${guide.fees.secondCheckedFee} ${guide.fees.currency}`}
                   </td>
-                  <td className="py-3 px-4 text-slate-500 text-[11px]">Online rate (airport desk fees may be higher)</td>
+                  <td className="py-3 px-4 text-slate-500 text-[11px]">
+                    {secondBagNote}
+                  </td>
                 </tr>
                 <tr>
                   <td className="py-3 px-4 font-bold text-slate-900">Overweight Surcharge (51–70 lbs)</td>

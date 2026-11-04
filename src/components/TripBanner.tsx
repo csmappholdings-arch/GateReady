@@ -53,6 +53,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [browserNoticeDismissed, setBrowserNoticeDismissed] = useState(() => {
     try {
       return localStorage.getItem('gateready_browser_only_notice_dismissed') === 'true';
@@ -87,19 +88,50 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     };
   });
 
+  // Single source of truth sync: re-sync all edit fields whenever the active trip switches
+  useEffect(() => {
+    if (currentTrip && !isEditing) {
+      setEditName(currentTrip.name || '');
+      setEditCarrier(currentTrip.companyName || '');
+      setEditSeatClass(currentTrip.seatClassOrCarSize || (currentTrip.travelType === 'CAR' ? 'Mid-Size SUV / Car' : currentTrip.travelType === 'CRUISE' ? 'Balcony Stateroom' : currentTrip.travelType === 'TRAIN' ? 'Standard Coach' : 'Main Cabin'));
+      setEditFareFamily(currentTrip.fareFamily || '');
+      setEditTravelType(currentTrip.travelType || 'PLANE');
+      setEditOriginCity(currentTrip.originCity || '');
+      setEditDestinationCity(currentTrip.destinationCity || '');
+      setEditDate(currentTrip.departureDate || '');
+      setEditTime(currentTrip.departureTime || '');
+      setEditReturnDate(currentTrip.returnTripDate || '');
+      setEditReturnTime(currentTrip.returnTripTime || '');
+      setEditAircraft(currentTrip.aircraftType || '');
+      setEditModeProfiles({
+        ...(currentTrip.modeProfiles || {}),
+        [currentTrip.travelType || 'PLANE']: {
+          companyName: currentTrip.companyName || '',
+          seatClassOrCarSize: currentTrip.seatClassOrCarSize || '',
+          aircraftType: currentTrip.aircraftType || '',
+          fareFamily: currentTrip.fareFamily || '',
+          originCity: currentTrip.originCity || '',
+          destinationCity: currentTrip.destinationCity || '',
+          departureDate: currentTrip.departureDate || '',
+          departureTime: currentTrip.departureTime || ''
+        }
+      });
+    }
+  }, [currentTrip?.id, currentTrip?.fareFamily, currentTrip?.travelType, currentTrip?.companyName, isEditing]);
+
   const editAirlineFareFamilies = React.useMemo(() => {
     if (editTravelType !== 'PLANE' || !editCarrier) return [];
     return getAirlineFareFamilies(editCarrier);
   }, [editTravelType, editCarrier]);
 
   useEffect(() => {
-    if (editTravelType === 'PLANE' && editAirlineFareFamilies.length > 0) {
+    if (isEditing && editTravelType === 'PLANE' && editAirlineFareFamilies.length > 0) {
       if (!editFareFamily || !editAirlineFareFamilies.some((f) => f.id === editFareFamily)) {
         const defaultFam = editAirlineFareFamilies.find((f) => f.isDefault) || editAirlineFareFamilies[0];
         setEditFareFamily(defaultFam ? defaultFam.id : '');
       }
     }
-  }, [editAirlineFareFamilies, editTravelType, editFareFamily]);
+  }, [editAirlineFareFamilies, editTravelType, editFareFamily, isEditing]);
 
   const currentFareFamilyObj = React.useMemo(() => {
     if (!currentTrip || currentTrip.travelType !== 'PLANE' || !currentTrip.companyName || !currentTrip.fareFamily) return null;
@@ -168,9 +200,9 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     setIsEditing(true);
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentTrip) return;
+    if (!currentTrip || isSaving) return;
 
     const trimmedName = editName.trim() || currentTrip.name?.trim();
     if (!trimmedName) {
@@ -211,24 +243,32 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       }));
     }
 
-    updateTripDetails(currentTrip.id, {
-      name: trimmedName,
-      companyName: resolvedCarrier,
-      seatClassOrCarSize: resolvedSeatClass,
-      fareFamily: editTravelType === 'PLANE' ? editFareFamily : '',
-      travelType: editTravelType,
-      originCity: resolvedOriginCity,
-      destinationCity: resolvedDestinationCity,
-      departureDate: resolvedDepartureDate,
-      departureTime: resolvedDepartureTime,
-      returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
-      returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
-      aircraftType: resolvedAircraft,
-      modeProfiles: finalModeProfiles,
-      ...(modeChanged ? { gateChecklist: updatedGateChecklist, bags: updatedBags } : {})
-    });
+    setIsSaving(true);
     setEditError(null);
-    setIsEditing(false);
+    try {
+      await updateTripDetails(currentTrip.id, {
+        name: trimmedName,
+        companyName: resolvedCarrier,
+        seatClassOrCarSize: resolvedSeatClass,
+        fareFamily: editTravelType === 'PLANE' ? editFareFamily : '',
+        travelType: editTravelType,
+        originCity: resolvedOriginCity,
+        destinationCity: resolvedDestinationCity,
+        departureDate: resolvedDepartureDate,
+        departureTime: resolvedDepartureTime,
+        returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
+        returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
+        aircraftType: resolvedAircraft,
+        modeProfiles: finalModeProfiles,
+        ...(modeChanged ? { gateChecklist: updatedGateChecklist, bags: updatedBags } : {})
+      });
+      setIsEditing(false);
+    } catch (err: any) {
+      console.error('Failed to save trip updates:', err);
+      setEditError(err?.message || 'Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // If no trip is selected / trips list is blank, return null so main clean empty state takes focus
@@ -779,10 +819,11 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               </button>
               <button
                 type="submit"
-                className="h-8.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-1 shadow-sm cursor-pointer"
+                disabled={isSaving}
+                className="h-8.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold flex items-center gap-1 shadow-sm cursor-pointer"
               >
                 <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Save Changes</span>
+                <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
               </button>
             </div>
           </form>
