@@ -55,33 +55,51 @@ export const FeedbackPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        topic,
+        message: trimmedMessage,
+        name: name.trim() || undefined,
+        email: email.trim() || undefined,
+        honeypot,
+        referrer: typeof document !== 'undefined' ? (document.referrer || 'Direct') : 'Direct',
+        sourcePage: typeof window !== 'undefined' ? window.location.href : 'https://gateready.ca/feedback',
+        timestamp: new Date().toISOString(),
+        planTier
+      };
+
       const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          topic,
-          message: trimmedMessage,
-          name: name.trim() || undefined,
-          email: email.trim() || undefined,
-          honeypot,
-          referrer: typeof document !== 'undefined' ? document.referrer || 'Direct' : 'Direct',
-          timestamp: new Date().toISOString(),
-          planTier
-        })
+        body: JSON.stringify(payload)
       });
 
-      const data = await response.json();
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch {
+        // Non-JSON response
+      }
 
-      if (response.ok && data.success) {
+      if (response.ok && data?.success) {
         setSubmitted(true);
         setMessage('');
+      } else if (response.status === 429) {
+        setErrorMessage(data?.error || 'Rate limit reached: maximum 3 submissions per hour. Please try again later.');
+      } else if (response.status === 400) {
+        setErrorMessage(data?.error || 'Validation error: please enter at least 10 characters.');
+      } else if (response.status === 404 || response.status === 405) {
+        setErrorMessage(`Feedback endpoint is temporarily unavailable (HTTP ${response.status}). Please try again shortly or visit our contact page.`);
       } else {
-        setErrorMessage(data.error || 'Unable to submit feedback right now. Please try again or visit our contact page.');
+        setErrorMessage(data?.error || `Service temporarily unavailable (HTTP ${response.status}). Please visit our contact page.`);
       }
-    } catch {
-      setErrorMessage('A network error occurred. Please try again or visit our contact page.');
+    } catch (err: any) {
+      setErrorMessage(
+        err?.message && !err.message.toLowerCase().includes('fetch')
+          ? `Submission failed: ${err.message}. Please visit our contact page.`
+          : 'Unable to connect to the feedback service. Please check your internet connection or visit our contact page.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -217,6 +235,7 @@ export const FeedbackPage: React.FC = () => {
               <label htmlFor="confirm_website">Leave this field blank</label>
               <input
                 id="confirm_website"
+                name="confirm_website"
                 type="text"
                 tabIndex={-1}
                 autoComplete="off"

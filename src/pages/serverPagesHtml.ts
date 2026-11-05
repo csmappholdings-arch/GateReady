@@ -239,8 +239,11 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       </section>
       <section class="p-6 rounded-3xl bg-purple-50 border border-purple-200 space-y-3 mt-4">
         <div class="text-xs font-bold text-purple-700 uppercase">Sole Official Support Email</div>
-        <div class="text-xl font-black text-slate-900"><a href="mailto:csmappholdings@gmail.com" class="underline text-purple-700">csmappholdings@gmail.com</a></div>
+        <a href="mailto:csmappholdings@gmail.com" class="text-base font-bold text-purple-700 underline block">csmappholdings@gmail.com</a>
         <div class="text-xs text-slate-600">Expected response: We aim to reply to all inquiries within a few business days. (We do not offer 24/7 support).</div>
+        <div class="pt-2 border-t border-purple-200 text-xs">
+          Have bug reports, feature suggestions, or feedback? <a href="/feedback" class="text-purple-700 font-bold underline">Submit structured feedback</a>.
+        </div>
       </section>
       <section class="space-y-2 pt-6 border-t border-slate-200 text-xs text-slate-600">
         <h3 class="font-bold text-slate-900 text-sm">Operating Company:</h3>

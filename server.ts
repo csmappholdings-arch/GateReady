@@ -19,6 +19,17 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(express.json({ limit: '10mb' }));
 
+// Enable CORS and preflight handling for all API endpoints
+app.use((req: Request, res: Response, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 // Cached reusable test account for Ethereal fallback when no live SMTP / Resend key is provided
 let cachedTestAccount: any = null;
 
@@ -198,7 +209,7 @@ function checkFeedbackRateLimit(ip: string): boolean {
 // API Route: Submit Feedback
 app.post('/api/feedback', async (req: Request, res: Response) => {
   try {
-    const { topic, message, name, email, honeypot, referrer, timestamp, planTier } = req.body;
+    const { topic, message, name, email, honeypot, referrer, sourcePage, timestamp, planTier } = req.body;
 
     // 1. Silent honeypot trap: if bot filled hidden field, drop silently and return 200 OK
     if (honeypot && String(honeypot).trim() !== '') {
@@ -229,7 +240,8 @@ app.post('/api/feedback', async (req: Request, res: Response) => {
     const cleanName = name ? String(name).trim() : 'Not provided';
     const cleanEmail = email ? String(email).trim() : 'Not provided';
     const cleanReferrer = referrer ? String(referrer).trim() : 'Direct';
-    const cleanTier = planTier ? String(planTier).trim() : 'Unknown';
+    const cleanSource = sourcePage ? String(sourcePage).trim() : (cleanReferrer !== 'Direct' ? cleanReferrer : '/feedback');
+    const cleanTier = planTier ? String(planTier).trim() : 'Guest';
     const cleanTime = timestamp ? String(timestamp).trim() : new Date().toISOString();
 
     const subject = `[GateReady Feedback] ${cleanTopic}`;
@@ -243,7 +255,7 @@ Plan Tier: ${cleanTier}
 Submitted At: ${cleanTime}
 Sender Name: ${cleanName}
 Sender Email: ${cleanEmail}
-Referrer: ${cleanReferrer}
+Source Page: ${cleanSource}
 Client IP: ${clientIp}
 
 Message:
@@ -259,7 +271,7 @@ ${cleanMessage}
           <p style="margin: 4px 0;"><strong>Plan Tier:</strong> ${cleanTier}</p>
           <p style="margin: 4px 0;"><strong>Sender Name:</strong> ${cleanName}</p>
           <p style="margin: 4px 0;"><strong>Sender Email:</strong> ${cleanEmail}</p>
-          <p style="margin: 4px 0;"><strong>Referrer:</strong> ${cleanReferrer}</p>
+          <p style="margin: 4px 0;"><strong>Source Page:</strong> ${cleanSource}</p>
           <p style="margin: 4px 0;"><strong>Submitted At:</strong> ${cleanTime}</p>
         </div>
         <h3 style="font-size: 14px; color: #1e293b; margin-bottom: 8px;">Message:</h3>
