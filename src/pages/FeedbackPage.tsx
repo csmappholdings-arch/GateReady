@@ -5,10 +5,6 @@ import {
   Send, 
   CheckCircle2, 
   AlertCircle, 
-  HelpCircle, 
-  Bug, 
-  Lightbulb, 
-  CreditCard, 
   ArrowRight,
   ShieldCheck,
   RefreshCw
@@ -82,25 +78,12 @@ export const FeedbackPage: React.FC = () => {
         setSubmitted(true);
         setMessage('');
       } else {
-        setErrorMessage(data.error || 'Unable to submit feedback right now. Please try again or email csmappholdings@gmail.com.');
+        setErrorMessage(data.error || 'Unable to submit feedback right now. Please try again or visit our contact page.');
       }
     } catch {
-      setErrorMessage('A network error occurred. Please try again or contact csmappholdings@gmail.com.');
+      setErrorMessage('A network error occurred. Please try again or visit our contact page.');
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const getTopicIcon = (t: FeedbackTopic) => {
-    switch (t) {
-      case 'Bug report':
-        return <Bug className="w-4 h-4 text-rose-500" />;
-      case 'Feature idea':
-        return <Lightbulb className="w-4 h-4 text-amber-500" />;
-      case 'Pricing or billing':
-        return <CreditCard className="w-4 h-4 text-purple-500" />;
-      case 'Something else':
-        return <HelpCircle className="w-4 h-4 text-indigo-500" />;
     }
   };
 
@@ -151,30 +134,28 @@ export const FeedbackPage: React.FC = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
-            {/* Topic Selector */}
-            <div className="space-y-2">
+            {/* Topic Selector - Dropdown */}
+            <div className="space-y-1.5">
               <label htmlFor="feedback-topic" className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 What is this regarding? <span className="text-purple-600">*</span>
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {(['Bug report', 'Feature idea', 'Pricing or billing', 'Something else'] as FeedbackTopic[]).map((t) => {
-                  const isSelected = topic === t;
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setTopic(t)}
-                      className={`p-3 rounded-2xl border text-left flex flex-col gap-2 transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-purple-600 bg-purple-50/70 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 shadow-xs'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800/60'
-                      }`}
-                    >
-                      {getTopicIcon(t)}
-                      <span className="text-xs font-bold leading-tight">{t}</span>
-                    </button>
-                  );
-                })}
+              <div className="relative">
+                <select
+                  id="feedback-topic"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value as FeedbackTopic)}
+                  className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:border-purple-500 transition-colors cursor-pointer appearance-none"
+                >
+                  <option value="Bug report">Bug report</option>
+                  <option value="Feature idea">Feature idea</option>
+                  <option value="Pricing or billing">Pricing or billing</option>
+                  <option value="Something else">Something else</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                  </svg>
+                </div>
               </div>
             </div>
 
@@ -218,7 +199,7 @@ export const FeedbackPage: React.FC = () => {
 
               <div className="space-y-1.5">
                 <label htmlFor="feedback-email" className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Your Email <span className="text-slate-400 text-[10px] font-normal lowercase">(optional, if you'd like a reply)</span>
+                  Your Email <span className="text-slate-400 text-[10px] font-normal lowercase">(so we can reply)</span>
                 </label>
                 <input
                   id="feedback-email"
@@ -257,7 +238,7 @@ export const FeedbackPage: React.FC = () => {
                 <div className="flex-1">
                   <p>{errorMessage}</p>
                   <p className="mt-1 text-[11px] text-rose-700 dark:text-rose-300">
-                    If this error persists, you can email us directly at <a href="mailto:csmappholdings@gmail.com" className="font-bold underline">csmappholdings@gmail.com</a>.
+                    If this error persists, you can reach out via our <a href="/contact" className="font-bold underline">contact page</a>.
                   </p>
                 </div>
               </div>

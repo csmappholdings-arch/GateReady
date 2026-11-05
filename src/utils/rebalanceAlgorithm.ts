@@ -20,6 +20,8 @@ export interface SuggestedMove {
   id: string;
   itemId: string;
   itemName: string;
+  quantity: number;
+  unitWeightLbs: number;
   itemWeightLbs: number;
   sourceBagId: string;
   sourceBagLabel: string;
@@ -117,15 +119,28 @@ export function isEssentialItem(item: PackingItem): boolean {
 /**
  * Get item weight in lbs. Returns null if item has no valid weight.
  */
-export function getItemWeightLbs(item: PackingItem): number | null {
+/**
+ * Single unit weight in lbs without quantity multiplier.
+ */
+export function getItemUnitWeightLbs(item: PackingItem): number | null {
   if (typeof item.customWeightLbs === 'number' && Number.isFinite(item.customWeightLbs) && item.customWeightLbs > 0) {
-    return item.customWeightLbs * (item.quantity || 1);
+    return item.customWeightLbs;
   }
   const estimated = DefaultSuggestions.getEstimatedWeightLbs(item.name);
   if (typeof estimated === 'number' && Number.isFinite(estimated) && estimated > 0) {
-    return estimated * (item.quantity || 1);
+    return estimated;
   }
   return null;
+}
+
+/**
+ * Total item entry weight in lbs (unit weight * quantity). Returns null if item has no valid weight.
+ */
+export function getItemWeightLbs(item: PackingItem): number | null {
+  const unit = getItemUnitWeightLbs(item);
+  if (unit === null) return null;
+  const qty = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
+  return Number((unit * qty).toFixed(1));
 }
 
 /**
@@ -162,8 +177,11 @@ export function getBagWeightCapLbs(bag: Bag, companyName: string | undefined, tr
 export function calculateBagTotalWeightLbs(bag: Bag): number {
   const emptyLbs = getBagEmptyWeightLbs(bag);
   const itemsLbs = (bag.items || []).reduce((sum, item) => {
-    const w = getItemWeightLbs(item);
-    return sum + (w ?? 0);
+    const unit = typeof item.customWeightLbs === 'number' && Number.isFinite(item.customWeightLbs) && item.customWeightLbs > 0
+      ? item.customWeightLbs
+      : DefaultSuggestions.getEstimatedWeightLbs(item.name);
+    const qty = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
+    return sum + (unit * qty);
   }, 0);
   return Number((emptyLbs + itemsLbs).toFixed(1));
 }
@@ -269,17 +287,21 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
     const candidateDestBags = snapshots.filter((d) => d.bagId !== sourceSnapshot.bagId);
 
     // Collect candidate items from source bag with valid weights
-    const candidateItems: Array<{ item: PackingItem; weightLbs: number; isEssential: boolean }> = [];
+    const candidateItems: Array<{ item: PackingItem; weightLbs: number; unitWeightLbs: number; quantity: number; isEssential: boolean }> = [];
 
     for (const item of currentSourceItems) {
       const w = getItemWeightLbs(item);
-      if (w === null || w <= 0) {
+      const unit = getItemUnitWeightLbs(item);
+      if (w === null || w <= 0 || unit === null) {
         unweightedItemsCount++;
         continue;
       }
+      const quantity = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
       candidateItems.push({
         item,
         weightLbs: w,
+        unitWeightLbs: unit,
+        quantity,
         isEssential: isEssentialItem(item)
       });
     }
@@ -321,11 +343,14 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
         // This move is valid!
         const sourceAfter = prospectiveSourceWeight;
         const destAfter = prospectiveDestWeight;
+        const displayName = cand.quantity > 1 ? `${cand.quantity}x ${cand.item.name}` : cand.item.name;
 
         suggestedMoves.push({
           id: `move-${sourceBag.id}-${destBag.id}-${cand.item.id}`,
           itemId: cand.item.id,
-          itemName: cand.item.name,
+          itemName: displayName,
+          quantity: cand.quantity,
+          unitWeightLbs: cand.unitWeightLbs,
           itemWeightLbs: cand.weightLbs,
           sourceBagId: sourceBag.id,
           sourceBagLabel: sourceBag.label,

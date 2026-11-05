@@ -128,6 +128,10 @@ export const PricingPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
+                <span>Rebalance Bags (suggest first)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>Emergency QR luggage recovery tag</span>
               </div>
               <div className="flex items-center gap-2">

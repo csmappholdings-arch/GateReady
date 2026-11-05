@@ -318,6 +318,11 @@ export const RebalanceBagsModal: React.FC<RebalanceBagsModalProps> = ({
                     </span>
                     <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
                       {formatWeight(move.itemWeightLbs)}
+                      {move.quantity > 1 && (
+                        <span className="ml-1 text-[10px] font-normal text-purple-600/80 dark:text-purple-300/80">
+                          ({formatWeight(move.unitWeightLbs)} each)
+                        </span>
+                      )}
                     </span>
                     {move.isEssential && (
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">

@@ -326,6 +326,10 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Rebalance Bags (suggest first)</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
                     <span className="text-slate-700 dark:text-slate-300">Emergency QR luggage recovery tag</span>
                   </div>
                   <div className="flex items-start gap-2">

@@ -295,7 +295,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-purple-900">Silver ($1.99/mo · $19.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, emergency QR recovery tag, terminal maps, travel wallet (loyalty numbers, TSA PreCheck, PNRs).</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, Rebalance Bags (suggest first), emergency QR recovery tag, terminal maps, travel wallet (loyalty numbers, TSA PreCheck, PNRs).</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
@@ -365,9 +365,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">November 2, 2026 — Rebalance Bags Luggage Optimizer, Fare-Family Single Source of Truth & Settings Reachability</div>
+            <div class="font-bold text-purple-900 text-sm">November 2, 2026 — Rebalance Bags Luggage Optimizer, Server-Side Account Deletion, Fare-Family Single Source of Truth & Settings Reachability</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li><strong>Rebalance Bags Luggage Optimizer (Silver+):</strong> When any suitcase exceeds weight limits, Rebalance evaluates your packed items to suggest safe transfers to lighter bags. Strictly suggest-first with 1-click apply and complete undo. Rigidly enforces airline safety rules (never moving keys, medications, or lithium power banks into checked luggage) and displays an honest notice when no safe move exists.</li>
+              <li><strong>Permanent Server-Side Account Deletion & Local Purge:</strong> Deleting an account enforces complete server-side deletion of Cloud Firestore user profile, all synced trip records, and the Firebase Auth user record before reporting completion. Local device trip state is completely wiped at deletion time, preventing any resurrected trips or subsequent logins with the same credentials.</li>
               <li><strong>Fare-Family Single Source of Truth:</strong> Eliminated cloud-sync race conditions when changing fare families. Trip updates write through with server confirmation and re-read the fresh saved fare whenever switching trips or opening the New Trip dialog.</li>
               <li><strong>Settings Modal Layout & Delete Account Button Visibility:</strong> Optimized vertical scrolling and sticky header in Settings & Preferences (max-h-[85vh]), ensuring "Delete Account & Erase Cloud Data" is visible and clickable by mouse/touch on all screen heights.</li>
               <li><strong>Weight Math Unification:</strong> Unified simulation and applied luggage weight math into a single formula, eliminating 0.1 lb prediction discrepancies.</li>
@@ -376,9 +377,8 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             </ul>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="font-bold text-slate-900 text-sm">November 1, 2026 — Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</div>
+            <div class="font-bold text-slate-900 text-sm">November 1, 2026 — Complete Plan Zero-Flash, Privacy Policy §5 In-App Deletion Synchronization & Multi-Modal Refinements</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
-              <li><strong>Server-Side Account Deletion & Local Purge:</strong> Deleting an account enforces complete server-side deletion of Cloud Firestore user profile, all synced trip records, and the Firebase Auth user record before reporting completion. Local device trip state is completely wiped at deletion time, preventing any resurrected trips or subsequent logins with the same credentials.</li>
               <li><strong>Complete Plan Pill & Tier Badge Zero-Flash:</strong> Synchronized trial expiration timestamps and subscription tier states from local cache on initial render, ensuring the header immediately displays the user's trial countdown and tier without flashing "Free Plan", "Upgrade PLANS", blank pills, or pulse skeletons on reload or new tabs.</li>
               <li><strong>Cruise Stateroom Storage Copy Cleanup:</strong> Updated cruise carry-on dimensional guidance to use verified cruise-appropriate wording ("Terminal security clearance sizer · must fit through terminal screening sizer and stow in stateroom"), eliminating bus/coach terminology on cruise itineraries.</li>
               <li><strong>Privacy Policy §5 In-App Deletion Synchronization:</strong> Updated Privacy Policy §5 (User Rights & Data Deletion) to document the in-app "Delete Account & Erase Cloud Data" control as the primary instant deletion mechanism, with email support as the fallback route.</li>
@@ -541,7 +541,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
         <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
           <p class="text-xs text-slate-600 leading-relaxed">
-            You can submit feedback directly in the interactive form above or email our support and product team directly at <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 font-bold underline">csmappholdings@gmail.com</a>.
+            You can submit feedback directly in the interactive form above or visit our <a href="/contact" class="text-purple-600 font-bold underline">contact page</a>.
           </p>
           <div class="p-3.5 rounded-2xl bg-purple-50 border border-purple-100 text-xs text-slate-600 font-medium">
             Feedback is used only to improve GateReady.

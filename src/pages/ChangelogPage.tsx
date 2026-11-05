@@ -20,7 +20,7 @@ export const ChangelogPage: React.FC = () => {
           <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
             November 2, 2026
           </span>
-          <span className="text-xs text-slate-500 font-medium">Rebalance Bags Luggage Optimizer, Fare-Family Single Source of Truth & Settings Reachability</span>
+          <span className="text-xs text-slate-500 font-medium">Rebalance Bags Luggage Optimizer, Server-Side Account Deletion, Fare-Family Single Source of Truth & Settings Reachability</span>
         </div>
 
         <div className="space-y-3">
@@ -31,6 +31,16 @@ export const ChangelogPage: React.FC = () => {
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Launched the Rebalance Bags Luggage Optimizer for Silver+ travelers. When any suitcase exceeds weight limits or approaches capacity, Rebalance evaluates your luggage manifest and suggests safe item transfers to lighter bags. Built strictly suggest-first with 1-click apply and complete undo. Rigidly enforces airline safety guardrails (never moving keys, passports, medications, or lithium power banks into checked bags) and displays an honest notice when no safe move exists.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Permanent Server-Side Account Deletion & Local Data Purge</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Enforced strict server-side completion of account deletion: the Cloud Firestore user profile, all synced trip records, and the Firebase Authentication user record are all permanently deleted before sign-out is reported. Local device trip state is completely purged at deletion time, preventing any resurrected trips on future visits or subsequent logins.
             </p>
           </div>
 
@@ -92,19 +102,10 @@ export const ChangelogPage: React.FC = () => {
           <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-mono text-xs font-bold">
             November 1, 2026
           </span>
-          <span className="text-xs text-slate-500 font-medium">Server-Side Account Deletion, Complete Plan Zero-Flash & Multi-Modal Refinements</span>
+          <span className="text-xs text-slate-500 font-medium">Complete Plan Zero-Flash, Privacy Policy §5 In-App Deletion Synchronization & Multi-Modal Refinements</span>
         </div>
 
         <div className="space-y-3">
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
-            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Permanent Server-Side Account Deletion & Local Data Purge</span>
-            </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Enforced strict server-side completion of account deletion: the Cloud Firestore user profile, all synced trip records, and the Firebase Authentication user record are all permanently deleted before sign-out is reported. Local device trip state is completely purged at deletion time, preventing any resurrected trips on future visits or subsequent logins.
-            </p>
-          </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
             <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
