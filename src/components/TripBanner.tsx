@@ -26,7 +26,9 @@ import {
   Trash2,
   Zap,
   Crown,
-  Lock
+  Lock,
+  ShieldCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
@@ -34,6 +36,40 @@ import { TripCountdownBanner } from './TripCountdownBanner';
 import { DatePickerInput } from './DatePickerInput';
 import { getDefaultChecklistForMode } from '../data/allowances';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
+import { checkPassportValidity } from '../utils/passportValidity';
+
+function getValidSeatClassForMode(mode: TravelType, seatClass?: string): string {
+  if (mode === 'PLANE') {
+    const validPlaneClasses = ['Main Cabin', 'Basic Economy', 'Comfort+ / Extra Legroom', 'Business / First Class'];
+    if (seatClass && validPlaneClasses.includes(seatClass)) return seatClass;
+    if (seatClass && /economy|main|standard/i.test(seatClass)) return 'Main Cabin';
+    if (seatClass && /basic/i.test(seatClass)) return 'Basic Economy';
+    if (seatClass && /comfort|extra|premium/i.test(seatClass)) return 'Comfort+ / Extra Legroom';
+    if (seatClass && /business|first/i.test(seatClass)) return 'Business / First Class';
+    return 'Main Cabin';
+  }
+  if (mode === 'CRUISE') {
+    const validCruiseClasses = ['Balcony Stateroom', 'Interior Cabin', 'Ocean View Porthole', 'Suite / Concierge'];
+    if (seatClass && validCruiseClasses.includes(seatClass)) return seatClass;
+    return 'Balcony Stateroom';
+  }
+  if (mode === 'CAR') {
+    const validCarClasses = ['Mid-Size SUV / Car', 'Large SUV / Suburban', 'Compact Sedan', 'Truck / Pickup', 'RV / Campervan'];
+    if (seatClass && validCarClasses.includes(seatClass)) return seatClass;
+    return 'Mid-Size SUV / Car';
+  }
+  if (mode === 'TRAIN') {
+    const validTrainClasses = ['Standard Coach', 'Business Class', 'First Class', 'Sleeper Roomette'];
+    if (seatClass && validTrainClasses.includes(seatClass)) return seatClass;
+    return 'Standard Coach';
+  }
+  if (mode === 'BUS') {
+    const validBusClasses = ['Standard Reserved Seat', 'Front Row / Extra Legroom', 'Panoramic View (Upper Deck)'];
+    if (seatClass && validBusClasses.includes(seatClass)) return seatClass;
+    return 'Standard Reserved Seat';
+  }
+  return seatClass || 'Main Cabin';
+}
 
 interface TripBannerProps {
   currentTrip: Trip | null;
@@ -65,7 +101,9 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   // Edit fields - initialized with currentTrip values
   const [editName, setEditName] = useState(currentTrip?.name || '');
   const [editCarrier, setEditCarrier] = useState(currentTrip?.companyName || '');
-  const [editSeatClass, setEditSeatClass] = useState(currentTrip?.seatClassOrCarSize || 'Main Cabin');
+  const [editSeatClass, setEditSeatClass] = useState(() => 
+    getValidSeatClassForMode(currentTrip?.travelType || 'PLANE', currentTrip?.seatClassOrCarSize)
+  );
   const [editFareFamily, setEditFareFamily] = useState(currentTrip?.fareFamily || '');
   const [editTravelType, setEditTravelType] = useState<TravelType>(currentTrip?.travelType || 'PLANE');
   const [editOriginCity, setEditOriginCity] = useState(currentTrip?.originCity || '');
@@ -75,6 +113,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
   const [editReturnDate, setEditReturnDate] = useState(currentTrip?.returnTripDate || '');
   const [editReturnTime, setEditReturnTime] = useState(currentTrip?.returnTripTime || '');
   const [editAircraft, setEditAircraft] = useState(currentTrip?.aircraftType || '');
+  const [editPassportExpiry, setEditPassportExpiry] = useState(currentTrip?.passportExpiryDate || '');
   const [editModeProfiles, setEditModeProfiles] = useState<Partial<Record<TravelType, ModeProfile>>>(() => {
     if (!currentTrip) return {};
     return {
@@ -93,7 +132,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     if (currentTrip && !isEditing) {
       setEditName(currentTrip.name || '');
       setEditCarrier(currentTrip.companyName || '');
-      setEditSeatClass(currentTrip.seatClassOrCarSize || (currentTrip.travelType === 'CAR' ? 'Mid-Size SUV / Car' : currentTrip.travelType === 'CRUISE' ? 'Balcony Stateroom' : currentTrip.travelType === 'TRAIN' ? 'Standard Coach' : 'Main Cabin'));
+      setEditSeatClass(getValidSeatClassForMode(currentTrip.travelType || 'PLANE', currentTrip.seatClassOrCarSize));
       setEditFareFamily(currentTrip.fareFamily || '');
       setEditTravelType(currentTrip.travelType || 'PLANE');
       setEditOriginCity(currentTrip.originCity || '');
@@ -103,6 +142,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
       setEditReturnDate(currentTrip.returnTripDate || '');
       setEditReturnTime(currentTrip.returnTripTime || '');
       setEditAircraft(currentTrip.aircraftType || '');
+      setEditPassportExpiry(currentTrip.passportExpiryDate || '');
       setEditModeProfiles({
         ...(currentTrip.modeProfiles || {}),
         [currentTrip.travelType || 'PLANE']: {
@@ -117,7 +157,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         }
       });
     }
-  }, [currentTrip?.id, currentTrip?.fareFamily, currentTrip?.travelType, currentTrip?.companyName, isEditing]);
+  }, [currentTrip?.id, currentTrip?.fareFamily, currentTrip?.travelType, currentTrip?.companyName, currentTrip?.passportExpiryDate, isEditing]);
 
   const editAirlineFareFamilies = React.useMemo(() => {
     if (editTravelType !== 'PLANE' || !editCarrier) return [];
@@ -138,6 +178,26 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     const families = getAirlineFareFamilies(currentTrip.companyName);
     return families.find((f) => f.id === currentTrip.fareFamily) || null;
   }, [currentTrip?.travelType, currentTrip?.companyName, currentTrip?.fareFamily]);
+
+  const passportWarning = React.useMemo(() => {
+    if (!currentTrip?.passportExpiryDate) return null;
+    const res = checkPassportValidity(
+      currentTrip.passportExpiryDate,
+      currentTrip.returnTripDate,
+      currentTrip.departureDate
+    );
+    return res.hasWarning ? res.message : null;
+  }, [currentTrip?.passportExpiryDate, currentTrip?.returnTripDate, currentTrip?.departureDate]);
+
+  const editPassportWarning = React.useMemo(() => {
+    if (!editPassportExpiry) return null;
+    const res = checkPassportValidity(
+      editPassportExpiry,
+      editReturnDate,
+      editDate
+    );
+    return res.hasWarning ? res.message : null;
+  }, [editPassportExpiry, editReturnDate, editDate]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -186,7 +246,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     setEditModeProfiles(initialProfiles);
     setEditName(currentTrip.name || '');
     setEditCarrier(currentTrip.companyName || '');
-    setEditSeatClass(currentTrip.seatClassOrCarSize || (currentTrip.travelType === 'CAR' ? 'Mid-Size SUV / Car' : currentTrip.travelType === 'CRUISE' ? 'Balcony Stateroom' : currentTrip.travelType === 'TRAIN' ? 'Standard Coach' : 'Main Cabin'));
+    setEditSeatClass(getValidSeatClassForMode(currentTrip.travelType || 'PLANE', currentTrip.seatClassOrCarSize));
     setEditFareFamily(currentTrip.fareFamily || '');
     setEditTravelType(currentTrip.travelType || 'PLANE');
     setEditOriginCity(currentTrip.originCity || '');
@@ -196,6 +256,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
     setEditReturnDate(currentTrip.returnTripDate || '');
     setEditReturnTime(currentTrip.returnTripTime || '');
     setEditAircraft(currentTrip.aircraftType || '');
+    setEditPassportExpiry(currentTrip.passportExpiryDate || '');
     setEditError(null);
     setIsEditing(true);
   };
@@ -212,7 +273,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
 
     const modeChanged = editTravelType !== currentTrip.travelType;
     const resolvedCarrier = editCarrier.trim();
-    const resolvedSeatClass = editSeatClass.trim();
+    const resolvedSeatClass = getValidSeatClassForMode(editTravelType, editSeatClass.trim());
     const resolvedOriginCity = editOriginCity.trim();
     const resolvedDestinationCity = editDestinationCity.trim();
     const resolvedAircraft = editTravelType === 'PLANE' ? editAircraft.trim() : '';
@@ -259,6 +320,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
         returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
         aircraftType: resolvedAircraft,
+        passportExpiryDate: editPassportExpiry.trim() || '',
         modeProfiles: finalModeProfiles,
         ...(modeChanged ? { gateChecklist: updatedGateChecklist, bags: updatedBags } : {})
       });
@@ -539,7 +601,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                         const targetProfile = updatedProfiles[type];
                         if (targetProfile) {
                           setEditCarrier(targetProfile.companyName || '');
-                          setEditSeatClass(targetProfile.seatClassOrCarSize || (type === 'PLANE' ? 'Main Cabin' : type === 'CAR' ? 'Mid-Size SUV / Car' : type === 'CRUISE' ? 'Balcony Stateroom' : type === 'TRAIN' ? 'Standard Coach' : 'Standard Coach'));
+                          setEditSeatClass(getValidSeatClassForMode(type, targetProfile.seatClassOrCarSize));
                           setEditAircraft(type === 'PLANE' ? (targetProfile.aircraftType || '') : '');
                           setEditFareFamily(type === 'PLANE' ? (targetProfile.fareFamily || '') : '');
                           setEditOriginCity(targetProfile.originCity || '');
@@ -548,7 +610,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                           if (targetProfile.departureTime) setEditTime(targetProfile.departureTime);
                         } else {
                           setEditCarrier('');
-                          setEditSeatClass(type === 'PLANE' ? 'Main Cabin' : type === 'CAR' ? 'Mid-Size SUV / Car' : type === 'CRUISE' ? 'Balcony Stateroom' : 'Standard Coach');
+                          setEditSeatClass(getValidSeatClassForMode(type, ''));
                           setEditAircraft('');
                           setEditFareFamily('');
                           setEditOriginCity('');
@@ -803,6 +865,47 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               </div>
             </div>
 
+            {/* Optional Passport Expiration Date & 6-Month Rule Check */}
+            <div className="pt-3 border-t border-purple-100 dark:border-purple-900/40">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Passport Expiration Date (Optional)</span>
+                  </label>
+                  <DatePickerInput
+                    value={editPassportExpiry}
+                    onChange={(val) => setEditPassportExpiry(val)}
+                    className="h-10 px-3 text-xs"
+                    placeholder="YYYY-MM-DD"
+                  />
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                    Checks against the 6-Month Passport Validity Rule for international entry.
+                  </p>
+                </div>
+
+                {editPassportWarning && (
+                  <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="font-extrabold text-[11px] uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                        Passport Validity Warning
+                      </p>
+                      <p className="text-[11px] mt-0.5 leading-snug">
+                        {editPassportWarning}
+                      </p>
+                      <a
+                        href="/entry-requirements"
+                        className="inline-block mt-1 text-[11px] font-bold text-amber-950 dark:text-amber-100 underline hover:no-underline"
+                      >
+                        View 6-Month Rule Guidelines →
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {editError && (
               <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-bold">
                 {editError}
@@ -912,8 +1015,8 @@ export const TripBanner: React.FC<TripBannerProps> = ({
               </span>
               <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                 <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                  {currentTrip.seatClassOrCarSize ? (
-                    currentTrip.seatClassOrCarSize
+                  {(isFlight ? getValidSeatClassForMode('PLANE', currentTrip.seatClassOrCarSize) : currentTrip.seatClassOrCarSize) ? (
+                    isFlight ? getValidSeatClassForMode('PLANE', currentTrip.seatClassOrCarSize) : currentTrip.seatClassOrCarSize
                   ) : (
                     <span className="text-slate-400 dark:text-slate-500 font-normal italic text-xs">
                       Add {isCruise ? 'stateroom' : isCar ? 'vehicle size' : isTrain ? 'class of service' : isBus ? 'seat type' : 'cabin class'}
@@ -942,6 +1045,34 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Passport 6-Month Validity Warning Banner */}
+        {!isEditing && passportWarning && (
+          <div className="mt-2.5 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-extrabold text-[11px] uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                  Passport Validity Notice
+                </span>
+                <span className="text-[10px] font-semibold bg-amber-200/70 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 px-2 py-0.5 rounded-full">
+                  6-Month Rule
+                </span>
+              </div>
+              <p className="text-xs mt-1 leading-snug">
+                {passportWarning}
+              </p>
+              <div className="mt-1.5 flex items-center gap-3">
+                <a
+                  href="/entry-requirements"
+                  className="text-[11px] font-bold text-amber-950 dark:text-amber-100 underline hover:no-underline"
+                >
+                  View destination entry requirements & validity rules →
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Secondary Info Line: Departure Date, Return Date, Travelers, Bags Count */}
         <div className="flex items-center justify-between gap-3 sm:gap-6 flex-wrap text-xs text-slate-600 dark:text-slate-300 mt-2.5 pt-2.5 border-t border-purple-100/80 dark:border-purple-950/60 font-medium">
@@ -975,6 +1106,13 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
               <Zap className="w-3.5 h-3.5 text-amber-500" />
               <span>Aircraft: <strong>{currentTrip.aircraftType}</strong></span>
+            </span>
+          )}
+
+          {currentTrip.passportExpiryDate && (
+            <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Passport: <strong>Expires {currentTrip.passportExpiryDate}</strong></span>
             </span>
           )}
         </div>

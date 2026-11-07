@@ -1,24 +1,26 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { AIRLINE_BAGGAGE_FEES, calculateTripBaggageFees, BagFeeCalculationResult } from '../data/baggageFeeData';
-import { getAirlineFareFamilies, AirlineFareFamily } from '../data/airlineFareFamilies';
-import { AIRLINE_GUIDES, getAirlineGuideById } from '../data/airlineGuidesData';
 import { 
+  AIRLINE_BAGGAGE_FEES, 
+  calculateTripBaggageFees, 
+  BagFeeCalculationResult 
+} from '../data/baggageFeeData';
+import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
+import { AIRLINE_GUIDES } from '../data/airlineGuidesData';
+import { 
+  Receipt, 
   Calculator, 
   Plane, 
-  Scale, 
   Luggage, 
-  Briefcase, 
   AlertTriangle, 
   CheckCircle2, 
   ExternalLink, 
   ArrowRight,
   ShieldCheck,
   Calendar,
-  Sparkles,
   HelpCircle,
-  Plus,
-  Minus
+  Info
 } from 'lucide-react';
+import { BagType } from '../types/travel';
 
 interface BaggageFeeCalculatorPageProps {
   onOpenTripBuilder?: (carrier: string, checkedCount: number, carryOnCount: number) => void;
@@ -39,74 +41,93 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
         if (found) return found.airlineName;
       }
     }
-    return 'Air Canada';
+    return 'WestJet'; // Default WestJet to immediately demonstrate published fare families & fees
   });
 
-  const [selectedCabin, setSelectedCabin] = useState<'Economy' | 'Premium Economy' | 'Business / First'>('Economy');
-  const [checkedCount, setCheckedCount] = useState<number>(1);
+  const [selectedCabin, setSelectedCabin] = useState<string>('Main Cabin / Economy');
+  const [checkedCount, setCheckedCount] = useState<number>(2); // Default 2 checked bags
   const [carryOnCount, setCarryOnCount] = useState<number>(1);
-  const [checkedWeight1, setCheckedWeight1] = useState<number>(45);
-  const [checkedWeight2, setCheckedWeight2] = useState<number>(48);
 
   const activeRecord = useMemo(() => {
     return AIRLINE_BAGGAGE_FEES.find((a) => a.airlineName === selectedAirlineName) || AIRLINE_BAGGAGE_FEES[0];
   }, [selectedAirlineName]);
 
-  const fareFamilies = useMemo(() => {
+  const airlineFareFamilies = useMemo(() => {
     return getAirlineFareFamilies(activeRecord.airlineId || activeRecord.airlineName);
   }, [activeRecord]);
 
   const [selectedFareFamilyId, setSelectedFareFamilyId] = useState<string>('');
 
   useEffect(() => {
-    const defaultFam = fareFamilies.find((f) => f.isDefault) || fareFamilies[0];
+    const defaultFam = airlineFareFamilies.find((f) => f.isDefault) || airlineFareFamilies[0];
     setSelectedFareFamilyId(defaultFam ? defaultFam.id : '');
-  }, [fareFamilies]);
+  }, [airlineFareFamilies]);
 
   const activeGuide = useMemo(() => {
     return AIRLINE_GUIDES.find((g) => g.name === activeRecord.airlineName);
   }, [activeRecord]);
 
-  // Construct synthetic bag list for the fee calculation engine
+  // Build synthetic bag manifest for the fee calculation engine
   const simulatedBags = useMemo(() => {
-    const bags: Array<{
+    const list: Array<{
       id: string;
       label: string;
-      type: 'PERSONAL' | 'CARRY_ON' | 'CHECKED';
+      type: BagType;
       currentWeightLbs: number;
       maxWeightLimitLbs?: number;
     }> = [];
 
-    // Personal item: always free
-    bags.push({
-      id: 'sim-personal',
-      label: 'Personal Item',
-      type: 'PERSONAL',
-      currentWeightLbs: 6
-    });
+    // Checked bags
+    for (let i = 0; i < checkedCount; i++) {
+      list.push({
+        id: `fee-chk-${i + 1}`,
+        label: checkedCount === 1 ? 'Checked Bag' : i === 0 ? '1st Checked Bag' : i === 1 ? '2nd Checked Bag' : `${i + 1}th Checked Bag`,
+        type: 'CHECKED',
+        currentWeightLbs: 45,
+        maxWeightLimitLbs: 50
+      });
+    }
 
+    // Carry-on bags
     for (let i = 0; i < carryOnCount; i++) {
-      bags.push({
-        id: `sim-carryon-${i + 1}`,
+      list.push({
+        id: `fee-co-${i + 1}`,
         label: carryOnCount === 1 ? 'Carry-On Roller' : `Carry-On #${i + 1}`,
         type: 'CARRY_ON',
-        currentWeightLbs: 18
+        currentWeightLbs: 18,
+        maxWeightLimitLbs: 22
       });
     }
 
-    for (let i = 0; i < checkedCount; i++) {
-      const weight = i === 0 ? checkedWeight1 : i === 1 ? checkedWeight2 : 46;
-      bags.push({
-        id: `sim-checked-${i + 1}`,
-        label: i === 0 ? '1st Checked Suitcase' : i === 1 ? '2nd Checked Suitcase' : `${i + 1}th Checked Suitcase`,
-        type: 'CHECKED',
-        currentWeightLbs: weight,
-        maxWeightLimitLbs: selectedCabin === 'Business / First' ? 70 : 50
-      });
-    }
+    return list;
+  }, [checkedCount, carryOnCount]);
 
-    return bags;
-  }, [checkedCount, carryOnCount, checkedWeight1, checkedWeight2, selectedCabin]);
+  // Run official published airline calculation with fare family
+  const feeResult: BagFeeCalculationResult | null = useMemo(() => {
+    return calculateTripBaggageFees(activeRecord.airlineName, simulatedBags, selectedCabin, selectedFareFamilyId);
+  }, [activeRecord.airlineName, simulatedBags, selectedCabin, selectedFareFamilyId]);
+
+  // Dynamic USD approximation based on active total fee
+  const approxUsd = useMemo(() => {
+    if (!feeResult) return null;
+    return feeResult.usdEquivalentNote || null;
+  }, [feeResult]);
+
+  // Fee-bearing bag count
+  const feeBearingBags = useMemo(() => {
+    if (!feeResult) return [];
+    return feeResult.breakdown.filter((b) => b.subtotal > 0 || (b.bagType === 'CHECKED' && b.baseFee > 0));
+  }, [feeResult]);
+
+  const feeSummaryBagCountText = useMemo(() => {
+    const count = feeBearingBags.length;
+    if (count === 0) return 'no fee-bearing bags';
+    const allChecked = feeBearingBags.every((b) => b.bagType === 'CHECKED');
+    if (count === 1) {
+      return allChecked ? '1 checked bag' : '1 bag';
+    }
+    return allChecked ? `${count} checked bags` : `${count} fee-bearing bags`;
+  }, [feeBearingBags]);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -118,10 +139,6 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
   const sortedAirlines = useMemo(() => {
     return [...AIRLINE_BAGGAGE_FEES].sort((a, b) => a.airlineName.localeCompare(b.airlineName));
   }, []);
-
-  const calculationResult: BagFeeCalculationResult | null = useMemo(() => {
-    return calculateTripBaggageFees(activeRecord.airlineName, simulatedBags, selectedCabin, selectedFareFamilyId);
-  }, [activeRecord, simulatedBags, selectedCabin, selectedFareFamilyId]);
 
   const handleStartTripWithBags = () => {
     if (onOpenTripBuilder) {
@@ -150,7 +167,13 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
               href="/airlines" 
               className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
-              All 42 Airline Guides
+              Airline Guides
+            </a>
+            <a 
+              href="/entry-requirements" 
+              className="text-xs font-bold text-slate-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 transition-colors"
+            >
+              Entry Requirements
             </a>
             <button
               onClick={handleStartTripWithBags}
@@ -167,8 +190,8 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
       <section className="w-full bg-gradient-to-b from-purple-50 via-white to-slate-50 border-b border-purple-100 py-10 px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-[11px] font-black uppercase tracking-wider">
-            <Calculator className="w-3.5 h-3.5 text-purple-600" />
-            <span>Interactive Tool · Instant Baggage Fee Calculations</span>
+            <Receipt className="w-3.5 h-3.5 text-purple-600" />
+            <span>BAGGAGE FEE CHECKER · 42 Airlines Audited</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
@@ -176,13 +199,13 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Estimate checked luggage costs, carry-on charges, and overweight surcharges across 42 global airlines before heading to the airport.
+            Estimate checked bag fees, carry-on charges, and fare-family luggage inclusions across 42 airlines with GateReady's standalone fee calculator.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-500">
             <span className="flex items-center gap-1 font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
               <Calendar className="w-3.5 h-3.5" />
-              <span>Updated & Verified: October 2026</span>
+              <span>Verified: November 4, 2026</span>
             </span>
             <span className="flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
@@ -192,291 +215,253 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
         </div>
       </section>
 
-      {/* Main Interactive Tool */}
-      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Calculator Controls */}
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-purple-100 shadow-xs p-6 sm:p-7 space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Calculator className="w-4 h-4 text-purple-600" />
-                <span>1. Select Carrier & Luggage Manifest</span>
-              </h2>
-              <span className="text-xs text-purple-600 font-bold">42 Airlines Available</span>
-            </div>
-
-            {/* Carrier Selector */}
-            <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
-                Airline / Carrier
-              </label>
-              <select
-                value={selectedAirlineName}
-                onChange={(e) => setSelectedAirlineName(e.target.value)}
-                className="w-full h-11 px-3.5 text-xs font-bold rounded-2xl border border-purple-200 bg-purple-50/40 text-slate-900 focus:outline-hidden focus:border-purple-600"
-              >
-                {sortedAirlines.map((airline) => (
-                  <option key={airline.airlineId} value={airline.airlineName}>
-                    {airline.airlineName} ({airline.currency})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Published Fare Family Selector */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
-                  Fare Family / Ticket Tier
-                </label>
-                <span className="text-[11px] font-semibold text-purple-700">Published Policy</span>
-              </div>
-              <select
-                value={selectedFareFamilyId}
-                onChange={(e) => setSelectedFareFamilyId(e.target.value)}
-                className="w-full h-11 px-3.5 text-xs font-bold rounded-2xl border border-purple-200 bg-white text-slate-900 focus:outline-hidden focus:border-purple-600 shadow-2xs"
-              >
-                {fareFamilies.map((fam) => (
-                  <option key={fam.id} value={fam.id}>
-                    {fam.name} {fam.isDefault ? '(Standard)' : ''} — {fam.includedCheckedBags > 0 ? `${fam.includedCheckedBags} checked included` : '0 checked included'}
-                  </option>
-                ))}
-              </select>
-
-              {/* Carry-on restriction notice (e.g. UltraBasic / Basic Economy) */}
-              {calculationResult?.carryOnRestrictionNotice && (
-                <div className="mt-2.5 p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900 font-medium">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span>{calculationResult.carryOnRestrictionNotice}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Cabin Class Selector */}
-            <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
-                Ticket / Cabin Class
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['Economy', 'Premium Economy', 'Business / First'] as const).map((cabin) => (
-                  <button
-                    key={cabin}
-                    type="button"
-                    onClick={() => setSelectedCabin(cabin)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                      selectedCabin === cabin
-                        ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
-                        : 'bg-white text-slate-700 border-slate-200 hover:border-purple-300'
-                    }`}
-                  >
-                    {cabin}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Bag Counter Controls */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {/* Checked Bags */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                    <Scale className="w-4 h-4 text-purple-600" />
-                    <span>Checked Bags</span>
-                  </span>
-                  <span className="text-xs font-black text-purple-700">{checkedCount}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCheckedCount(Math.max(0, checkedCount - 1))}
-                    disabled={checkedCount === 0}
-                    className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-100 flex items-center justify-center disabled:opacity-40 cursor-pointer"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="text-xs font-extrabold text-slate-700 flex-1 text-center">
-                    {checkedCount} {checkedCount === 1 ? 'Suitcase' : 'Suitcases'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setCheckedCount(Math.min(5, checkedCount + 1))}
-                    className="w-8 h-8 rounded-xl bg-purple-600 text-white font-bold hover:bg-purple-700 flex items-center justify-center cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Carry-On Bags */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                    <Luggage className="w-4 h-4 text-purple-600" />
-                    <span>Carry-On Bags</span>
-                  </span>
-                  <span className="text-xs font-black text-purple-700">{carryOnCount}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCarryOnCount(Math.max(0, carryOnCount - 1))}
-                    disabled={carryOnCount === 0}
-                    className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-100 flex items-center justify-center disabled:opacity-40 cursor-pointer"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="text-xs font-extrabold text-slate-700 flex-1 text-center">
-                    {carryOnCount} {carryOnCount === 1 ? 'Roller' : 'Rollers'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setCarryOnCount(Math.min(3, carryOnCount + 1))}
-                    className="w-8 h-8 rounded-xl bg-purple-600 text-white font-bold hover:bg-purple-700 flex items-center justify-center cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Overweight Surcharge Simulator Sliders */}
-            {checkedCount > 0 && (
-              <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-200/80 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-purple-900 flex items-center gap-1.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-500" />
-                    <span>Simulate Packed Scale Weight</span>
-                  </span>
-                  <span className="text-[10px] text-purple-700 font-semibold">
-                    Standard Cap: {selectedCabin === 'Business / First' ? '70 lbs' : '50 lbs (23 kg)'}
-                  </span>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="font-semibold text-slate-700">1st Checked Bag Weight:</span>
-                    <span className={`font-black ${checkedWeight1 > (selectedCabin === 'Business / First' ? 70 : 50) ? 'text-rose-600' : 'text-slate-900'}`}>
-                      {checkedWeight1} lbs
-                    </span>
+      {/* Main Interactive Baggage Fee Checker Tool */}
+      <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
+        
+        {/* The Complete Standalone Baggage Fee Checker Card */}
+        <div className="rounded-3xl bg-white border border-purple-200/90 shadow-lg overflow-hidden flex flex-col justify-between">
+          <div>
+            {/* Card Top Title Bar */}
+            <div className="p-4 sm:p-5 bg-gradient-to-r from-purple-50/90 via-white to-purple-50/40 border-b border-purple-100">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/25">
+                    <Receipt className="w-5 h-5" />
                   </div>
-                  <input
-                    type="range"
-                    min="30"
-                    max="65"
-                    step="1"
-                    value={checkedWeight1}
-                    onChange={(e) => setCheckedWeight1(Number(e.target.value))}
-                    className="w-full accent-purple-600 cursor-pointer"
-                  />
-                </div>
-
-                {checkedCount > 1 && (
                   <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-slate-700">2nd Checked Bag Weight:</span>
-                      <span className={`font-black ${checkedWeight2 > (selectedCabin === 'Business / First' ? 70 : 50) ? 'text-rose-600' : 'text-slate-900'}`}>
-                        {checkedWeight2} lbs
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-purple-700">
+                        Baggage Fee Checker
+                      </span>
+                      <span className="text-slate-300">·</span>
+                      <span className="text-[10px] font-bold text-slate-500">
+                        42 Airlines Audited
                       </span>
                     </div>
-                    <input
-                      type="range"
-                      min="30"
-                      max="65"
-                      step="1"
-                      value={checkedWeight2}
-                      onChange={(e) => setCheckedWeight2(Number(e.target.value))}
-                      className="w-full accent-purple-600 cursor-pointer"
-                    />
+                    <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-0.5">
+                      Estimate Airline Bag Fees
+                    </h2>
                   </div>
+                </div>
+
+                {feeResult?.officialBaggagePageUrl && (
+                  <a
+                    href={feeResult.officialBaggagePageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-8 px-2.5 rounded-xl border border-purple-200 hover:bg-purple-50 text-purple-700 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                    title="View official published airline fee page"
+                  >
+                    <span>Official Policy</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 )}
+              </div>
+            </div>
+
+            {/* Inputs Panel */}
+            <div className="p-4 sm:p-5 space-y-4 border-b border-purple-100/70 bg-purple-50/20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Airline Dropdown */}
+                <div>
+                  <label
+                    htmlFor="fee-calculator-airline-select"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 mb-1 cursor-pointer select-none"
+                  >
+                    Select Airline (42 Available)
+                  </label>
+                  <select
+                    id="fee-calculator-airline-select"
+                    name="airline"
+                    value={selectedAirlineName}
+                    onChange={(e) => setSelectedAirlineName(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 bg-white text-slate-900 font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs relative z-10 pointer-events-auto"
+                  >
+                    {sortedAirlines.map((airline) => (
+                      <option key={airline.airlineId} value={airline.airlineName}>
+                        {airline.airlineName} ({airline.currency})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Cabin / Fare Class */}
+                <div>
+                  <label
+                    htmlFor="fee-calculator-fare-family-select"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 mb-1 cursor-pointer select-none"
+                  >
+                    Fare Family / Ticket Tier
+                  </label>
+                  <select
+                    id="fee-calculator-fare-family-select"
+                    name="fareFamily"
+                    value={selectedFareFamilyId}
+                    onChange={(e) => setSelectedFareFamilyId(e.target.value)}
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-purple-200 bg-white text-slate-900 font-medium focus:outline-hidden focus:border-purple-500 cursor-pointer shadow-2xs relative z-10 pointer-events-auto"
+                  >
+                    {airlineFareFamilies.map((fam) => (
+                      <option key={fam.id} value={fam.id}>
+                        {fam.name} {fam.isDefault ? '(Standard)' : ''} — {fam.includedCheckedBags > 0 ? `${fam.includedCheckedBags} checked included` : '0 checked included'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Carry-on restriction banner if active fare family prohibits overhead bags */}
+              {feeResult?.carryOnRestrictionNotice && (
+                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2 text-xs text-amber-900">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <span>{feeResult.carryOnRestrictionNotice}</span>
+                </div>
+              )}
+
+              {/* Bag Count Selectors: Checked Bags (0-3) and Carry-Ons (0-2) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Checked Bags Selector */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 mb-1.5 flex items-center justify-between">
+                    <span>Checked Bags (to hold)</span>
+                    <span className="text-[10px] text-purple-600 font-bold">{checkedCount} selected</span>
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5 bg-white p-1 rounded-xl border border-purple-200/80">
+                    {[0, 1, 2, 3].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setCheckedCount(num)}
+                        className={`h-8 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                          checkedCount === num
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:bg-purple-50'
+                        }`}
+                      >
+                        {num === 0 ? 'None' : `${num} ${num === 1 ? 'Bag' : 'Bags'}`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Carry-On Bags Selector */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-950 mb-1.5 flex items-center justify-between">
+                    <span>Overhead Carry-On Rollers</span>
+                    <span className="text-[10px] text-purple-600 font-bold">{carryOnCount} selected</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-xl border border-purple-200/80">
+                    {[0, 1, 2].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setCarryOnCount(num)}
+                        className={`h-8 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                          carryOnCount === num
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:bg-purple-50'
+                        }`}
+                      >
+                        {num === 0 ? 'None' : `${num} ${num === 1 ? 'Roller' : 'Rollers'}`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Results Display Area */}
+            {feeResult && (
+              <div className="p-4 sm:p-5 space-y-3.5">
+                {/* Total in Large Type */}
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 pb-2 border-b border-slate-100">
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums">
+                      {feeResult.totalEstimatedFeeFormatted}
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">
+                      estimated total · {feeSummaryBagCountText}
+                    </span>
+                  </div>
+                  {approxUsd && (
+                    <span className="text-xs font-bold text-slate-500">
+                      ({approxUsd})
+                    </span>
+                  )}
+                </div>
+
+                {/* Per-Bag Breakdown */}
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Per-Bag Cost Breakdown:
+                  </div>
+                  {feeResult.breakdown.length === 0 ? (
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                      No bags selected. Choose 1 or more checked or carry-on bags above.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                      {feeResult.breakdown.map((item, idx) => (
+                        <div
+                          key={item.bagId || idx}
+                          className="p-2.5 sm:px-3.5 flex items-center justify-between text-xs hover:bg-slate-100/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Luggage className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                            <span className="font-bold text-slate-800">
+                              {item.bagLabel}
+                            </span>
+                            <span className="text-[10px] text-slate-400 hidden sm:inline">
+                              ({item.bagType === 'CHECKED' ? 'Checked Luggage' : 'Carry-On Overhead'})
+                            </span>
+                          </div>
+                          <span className="font-extrabold text-slate-900 tabular-nums">
+                            {item.subtotalFormatted}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Airline Fee Notes / UltraBasic Alert */}
+                {feeResult.feeNotes && (
+                  <p className="text-[11px] text-slate-500 leading-relaxed bg-purple-50/50 p-2.5 rounded-xl border border-purple-100">
+                    <strong className="text-purple-900">Policy Notes: </strong>
+                    {feeResult.feeNotes}
+                  </p>
+                )}
+
+                {/* Estimate Disclaimer with Last-Verified Date */}
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-1">
+                  <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="leading-snug">Estimate from published airline fee tables, last verified November 4, 2026. Airlines change fees — confirm at booking.</span>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Right Column: Live Calculation Breakdown */}
-          <div className="lg:col-span-5 flex flex-col justify-between bg-white rounded-3xl border border-purple-100 shadow-xs p-6 sm:p-7 space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 className="text-base font-black text-slate-900">
-                  Estimated Baggage Total
-                </h2>
-                <span className="text-[11px] font-bold text-slate-500">
-                  {activeRecord.currency}
-                </span>
-              </div>
-
-              {/* Big Fee Display */}
-              <div className="p-5 rounded-2xl bg-purple-50 border border-purple-200 text-center space-y-1">
-                <span className="text-xs font-bold text-purple-700 uppercase tracking-wider block">
-                  {activeRecord.airlineName} Total
-                </span>
-                <div className="text-4xl font-black text-purple-950 tracking-tight">
-                  {calculationResult?.totalEstimatedFeeFormatted || '$0'}
-                </div>
-                {calculationResult?.usdEquivalentNote && activeRecord.currency !== 'USD' && (
-                  <span className="text-[11px] text-purple-800 font-semibold block">
-                    ({calculationResult.usdEquivalentNote})
-                  </span>
-                )}
-              </div>
-
-              {/* Itemized Breakdown List */}
-              <div className="space-y-2 text-xs">
-                <span className="font-bold text-slate-700 block uppercase tracking-wider text-[10px]">
-                  Fee Breakdown
-                </span>
-
-                {calculationResult?.breakdown.map((item, idx) => (
-                  <div 
-                    key={idx}
-                    className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2"
-                  >
-                    <div>
-                      <div className="font-bold text-slate-900">{item.bagLabel}</div>
-                      {item.isOverweight && (
-                        <div className="text-[10px] text-rose-600 font-bold">
-                          Overweight (+{activeRecord.currencySymbol}{item.overweightFee})
-                        </div>
-                      )}
-                    </div>
-                    <div className="font-black text-purple-900 text-sm">
-                      {item.subtotalFormatted}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Policy Note */}
-              <p className="text-[11px] text-slate-500 leading-relaxed pt-2">
-                {calculationResult?.feeNotes || activeRecord.feeNotes}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-2 pt-4 border-t border-slate-100">
-              <button
-                onClick={handleStartTripWithBags}
-                className="w-full h-11 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-purple-600/20 cursor-pointer transition-all active:scale-95"
+          {/* Bottom Action Footer with secondary utility CTA */}
+          <div className="p-4 sm:p-5 bg-slate-50 border-t border-purple-100 flex flex-col sm:flex-row items-center gap-3">
+            <button
+              type="button"
+              onClick={handleStartTripWithBags}
+              className="w-full sm:flex-1 h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+            >
+              <span>Build my full packing list with these bags →</span>
+            </button>
+            {activeGuide && (
+              <a
+                href={activeGuide.canonicalPath}
+                className="w-full sm:w-auto h-11 px-4 rounded-2xl bg-white hover:bg-purple-50 text-purple-900 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-purple-200"
               >
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Pack for {activeRecord.airlineName} in GateReady</span>
-              </button>
-
-              {activeGuide && (
-                <a
-                  href={activeGuide.canonicalPath}
-                  className="w-full h-10 rounded-2xl bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-purple-200"
-                >
-                  <span>View Full {activeRecord.airlineName} Baggage Guide</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
+                <span>View {activeRecord.airlineName} Guide</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            )}
           </div>
         </div>
 
-        {/* Informative FAQs for SEO */}
+        {/* Informative FAQs for Baggage Fees */}
         <section className="bg-white rounded-3xl border border-purple-100 shadow-xs p-6 sm:p-8 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
             <HelpCircle className="w-5 h-5 text-purple-600" />
@@ -524,7 +509,7 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
           </div>
         </section>
 
-        {/* Cross-Link Hub */}
+        {/* Cross-Link Directory Footer */}
         <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
           <a href="/airlines" className="text-purple-700 hover:text-purple-900 underline flex items-center gap-1.5">
             <span>← Directory of all 42 Airline Allowance Guides</span>
@@ -532,12 +517,12 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
           <div className="flex items-center gap-4 text-slate-500">
             <a href="/tare-weight" className="hover:text-purple-700">What is Tare Weight?</a>
             <span>·</span>
-            <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements Hub</a>
+            <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements Quick-Check</a>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Global Footer */}
       <footer className="w-full bg-slate-900 text-slate-400 py-10 px-4 sm:px-6 lg:px-8 border-t border-slate-800 text-xs mt-12">
         <div className="max-w-[1550px] mx-auto space-y-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-800">

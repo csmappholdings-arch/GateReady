@@ -445,6 +445,7 @@ export function subscribeToUserTrips(
         souvenirBufferEnabled: data.souvenirBufferEnabled ?? true,
         gateChecklist: data.gateChecklist || [],
         luggageTags: data.luggageTags || {},
+        passportExpiryDate: data.passportExpiryDate || '',
         modeProfiles: data.modeProfiles || {}
       });
     });
@@ -483,6 +484,7 @@ export async function saveTripToCloud(userId: string, trip: Trip): Promise<void>
       souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
       gateChecklist: trip.gateChecklist || [],
       luggageTags: trip.luggageTags || {},
+      passportExpiryDate: trip.passportExpiryDate || '',
       modeProfiles: trip.modeProfiles || {},
       updatedAt: new Date().toISOString()
     }, { merge: true });
@@ -533,6 +535,7 @@ export async function syncLocalTripsToCloud(userId: string, localTrips: Trip[]):
         souvenirBufferEnabled: trip.souvenirBufferEnabled ?? true,
         gateChecklist: trip.gateChecklist || [],
         luggageTags: trip.luggageTags || {},
+        passportExpiryDate: trip.passportExpiryDate || '',
         modeProfiles: trip.modeProfiles || {},
         updatedAt: new Date().toISOString()
       }, { merge: true });

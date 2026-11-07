@@ -87,10 +87,10 @@ export const ChangelogPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
             <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Dedicated User Feedback Channel (/feedback)</span>
+              <span>Unified Support Channel & Streamlined Navigation</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Added a dedicated feedback page with categorized topics (Bug report, Feature idea, Pricing or billing, Something else), secure server-side email dispatch to support, rate limiting, and spam protection.
+              Consolidated all customer communications into our single official Contact Support channel (csmappholdings@gmail.com) and organized site-wide navigation into compact, mobile-responsive footer columns.
             </p>
           </div>
         </div>

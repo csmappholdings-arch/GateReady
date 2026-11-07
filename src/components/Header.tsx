@@ -37,6 +37,7 @@ import {
   X,
   Gift,
   MessageSquare,
+  Mail,
   User as UserIcon
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
@@ -235,7 +236,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Direct Links to Guides & Calculator (hidden on mobile to protect two-row layout) */}
+          {/* Desktop Direct Links to Guides, Fee Calculator & Entry Requirements (hidden on mobile to protect two-row layout) */}
           <nav className="hidden xl:flex items-center gap-2 ml-2" aria-label="Quick travel links">
             <a
               href="/airlines"
@@ -248,6 +249,12 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
             >
               Fee Calculator
+            </a>
+            <a
+              href="/entry-requirements"
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Entry Requirements
             </a>
           </nav>
 
@@ -1134,14 +1141,14 @@ export const Header: React.FC<HeaderProps> = ({
                     <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Gov Info</span>
                   </a>
                   <a
-                    href="/feedback"
+                    href="/contact"
                     className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      <MessageSquare className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                      Share Feedback / Bug Report
+                      <Mail className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                      Contact Support
                     </span>
-                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Feedback</span>
+                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Support</span>
                   </a>
                 </div>
 

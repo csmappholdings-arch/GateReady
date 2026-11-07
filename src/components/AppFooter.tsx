@@ -69,71 +69,126 @@ export const AppFooter: React.FC<AppFooterProps> = ({
           </div>
         </div>
 
-        {/* Middle: Complete Site Directory Links (All Pages EXCEPT /reviews) */}
-        <div className="flex items-center justify-center gap-x-6 gap-y-2.5 flex-wrap font-semibold text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">
-          <a href="/about" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            About
-          </a>
-          <a href="/how-it-works" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            How It Works
-          </a>
-          <a href="/pricing" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Pricing
-          </a>
-          <a href="/faq" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            FAQ
-          </a>
-          <a href="/contact" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Contact
-          </a>
-          <a href="/feedback" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Feedback
-          </a>
-          <a href="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Privacy Policy
-          </a>
-          <a href="/terms" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Terms of Service
-          </a>
-          <a href="/cookies" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Cookies
-          </a>
-          <a href="/refunds" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Refunds
-          </a>
-          <a href="/security" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Security
-          </a>
-          <a href="/changelog" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Changelog
-          </a>
-          <a href="/airlines" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Airline Guides (42)
-          </a>
-          <a href="/baggage-fee-calculator" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Fee Calculator
-          </a>
-          <a href="/tare-weight" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Tare Weight
-          </a>
-          <a href="/entry-requirements" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-            Entry Requirements
-          </a>
-          {onOpenAirlineGuides && (
-            <button
-              type="button"
-              onClick={onOpenAirlineGuides}
-              className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer text-purple-600 dark:text-purple-400 font-bold"
-            >
-              Quick Intel Modal
-            </button>
-          )}
+        {/* Middle: Consolidated Site Directory Links (3 Columns) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 pb-2 text-xs">
+          {/* Column 1: Tools */}
+          <div className="space-y-2">
+            <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-purple-700 dark:text-purple-400">
+              Tools
+            </h3>
+            <ul className="space-y-1.5 font-medium text-slate-600 dark:text-slate-300 text-[11px] sm:text-xs">
+              <li>
+                <a href="/airlines" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Airline Baggage Guides
+                </a>
+              </li>
+              <li>
+                <a href="/baggage-fee-calculator" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Baggage Fee Calculator
+                </a>
+              </li>
+              <li>
+                <a href="/tare-weight" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Tare Weight Guide
+                </a>
+              </li>
+              <li>
+                <a href="/entry-requirements" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Entry Requirements
+                </a>
+              </li>
+              {onOpenAirlineGuides && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenAirlineGuides}
+                    className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer text-purple-600 dark:text-purple-400 font-bold"
+                  >
+                    Quick Intel Modal
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+
+          {/* Column 2: Product */}
+          <div className="space-y-2">
+            <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-purple-700 dark:text-purple-400">
+              Product
+            </h3>
+            <ul className="space-y-1.5 font-medium text-slate-600 dark:text-slate-300 text-[11px] sm:text-xs">
+              <li>
+                <a href="/pricing" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Pricing & Plans
+                </a>
+              </li>
+              <li>
+                <a href="/how-it-works" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  How It Works
+                </a>
+              </li>
+              <li>
+                <a href="/about" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="/faq" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a href="/changelog" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Changelog
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Support & Legal */}
+          <div className="space-y-2">
+            <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-purple-700 dark:text-purple-400">
+              Support & Legal
+            </h3>
+            <ul className="space-y-1.5 font-medium text-slate-600 dark:text-slate-300 text-[11px] sm:text-xs">
+              <li>
+                <a href="/contact" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-semibold text-purple-700 dark:text-purple-300">
+                  Contact Support
+                </a>
+              </li>
+              <li>
+                <a href="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="/cookies" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Cookies & Storage
+                </a>
+              </li>
+              <li>
+                <a href="/refunds" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  14-Day Refunds
+                </a>
+              </li>
+              <li>
+                <a href="/security" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Security Safeguards
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Bottom Copyright line: © CSM App Holdings */}
         <div className="pt-2 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-900">
           <span>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</span>
-          <span>Not affiliated with TSA, IATA, or airlines. Baggage fees are estimates from published tables.</span>
+          <span>Sole official support contact: <a href="mailto:csmappholdings@gmail.com" className="text-purple-600 dark:text-purple-400 hover:underline">csmappholdings@gmail.com</a></span>
         </div>
       </div>
     </footer>

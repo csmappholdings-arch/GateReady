@@ -137,6 +137,60 @@ async function prerender() {
     }
   }
 
+  // Generate static redirect for deprecated /feedback route -> /contact
+  const feedbackDir = path.join(distDir, 'feedback');
+  fs.mkdirSync(feedbackDir, { recursive: true });
+  const feedbackRedirectHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting to Contact Support – GateReady</title>
+  <meta http-equiv="refresh" content="0; url=https://gateready.ca/contact">
+  <link rel="canonical" href="https://gateready.ca/contact">
+  <script>window.location.replace("https://gateready.ca/contact");</script>
+</head>
+<body>
+  <p>Redirecting to <a href="https://gateready.ca/contact">Contact Support</a>...</p>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(feedbackDir, 'index.html'), feedbackRedirectHtml, 'utf-8');
+
+  // Generate static redirect for /fee-calculator -> /baggage-fee-calculator
+  const feeCalcDir = path.join(distDir, 'fee-calculator');
+  fs.mkdirSync(feeCalcDir, { recursive: true });
+  const feeCalcRedirectHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting to Baggage Fee Calculator – GateReady</title>
+  <meta http-equiv="refresh" content="0; url=https://gateready.ca/baggage-fee-calculator">
+  <link rel="canonical" href="https://gateready.ca/baggage-fee-calculator">
+  <script>window.location.replace("https://gateready.ca/baggage-fee-calculator");</script>
+</head>
+<body>
+  <p>Redirecting to <a href="https://gateready.ca/baggage-fee-calculator">Baggage Fee Calculator</a>...</p>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(feeCalcDir, 'index.html'), feeCalcRedirectHtml, 'utf-8');
+
+  // Generate static redirect for /requirements -> /entry-requirements
+  const reqDir = path.join(distDir, 'requirements');
+  fs.mkdirSync(reqDir, { recursive: true });
+  const reqRedirectHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting to Entry Requirements – GateReady</title>
+  <meta http-equiv="refresh" content="0; url=https://gateready.ca/entry-requirements">
+  <link rel="canonical" href="https://gateready.ca/entry-requirements">
+  <script>window.location.replace("https://gateready.ca/entry-requirements");</script>
+</head>
+<body>
+  <p>Redirecting to <a href="https://gateready.ca/entry-requirements">Entry Requirements</a>...</p>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(reqDir, 'index.html'), reqRedirectHtml, 'utf-8');
+
   console.log(`[Prerender] Successfully generated ${successCount} prerendered pages and alias redirects.`);
 }
 

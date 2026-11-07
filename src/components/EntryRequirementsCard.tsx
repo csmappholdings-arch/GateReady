@@ -14,8 +14,10 @@ import {
   Calendar, 
   AlertCircle,
   Clock,
-  Sparkles
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
+import { checkPassportValidity } from '../utils/passportValidity';
 
 interface EntryRequirementsCardProps {
   trip: Trip;
@@ -146,6 +148,10 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
     }
   };
 
+  const passportValidity = useMemo(() => {
+    return checkPassportValidity(trip.passportExpiryDate, trip.returnTripDate, trip.departureDate);
+  }, [trip.passportExpiryDate, trip.returnTripDate, trip.departureDate]);
+
   return (
     <div className={`rounded-2xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/60 shadow-sm overflow-hidden transition-all ${className}`}>
       {/* Header with Title and Nationality Switcher */}
@@ -202,6 +208,27 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
         </div>
       </div>
 
+      {/* 6-Month Passport Validity Warning */}
+      {passportValidity.hasWarning && passportValidity.message && (
+        <div className="p-3.5 sm:px-5 bg-amber-50 dark:bg-amber-950/60 border-b border-amber-200 dark:border-amber-900/60 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <span className="font-extrabold uppercase tracking-wider text-[11px] text-amber-800 dark:text-amber-300 block">
+              Passport Validity Alert
+            </span>
+            <p className="mt-0.5 leading-snug">
+              {passportValidity.message}
+            </p>
+            <a
+              href="/entry-requirements"
+              className="inline-block mt-1 font-bold text-amber-950 dark:text-amber-100 underline hover:no-underline"
+            >
+              Learn more about 6-Month Passport Validity Rules →
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Clean Mobile-Friendly Rows: PASSPORT / VISA / MAX STAY / SOURCE */}
       <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
         {/* Row 1: PASSPORT VALIDITY */}
@@ -213,9 +240,14 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
             </span>
           </div>
           <div className="sm:w-2/3 sm:text-right">
-            <span className="font-bold text-slate-900 dark:text-white">
+            <span className="font-bold text-slate-900 dark:text-white block">
               {entryData.passportValidityRule}
             </span>
+            {trip.passportExpiryDate && (
+              <span className="text-[11px] text-purple-600 dark:text-purple-300 block mt-0.5">
+                Your passport expires: {trip.passportExpiryDate}
+              </span>
+            )}
           </div>
         </div>
 

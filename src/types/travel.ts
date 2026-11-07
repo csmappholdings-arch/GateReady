@@ -143,6 +143,7 @@ export interface LoyaltyAccount {
   programOrProvider: string; // e.g. "Delta SkyMiles", "Marriott Bonvoy", "TSA PreCheck / KTN"
   accountNumberOrCode: string; // e.g. "2849182390", "HQ7X8L"
   tierOrNotes?: string; // e.g. "Platinum Medallion", "Expires 2028"
+  expiryDate?: string; // e.g. "2028-11-20" for passports / travel credentials
   travelerName?: string; // e.g. "Alex"
   updatedAt?: string;
 }
@@ -235,6 +236,7 @@ export interface Trip {
   souvenirBufferLbs?: number; // reserved weight buffer in lbs (default 5.0 lbs)
   luggageTags?: Record<string, LuggageTagInfo>;
   gateChecklist?: GateCheckItem[];
+  passportExpiryDate?: string; // Optional passport expiry (YYYY-MM-DD) for 6-month rule verification
   modeProfiles?: Partial<Record<TravelType, ModeProfile>>;
 }
 

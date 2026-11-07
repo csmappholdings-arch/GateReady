@@ -131,14 +131,5 @@ export const STATIC_PAGES: Record<string, StaticPageMeta> = {
     heading: 'Security & Data Protection',
     subheading: 'Factual information on our security practices and account safeguards.',
     schemaType: 'WebPage'
-  },
-  '/feedback': {
-    path: '/feedback',
-    title: 'Share Feedback – GateReady',
-    description: 'Send feedback, report a bug, or suggest new features for GateReady. Your input helps improve packing and baggage calculations for all travelers.',
-    keywords: 'GateReady feedback, report a bug, feature request, travel app feedback, packing list suggestions, CSM App Holdings support',
-    heading: 'Send Us Your Feedback',
-    subheading: 'Tell us how we can make your packing and travel experience even better.',
-    schemaType: 'ContactPage'
   }
 };

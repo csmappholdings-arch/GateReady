@@ -33,12 +33,15 @@ import {
   Zap,
   Maximize2,
   Minimize2,
-  Lock
+  Lock,
+  ShieldCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
 import { DatePickerInput } from './DatePickerInput';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
+import { checkPassportValidity } from '../utils/passportValidity';
 
 interface AddTripDialogProps {
   isOpen: boolean;
@@ -108,6 +111,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   const [returnTripTime, setReturnTripTime] = useState('');
   const [aircraftType, setAircraftType] = useState('');
   const [fareFamily, setFareFamily] = useState<string>(initialFareFamily || '');
+  const [passportExpiryDate, setPassportExpiryDate] = useState('');
+
+  const passportWarning = React.useMemo(() => {
+    if (!passportExpiryDate) return null;
+    const res = checkPassportValidity(passportExpiryDate, returnTripDate, departureDate);
+    return res.hasWarning ? res.message : null;
+  }, [passportExpiryDate, returnTripDate, departureDate]);
 
   const airlineFareFamilies = React.useMemo(() => {
     if (travelType !== 'PLANE' || !companyName) return [];
@@ -201,6 +211,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       setReturnTripDate('');
       setReturnTripTime('');
       setAircraftType('');
+      setPassportExpiryDate('');
       const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
       setFamilyMembers([defaultUser]);
       setNewMemberInput('');
@@ -494,7 +505,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         returnTripDate,
         returnTripTime,
         aircraftType,
-        fareFamily
+        fareFamily,
+        passportExpiryDate: passportExpiryDate.trim() || undefined
       }
     );
 
@@ -1109,6 +1121,52 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Optional Passport Expiration Date & 6-Month Rule Check */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <span>Passport Expiration Date (Optional)</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                    Checks against 6-Month Validity Rule
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                  <div>
+                    <DatePickerInput
+                      placeholder="Select passport expiration date"
+                      value={passportExpiryDate}
+                      onChange={(val) => setPassportExpiryDate(val)}
+                      className={isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'}
+                    />
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                      Helps avoid denied boarding for international flights requiring 6 months remaining validity.
+                    </p>
+                  </div>
+
+                  {passportWarning && (
+                    <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <p className="font-extrabold text-[11px] uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                          6-Month Passport Validity Warning
+                        </p>
+                        <p className="text-[11px] mt-0.5 leading-snug">
+                          {passportWarning}
+                        </p>
+                        <a
+                          href="/entry-requirements"
+                          className="inline-block mt-1 text-[11px] font-bold text-amber-950 dark:text-amber-100 underline hover:no-underline"
+                        >
+                          View 6-Month Rule Guidelines →
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

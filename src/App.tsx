@@ -47,7 +47,6 @@ import { AirlineIndexPage } from './pages/AirlineIndexPage';
 import { BaggageFeeCalculatorPage } from './pages/BaggageFeeCalculatorPage';
 import { TareWeightPage } from './pages/TareWeightPage';
 import { EntryRequirementsPage } from './pages/EntryRequirementsPage';
-import { FeedbackPage } from './pages/FeedbackPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -948,16 +947,25 @@ export default function App() {
   if (pathname === '/airlines') return <AirlineIndexPage />;
   if (pathname.startsWith('/airlines/')) return <AirlineGuidePage />;
   if (pathname === '/baggage-fee-calculator') return <BaggageFeeCalculatorPage />;
+  if (pathname === '/fee-calculator' || pathname === '/fee-calculator/') {
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({}, '', '/baggage-fee-calculator');
+    }
+    return <BaggageFeeCalculatorPage />;
+  }
   if (pathname === '/tare-weight') return <TareWeightPage />;
   if (pathname === '/entry-requirements') return <EntryRequirementsPage />;
-  if (pathname === '/feedback') {
-    return (
-      <AuthProvider>
-        <SubscriptionProvider>
-          <FeedbackPage />
-        </SubscriptionProvider>
-      </AuthProvider>
-    );
+  if (pathname === '/requirements' || pathname === '/requirements/') {
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({}, '', '/entry-requirements');
+    }
+    return <EntryRequirementsPage />;
+  }
+  if (pathname === '/feedback' || pathname === '/feedback/') {
+    if (typeof window !== 'undefined') {
+      window.location.replace('/contact');
+    }
+    return <ContactPage />;
   }
 
   return (

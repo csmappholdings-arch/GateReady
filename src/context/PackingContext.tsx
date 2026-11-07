@@ -47,6 +47,7 @@ interface PackingContextType {
       returnTripTime?: string;
       aircraftType?: string;
       fareFamily?: string;
+      passportExpiryDate?: string;
     }
   ) => Trip;
   loadDemoTrip: () => Trip;
@@ -67,7 +68,7 @@ interface PackingContextType {
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles'>>
   ) => Promise<Trip>;
   refreshActiveTrip: () => void;
   updateLuggageTag: (
@@ -482,6 +483,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       returnTripTime?: string;
       aircraftType?: string;
       fareFamily?: string;
+      passportExpiryDate?: string;
     }
   ): Trip => {
     const newTripId = 'trip-' + Date.now();
@@ -543,6 +545,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       destinationCountry: extraDetails?.destinationCountry?.trim() || '',
       aircraftType: extraDetails?.aircraftType?.trim() || '',
       fareFamily: extraDetails?.fareFamily?.trim() || '',
+      passportExpiryDate: extraDetails?.passportExpiryDate?.trim() || '',
       departureDate: extraDetails?.departureDate?.trim() || '',
       departureTime: extraDetails?.departureTime?.trim() || '',
       returnTripDate: extraDetails?.returnTripDate?.trim() || '',
@@ -1069,7 +1072,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateTripDetails = async (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'modeProfiles'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles'>>
   ): Promise<Trip> => {
     let targetTrip = tripsRef.current.find((t) => t.id === tripId);
     if (!targetTrip) {
@@ -1109,19 +1112,25 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ...(details.luggageTags !== undefined ? { luggageTags: details.luggageTags } : {}),
       ...(details.gateChecklist !== undefined ? { gateChecklist: details.gateChecklist } : {}),
       ...(details.bags !== undefined ? { bags: details.bags } : {}),
+      ...(details.passportExpiryDate !== undefined ? { passportExpiryDate: details.passportExpiryDate } : {}),
       ...(details.modeProfiles !== undefined ? { modeProfiles: details.modeProfiles } : {})
     };
 
-    // Ensure modeProfiles for PLANE keeps fareFamily strictly in sync
-    if (updated.travelType === 'PLANE' || updated.modeProfiles?.PLANE) {
+    // Ensure modeProfiles for the current active travelType keeps company, seatClass, aircraftType, fareFamily strictly in sync
+    // CRITICAL: Only sync to the active mode! Do NOT overwrite PLANE profile when active mode is CRUISE, TRAIN, CAR, or BUS!
+    if (updated.travelType) {
       updated.modeProfiles = {
         ...(updated.modeProfiles || {}),
-        PLANE: {
-          ...(updated.modeProfiles?.PLANE || {}),
+        [updated.travelType]: {
+          ...(updated.modeProfiles?.[updated.travelType] || {}),
           companyName: updated.companyName || '',
           seatClassOrCarSize: updated.seatClassOrCarSize || '',
           aircraftType: updated.aircraftType || '',
-          fareFamily: updated.fareFamily || ''
+          fareFamily: updated.fareFamily || '',
+          originCity: updated.originCity || '',
+          destinationCity: updated.destinationCity || '',
+          departureDate: updated.departureDate || '',
+          departureTime: updated.departureTime || ''
         }
       };
     }

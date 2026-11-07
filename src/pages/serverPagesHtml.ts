@@ -72,8 +72,8 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     const meta: StaticPageMeta = {
       path: '/baggage-fee-calculator',
       title: 'Baggage Fee Calculator – Check Airline Luggage Fees | GateReady',
-      description: 'Calculate checked bag fees, carry-on charges, and overweight surcharges across 42 global airlines with our standalone baggage fee calculator.',
-      keywords: 'baggage fee calculator, airline luggage fees, calculate baggage fees by airline, overweight baggage cost, carry on fee calculator',
+      description: "Estimate checked bag fees, carry-on charges, and fare-family luggage inclusions across 42 airlines with GateReady's standalone fee calculator.",
+      keywords: 'baggage fee calculator, airline luggage fees, calculate baggage fees by airline, overweight baggage cost, carry on fee calculator, fare families luggage',
       heading: 'Airline Baggage Fee Calculator',
       subheading: 'Instant baggage fee calculations across 42 airlines before heading to the airport.',
       schemaType: 'WebApplication'
@@ -105,10 +105,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
   if (normalizedPath === '/entry-requirements') {
     const meta: StaticPageMeta = {
       path: '/entry-requirements',
-      title: 'International Travel Entry Requirements Hub – GateReady',
-      description: 'Essential passport validity rules, 6-month rule, electronic travel authorizations (ESTA, eTA), and direct links to official government entry portals.',
-      keywords: 'travel entry requirements, 6 month passport rule, ESTA eTA requirements, international travel advisories, TSA 3-1-1 rules',
-      heading: 'International Travel Entry Requirements Hub',
+      title: 'Entry Requirements Quick-Check – Passport & Visa Rules | GateReady',
+      description: 'Check passport validity rules, 6-month validity requirements, visa waivers, and official government advisories for Canadian and US passport holders.',
+      keywords: 'entry requirements quick-check, passport validity rules, 6 month passport rule, ESTA eTA requirements, international travel advisories, visa requirements',
+      heading: 'Entry Requirements Quick-Check – Passport & Visa Rules',
       subheading: 'Official government intelligence and cross-border checklist rules before departure.',
       schemaType: 'WebPage'
     };
@@ -241,9 +241,6 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <div class="text-xs font-bold text-purple-700 uppercase">Sole Official Support Email</div>
         <a href="mailto:csmappholdings@gmail.com" class="text-base font-bold text-purple-700 underline block">csmappholdings@gmail.com</a>
         <div class="text-xs text-slate-600">Expected response: We aim to reply to all inquiries within a few business days. (We do not offer 24/7 support).</div>
-        <div class="pt-2 border-t border-purple-200 text-xs">
-          Have bug reports, feature suggestions, or feedback? <a href="/feedback" class="text-purple-700 font-bold underline">Submit structured feedback</a>.
-        </div>
       </section>
       <section class="space-y-2 pt-6 border-t border-slate-200 text-xs text-slate-600">
         <h3 class="font-bold text-slate-900 text-sm">Operating Company:</h3>
@@ -376,7 +373,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
               <li><strong>Settings Modal Layout & Delete Account Button Visibility:</strong> Optimized vertical scrolling and sticky header in Settings & Preferences (max-h-[85vh]), ensuring "Delete Account & Erase Cloud Data" is visible and clickable by mouse/touch on all screen heights.</li>
               <li><strong>Weight Math Unification:</strong> Unified simulation and applied luggage weight math into a single formula, eliminating 0.1 lb prediction discrepancies.</li>
               <li><strong>USD Guide Note Splitting:</strong> Separated 1st-bag and 2nd-bag USD conversion notes onto individual rows for Air Canada and WestJet guides.</li>
-              <li><strong>User Feedback Channel (/feedback):</strong> Added dedicated feedback intake with categorized topics, server-side email dispatch, rate limiting, and spam protection.</li>
+              <li><strong>Unified Support Channel & Streamlined Navigation:</strong> Consolidated all customer communications into our single official Contact Support channel (csmappholdings@gmail.com) and organized site-wide navigation into compact, mobile-responsive footer columns.</li>
             </ul>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
@@ -533,25 +530,6 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
-  } else if (normalizedPath === '/feedback') {
-    innerContentHtml = `
-      <section class="max-w-2xl mx-auto space-y-6">
-        <div class="space-y-2">
-          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Send Us Your Feedback</h2>
-          <p class="text-sm text-slate-600">
-            Encountered a bug, have an idea to improve packing, or want to share your travel experience? We read every submission.
-          </p>
-        </div>
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
-          <p class="text-xs text-slate-600 leading-relaxed">
-            You can submit feedback directly in the interactive form above or visit our <a href="/contact" class="text-purple-600 font-bold underline">contact page</a>.
-          </p>
-          <div class="p-3.5 rounded-2xl bg-purple-50 border border-purple-100 text-xs text-slate-600 font-medium">
-            Feedback is used only to improve GateReady.
-          </div>
-        </div>
-      </section>
-    `;
   }
 
   const bodyHtml = renderPageShell(meta, innerContentHtml);
@@ -562,32 +540,49 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
   const footerLinksHtml = `
     <footer class="w-full bg-slate-900 text-slate-400 py-12 px-4 sm:px-6 lg:px-8 border-t border-slate-800 text-xs">
       <div class="max-w-[1550px] mx-auto space-y-8">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
           <div class="flex items-center gap-3">
             <span class="font-black text-lg tracking-tight text-white">Gate<span class="text-purple-400">Ready</span></span>
             <span class="text-slate-600">|</span>
             <span class="text-slate-400">Smart Trip Packing & Baggage Limits</span>
           </div>
-          <div class="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-            <a href="/airlines" class="hover:text-purple-300">Airline Baggage Guides</a>
-            <a href="/baggage-fee-calculator" class="hover:text-purple-300">Baggage Fee Calculator</a>
-            <a href="/tare-weight" class="hover:text-purple-300">Tare Weight Guide</a>
-            <a href="/entry-requirements" class="hover:text-purple-300">Entry Requirements</a>
-            <a href="/pricing" class="hover:text-purple-300">Pricing & Plans</a>
-            <a href="/how-it-works" class="hover:text-purple-300">How It Works</a>
-            <a href="/about" class="hover:text-purple-300">About</a>
-            <a href="/faq" class="hover:text-purple-300">FAQ</a>
-            <a href="/contact" class="hover:text-purple-300">Contact Support</a>
-            <a href="/feedback" class="hover:text-purple-300">Feedback</a>
-            <a href="/privacy" class="hover:text-purple-300">Privacy Policy</a>
-            <a href="/terms" class="hover:text-purple-300">Terms of Service</a>
-            <a href="/cookies" class="hover:text-purple-300">Cookies & Storage</a>
-            <a href="/refunds" class="hover:text-purple-300">14-Day Refunds</a>
-            <a href="/security" class="hover:text-purple-300">Security Safeguards</a>
-            <a href="/changelog" class="hover:text-purple-300">Changelog</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-xs pb-4">
+          <!-- Column 1: Tools -->
+          <div class="space-y-2.5">
+            <h3 class="font-bold text-[11px] uppercase tracking-wider text-purple-400">Tools</h3>
+            <ul class="space-y-2 text-slate-400">
+              <li><a href="/airlines" class="hover:text-purple-300 transition-colors">Airline Baggage Guides</a></li>
+              <li><a href="/baggage-fee-calculator" class="hover:text-purple-300 transition-colors">Baggage Fee Calculator</a></li>
+              <li><a href="/tare-weight" class="hover:text-purple-300 transition-colors">Tare Weight Guide</a></li>
+              <li><a href="/entry-requirements" class="hover:text-purple-300 transition-colors">Entry Requirements</a></li>
+            </ul>
+          </div>
+          <!-- Column 2: Product -->
+          <div class="space-y-2.5">
+            <h3 class="font-bold text-[11px] uppercase tracking-wider text-purple-400">Product</h3>
+            <ul class="space-y-2 text-slate-400">
+              <li><a href="/pricing" class="hover:text-purple-300 transition-colors">Pricing & Plans</a></li>
+              <li><a href="/how-it-works" class="hover:text-purple-300 transition-colors">How It Works</a></li>
+              <li><a href="/about" class="hover:text-purple-300 transition-colors">About</a></li>
+              <li><a href="/faq" class="hover:text-purple-300 transition-colors">FAQ</a></li>
+              <li><a href="/changelog" class="hover:text-purple-300 transition-colors">Changelog</a></li>
+            </ul>
+          </div>
+          <!-- Column 3: Support & Legal -->
+          <div class="space-y-2.5">
+            <h3 class="font-bold text-[11px] uppercase tracking-wider text-purple-400">Support & Legal</h3>
+            <ul class="space-y-2 text-slate-400">
+              <li><a href="/contact" class="hover:text-purple-300 transition-colors text-purple-300 font-medium">Contact Support</a></li>
+              <li><a href="/privacy" class="hover:text-purple-300 transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" class="hover:text-purple-300 transition-colors">Terms of Service</a></li>
+              <li><a href="/cookies" class="hover:text-purple-300 transition-colors">Cookies & Storage</a></li>
+              <li><a href="/refunds" class="hover:text-purple-300 transition-colors">14-Day Refunds</a></li>
+              <li><a href="/security" class="hover:text-purple-300 transition-colors">Security Safeguards</a></li>
+            </ul>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 pt-4 border-t border-slate-800/80">
           <div>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</div>
           <div>Sole official contact: <a href="mailto:csmappholdings@gmail.com" class="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></div>
         </div>

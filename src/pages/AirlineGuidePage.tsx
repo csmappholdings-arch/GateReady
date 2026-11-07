@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { AIRLINE_GUIDES, AirlineGuideItem, getAirlineGuideBySlug, getAirlineGuideByAnySlug } from '../data/airlineGuidesData';
 import { getSplitBagUsdNotes } from '../data/baggageFeeData';
+import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { 
   Plane, 
   ArrowLeft, 
@@ -65,6 +66,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
   };
 
   const { firstBagNote, secondBagNote } = getSplitBagUsdNotes(guide.fees);
+  const fareFamilies = getAirlineFareFamilies(guide.id);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
@@ -351,27 +353,119 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
           </div>
         </section>
 
-        {/* 3. Honest Disclaimer & Official Verification Source */}
+        {/* 3. Fare Family Baggage Comparison Table */}
+        {fareFamilies.length > 0 && (
+          <section className="bg-white rounded-3xl border border-purple-100 shadow-xs p-6 sm:p-8 space-y-6">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                <Luggage className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                  {guide.name} Fare Family Baggage Comparison
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Allowances vary by ticket tier. Here is how carry-on and checked luggage differ across published fare families:
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto rounded-2xl border border-slate-200">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
+                  <tr>
+                    <th className="py-3 px-4">Fare Family</th>
+                    <th className="py-3 px-4">Carry-On Allowance</th>
+                    <th className="py-3 px-4">1st Checked Bag</th>
+                    <th className="py-3 px-4">2nd Checked Bag</th>
+                    <th className="py-3 px-4">Fare Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  {fareFamilies.map((fam) => (
+                    <tr key={fam.id} className={fam.isDefault ? 'bg-purple-50/40' : ''}>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span>{fam.name}</span>
+                          {fam.isDefault && (
+                            <span className="text-[9px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded">
+                              Standard
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {fam.carryOnAllowed ? (
+                          <span className="font-semibold text-emerald-700 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Included {fam.carryOnFee > 0 ? `(${guide.fees.currencySymbol}${fam.carryOnFee})` : 'Free'}</span>
+                          </span>
+                        ) : (
+                          <span className="font-semibold text-rose-600">
+                            {fam.carryOnRestrictionNotice || 'Personal Item Only'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {fam.includedCheckedBags >= 1 ? (
+                          <span className="font-bold text-emerald-700">Included Free (1st)</span>
+                        ) : (
+                          <span className="font-semibold text-slate-700">
+                            {fam.firstCheckedFee === 0 
+                              ? 'Included' 
+                              : `${guide.fees.currencySymbol}${fam.firstCheckedFee} ${guide.fees.currency}`}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {fam.includedCheckedBags >= 2 ? (
+                          <span className="font-bold text-emerald-700">Included Free (2nd)</span>
+                        ) : (
+                          <span className="font-semibold text-slate-700">
+                            {fam.secondCheckedFee === 0 
+                              ? 'Included' 
+                              : `${guide.fees.currencySymbol}${fam.secondCheckedFee} ${guide.fees.currency}`}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500 text-[11px] max-w-xs leading-relaxed">
+                        {fam.fareNote}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* 4. Honest Disclaimer & Official Verification Source */}
         <section className="p-6 rounded-3xl bg-slate-100 border border-slate-200 text-xs text-slate-700 space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="font-bold text-slate-900 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-purple-600" />
               <span>GateReady Data Integrity & Verification Standard</span>
             </span>
-            <span className="text-slate-500">Last verified: {guide.fees.lastVerified}</span>
+            <span className="text-slate-600 font-bold">Last checked: {guide.fees.lastVerified}</span>
           </div>
           <p className="leading-relaxed">
             All allowances, size sizer limits, and baggage fees shown above are compiled directly from published tables provided by {guide.name}. Airlines frequently adjust fee structures, seasonal baggage embargoes, and cabin tier allowances. You should always verify your specific itinerary baggage rules on the carrier's website before arriving at the airport.
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
             <a
               href={guide.fees.officialBaggagePageUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-purple-700 hover:text-purple-900 font-bold underline cursor-pointer"
             >
-              <span>Visit Official {guide.name} Baggage Page</span>
+              <span>Source: Official {guide.name} Baggage Page</span>
               <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center gap-1 text-slate-600 hover:text-purple-700 font-medium underline cursor-pointer"
+            >
+              <span>Spotted an error? Contact us</span>
             </a>
           </div>
         </section>

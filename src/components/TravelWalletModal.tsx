@@ -42,6 +42,7 @@ export const TravelWalletModal: React.FC = () => {
   const [formNumber, setFormNumber] = useState('');
   const [formTierNotes, setFormTierNotes] = useState('');
   const [formTraveler, setFormTraveler] = useState('');
+  const [formExpiryDate, setFormExpiryDate] = useState('');
 
   if (!isWalletModalOpen) return null;
   if (typeof document === 'undefined') return null;
@@ -61,6 +62,7 @@ export const TravelWalletModal: React.FC = () => {
       programOrProvider: formProgram.trim(),
       accountNumberOrCode: formNumber.trim(),
       tierOrNotes: formTierNotes.trim() ? formTierNotes.trim() : undefined,
+      expiryDate: formExpiryDate.trim() ? formExpiryDate.trim() : undefined,
       travelerName: formTraveler.trim() ? formTraveler.trim() : undefined
     });
 
@@ -69,6 +71,7 @@ export const TravelWalletModal: React.FC = () => {
     setFormNumber('');
     setFormTierNotes('');
     setFormTraveler('');
+    setFormExpiryDate('');
     setIsAdding(false);
   };
 
@@ -237,6 +240,18 @@ export const TravelWalletModal: React.FC = () => {
                   className="w-full h-9 px-3 text-xs font-semibold rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"
                 />
               </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Expiration Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={formExpiryDate}
+                  onChange={(e) => setFormExpiryDate(e.target.value)}
+                  className="w-full h-9 px-3 text-xs font-semibold rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-1">
@@ -320,6 +335,11 @@ export const TravelWalletModal: React.FC = () => {
                         {account.tierOrNotes && (
                           <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
                             · {account.tierOrNotes}
+                          </span>
+                        )}
+                        {account.expiryDate && (
+                          <span className="text-[11px] text-purple-700 dark:text-purple-300 font-semibold truncate">
+                            · Exp: {account.expiryDate}
                           </span>
                         )}
                       </div>

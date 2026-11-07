@@ -1,9 +1,11 @@
 import { AIRLINE_GUIDES, AirlineGuideItem } from '../data/airlineGuidesData';
 import { getSplitBagUsdNotes } from '../data/baggageFeeData';
+import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 
 export function getAirlinePageHtml(guide: AirlineGuideItem): string {
   const isNoLimit = (guide.limits.carryOnWeightLimit || '').toLowerCase().includes('no');
   const { firstBagNote, secondBagNote } = getSplitBagUsdNotes(guide.fees);
+  const fareFamilies = getAirlineFareFamilies(guide.id);
 
   return `
     <div class="space-y-8">
@@ -146,18 +148,70 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
         </div>
       </section>
 
-      <!-- Section 3: Data Integrity Disclaimer -->
+      <!-- Section 3: Fare Family Baggage Comparison Table -->
+      ${fareFamilies.length > 0 ? `
+        <section class="space-y-3 pt-4 border-t border-slate-100">
+          <h2 class="text-xl font-black text-slate-900 tracking-tight">3. ${guide.name} Fare Family Baggage Comparison</h2>
+          <p class="text-xs text-slate-600">Allowances vary by ticket tier. Here is how carry-on and checked luggage differ across published fare families:</p>
+
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3 px-4">Fare Family</th>
+                  <th class="py-3 px-4">Carry-On Allowance</th>
+                  <th class="py-3 px-4">1st Checked Bag</th>
+                  <th class="py-3 px-4">2nd Checked Bag</th>
+                  <th class="py-3 px-4">Fare Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-700">
+                ${fareFamilies.map(fam => `
+                  <tr class="${fam.isDefault ? 'bg-purple-50/40' : ''}">
+                    <td class="py-3.5 px-4 font-bold text-slate-900">
+                      ${fam.name} ${fam.isDefault ? '<span class="text-[9px] font-black uppercase bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded">Standard</span>' : ''}
+                    </td>
+                    <td class="py-3.5 px-4">
+                      ${fam.carryOnAllowed 
+                        ? `<span class="font-semibold text-emerald-700">Included ${fam.carryOnFee > 0 ? `(${guide.fees.currencySymbol}${fam.carryOnFee})` : 'Free'}</span>`
+                        : `<span class="font-semibold text-rose-600">${fam.carryOnRestrictionNotice || 'Personal Item Only'}</span>`}
+                    </td>
+                    <td class="py-3.5 px-4">
+                      ${fam.includedCheckedBags >= 1 
+                        ? '<span class="font-bold text-emerald-700">Included Free (1st)</span>' 
+                        : `<span class="font-semibold text-slate-700">${fam.firstCheckedFee === 0 ? 'Included' : `${guide.fees.currencySymbol}${fam.firstCheckedFee} ${guide.fees.currency}`}</span>`}
+                    </td>
+                    <td class="py-3.5 px-4">
+                      ${fam.includedCheckedBags >= 2 
+                        ? '<span class="font-bold text-emerald-700">Included Free (2nd)</span>' 
+                        : `<span class="font-semibold text-slate-700">${fam.secondCheckedFee === 0 ? 'Included' : `${guide.fees.currencySymbol}${fam.secondCheckedFee} ${guide.fees.currency}`}</span>`}
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-500 text-[11px] max-w-xs leading-relaxed">
+                      ${fam.fareNote}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ` : ''}
+
+      <!-- Section 4: Data Integrity Disclaimer & Trust Standards -->
       <section class="p-5 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-700 space-y-2">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <strong class="text-slate-900 font-bold">GateReady Verification Standard</strong>
-          <span class="text-slate-500">Last verified: ${guide.fees.lastVerified}</span>
+          <span class="text-slate-600 font-bold">Last checked: ${guide.fees.lastVerified}</span>
         </div>
         <p class="leading-relaxed">
           Estimate from published airline fee tables, last verified ${guide.fees.lastVerified}. Airlines change fees and conditions frequently — always confirm at booking or on the carrier's official website.
         </p>
-        <div class="pt-1">
+        <div class="pt-1 flex items-center justify-between flex-wrap gap-3">
           <a href="${guide.fees.officialBaggagePageUrl}" target="_blank" rel="noopener noreferrer" class="text-purple-700 hover:text-purple-900 font-bold underline">
-            Visit Official ${guide.name} Baggage Page ↗
+            Source: Official ${guide.name} Baggage Page ↗
+          </a>
+          <a href="/contact" class="text-slate-600 hover:text-purple-700 font-medium underline">
+            Spotted an error? Contact us
           </a>
         </div>
       </section>
@@ -348,7 +402,7 @@ export function getBaggageFeeCalculatorHtml(): string {
             </tbody>
           </table>
         </div>
-        <p class="text-[11px] text-slate-500">*UltraBasic fares on WestJet exclude carry-on bags. Rates compiled from published airline schedules.</p>
+        <p class="text-[11px] text-slate-500">*UltraBasic fares on WestJet exclude carry-on bags. Estimate from published airline fee tables, last verified November 4, 2026. Airlines change fees — confirm at booking.</p>
       </section>
 
       <section class="p-5 rounded-2xl bg-purple-600 text-white space-y-3">
@@ -452,7 +506,7 @@ export function getEntryRequirementsHtml(): string {
   return `
     <div class="space-y-6">
       <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs text-purple-950 leading-relaxed">
-        <strong>International Entry Verification Hub:</strong> Review passport validity standards, electronic travel authorizations, TSA checkpoint rules, and authoritative links to official national travel advisory portals.
+        <strong>International Entry Verification Hub:</strong> Review passport validity standards, 6-month validity rules, electronic travel authorizations (ESTA, eTA), and direct links to official national travel advisory portals. Last verified October 15, 2026.
       </div>
 
       <section class="space-y-3">
@@ -537,32 +591,35 @@ export function getHomepageHtml(): string {
         </div>
       </section>
 
-      <!-- Quick Checkers -->
-      <section class="space-y-4 pt-6 border-t border-slate-200">
-        <h2 class="text-xl font-black text-slate-900 tracking-tight">Free Travel Intelligence Tools & Checkers</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-2">
-            <h3 class="font-bold text-purple-950 text-base">Airline Baggage Allowance Guides</h3>
-            <p class="text-xs text-slate-600">Verified carry-on dimensions, weight caps, and checked fee tables for 42 major airlines across North America, Europe, Asia, and worldwide.</p>
-            <a href="/airlines" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">Explore all 42 airlines →</a>
+      <!-- Travel Requirements Hub: 2-Card Hub -->
+      <section class="space-y-4 pt-6 border-t border-slate-200" id="travel-requirements-hub">
+        <div class="text-center max-w-3xl mx-auto space-y-1.5">
+          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Baggage Fees by Airline, Luggage Allowances & Entry Requirements</h2>
+          <p class="text-xs sm:text-sm text-slate-600">Look up published airline checked luggage fees and passport validity rules right now before creating a trip.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto pt-2">
+          <div class="p-6 rounded-3xl bg-purple-50/70 border border-purple-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-black text-purple-950 text-lg">Baggage Fee Calculator</h3>
+              <span class="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">42 Airlines Audited</span>
+            </div>
+            <p class="text-xs text-slate-600">Calculate checked and carry-on luggage fees across 42 airlines, compare fare-family inclusions, and estimate total costs.</p>
+            <p class="text-[11px] text-slate-400">Verified November 4, 2026 · Real Carrier Fare Tables</p>
+            <div class="pt-2">
+              <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 transition-colors">Open Baggage Fee Calculator →</a>
+            </div>
           </div>
 
-          <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-2">
-            <h3 class="font-bold text-purple-950 text-base">Standalone Baggage Fee Calculator</h3>
-            <p class="text-xs text-slate-600">Model carry-on charges, first and second checked bag fees, fare families, and overweight surcharges before heading to the airport.</p>
-            <a href="/baggage-fee-calculator" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">Open fee calculator →</a>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <h3 class="font-bold text-slate-900 text-base">Luggage Tare Weight Explainer</h3>
-            <p class="text-xs text-slate-600">Learn why empty suitcases consume 15% to 25% of your airline weight allowance, and how tare deduction prevents airport counter fees.</p>
-            <a href="/tare-weight" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">Read tare weight guide →</a>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <h3 class="font-bold text-slate-900 text-base">International Entry Requirements Hub</h3>
-            <p class="text-xs text-slate-600">Check the 6-month passport validity rule, electronic travel authorizations (ESTA, eTA, ETIAS), and official government advisories.</p>
-            <a href="/entry-requirements" class="text-xs font-bold text-purple-700 hover:text-purple-900 inline-block pt-1">View entry requirements →</a>
+          <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-black text-slate-900 text-lg">Entry Requirements Quick-Check</h3>
+              <span class="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">CA & US Passports</span>
+            </div>
+            <p class="text-xs text-slate-600">Check passport validity rules, visa requirements, and official government advisories for Canadian and US passport holders.</p>
+            <p class="text-[11px] text-slate-400">Verified October 15, 2026 · Official Government Portals</p>
+            <div class="pt-2">
+              <a href="/entry-requirements" class="h-10 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs inline-flex items-center gap-2 transition-colors">Check Entry Requirements →</a>
+            </div>
           </div>
         </div>
       </section>
