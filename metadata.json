@@ -1,6 +1,6 @@
 {
   "name": "GateReady.ca",
-  "description": "Calculate baggage fees by airline, check carry-on size and weight limits, audit TSA 3-1-1 liquids, and pack with an intelligent overweight baggage calculator.",
+  "description": "Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees. Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

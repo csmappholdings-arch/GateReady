@@ -575,9 +575,9 @@ export function getHomepageHtml(): string {
     <div class="space-y-8">
       <!-- Hero Intro -->
       <section class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Smart Luggage Packing, Sizer Verification & Baggage Fee Engine</h2>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.</h2>
         <p class="text-base text-slate-700 leading-relaxed">
-          GateReady is the dedicated travel packing platform that models empty suitcase tare weights, verifies luggage dimensions against airline gate sizers, audits TSA 3-1-1 liquids compliance, and calculates baggage fees across 42+ global airlines.
+          Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home. GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42+ worldwide airlines.
         </p>
         <div class="flex flex-wrap gap-3 pt-2">
           <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">
@@ -592,39 +592,6 @@ export function getHomepageHtml(): string {
           <a href="/entry-requirements" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
             Entry Requirements
           </a>
-        </div>
-      </section>
-
-      <!-- Travel Requirements Hub: 2-Card Hub -->
-      <section class="space-y-4 pt-6 border-t border-slate-200" id="travel-requirements-hub">
-        <div class="text-center max-w-3xl mx-auto space-y-1.5">
-          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Baggage Fees by Airline, Luggage Allowances & Entry Requirements</h2>
-          <p class="text-xs sm:text-sm text-slate-600">Look up published airline checked luggage fees and passport validity rules right now before creating a trip.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto pt-2">
-          <div class="p-6 rounded-3xl bg-purple-50/70 border border-purple-200 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-black text-purple-950 text-lg">Baggage Fee Calculator</h3>
-              <span class="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">42 Airlines Audited</span>
-            </div>
-            <p class="text-xs text-slate-600">Calculate checked and carry-on luggage fees across 42 airlines, compare fare-family inclusions, and estimate total costs.</p>
-            <p class="text-[11px] text-slate-400">Verified November 4, 2026 · Real Carrier Fare Tables</p>
-            <div class="pt-2">
-              <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 transition-colors">Open Baggage Fee Calculator →</a>
-            </div>
-          </div>
-
-          <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-black text-slate-900 text-lg">Entry Requirements Quick-Check</h3>
-              <span class="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">CA & US Passports</span>
-            </div>
-            <p class="text-xs text-slate-600">Check passport validity rules, visa requirements, and official government advisories for Canadian and US passport holders.</p>
-            <p class="text-[11px] text-slate-400">Verified October 15, 2026 · Official Government Portals</p>
-            <div class="pt-2">
-              <a href="/entry-requirements" class="h-10 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs inline-flex items-center gap-2 transition-colors">Check Entry Requirements →</a>
-            </div>
-          </div>
         </div>
       </section>
 

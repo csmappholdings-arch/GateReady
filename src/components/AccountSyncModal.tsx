@@ -22,6 +22,7 @@ import {
   Gift
 } from 'lucide-react';
 import { trackAccountCreated } from '../lib/firebase';
+import { trackEvent } from '../utils/analytics';
 
 interface AccountSyncModalProps {
   isOpen: boolean;
@@ -110,6 +111,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
       const res = await signIn();
       if (res?.isNewUser) {
         trackAccountCreated('google', getEffectiveOrigin());
+        trackEvent('registration_completed', { method: 'google', origin: getEffectiveOrigin() });
       }
       onClose();
     } catch (err: any) {
@@ -181,6 +183,7 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
       if (mode === 'signup') {
         await signUpWithEmail(email, password, displayName);
         trackAccountCreated('email', getEffectiveOrigin());
+        trackEvent('registration_completed', { method: 'email', origin: getEffectiveOrigin() });
       } else {
         await signInWithEmail(email, password);
       }
@@ -236,12 +239,14 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
           )}
 
           <h2 className="text-lg sm:text-xl font-black pr-8 leading-tight">
-            {mode === 'signup' && 'Create Your Gate Ready Account'}
+            {mode === 'signup' && 'Your Next Trip Starts Here.'}
             {mode === 'signin' && 'Welcome Back, Traveler'}
             {mode === 'forgot' && 'Reset Your Password'}
           </h2>
           <p className="text-[11px] text-purple-100/90 mt-0.5 pr-6">
-            Access your packing checklists, luggage tags, and loyalty rewards on your own devices. Upgrade anytime for shared family sync & multiple travelers.
+            {mode === 'signup' 
+              ? 'Create your free GateReady account and start preparing for a smoother, more organized trip.'
+              : 'Access your packing checklists, luggage tare meters, and airline intelligence.'}
           </p>
         </div>
 
@@ -517,9 +522,62 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
             )}
 
             {mode === 'signup' && (
-              <p className="text-[11px] text-purple-900 dark:text-purple-300 font-medium leading-relaxed text-center px-1 py-1">
-                Free account — includes a 7-day full Platinum trial, automatically activated. No credit card required. Returns to Free after 7 days.
-              </p>
+              <div className="space-y-3 pt-1">
+                {/* 6 Core Account Benefits */}
+                <div className="p-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/50 space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300 block">
+                    Free Account Highlights:
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Save your trips</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Manage multiple suitcases</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Track luggage weights</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Personalized packing lists</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Airline baggage restrictions</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Keep travel info organized</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 7-Day Platinum Trial Explainer */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50 to-purple-50 dark:from-amber-950/30 dark:to-purple-950/30 border border-amber-200 dark:border-amber-900/60 text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
+                  <div className="flex items-center gap-1.5 font-black text-amber-900 dark:text-amber-300 text-[11px] uppercase tracking-wider">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span>Includes 7-Day Platinum Trial</span>
+                  </div>
+                  <ul className="text-[11px] space-y-1 text-slate-600 dark:text-slate-300">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">·</span>
+                      <span><strong>What&apos;s included:</strong> Unlimited bags, empty suitcase tare deduction, travel wallet, and companion sharing.</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">·</span>
+                      <span><strong>No payment required:</strong> Zero credit card or billing details asked.</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">·</span>
+                      <span><strong>After 7 days:</strong> Gracefully returns to the Free Plan with zero surprise charges. All your trips remain saved safely.</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             )}
 
             <button

@@ -17,11 +17,11 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
   if (normalizedPath === '/') {
     const meta: StaticPageMeta = {
       path: '/',
-      title: 'GateReady – Smart Trip Packing & Airline Baggage Intelligence',
-      description: 'Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42+ airlines with GateReady.',
-      keywords: 'travel packing app, airline baggage fee calculator, luggage weight checker, TSA liquids rule, carry on size limit, suitcase tare weight, 42 airlines baggage',
-      heading: 'Smart Trip Packing & Airline Baggage Intelligence',
-      subheading: 'Stop paying unexpected airport baggage fees. Model tare weights, verify carry-on dimensions, and audit luggage policies for 42+ airlines.',
+      title: 'GateReady.ca – Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.',
+      description: 'Pack smart, fly prepared, and avoid surprise baggage fees. Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home.',
+      keywords: 'airline baggage allowance, carry-on baggage restrictions, airline baggage fees, luggage weight calculator, carry-on size checker, travel packing checklist, checked baggage allowance, avoid overweight baggage fees',
+      heading: 'Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.',
+      subheading: 'Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home.',
       schemaType: 'WebApplication'
     };
 
@@ -303,30 +303,36 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     `;
   } else if (pathname === '/pricing') {
     innerContentHtml = `
-      <section class="space-y-4">
-        <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Pricing & Plans</h2>
-        <p class="text-slate-700 leading-relaxed">Free for solo travelers, with affordable upgrades for families, frequent flyers, and multi-bag itineraries.</p>
+      <section class="space-y-6">
+        <div class="space-y-2">
+          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Transparent Plans for Every Type of Traveler</h2>
+          <p class="text-slate-700 leading-relaxed">Start 100% free with no credit card required. Free account signup automatically unlocks a 7-day full Platinum trial.</p>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
             <h3 class="font-bold text-slate-900">Free ($0)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (1 checked + 1 carry-on), Smart Scales, TSA 3-1-1 checker.</p>
+            <p class="text-[11px] font-semibold text-slate-500">For people who want to explore GateReady and organize basic travel preparation.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (1 checked + 1 carry-on), Smart Scales, TSA 3-1-1 liquids checker, 42-airline baggage allowance lookup.</p>
           </div>
-          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
             <h3 class="font-bold text-purple-900">Silver ($1.99/mo · $19.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, Rebalance Bags (suggest first), emergency QR recovery tag, terminal maps, travel wallet (loyalty numbers, TSA PreCheck, PNRs).</p>
+            <p class="text-[11px] font-semibold text-purple-700">For individual travellers who want more luggage management and saved travel functionality.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, travel wallet, rebalance suggestions, printable PDF manifests.</p>
           </div>
-          <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
+          <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
             <h3 class="font-bold text-slate-900 mt-0.5">Gold ($3.99/mo · $29.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">2 travelers, unlimited active trips, unlimited bags & scales, multi-device sync, printable PDF manifests.</p>
+            <p class="text-[11px] font-semibold text-amber-800">For couples and small families who want a more complete travel planning experience.</p>
+            <p class="text-xs text-slate-600 mt-1">2 travelers, unlimited active trips, unlimited bags & scales, companion sync, emergency QR luggage recovery tags, everything in Silver included.</p>
           </div>
-          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2">
             <h3 class="font-bold text-indigo-900">Platinum ($4.99/mo · $39.99/yr)</h3>
-            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited devices, unlimited active trips, unlimited bags & scales, priority fee updates.</p>
+            <p class="text-[11px] font-semibold text-indigo-700">For frequent travellers and families who want the complete GateReady experience.</p>
+            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited devices, unlimited active trips, unlimited bags & scales, family sharing, priority fee updates, VIP fast support.</p>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-slate-100 text-xs text-slate-600 space-y-1">
-          <div><strong>7-Day Free Platinum Trial:</strong> Free signup includes 7 days full Platinum, no credit card required. Drops back to Free on day 7.</div>
+          <div><strong>7-Day Free Platinum Trial:</strong> Free signup includes 7 days full Platinum, no credit card required. Drops back to Free on day 7 with all trips safely preserved.</div>
           <div><strong>14-Day Guarantee:</strong> 100% money-back guarantee on paid plans via Lemon Squeezy. Contact csmappholdings@gmail.com.</div>
         </div>
       </section>

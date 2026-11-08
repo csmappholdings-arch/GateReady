@@ -42,15 +42,20 @@ import { CarrierSearchInput } from './CarrierSearchInput';
 import { DatePickerInput } from './DatePickerInput';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { checkPassportValidity } from '../utils/passportValidity';
+import { trackEvent } from '../utils/analytics';
 
 interface AddTripDialogProps {
   isOpen: boolean;
   onClose: () => void;
   initialTravelType?: TravelType;
   initialDestinationCity?: string;
+  initialOriginCity?: string;
   initialCarrier?: string;
   initialSeatClass?: string;
   initialFareFamily?: string;
+  initialDepartureDate?: string;
+  initialTravelers?: string[];
+  isOnboarding?: boolean;
   initialBags?: Array<{ 
     type: BagType; 
     label: string; 
@@ -65,9 +70,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   onClose, 
   initialTravelType, 
   initialDestinationCity,
+  initialOriginCity,
   initialCarrier,
   initialSeatClass,
   initialFareFamily,
+  initialDepartureDate,
+  initialTravelers,
+  isOnboarding,
   initialBags
 }) => {
   const { addTrip } = usePacking();
@@ -194,7 +203,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         );
       }
 
-      setOriginCity('');
+      setOriginCity(initialOriginCity || '');
       const safeDest = initialDestinationCity || '';
       setDestinationCity(safeDest);
 
@@ -206,14 +215,18 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         setName('');
       }
 
-      setDepartureDate('');
+      setDepartureDate(initialDepartureDate || '');
       setDepartureTime('');
       setReturnTripDate('');
       setReturnTripTime('');
       setAircraftType('');
       setPassportExpiryDate('');
       const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
-      setFamilyMembers([defaultUser]);
+      if (initialTravelers && initialTravelers.length > 0) {
+        setFamilyMembers(initialTravelers);
+      } else {
+        setFamilyMembers([defaultUser]);
+      }
       setNewMemberInput('');
       setTravelerError('');
 
@@ -510,6 +523,12 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       }
     );
 
+    trackEvent('first_trip_created', {
+      carrier: companyName,
+      destination: destinationCity.trim(),
+      travelType
+    });
+
     onClose();
   };
 
@@ -596,7 +615,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
               <h3 className={`font-black leading-tight flex items-center gap-2 ${
                 isExpanded ? 'text-xl' : 'text-base sm:text-lg'
               }`}>
-                <span>Set Trip Details & Luggage</span>
+                <span>{isOnboarding ? "Let's Get Your Next Trip Ready!" : 'Set Trip Details & Luggage'}</span>
                 {isExpanded && (
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full text-purple-200">
                     Spacious Mode
@@ -604,7 +623,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 )}
               </h3>
               <p className={`text-purple-200/90 mt-0.5 ${isExpanded ? 'text-xs' : 'text-[11px]'}`}>
-                Plan your departure, transit hubs, luggage allowances & travelers
+                {isOnboarding 
+                  ? 'Step 1: Enter route and flight · Step 2: Configure luggage & travelers'
+                  : 'Plan your departure, transit hubs, luggage allowances & travelers'}
               </p>
             </div>
           </div>
