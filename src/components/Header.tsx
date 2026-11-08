@@ -236,8 +236,8 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Direct Links to Guides, Fee Calculator & Entry Requirements (hidden on mobile to protect two-row layout) */}
-          <nav className="hidden xl:flex items-center gap-2 ml-2" aria-label="Quick travel links">
+          {/* Desktop Direct Links to Guides, Fee Calculator & Entry Requirements */}
+          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 ml-1 xl:ml-2" aria-label="Quick travel links">
             <a
               href="/airlines"
               className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"

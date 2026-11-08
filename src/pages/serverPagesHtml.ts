@@ -6,7 +6,8 @@ import {
   getBaggageFeeCalculatorHtml, 
   getTareWeightHtml, 
   getEntryRequirementsHtml,
-  getHomepageHtml
+  getHomepageHtml,
+  getRequirementsHubHtml
 } from './serverGuidesHtml';
 
 export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bodyHtml: string } | null {
@@ -71,7 +72,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
   if (normalizedPath === '/baggage-fee-calculator') {
     const meta: StaticPageMeta = {
       path: '/baggage-fee-calculator',
-      title: 'Baggage Fee Calculator – Check Airline Luggage Fees | GateReady',
+      title: 'Baggage Fee Calculator — GateReady',
       description: "Estimate checked bag fees, carry-on charges, and fare-family luggage inclusions across 42 airlines with GateReady's standalone fee calculator.",
       keywords: 'baggage fee calculator, airline luggage fees, calculate baggage fees by airline, overweight baggage cost, carry on fee calculator, fare families luggage',
       heading: 'Airline Baggage Fee Calculator',
@@ -105,7 +106,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
   if (normalizedPath === '/entry-requirements') {
     const meta: StaticPageMeta = {
       path: '/entry-requirements',
-      title: 'Entry Requirements Quick-Check – Passport & Visa Rules | GateReady',
+      title: 'Entry Requirements — GateReady',
       description: 'Check passport validity rules, 6-month validity requirements, visa waivers, and official government advisories for Canadian and US passport holders.',
       keywords: 'entry requirements quick-check, passport validity rules, 6 month passport rule, ESTA eTA requirements, international travel advisories, visa requirements',
       heading: 'Entry Requirements Quick-Check – Passport & Visa Rules',
@@ -118,7 +119,24 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     return { meta, bodyHtml };
   }
 
-  // 6. Check if path is one of the 12 existing static pages
+  // 6. Intent Page: Requirements Hub (/requirements)
+  if (normalizedPath === '/requirements') {
+    const meta: StaticPageMeta = {
+      path: '/requirements',
+      title: 'Travel Requirements Hub — GateReady',
+      description: 'Look up published airline checked luggage fees and passport validity rules right now before creating a trip.',
+      keywords: 'travel requirements hub, baggage fee calculator, entry requirements quick-check, passport validity rules, 42 airlines baggage',
+      heading: 'Baggage Fees by Airline, Luggage Allowances & Entry Requirements',
+      subheading: 'Look up published airline checked luggage fees and passport validity rules right now before creating a trip.',
+      schemaType: 'CollectionPage'
+    };
+
+    const innerContentHtml = getRequirementsHubHtml();
+    const bodyHtml = renderPageShell(meta, innerContentHtml);
+    return { meta, bodyHtml };
+  }
+
+  // 7. Check if path is one of the 12 existing static pages
   const meta = STATIC_PAGES[normalizedPath];
   if (!meta) return null;
 

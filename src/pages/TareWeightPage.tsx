@@ -258,7 +258,7 @@ export const TareWeightPage: React.FC = () => {
           <div className="flex items-center gap-4 text-slate-500">
             <a href="/baggage-fee-calculator" className="hover:text-purple-700">Fee Calculator</a>
             <span>·</span>
-            <a href="/entry-requirements" className="hover:text-purple-700">Entry Hub</a>
+            <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements</a>
           </div>
         </div>
       </main>

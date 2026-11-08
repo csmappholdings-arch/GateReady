@@ -97,6 +97,11 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                   Entry Requirements
                 </a>
               </li>
+              <li>
+                <a href="/requirements" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Requirements Hub
+                </a>
+              </li>
               {onOpenAirlineGuides && (
                 <li>
                   <button

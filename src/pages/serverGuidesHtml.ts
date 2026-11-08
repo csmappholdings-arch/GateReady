@@ -552,6 +552,10 @@ export function getEntryRequirementsHtml(): string {
           Containers in carry-on luggage must be 3.4 oz (100 ml) or less, and all bottles must fit into one clear quart-sized zip-top plastic bag (one bag per passenger). Larger containers must be checked.
         </p>
       </section>
+
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500">
+        Reference only — entry rules change. Always confirm with official government sources before you travel.
+      </div>
     </div>
   `;
 }
@@ -720,6 +724,59 @@ export function getHomepageHtml(): string {
         <p>GateReady is a trip planning assistant. Baggage fee figures are estimates based on published tables, not carrier guarantees. The TSA checker is rule-based, not an x-ray or hardware scanner. GateReady does not provide real-time flight telemetry, gate change alerts, GPS bag beacons, or hardware scales.</p>
         <p>Operated by <strong>CSM App Holdings</strong> · Sole official support contact: <a href="mailto:csmappholdings@gmail.com" class="font-semibold underline">csmappholdings@gmail.com</a>.</p>
       </section>
+    </div>
+  `;
+}
+
+export function getRequirementsHubHtml(): string {
+  return `
+    <div class="space-y-8 max-w-4xl mx-auto py-6">
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Baggage Fees by Airline, Luggage Allowances & Entry Requirements</h2>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Look up published airline checked luggage fees and passport validity rules right now before creating a trip.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch pt-2">
+        <div class="p-6 sm:p-8 rounded-3xl bg-white border border-purple-200 shadow-md flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-700 uppercase tracking-wider bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">Baggage Intel</span>
+              <span class="text-[11px] font-bold text-slate-400">42 Airlines Audited</span>
+            </div>
+            <h3 class="text-xl font-black text-slate-900">Baggage Fee Calculator</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Calculate checked and carry-on luggage fees across 42 airlines, compare fare-family inclusions, and estimate total costs.
+            </p>
+            <p class="text-[11px] text-slate-400">Verified November 4, 2026 · Real Carrier Fare Tables</p>
+          </div>
+          <div class="pt-4 border-t border-purple-100">
+            <a href="/baggage-fee-calculator" class="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">
+              Open Baggage Fee Calculator →
+            </a>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-8 rounded-3xl bg-white border border-purple-200 shadow-md flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-700 uppercase tracking-wider bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">Cross-Border Rules</span>
+              <span class="text-[11px] font-bold text-slate-400">CA & US Passports</span>
+            </div>
+            <h3 class="text-xl font-black text-slate-900">Entry Requirements Quick-Check</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Check passport validity rules, visa requirements, and official government advisories for Canadian and US passport holders.
+            </p>
+            <p class="text-[11px] text-slate-400">Verified October 15, 2026 · Official Government Portals</p>
+          </div>
+          <div class="pt-4 border-t border-purple-100">
+            <a href="/entry-requirements" class="w-full h-11 px-5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">
+              Check Entry Requirements →
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 }

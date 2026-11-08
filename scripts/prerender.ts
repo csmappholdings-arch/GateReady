@@ -26,10 +26,11 @@ async function prerender() {
     ...Object.keys(STATIC_PAGES),
     // Directory index
     '/airlines',
-    // 3 Intent hubs
+    // 4 Intent hubs
     '/baggage-fee-calculator',
     '/tare-weight',
     '/entry-requirements',
+    '/requirements',
     // 42 Airline canonical guides
     ...AIRLINE_GUIDES.map((g) => g.canonicalPath)
   ];
@@ -172,24 +173,6 @@ async function prerender() {
 </body>
 </html>`;
   fs.writeFileSync(path.join(feeCalcDir, 'index.html'), feeCalcRedirectHtml, 'utf-8');
-
-  // Generate static redirect for /requirements -> /entry-requirements
-  const reqDir = path.join(distDir, 'requirements');
-  fs.mkdirSync(reqDir, { recursive: true });
-  const reqRedirectHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Redirecting to Entry Requirements – GateReady</title>
-  <meta http-equiv="refresh" content="0; url=https://gateready.ca/entry-requirements">
-  <link rel="canonical" href="https://gateready.ca/entry-requirements">
-  <script>window.location.replace("https://gateready.ca/entry-requirements");</script>
-</head>
-<body>
-  <p>Redirecting to <a href="https://gateready.ca/entry-requirements">Entry Requirements</a>...</p>
-</body>
-</html>`;
-  fs.writeFileSync(path.join(reqDir, 'index.html'), reqRedirectHtml, 'utf-8');
 
   console.log(`[Prerender] Successfully generated ${successCount} prerendered pages and alias redirects.`);
 }

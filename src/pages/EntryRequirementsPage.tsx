@@ -65,7 +65,7 @@ export const EntryRequirementsPage: React.FC = () => {
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.title = 'Entry Requirements Quick-Check – Passport & Visa Rules | GateReady';
+      document.title = 'Entry Requirements — GateReady';
       window.scrollTo(0, 0);
     }
   }, []);

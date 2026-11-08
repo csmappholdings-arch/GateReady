@@ -199,11 +199,6 @@ app.get(['/fee-calculator', '/fee-calculator/'], (_req: Request, res: Response) 
   return res.redirect(301, '/baggage-fee-calculator');
 });
 
-// 301 Permanent Redirect: /requirements -> /entry-requirements
-app.get(['/requirements', '/requirements/'], (_req: Request, res: Response) => {
-  return res.redirect(301, '/entry-requirements');
-});
-
 // Setup Vite middleware in dev or static files in production
 async function startServer() {
   let viteDevServer: any = null;

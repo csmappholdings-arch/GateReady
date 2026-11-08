@@ -47,6 +47,7 @@ import { AirlineIndexPage } from './pages/AirlineIndexPage';
 import { BaggageFeeCalculatorPage } from './pages/BaggageFeeCalculatorPage';
 import { TareWeightPage } from './pages/TareWeightPage';
 import { EntryRequirementsPage } from './pages/EntryRequirementsPage';
+import { RequirementsPage } from './pages/RequirementsPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -955,12 +956,7 @@ export default function App() {
   }
   if (pathname === '/tare-weight') return <TareWeightPage />;
   if (pathname === '/entry-requirements') return <EntryRequirementsPage />;
-  if (pathname === '/requirements' || pathname === '/requirements/') {
-    if (typeof window !== 'undefined') {
-      window.history.replaceState({}, '', '/entry-requirements');
-    }
-    return <EntryRequirementsPage />;
-  }
+  if (pathname === '/requirements') return <RequirementsPage />;
   if (pathname === '/feedback' || pathname === '/feedback/') {
     if (typeof window !== 'undefined') {
       window.location.replace('/contact');

@@ -131,7 +131,7 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.title = 'Baggage Fee Calculator – Check Airline Luggage Fees | GateReady';
+      document.title = 'Baggage Fee Calculator — GateReady';
       window.scrollTo(0, 0);
     }
   }, []);

@@ -532,7 +532,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
             <span>·</span>
             <a href="/tare-weight" className="hover:text-purple-700">Tare Weight Guide</a>
             <span>·</span>
-            <a href="/entry-requirements" className="hover:text-purple-700">Entry Hub</a>
+            <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements</a>
           </div>
         </div>
       </main>
