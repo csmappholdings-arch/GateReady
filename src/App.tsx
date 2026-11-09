@@ -22,6 +22,12 @@ import { AccountSyncModal } from './components/AccountSyncModal';
 import { TransitNetworkHub } from './components/TransitNetworkHub';
 import { LandingHero } from './components/LandingHero';
 import { InteractiveTripPreview, TripPreviewConfig } from './components/InteractiveTripPreview';
+import { TravelDashboard } from './components/TravelDashboard';
+import { TripWorkspace, WorkspaceTab } from './components/TripWorkspace';
+import { NotificationsModal } from './components/NotificationsModal';
+import { LuggageLibraryModal } from './components/LuggageLibraryModal';
+import { InAppNotification, LuggageProfile } from './types/travel';
+import { generateTripNotifications } from './utils/notifications';
 import { trackEvent } from './utils/analytics';
 import { AppFooter } from './components/AppFooter';
 import { TrialNudgeBanner } from './components/TrialNudgeBanner';
@@ -71,7 +77,18 @@ import {
 } from 'lucide-react';
 
 function PackingAppContent() {
-  const { currentTrip, trips, selectedBagId, setSelectedBagId, addTrip, loadDemoTrip, refreshActiveTrip } = usePacking();
+  const { 
+    currentTrip, 
+    trips, 
+    selectedBagId, 
+    setSelectedBagId, 
+    addTrip, 
+    loadDemoTrip, 
+    refreshActiveTrip,
+    selectTrip,
+    deleteTrip,
+    updateTripDetails
+  } = usePacking();
   const { isPro, isTrialActive, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
   const { user, resendVerificationEmail } = useAuth();
   const [resentEmailNotice, setResentEmailNotice] = useState(false);
@@ -128,6 +145,37 @@ function PackingAppContent() {
 
   // Feature 1: Save Gate state
   const [showSaveGateModal, setShowSaveGateModal] = useState(false);
+
+  // Phase 2: Personalized Travel Dashboard & Workspace State
+  const [appView, setAppView] = useState<'dashboard' | 'workspace'>('dashboard');
+  const [workspaceInitialTab, setWorkspaceInitialTab] = useState<WorkspaceTab>('Overview');
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showLuggageLibraryModal, setShowLuggageLibraryModal] = useState(false);
+  const [notifications, setNotifications] = useState<InAppNotification[]>(() => generateTripNotifications(trips));
+
+  useEffect(() => {
+    setNotifications(generateTripNotifications(trips));
+  }, [trips]);
+
+  const unreadNotificationsCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleLoadDemo = () => {
+    const demo = loadDemoTrip();
+    if (demo) {
+      selectTrip(demo);
+      setAppView('workspace');
+    }
+  };
+
+  useEffect(() => {
+    if (appView === 'workspace' && !currentTrip) {
+      if (trips.length > 0) {
+        selectTrip(trips[0]);
+      } else {
+        setAppView('dashboard');
+      }
+    }
+  }, [appView, currentTrip, trips, selectTrip]);
 
   // Track separate browser visits in localStorage & GA4
   useEffect(() => {
@@ -487,6 +535,10 @@ function PackingAppContent() {
           setShowAccountModal(true);
         }}
         onOpenReferral={() => setShowReferralModal(true)}
+        onOpenDashboard={() => setAppView('dashboard')}
+        onOpenNotifications={() => setShowNotificationsModal(true)}
+        unreadNotificationsCount={notifications.filter((n) => !n.isRead).length}
+        currentView={appView}
       />
 
       {/* Free Plan Bag Limit Trip Notice (strictly scoped to currentTrip; never on landing or other trips) */}
@@ -595,143 +647,6 @@ function PackingAppContent() {
         setShowAccountModal(true);
       }} />
 
-      {/* Prominent Navigation Tabs (Desktop & Tablet) - Moved to TOP of section */}
-      {currentTrip && (
-        <div className="hidden sm:block sticky top-16 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md pt-2.5 pb-2 border-b border-purple-100/80 dark:border-purple-950/60 shadow-xs">
-          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-            <nav
-              aria-label="Main application tabs"
-              className="p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/80 shadow-md flex items-center justify-between gap-1 sm:gap-2.5"
-            >
-              {/* Tab 1: Bags & Items */}
-              <button
-                type="button"
-                onClick={() => setCurrentScreen('Bags')}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
-                  currentScreen === 'Bags'
-                    ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                }`}
-              >
-                <Luggage className="w-4 h-4 shrink-0" />
-                <span className="truncate">{tab1Title}</span>
-                <span
-                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 transition-colors ${
-                    currentScreen === 'Bags'
-                      ? 'bg-white/20 text-white'
-                      : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                  }`}
-                >
-                  {totalBags} {totalBags === 1 ? 'Bag' : 'Bags'}
-                </span>
-              </button>
-
-              {/* Tab 2: Trip Intel & Checklists (Pro) */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isPro) {
-                    openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Trip Intel & Terminal Maps.");
-                  }
-                  setCurrentScreen('Checklist');
-                }}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
-                  currentScreen === 'Checklist'
-                    ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                }`}
-              >
-                <CloudSun className="w-4 h-4 shrink-0 text-amber-400" />
-                <span className="truncate">{tab2Title}</span>
-                <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
-                </span>
-              </button>
-
-              {/* Tab 3: Cabin & Plugs (Silver+) */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isPro) {
-                    openPaywall("Upgrade to Silver, Gold, or Platinum to unlock In-Seat Power & Seating Intel.");
-                  }
-                  setCurrentScreen('CabinIntel');
-                }}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
-                  currentScreen === 'CabinIntel'
-                    ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                }`}
-              >
-                <Zap className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="truncate">{tab3Title}</span>
-                <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow-2xs shrink-0">
-                  <Crown className="w-2.5 h-2.5 fill-purple-950" /> Silver+
-                </span>
-              </button>
-
-              {/* Tab 4: Allowances */}
-              <button
-                type="button"
-                onClick={() => setCurrentScreen('Allowances')}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
-                  currentScreen === 'Allowances'
-                    ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                }`}
-              >
-                <Info className="w-4 h-4 shrink-0" />
-                <span className="truncate">{tab4Title}</span>
-                <span
-                  className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 transition-colors ${
-                    currentScreen === 'Allowances'
-                      ? 'bg-white/20 text-white'
-                      : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                  }`}
-                >
-                  {isFlight ? 'Rules' : 'Guide'}
-                </span>
-              </button>
-
-              {/* Tab 5: Gate Ready */}
-              <button
-                type="button"
-                onClick={() => setCurrentScreen('GateReady')}
-                className={`flex-1 min-w-0 h-10 px-2 sm:px-4 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2.5 text-xs sm:text-[13px] font-black transition-all cursor-pointer whitespace-nowrap ${
-                  currentScreen === 'GateReady'
-                    ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.01]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                }`}
-              >
-                <Tab5IconComponent className="w-4 h-4 shrink-0" />
-                <span className="truncate">{tab5Title}</span>
-                <span
-                  className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 transition-colors ${
-                    isAllPacked
-                      ? 'bg-emerald-500 text-white'
-                      : currentScreen === 'GateReady'
-                        ? 'bg-white/20 text-white'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                  }`}
-                >
-                  {isAllPacked ? 'Ready' : 'Check'}
-                </span>
-              </button>
-            </nav>
-          </div>
-        </div>
-      )}
-
-      {/* Prominent Condensed Trip Information Banner with Location, Carrier, Seat Level & Dropdown */}
-      <TripBanner
-        currentTrip={currentTrip}
-        onOpenAddTrip={handleOpenAddTrip}
-        onOpenAccountSync={() => {
-          setAccountModalOrigin('workspace_banner');
-          setShowAccountModal(true);
-        }}
-      />
-
       {/* Main Content Area */}
       <main className="flex-1 w-full pb-20 sm:pb-12 relative overflow-x-hidden">
         {/* Overall Ambient Blueprint Grid for main page */}
@@ -739,12 +654,55 @@ function PackingAppContent() {
           <div className="absolute inset-0 bg-[radial-gradient(#c084fc_1px,transparent_1px)] [background-size:32px_32px]" />
         </div>
 
-        {currentTrip == null ? (
+        {appView === 'workspace' && currentTrip ? (
+          <TripWorkspace
+            trip={currentTrip}
+            initialTab={workspaceInitialTab}
+            onBackToDashboard={() => setAppView('dashboard')}
+            onOpenAddBag={() => setShowAddBagModal(true)}
+            onOpenAddItem={(bagId) => {
+              setTargetBagId(bagId);
+              setShowAddItemModal(true);
+            }}
+            onOpenTripEdit={() => {
+              setAddTripPreFill({
+                originCity: currentTrip.originCity,
+                carrier: currentTrip.companyName,
+                seatClass: currentTrip.seatClassOrCarSize,
+                departureDate: currentTrip.departureDate,
+                travelers: currentTrip.familyMembers
+              });
+              setSelectedTravelTypeForAdd(currentTrip.travelType);
+              setSelectedDestinationForAdd(currentTrip.destinationCity);
+              setAddTripKey((prev) => prev + 1);
+              setShowAddTripModal(true);
+            }}
+            onOpenReferral={() => setShowReferralModal(true)}
+          />
+        ) : trips.length > 0 ? (
+          <TravelDashboard
+            trips={trips}
+            onOpenTripWorkspace={(trip, initialTab) => {
+              selectTrip(trip);
+              if (initialTab) {
+                setWorkspaceInitialTab(initialTab as WorkspaceTab);
+              } else {
+                setWorkspaceInitialTab('Overview');
+              }
+              setAppView('workspace');
+            }}
+            onOpenNewTripModal={() => handleOpenAddTrip()}
+            onDeleteTrip={deleteTrip}
+            onOpenLuggageLibrary={() => setShowLuggageLibraryModal(true)}
+            onOpenNotifications={() => setShowNotificationsModal(true)}
+            unreadNotificationsCount={unreadNotificationsCount}
+          />
+        ) : (
           <div className="flex flex-col">
             {/* Conversion Marketing Hero (Above the trip creator) */}
             <LandingHero
               onOpenAddTrip={() => handleOpenAddTrip()}
-              onLoadDemo={loadDemoTrip}
+              onLoadDemo={handleLoadDemo}
               onOpenPricing={() => openPaywall()}
               onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
               onOpenAccountSync={() => {
@@ -767,139 +725,11 @@ function PackingAppContent() {
             <TransitNetworkHub
               onOpenAddTrip={handleOpenAddTrip}
               onOpenTour={() => setShowTourModal(true)}
-              onLoadDemo={loadDemoTrip}
+              onLoadDemo={handleLoadDemo}
             />
           </div>
-        ) : (
-          <>
-            {/* Screen Router */}
-            {currentScreen === 'Bags' && (
-              <BaggageScreen
-                trip={currentTrip}
-                onOpenAddBag={() => setShowAddBagModal(true)}
-                onOpenReferral={() => setShowReferralModal(true)}
-              />
-            )}
-
-            {currentScreen === 'Checklist' && (
-              <TripPrepChecklistScreen
-                trip={currentTrip}
-              />
-            )}
-
-            {currentScreen === 'CabinIntel' && (
-              <CabinIntelScreen trip={currentTrip} />
-            )}
-
-            {currentScreen === 'Allowances' && (
-              <AllowancesScreen trip={currentTrip} />
-            )}
-
-            {currentScreen === 'GateReady' && (
-              <GateReadyChecklistScreen trip={currentTrip} />
-            )}
-          </>
         )}
       </main>
-
-      {/* Mobile Fixed Bottom Navigation Bar (5 Prominent Tabs) - only when a trip exists */}
-      {currentTrip != null && (
-        <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-purple-200/80 dark:border-purple-900/80 pb-safe shadow-xl">
-          <div className="grid grid-cols-5 items-center h-16 px-1">
-            {/* Mobile Tab 1: Bags & Items */}
-            <button
-              onClick={() => setCurrentScreen('Bags')}
-              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
-                currentScreen === 'Bags'
-                  ? 'text-purple-700 dark:text-purple-300 font-black'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-              }`}
-            >
-              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Bags' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-                <Luggage className="w-4 h-4" />
-              </div>
-              <span className="text-[10px] tracking-tight mt-0.5">{isCar ? 'Trunk' : 'Luggage'}</span>
-              {totalBags > 0 && (
-                <span className="absolute top-1 right-2 text-[9px] font-extrabold px-1 rounded-full bg-purple-600 text-white">
-                  {totalBags}
-                </span>
-              )}
-            </button>
-
-            {/* Mobile Tab 2: Trip Intel & Checklists */}
-            <button
-              onClick={() => {
-                if (!isPro) {
-                  openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Trip Intel & Terminal Maps.");
-                }
-                setCurrentScreen('Checklist');
-              }}
-              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
-                currentScreen === 'Checklist'
-                  ? 'text-purple-700 dark:text-purple-300 font-black'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-              }`}
-            >
-              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Checklist' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-                <CloudSun className="w-4 h-4 text-amber-500" />
-              </div>
-              <span className="text-[10px] tracking-tight mt-0.5">Intel</span>
-              <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
-            </button>
-
-            {/* Mobile Tab 3: Plugs & Bins */}
-            <button
-              onClick={() => {
-                if (!isPro) {
-                  openPaywall("Upgrade to Silver, Gold, or Platinum to unlock In-Seat Power & Seating Intel.");
-                }
-                setCurrentScreen('CabinIntel');
-              }}
-              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer relative ${
-                currentScreen === 'CabinIntel'
-                  ? 'text-purple-700 dark:text-purple-300 font-black'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-              }`}
-            >
-              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'CabinIntel' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-                <Zap className="w-4 h-4 text-amber-500" />
-              </div>
-              <span className="text-[10px] tracking-tight mt-0.5">{isCar ? 'Power' : isCruise ? 'Cabin' : 'Plugs'}</span>
-              <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500 absolute top-1 right-2" />
-            </button>
-
-            {/* Mobile Tab 4: Allowances */}
-            <button
-              onClick={() => setCurrentScreen('Allowances')}
-              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
-                currentScreen === 'Allowances'
-                  ? 'text-purple-700 dark:text-purple-300 font-black'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-              }`}
-            >
-              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'Allowances' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-                <Info className="w-4 h-4" />
-              </div>
-              <span className="text-[10px] tracking-tight mt-0.5">{isFlight ? 'Limits' : 'Rules'}</span>
-            </button>
-
-            {/* Mobile Tab 5: Departure Ready */}
-            <button
-              onClick={() => setCurrentScreen('GateReady')}
-              className={`flex flex-col items-center justify-center h-full min-h-[44px] transition-all cursor-pointer ${
-                currentScreen === 'GateReady'
-                  ? 'text-purple-700 dark:text-purple-300 font-black'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-purple-900'
-              }`}
-            >
-              <div className={`p-1 rounded-xl transition-colors ${currentScreen === 'GateReady' ? 'bg-purple-100 dark:bg-purple-950/80' : ''}`}>
-                <Tab5IconComponent className="w-4 h-4" />
-              </div>
-              <span className="text-[10px] tracking-tight mt-0.5">{tab5MobileLabel}</span>
-            </button>
-          </div>
-        </nav>
-      )}
 
       {/* Modals */}
       <AddTripDialog
@@ -986,6 +816,36 @@ function PackingAppContent() {
           setPendingCheckerConfig(null);
           openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
         }}
+      />
+
+      {/* Phase 2: Departure Reminders & In-App Notification Center */}
+      <NotificationsModal
+        isOpen={showNotificationsModal}
+        onClose={() => setShowNotificationsModal(false)}
+        notifications={notifications}
+        onRefreshNotifications={() => setNotifications(generateTripNotifications(trips))}
+        onSelectNotificationAction={(notif) => {
+          setShowNotificationsModal(false);
+          if (notif.tripId) {
+            const targetTrip = trips.find((t) => t.id === notif.tripId);
+            if (targetTrip) {
+              selectTrip(targetTrip);
+              if (notif.targetTab) {
+                setWorkspaceInitialTab(notif.targetTab);
+              } else {
+                setWorkspaceInitialTab('Overview');
+              }
+              setAppView('workspace');
+            }
+          }
+        }}
+      />
+
+      {/* Phase 2: Personal Luggage Library Modal */}
+      <LuggageLibraryModal
+        isOpen={showLuggageLibraryModal}
+        onClose={() => setShowLuggageLibraryModal(false)}
+        currentTrip={currentTrip || undefined}
       />
 
       {/* Non-intrusive ad placement slot above footer on guest landing page */}

@@ -101,6 +101,10 @@ export const PricingPage: React.FC = () => {
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span>42-airline baggage allowance lookup</span>
               </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Personal cloud sync (all your devices)</span>
+              </div>
             </div>
           </div>
           <a
@@ -158,6 +162,10 @@ export const PricingPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>Printable PDF packing lists</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-purple-600 shrink-0" />
+                <span>Personal cloud sync (all your devices)</span>
               </div>
             </div>
           </div>
@@ -370,9 +378,16 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">Family Multi-Device Cloud Sync</td>
-                <td className="p-4 text-slate-400">—</td>
-                <td className="p-4 text-slate-400">—</td>
+                <td className="p-4 font-semibold">Personal Cloud Sync (All Your Devices)</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+              </tr>
+              <tr>
+                <td className="p-4 font-semibold">Companion &amp; Family Member Sync</td>
+                <td className="p-4">1 traveler (self)</td>
+                <td className="p-4">1 traveler (self)</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ 2 Travelers</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Unlimited Family</td>
               </tr>

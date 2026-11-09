@@ -68,7 +68,7 @@ interface PackingContextType {
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles' | 'familyMembers' | 'travelerMembers' | 'travelDocuments' | 'isArchived' | 'sharedWith'>>
   ) => Promise<Trip>;
   refreshActiveTrip: () => void;
   updateLuggageTag: (
@@ -1072,7 +1072,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateTripDetails = async (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles' | 'familyMembers' | 'travelerMembers' | 'travelDocuments' | 'isArchived' | 'sharedWith'>>
   ): Promise<Trip> => {
     let targetTrip = tripsRef.current.find((t) => t.id === tripId);
     if (!targetTrip) {
@@ -1113,7 +1113,12 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ...(details.gateChecklist !== undefined ? { gateChecklist: details.gateChecklist } : {}),
       ...(details.bags !== undefined ? { bags: details.bags } : {}),
       ...(details.passportExpiryDate !== undefined ? { passportExpiryDate: details.passportExpiryDate } : {}),
-      ...(details.modeProfiles !== undefined ? { modeProfiles: details.modeProfiles } : {})
+      ...(details.modeProfiles !== undefined ? { modeProfiles: details.modeProfiles } : {}),
+      ...(details.familyMembers !== undefined ? { familyMembers: details.familyMembers } : {}),
+      ...(details.travelerMembers !== undefined ? { travelerMembers: details.travelerMembers } : {}),
+      ...(details.travelDocuments !== undefined ? { travelDocuments: details.travelDocuments } : {}),
+      ...(details.isArchived !== undefined ? { isArchived: details.isArchived } : {}),
+      ...(details.sharedWith !== undefined ? { sharedWith: details.sharedWith } : {})
     };
 
     // Ensure modeProfiles for the current active travelType keeps company, seatClass, aircraftType, fareFamily strictly in sync

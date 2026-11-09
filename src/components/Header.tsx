@@ -38,7 +38,9 @@ import {
   Gift,
   MessageSquare,
   Mail,
-  User as UserIcon
+  User as UserIcon,
+  Bell,
+  LayoutDashboard
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
@@ -50,13 +52,21 @@ interface HeaderProps {
   onOpenTour?: () => void;
   onOpenAccountSync?: () => void;
   onOpenReferral?: () => void;
+  onOpenDashboard?: () => void;
+  onOpenNotifications?: () => void;
+  unreadNotificationsCount?: number;
+  currentView?: 'dashboard' | 'workspace';
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
   onOpenAddTrip, 
   onOpenTour, 
   onOpenAccountSync,
-  onOpenReferral 
+  onOpenReferral,
+  onOpenDashboard,
+  onOpenNotifications,
+  unreadNotificationsCount = 0,
+  currentView = 'dashboard'
 }) => {
   const {
     trips,
@@ -201,7 +211,11 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6 relative z-10">
         {/* Left: GateReady.ca Stadium Neon Badge matching uploaded branding */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative group cursor-default select-none">
+          <div 
+            onClick={onOpenDashboard}
+            className={`relative group select-none ${onOpenDashboard ? 'cursor-pointer active:scale-98 transition-transform' : 'cursor-default'}`}
+            title="GateReady Travel Dashboard"
+          >
             {/* Outer neon magenta/violet glow blur aura */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 rounded-2xl blur-[3px] opacity-75 group-hover:opacity-100 transition duration-300" />
 
@@ -236,8 +250,22 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Direct Links to Guides, Fee Calculator & Entry Requirements */}
+          {/* Desktop Direct Links to Dashboard, Guides, Fee Calculator & Entry Requirements */}
           <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 ml-1 xl:ml-2" aria-label="Quick travel links">
+            {onOpenDashboard && (
+              <button
+                type="button"
+                onClick={onOpenDashboard}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  currentView === 'dashboard'
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-purple-100 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5 text-amber-300" />
+                <span>Dashboard</span>
+              </button>
+            )}
             <a
               href="/airlines"
               className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
@@ -346,6 +374,24 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Gift className="w-3.5 h-3.5 text-amber-300 shrink-0" />
               <span className="text-[11px]">Free Month</span>
+            </button>
+          )}
+
+          {/* Item 7.5: Departure Reminders & In-App Notification Bell */}
+          {onOpenNotifications && (
+            <button
+              type="button"
+              onClick={onOpenNotifications}
+              className="relative h-8.5 sm:h-9 w-8.5 sm:w-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white flex items-center justify-center transition-colors cursor-pointer"
+              title="Departure Alerts & Reminders"
+              aria-label="Departure Alerts"
+            >
+              <Bell className="w-4 h-4 text-purple-200" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-amber-400 text-purple-950 font-black text-[9px] flex items-center justify-center shadow-sm">
+                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                </span>
+              )}
             </button>
           )}
 

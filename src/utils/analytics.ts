@@ -15,7 +15,20 @@ export type AnalyticsEventType =
   | 'first_packing_checklist_created'
   | 'pricing_page_viewed'
   | 'subscription_plan_selected'
-  | 'subscription_upgrade_completed';
+  | 'subscription_upgrade_completed'
+  // Phase 2 Engagement & Retention Events
+  | 'dashboard_view'
+  | 'trip_workspace_open'
+  | 'readiness_score_view'
+  | 'packing_template_applied'
+  | 'personal_template_saved'
+  | 'luggage_profile_saved'
+  | 'luggage_profile_applied'
+  | 'document_checklist_toggle'
+  | 'reminder_notification_click'
+  | 'traveler_category_set'
+  | 'trip_share_invite_create'
+  | 'suitcase_weight_updated';
 
 export interface AnalyticsEventParams {
   [key: string]: string | number | boolean | undefined;

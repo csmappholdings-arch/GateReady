@@ -159,6 +159,15 @@ export interface PackingItem {
   packedFor?: string; // e.g. "Mom", "Dad", "Emma (Child)", "Liam (Toddler)"
 }
 
+export type TravelerCategory = 'ADULT' | 'CHILD' | 'INFANT';
+
+export interface TravelerMember {
+  id: string;
+  name: string;
+  category: TravelerCategory;
+  avatarColor?: string;
+}
+
 export interface Bag {
   id: string;
   type: BagType;
@@ -168,6 +177,11 @@ export interface Bag {
   assignedTo?: string; // default packer / person this bag belongs to
   material?: BagMaterial; // 'HARD_SHELL' | 'FABRIC'
   emptyBagWeightLbs?: number; // tare weight of empty luggage in lbs
+  lengthInches?: number;
+  widthInches?: number;
+  heightInches?: number;
+  brand?: string;
+  color?: string;
 }
 
 export interface DepartureReminder {
@@ -211,6 +225,24 @@ export interface ModeProfile {
   departureTime?: string;
 }
 
+export interface TravelDocumentChecklist {
+  passportChecked?: boolean;
+  visaReviewed?: boolean;
+  boardingPassAvailable?: boolean;
+  travelInsuranceReviewed?: boolean;
+  hotelConfirmationAvailable?: boolean;
+  flightConfirmationAvailable?: boolean;
+  travelAuthorizationsReviewed?: boolean;
+  emergencyContactNoted?: boolean;
+  notes?: string;
+}
+
+export interface SharedTripMember {
+  email: string;
+  role: 'VIEWER' | 'EDITOR';
+  invitedAt: string;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -226,6 +258,7 @@ export interface Trip {
   departureCountdownEnabled?: boolean;
   departureReminders?: DepartureReminder[];
   familyMembers?: string[]; // e.g. ["Mom (Parent)", "Dad (Parent)", "Emma (Child)", "Lucas (Toddler)"]
+  travelerMembers?: TravelerMember[];
   bags: Bag[];
   flightNumber?: string; // e.g. "DL 482", "AC 854"
   aircraftType?: string; // e.g. "Boeing 737-800", "Airbus A321neo", "Embraer 175"
@@ -236,8 +269,62 @@ export interface Trip {
   souvenirBufferLbs?: number; // reserved weight buffer in lbs (default 5.0 lbs)
   luggageTags?: Record<string, LuggageTagInfo>;
   gateChecklist?: GateCheckItem[];
+  travelDocuments?: TravelDocumentChecklist;
   passportExpiryDate?: string; // Optional passport expiry (YYYY-MM-DD) for 6-month rule verification
   modeProfiles?: Partial<Record<TravelType, ModeProfile>>;
+  isArchived?: boolean;
+  sharedWith?: SharedTripMember[];
+}
+
+export interface LuggageProfile {
+  id: string;
+  name: string;
+  type: BagType;
+  material: BagMaterial;
+  emptyBagWeightLbs: number;
+  lengthInches?: number;
+  widthInches?: number;
+  heightInches?: number;
+  brand?: string;
+  color?: string;
+  assignedTraveler?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface InAppNotification {
+  id: string;
+  tripId: string;
+  tripName: string;
+  trigger: '14_DAYS' | '7_DAYS' | '3_DAYS' | '24_HOURS' | 'DEPARTURE_DAY' | 'CUSTOM';
+  title: string;
+  message: string;
+  scheduledDate: string;
+  isRead: boolean;
+  actionLabel: string;
+  targetTab?: 'Overview' | 'Travellers' | 'Luggage' | 'Checklist' | 'AirlineRules' | 'Documents' | 'Summary';
+  createdAt: string;
+}
+
+export interface TravelReadinessScore {
+  totalScore: number; // 0-100
+  statusLabel: 'NEEDS ATTENTION' | 'GETTING READY' | 'ALMOST READY' | "YOU'RE TRAVEL READY!";
+  statusColor: string;
+  categories: {
+    packing: { score: number; max: 30; percentage: number; label: string; detail: string; complete: boolean };
+    baggage: { score: number; max: 30; percentage: number; label: string; detail: string; complete: boolean };
+    travellers: { score: number; max: 15; percentage: number; label: string; detail: string; complete: boolean };
+    documents: { score: number; max: 15; percentage: number; label: string; detail: string; complete: boolean };
+    finalReview: { score: number; max: 10; percentage: number; label: string; detail: string; complete: boolean };
+  };
+  recommendedNextActions: Array<{
+    id: string;
+    title: string;
+    description: string;
+    actionLabel: string;
+    targetTab: 'Overview' | 'Travellers' | 'Luggage' | 'Checklist' | 'AirlineRules' | 'Documents' | 'Summary';
+    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  }>;
 }
 
 export interface BaggageLimitInfo {
