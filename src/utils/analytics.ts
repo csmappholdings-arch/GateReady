@@ -28,7 +28,16 @@ export type AnalyticsEventType =
   | 'reminder_notification_click'
   | 'traveler_category_set'
   | 'trip_share_invite_create'
-  | 'suitcase_weight_updated';
+  | 'suitcase_weight_updated'
+  // Phase 2 User Experience & Onboarding Events
+  | 'onboarding_started'
+  | 'onboarding_completed'
+  | 'onboarding_skipped'
+  | 'dashboard_feature_clicked'
+  | 'premium_feature_clicked'
+  | 'upgrade_page_viewed'
+  | 'upgrade_button_clicked'
+  | 'subscription_started';
 
 export interface AnalyticsEventParams {
   [key: string]: string | number | boolean | undefined;

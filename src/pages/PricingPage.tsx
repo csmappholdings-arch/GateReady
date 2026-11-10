@@ -2,16 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { PageLayout } from './PageLayout';
 import { Check, Sparkles, Shield, ArrowRight, HelpCircle, Mail, Zap, Crown, X } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
+import { useAuth } from '../context/AuthContext';
+import { openLemonCheckout } from '../lib/lemonSqueezy';
 
 export const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
 
   useEffect(() => {
     trackEvent('pricing_page_viewed');
+    trackEvent('upgrade_page_viewed', { source: 'pricing_page' });
   }, []);
+
+  const { user } = useAuth();
 
   const handleSelectPlan = (plan: string) => {
     trackEvent('subscription_plan_selected', { plan, billing_cycle: billingCycle });
+    trackEvent('upgrade_button_clicked', { tier: plan, billing_cycle: billingCycle, source: 'pricing_page' });
+  };
+
+  const handlePaidCheckout = (tier: 'SILVER' | 'GOLD' | 'PLATINUM') => {
+    trackEvent('subscription_plan_selected', { plan: tier, billing_cycle: billingCycle });
+    trackEvent('upgrade_button_clicked', { tier, billing_cycle: billingCycle, source: 'pricing_page' });
+    trackEvent('subscription_started', { tier, billing_cycle: billingCycle, gateway: 'lemonsqueezy' });
+    openLemonCheckout({
+      tier,
+      cycle: billingCycle,
+      user,
+      onSuccess: () => {
+        window.location.href = '/?lemon_status=success';
+      }
+    });
   };
 
   return (
@@ -26,7 +46,7 @@ export const PricingPage: React.FC = () => {
           Transparent Plans for Every Type of Traveler
         </h1>
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
-          Start 100% free with no credit card required. Free account signup automatically unlocks a <strong>7-day full Platinum trial</strong> with unlimited bags and tare weight deduction.
+          Start 100% free with no credit card required. Free account registration automatically unlocks an unrestricted <strong>7-day full Platinum trial</strong> with unlimited bags and tare weight deduction.
         </p>
 
         {/* Monthly / Yearly Switch */}
@@ -74,7 +94,7 @@ export const PricingPage: React.FC = () => {
               <span className="text-xs text-slate-500">/ forever</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-              For people who want to explore GateReady and organize basic travel preparation.
+              Ideal for occasional travelers exploring GateReady and organizing basic trip preparation.
             </p>
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
               <div className="flex items-center gap-2">
@@ -110,7 +130,7 @@ export const PricingPage: React.FC = () => {
           <a
             href="/"
             onClick={() => handleSelectPlan('FREE')}
-            className="w-full py-3 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-xs text-center block transition-colors"
+            className="w-full py-3 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-xs text-center block transition-colors cursor-pointer"
           >
             Start Free
           </a>
@@ -121,7 +141,7 @@ export const PricingPage: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-purple-600 dark:text-purple-400 uppercase tracking-wider">Silver</span>
-              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 rounded-full">Individual</span>
+              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 rounded-full">Individual Travelers</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
@@ -132,7 +152,7 @@ export const PricingPage: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-              For individual travellers who want more luggage management and saved travel functionality.
+              For solo flyers and business travelers who want unlimited bags, tare subtraction, and saved documents.
             </p>
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
               <div className="flex items-center gap-2">
@@ -169,13 +189,13 @@ export const PricingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <a
-            href="/"
-            onClick={() => handleSelectPlan('SILVER')}
-            className="w-full py-3 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-200 font-bold text-xs text-center block transition-colors"
+          <button
+            type="button"
+            onClick={() => handlePaidCheckout('SILVER')}
+            className="w-full py-3 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900 font-bold text-xs text-center block transition-colors cursor-pointer"
           >
             Choose Silver
-          </a>
+          </button>
         </div>
 
         {/* GOLD (MOST POPULAR) */}
@@ -198,7 +218,7 @@ export const PricingPage: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-              For couples and small families who want a more complete travel planning experience.
+              For couples and small families who want unlimited trips, multi-device companion sync, and complete baggage management.
             </p>
             <div className="pt-3 border-t border-amber-200 dark:border-amber-900/60 space-y-2 text-xs">
               <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
@@ -227,13 +247,13 @@ export const PricingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <a
-            href="/"
-            onClick={() => handleSelectPlan('GOLD')}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs text-center block shadow-md shadow-amber-500/25 transition-all"
+          <button
+            type="button"
+            onClick={() => handlePaidCheckout('GOLD')}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs text-center block shadow-md shadow-amber-500/25 transition-all cursor-pointer"
           >
             Choose Gold
-          </a>
+          </button>
         </div>
 
         {/* PLATINUM */}
@@ -252,7 +272,7 @@ export const PricingPage: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-              For frequent travellers and families who want the complete GateReady experience.
+              For frequent flyers and large families who want the ultimate travel planning experience with priority updates and VIP support.
             </p>
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
               <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
@@ -281,13 +301,13 @@ export const PricingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <a
-            href="/"
-            onClick={() => handleSelectPlan('PLATINUM')}
-            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs text-center block shadow-md shadow-indigo-600/25 transition-all"
+          <button
+            type="button"
+            onClick={() => handlePaidCheckout('PLATINUM')}
+            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs text-center block shadow-md shadow-indigo-600/25 transition-all cursor-pointer"
           >
             Choose Platinum
-          </a>
+          </button>
         </div>
       </section>
 

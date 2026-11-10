@@ -15,6 +15,7 @@ export const DEFAULT_LUGGAGE_LIBRARY: LuggageProfile[] = [
     brand: 'Away',
     color: 'Navy Blue',
     notes: 'Fits major airline domestic & international overhead bins',
+    isDemo: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -29,6 +30,7 @@ export const DEFAULT_LUGGAGE_LIBRARY: LuggageProfile[] = [
     brand: 'Samsonite',
     color: 'Charcoal Grey',
     notes: 'Large checked spinner with TSA combination lock',
+    isDemo: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -43,6 +45,7 @@ export const DEFAULT_LUGGAGE_LIBRARY: LuggageProfile[] = [
     brand: 'Patagonia',
     color: 'Black',
     notes: 'Personal item backpack for under-seat stowage',
+    isDemo: true,
     createdAt: new Date().toISOString()
   }
 ];
@@ -50,10 +53,19 @@ export const DEFAULT_LUGGAGE_LIBRARY: LuggageProfile[] = [
 export function getLuggageLibrary(): LuggageProfile[] {
   if (typeof window === 'undefined') return DEFAULT_LUGGAGE_LIBRARY;
   try {
+    if (localStorage.getItem('gateready_demo_luggage_cleared') === 'true') {
+      const raw = localStorage.getItem(LUGGAGE_LIBRARY_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+      return [];
+    }
+
     const raw = localStorage.getItem(LUGGAGE_LIBRARY_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {}
   return DEFAULT_LUGGAGE_LIBRARY;
@@ -93,3 +105,18 @@ export function deleteLuggageProfile(id: string): void {
     } catch {}
   }
 }
+
+export function clearDemoLuggageProfiles(): LuggageProfile[] {
+  const current = getLuggageLibrary();
+  const remaining = current.filter(
+    (p) => !p.isDemo && !p.id.startsWith('prof_away') && !p.id.startsWith('prof_samsonite') && !p.id.startsWith('prof_patagonia')
+  );
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(LUGGAGE_LIBRARY_STORAGE_KEY, JSON.stringify(remaining));
+      localStorage.setItem('gateready_demo_luggage_cleared', 'true');
+    } catch {}
+  }
+  return remaining;
+}
+

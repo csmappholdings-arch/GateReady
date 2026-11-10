@@ -1,4 +1,5 @@
 import { Trip, InAppNotification } from '../types/travel';
+import { getDaysUntilDeparture } from './countdown';
 
 const NOTIFICATIONS_STORAGE_KEY = 'gateready_in_app_notifications_v1';
 const NOTIFICATION_PREFS_KEY = 'gateready_notification_prefs_v1';
@@ -70,33 +71,18 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
   const prefs = getNotificationPreferences();
   if (!prefs.enabled) return [];
 
-  const existing = getStoredNotifications();
+  const activeTripIds = new Set(trips.filter((t) => !t.isArchived).map((t) => t.id));
+  const existing = getStoredNotifications().filter((n) => activeTripIds.has(n.tripId));
   const existingMap = new Map(existing.map((n) => [`${n.tripId}_${n.trigger}`, n]));
-  const now = new Date();
   const result: InAppNotification[] = [...existing];
 
   trips.forEach((trip) => {
     if (trip.isArchived || !trip.departureDate) return;
 
-    // Parse departure date
-    const [year, month, day] = trip.departureDate.split('-').map(Number);
-    if (!year || !month || !day) return;
-
-    let depHour = 9;
-    let depMin = 0;
-    if (trip.departureTime && trip.departureTime.includes(':')) {
-      const parts = trip.departureTime.split(':').map(Number);
-      depHour = parts[0] || 9;
-      depMin = parts[1] || 0;
-    }
-
-    const depDate = new Date(year, month - 1, day, depHour, depMin, 0);
-    const diffMs = depDate.getTime() - now.getTime();
-    const diffHours = diffMs / (1000 * 60 * 60);
-    const diffDays = diffHours / 24;
+    const daysRemaining = getDaysUntilDeparture(trip.departureDate, trip.departureTime);
 
     // Ignore past departed trips
-    if (diffMs <= 0) return;
+    if (daysRemaining < 0) return;
 
     // Helper to add notification if not already added
     const addNotice = (
@@ -126,45 +112,47 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
       }
     };
 
-    // 14 Days Check (triggers when between 7 and 14 days)
-    if (prefs.fourteenDaysNotice && diffDays <= 14 && diffDays > 7) {
+    // 14 Days Check (triggers when strictly 8 to 14 days out)
+    if (prefs.fourteenDaysNotice && daysRemaining <= 14 && daysRemaining >= 8) {
       addNotice(
         '14_DAYS',
-        'Your Trip Is Coming Up!',
-        `Your trip to ${trip.destinationCity || trip.name} is approaching. Now is a great time to review your airline baggage allowance and begin preparing your packing list.`,
+        `${daysRemaining} Days Until Departure: ${trip.destinationCity || trip.name}`,
+        `Your departure is ${daysRemaining} days away. Now is a great time to review your airline baggage allowance and begin preparing your packing list.`,
         'Review My Trip',
         'Overview'
       );
     }
 
-    // 7 Days Check (triggers when between 3 and 7 days)
-    if (prefs.sevenDaysNotice && diffDays <= 7 && diffDays > 3) {
+    // 7 Days Check (triggers when strictly 4 to 7 days out)
+    if (prefs.sevenDaysNotice && daysRemaining <= 7 && daysRemaining >= 4) {
       addNotice(
         '7_DAYS',
-        'One Week Until Your Trip!',
-        `Your departure is one week away. Check your luggage weights, dimensions, and airline baggage restrictions.`,
+        `${daysRemaining} Days Until Departure: One Week to Travel!`,
+        `Your departure is ${daysRemaining} days away. Check your luggage weights, dimensions, and airline baggage restrictions.`,
         'Check My Luggage',
         'Luggage'
       );
     }
 
-    // 3 Days Check (triggers when between 24h and 3 days)
-    if (prefs.threeDaysNotice && diffDays <= 3 && diffHours > 24) {
+    // 3 Days Check (triggers when strictly 2 to 3 days out)
+    if (prefs.threeDaysNotice && daysRemaining <= 3 && daysRemaining >= 2) {
       addNotice(
         '3_DAYS',
-        'Time to Finalize Your Packing!',
-        `Your trip is getting close. Complete your packing checklist and make sure your luggage is within your airline's limits.`,
+        `${daysRemaining} Days Until Departure: Finalize Packing!`,
+        `Your trip is only ${daysRemaining} days away. Complete your packing checklist and make sure your luggage is within your airline's limits.`,
         'Complete My Packing',
         'Checklist'
       );
     }
 
-    // 24 Hours Check (triggers when under 24 hours)
-    if (prefs.twentyFourHoursNotice && diffHours <= 24 && diffHours > 0) {
+    // 24 Hours / 1 Day Check (triggers when 0 or 1 day out)
+    if (prefs.twentyFourHoursNotice && daysRemaining <= 1 && daysRemaining >= 0) {
       addNotice(
         '24_HOURS',
-        'Your Final Travel Readiness Check',
-        `Your trip is tomorrow! Review your packing checklist, luggage restrictions, and travel documents before heading to the airport.`,
+        daysRemaining === 0 ? 'Today is Departure Day!' : '1 Day Until Departure: Final Check',
+        daysRemaining === 0
+          ? `Safe travels to ${trip.destinationCity || trip.name}! Have your boarding pass, photo ID, and carry-on liquids ready.`
+          : `Your trip is tomorrow! Review your packing checklist, luggage restrictions, and travel documents before heading to the airport.`,
         'Review My Travel Readiness',
         'Documents'
       );

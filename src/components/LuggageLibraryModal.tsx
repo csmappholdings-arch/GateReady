@@ -17,7 +17,8 @@ import { LuggageProfile, BagType, BagMaterial, Trip } from '../types/travel';
 import { 
   getLuggageLibrary, 
   saveLuggageProfile, 
-  deleteLuggageProfile 
+  deleteLuggageProfile,
+  clearDemoLuggageProfiles
 } from '../utils/luggageLibrary';
 import { trackEvent } from '../utils/analytics';
 
@@ -322,18 +323,34 @@ export const LuggageLibraryModal: React.FC<LuggageLibraryModalProps> = ({
             </form>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   {library.length} Saved Suitcase Profiles
                 </span>
-                <button
-                  type="button"
-                  onClick={handleOpenAdd}
-                  className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 transition-all"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add New Suitcase</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {library.some((p) => p.isDemo) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const remaining = clearDemoLuggageProfiles();
+                        setLibrary(remaining);
+                      }}
+                      className="h-8 px-2.5 rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                      title="Clear pre-saved demo suitcase profiles"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear Demo Suitcases</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleOpenAdd}
+                    className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add New Suitcase</span>
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2.5">
@@ -351,6 +368,11 @@ export const LuggageLibraryModal: React.FC<LuggageLibraryModalProps> = ({
                           <p className="font-bold text-xs text-slate-900 dark:text-white truncate">
                             {profile.name}
                           </p>
+                          {profile.isDemo && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-400 text-purple-950 border border-amber-500/40">
+                              DEMO
+                            </span>
+                          )}
                           <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.2 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
                             {profile.type.replace('_', ' ')}
                           </span>

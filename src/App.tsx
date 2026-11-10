@@ -26,6 +26,7 @@ import { TravelDashboard } from './components/TravelDashboard';
 import { TripWorkspace, WorkspaceTab } from './components/TripWorkspace';
 import { NotificationsModal } from './components/NotificationsModal';
 import { LuggageLibraryModal } from './components/LuggageLibraryModal';
+import { OnboardingModal, isOnboardingCompleted, saveUserPreferences } from './components/OnboardingModal';
 import { InAppNotification, LuggageProfile } from './types/travel';
 import { generateTripNotifications } from './utils/notifications';
 import { trackEvent } from './utils/analytics';
@@ -147,11 +148,31 @@ function PackingAppContent() {
   const [showSaveGateModal, setShowSaveGateModal] = useState(false);
 
   // Phase 2: Personalized Travel Dashboard & Workspace State
-  const [appView, setAppView] = useState<'dashboard' | 'workspace'>('dashboard');
+  const [appView, setAppView] = useState<'dashboard' | 'workspace' | 'home'>(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.replace(/\/+$/, '') || '/';
+      if (p === '/dashboard') return 'dashboard';
+    }
+    return trips.length > 0 ? 'dashboard' : 'home';
+  });
   const [workspaceInitialTab, setWorkspaceInitialTab] = useState<WorkspaceTab>('Overview');
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showLuggageLibraryModal, setShowLuggageLibraryModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<InAppNotification[]>(() => generateTripNotifications(trips));
+
+  // Auto-launch guided onboarding for first-time visitors on home/dashboard
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.replace(/\/+$/, '') || '/';
+      if ((p === '/' || p === '/dashboard') && !isOnboardingCompleted()) {
+        const timer = setTimeout(() => {
+          setShowOnboardingModal(true);
+        }, 900);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     setNotifications(generateTripNotifications(trips));
@@ -313,7 +334,12 @@ function PackingAppContent() {
     setShowAccountModal(true);
   };
 
-  const handleOpenAddTrip = (travelType?: TravelType, destinationCity?: string) => {
+  const handleOpenAddTrip = (
+    travelType?: TravelType, 
+    destinationCity?: string,
+    prefillCarrier?: string,
+    prefillOriginCity?: string
+  ) => {
     refreshActiveTrip();
     const safeTravelType = typeof travelType === 'string' ? travelType : undefined;
     const safeDest = typeof destinationCity === 'string' ? destinationCity : undefined;
@@ -324,7 +350,14 @@ function PackingAppContent() {
     }
     setSelectedTravelTypeForAdd(safeTravelType);
     setSelectedDestinationForAdd(safeDest);
-    setAddTripPreFill(null);
+    if (prefillCarrier || prefillOriginCity) {
+      setAddTripPreFill({
+        carrier: prefillCarrier,
+        originCity: prefillOriginCity
+      });
+    } else {
+      setAddTripPreFill(null);
+    }
     setAddTripKey((prev) => prev + 1);
     setShowAddTripModal(true);
   };
@@ -535,10 +568,18 @@ function PackingAppContent() {
           setShowAccountModal(true);
         }}
         onOpenReferral={() => setShowReferralModal(true)}
-        onOpenDashboard={() => setAppView('dashboard')}
+        onOpenDashboard={() => {
+          setAppView('dashboard');
+          if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
+            try {
+              window.history.pushState({}, '', '/dashboard');
+            } catch {}
+          }
+        }}
         onOpenNotifications={() => setShowNotificationsModal(true)}
         unreadNotificationsCount={notifications.filter((n) => !n.isRead).length}
         currentView={appView}
+        onOpenOnboarding={() => setShowOnboardingModal(true)}
       />
 
       {/* Free Plan Bag Limit Trip Notice (strictly scoped to currentTrip; never on landing or other trips) */}
@@ -679,7 +720,7 @@ function PackingAppContent() {
             }}
             onOpenReferral={() => setShowReferralModal(true)}
           />
-        ) : trips.length > 0 ? (
+        ) : appView === 'dashboard' || trips.length > 0 ? (
           <TravelDashboard
             trips={trips}
             onOpenTripWorkspace={(trip, initialTab) => {
@@ -696,6 +737,8 @@ function PackingAppContent() {
             onOpenLuggageLibrary={() => setShowLuggageLibraryModal(true)}
             onOpenNotifications={() => setShowNotificationsModal(true)}
             unreadNotificationsCount={unreadNotificationsCount}
+            onOpenOnboarding={() => setShowOnboardingModal(true)}
+            onLoadDemoTrip={handleLoadDemo}
           />
         ) : (
           <div className="flex flex-col">
@@ -846,6 +889,25 @@ function PackingAppContent() {
         isOpen={showLuggageLibraryModal}
         onClose={() => setShowLuggageLibraryModal(false)}
         currentTrip={currentTrip || undefined}
+      />
+
+      {/* Phase 2: Customer Guided Onboarding Modal (5-Step) */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+        onStartTripCreation={(prefill) => {
+          setShowOnboardingModal(false);
+          handleOpenAddTrip(prefill?.travelType, undefined, prefill?.carrier, prefill?.originCity);
+        }}
+        onExploreTools={() => {
+          setShowOnboardingModal(false);
+          setAppView('dashboard');
+          if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
+            try {
+              window.history.pushState({}, '', '/dashboard');
+            } catch {}
+          }
+        }}
       />
 
       {/* Non-intrusive ad placement slot above footer on guest landing page */}

@@ -40,7 +40,13 @@ import {
   Mail,
   User as UserIcon,
   Bell,
-  LayoutDashboard
+  LayoutDashboard,
+  Wallet,
+  Calculator,
+  ShieldCheck,
+  CheckCircle2,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
@@ -55,7 +61,8 @@ interface HeaderProps {
   onOpenDashboard?: () => void;
   onOpenNotifications?: () => void;
   unreadNotificationsCount?: number;
-  currentView?: 'dashboard' | 'workspace';
+  currentView?: 'dashboard' | 'workspace' | 'home';
+  onOpenOnboarding?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -66,7 +73,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenDashboard,
   onOpenNotifications,
   unreadNotificationsCount = 0,
-  currentView = 'dashboard'
+  currentView = 'dashboard',
+  onOpenOnboarding
 }) => {
   const {
     trips,
@@ -126,9 +134,16 @@ export const Header: React.FC<HeaderProps> = ({
   const [licenseFeedback, setLicenseFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showLicenseField, setShowLicenseField] = useState(false);
 
+  const [planMenuOpen, setPlanMenuOpen] = useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
+  const [whyMenuOpen, setWhyMenuOpen] = useState(false);
+
   const settingsRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const tripMenuRef = useRef<HTMLDivElement>(null);
+  const planMenuRef = useRef<HTMLDivElement>(null);
+  const toolsMenuRef = useRef<HTMLDivElement>(null);
+  const whyMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
@@ -141,6 +156,15 @@ export const Header: React.FC<HeaderProps> = ({
       if (tripMenuRef.current && !tripMenuRef.current.contains(e.target as Node)) {
         setTripMenuOpen(false);
       }
+      if (planMenuRef.current && !planMenuRef.current.contains(e.target as Node)) {
+        setPlanMenuOpen(false);
+      }
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(e.target as Node)) {
+        setToolsMenuOpen(false);
+      }
+      if (whyMenuRef.current && !whyMenuRef.current.contains(e.target as Node)) {
+        setWhyMenuOpen(false);
+      }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -148,6 +172,9 @@ export const Header: React.FC<HeaderProps> = ({
         setSettingsOpen(false);
         setUserMenuOpen(false);
         setTripMenuOpen(false);
+        setPlanMenuOpen(false);
+        setToolsMenuOpen(false);
+        setWhyMenuOpen(false);
       }
     };
 
@@ -250,13 +277,13 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Direct Links to Dashboard, Guides, Fee Calculator & Entry Requirements */}
-          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 ml-1 xl:ml-2" aria-label="Quick travel links">
+          {/* Desktop Navigation: 3 Structured Dropdown Groups + Dashboard */}
+          <nav className="hidden xl:flex items-center gap-1.5 ml-2" aria-label="Main travel navigation">
             {onOpenDashboard && (
               <button
                 type="button"
                 onClick={onOpenDashboard}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
                   currentView === 'dashboard'
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-purple-100 hover:text-white hover:bg-white/10'
@@ -266,24 +293,217 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>Dashboard</span>
               </button>
             )}
-            <a
-              href="/airlines"
-              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              Airline Guides
-            </a>
-            <a
-              href="/baggage-fee-calculator"
-              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              Fee Calculator
-            </a>
-            <a
-              href="/entry-requirements"
-              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              Entry Requirements
-            </a>
+
+            {/* 1. PLAN YOUR TRIP Dropdown */}
+            <div className="relative" ref={planMenuRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setPlanMenuOpen(!planMenuOpen);
+                  setToolsMenuOpen(false);
+                  setWhyMenuOpen(false);
+                }}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                  planMenuOpen ? 'bg-white/20 text-white' : 'text-purple-100 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>PLAN YOUR TRIP</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${planMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {planMenuOpen && (
+                <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlanMenuOpen(false);
+                      onOpenAddTrip();
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 text-purple-600" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Create a Trip</div>
+                      <div className="text-[10px] text-slate-500">Plan dates, route & airlines</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlanMenuOpen(false);
+                      if (onOpenDashboard) onOpenDashboard();
+                      else {
+                        const el = document.getElementById('interactive-trip-preview');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Packing Lists</div>
+                      <div className="text-[10px] text-slate-500">Tailored packing checklist</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlanMenuOpen(false);
+                      openWalletModal();
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <Wallet className="w-4 h-4 text-amber-500" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Travel Wallet</div>
+                      <div className="text-[10px] text-slate-500">PNR codes & loyalty numbers</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 2. TRAVEL TOOLS Dropdown */}
+            <div className="relative" ref={toolsMenuRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setToolsMenuOpen(!toolsMenuOpen);
+                  setPlanMenuOpen(false);
+                  setWhyMenuOpen(false);
+                }}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                  toolsMenuOpen ? 'bg-white/20 text-white' : 'text-purple-100 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>TRAVEL TOOLS</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${toolsMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {toolsMenuOpen && (
+                <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <a
+                    href="/airlines"
+                    onClick={() => setToolsMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <Plane className="w-4 h-4 text-purple-600" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Airline Baggage Guides</div>
+                      <div className="text-[10px] text-slate-500">42+ carriers audited tariffs</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="/baggage-fee-calculator"
+                    onClick={() => setToolsMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <Calculator className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Baggage Fee Calculator</div>
+                      <div className="text-[10px] text-slate-500">Calculate total checked fees</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="/entry-requirements"
+                    onClick={() => setToolsMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-sky-500" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Carry-on & Entry Checker</div>
+                      <div className="text-[10px] text-slate-500">Passport validity & sizer rules</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="/travel-preparation"
+                    onClick={() => setToolsMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <Luggage className="w-4 h-4 text-amber-500" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Travel Preparation</div>
+                      <div className="text-[10px] text-slate-500">Departure checklist guides</div>
+                    </div>
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* 3. WHY GATEREADY Dropdown */}
+            <div className="relative" ref={whyMenuRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setWhyMenuOpen(!whyMenuOpen);
+                  setPlanMenuOpen(false);
+                  setToolsMenuOpen(false);
+                }}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                  whyMenuOpen ? 'bg-white/20 text-white' : 'text-purple-100 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>WHY GATEREADY</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${whyMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {whyMenuOpen && (
+                <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <a
+                    href="/"
+                    onClick={() => setWhyMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <Zap className="w-4 h-4 text-purple-600" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">How It Works</div>
+                      <div className="text-[10px] text-slate-500">3-step travel readiness</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="/"
+                    onClick={() => setWhyMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Features</div>
+                      <div className="text-[10px] text-slate-500">Smart scale, tare & TSA 3-1-1</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="/pricing"
+                    onClick={() => setWhyMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <CreditCard className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Pricing & Plans</div>
+                      <div className="text-[10px] text-slate-500">Free, Silver, Gold, Platinum</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="/"
+                    onClick={() => setWhyMenuOpen(false)}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
+                  >
+                    <HelpCircle className="w-4 h-4 text-indigo-500" />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">FAQs</div>
+                      <div className="text-[10px] text-slate-500">Frequently asked questions</div>
+                    </div>
+                  </a>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Pro / Referral / Trial / Free Plan Badge (Desktop row) */}
@@ -435,23 +655,41 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="w-5 h-5 rounded-full bg-white/20" />
               </div>
             ) : (
-              /* Sync Account button: surfaced for guests ONLY when they have saved trips worth syncing */
-              <button
-                type="button"
-                onClick={() => {
-                  setAccountSyncModalMode('signin');
-                  if (onOpenAccountSync) {
-                    onOpenAccountSync();
-                  } else {
-                    setAccountSyncModalOpen(true);
-                  }
-                }}
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
-                title="Sign in with Google or Email to sync trips across devices"
-              >
-                <Cloud className="w-4 h-4 text-fuchsia-300 shrink-0" />
-                <span className="hidden sm:inline">Sync Account</span>
-              </button>
+              /* High-Intent Guest Actions: Clearly Visible Log In and Sign Up Free */
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountSyncModalMode('signin');
+                    if (onOpenAccountSync) {
+                      onOpenAccountSync();
+                    } else {
+                      setAccountSyncModalOpen(true);
+                    }
+                  }}
+                  className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Log into existing GateReady account"
+                >
+                  <span>Log In</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountSyncModalMode('signup');
+                    if (onOpenAccountSync) {
+                      onOpenAccountSync();
+                    } else {
+                      setAccountSyncModalOpen(true);
+                    }
+                  }}
+                  className="h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:brightness-105 active:scale-95 text-purple-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-400/25 transition-all cursor-pointer"
+                  title="Create your free account (includes 7-day Platinum trial)"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-900" />
+                  <span className="whitespace-nowrap">Sign Up Free</span>
+                </button>
+              </div>
             )}
 
             {/* User Account Popover */}
@@ -1137,6 +1375,33 @@ export const Header: React.FC<HeaderProps> = ({
                       className="px-2.5 py-1 rounded-lg text-xs font-bold bg-fuchsia-50 dark:bg-fuchsia-950/60 text-fuchsia-600 dark:text-fuchsia-300 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900 transition-colors cursor-pointer border border-fuchsia-200 dark:border-fuchsia-800/40"
                     >
                       Invite & Earn
+                    </button>
+                  </div>
+                )}
+
+                {/* Onboarding Guide in Settings */}
+                {onOpenOnboarding && (
+                  <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-500" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                          Onboarding Guide
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          Interactive 5-step walkthrough
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onOpenOnboarding();
+                        setSettingsOpen(false);
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors cursor-pointer border border-purple-200 dark:border-purple-800/40"
+                    >
+                      Restart Tour
                     </button>
                   </div>
                 )}

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useSubscription, BillingCycle, PaidTier } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { openLemonCheckout, buildLemonCheckoutUrl } from '../lib/lemonSqueezy';
+import { trackEvent } from '../utils/analytics';
 import { 
   Crown, 
   Check, 
@@ -38,17 +39,22 @@ export const SubscriptionModal: React.FC = () => {
   const [licenseError, setLicenseError] = useState('');
   const [licenseSuccessMsg, setLicenseSuccessMsg] = useState('');
 
-  // Re-initialize Lemon.js when paywall opens
+  // Re-initialize Lemon.js when paywall opens & track upgrade_page_viewed
   useEffect(() => {
-    if (isPaywallOpen && typeof window !== 'undefined' && window.createLemonSqueezy) {
-      window.createLemonSqueezy();
+    if (isPaywallOpen) {
+      trackEvent('upgrade_page_viewed', { reason: paywallReason || undefined, current_tier: tier });
+      if (typeof window !== 'undefined' && window.createLemonSqueezy) {
+        window.createLemonSqueezy();
+      }
     }
-  }, [isPaywallOpen]);
+  }, [isPaywallOpen, paywallReason, tier]);
 
   if (!isPaywallOpen) return null;
   if (typeof document === 'undefined') return null;
 
   const handleChooseTier = (chosenTier: PaidTier) => {
+    trackEvent('upgrade_button_clicked', { tier: chosenTier, billing_cycle: selectedCycle, source: 'modal' });
+    trackEvent('subscription_started', { tier: chosenTier, billing_cycle: selectedCycle, gateway: 'lemonsqueezy' });
     setProcessingTier(chosenTier);
 
     openLemonCheckout({

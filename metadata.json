@@ -1,6 +1,6 @@
 {
   "name": "GateReady.ca",
-  "description": "Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees. Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home.",
+  "description": "Travel Smarter. Pack Better. Avoid Airport Surprises. Plan your trip, check airline baggage limits, organize your luggage and know what to expect before you leave home.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

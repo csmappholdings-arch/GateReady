@@ -104,8 +104,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     });
   };
 
-  // Active Setup Tab: 'flight' (Flight & Journey) vs 'baggage' (Baggage & Travelers)
-  const [activeTab, setActiveTab] = useState<'flight' | 'baggage'>('flight');
+  // Active Setup Step: 'destination' (Step 1) -> 'carrier' (Step 2) -> 'baggage' (Step 3)
+  const [activeTab, setActiveTab] = useState<'destination' | 'carrier' | 'baggage'>('destination');
 
   // Tab 1: Journey Details State - completely blank for a new trip setup
   const [name, setName] = useState('');
@@ -180,7 +180,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   // Reset all dialog form inputs to a fresh state (or prefilled if launched from quick checker) whenever dialog opens
   useEffect(() => {
     if (isOpen) {
-      setActiveTab('flight');
+      setActiveTab('destination');
       const initialType = initialTravelType || 'PLANE';
       setTravelType(initialType);
       
@@ -668,45 +668,56 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         <div className={`bg-slate-50 dark:bg-slate-950/60 border-b border-purple-100 dark:border-purple-900/40 ${
           isExpanded ? 'px-6 pt-4 pb-3' : 'px-5 sm:px-6 pt-3 pb-2'
         }`}>
-          <div className="grid grid-cols-2 p-1 bg-white dark:bg-slate-900 rounded-2xl border border-purple-200/80 dark:border-purple-900/60 shadow-xs">
+          <div className="grid grid-cols-3 p-1 bg-white dark:bg-slate-900 rounded-2xl border border-purple-200/80 dark:border-purple-900/60 shadow-xs">
             <button
               type="button"
-              onClick={() => setActiveTab('flight')}
-              className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                isExpanded ? 'text-sm' : 'text-xs'
+              onClick={() => setActiveTab('destination')}
+              className={`py-2 px-2 sm:px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                isExpanded ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'
               } ${
-                activeTab === 'flight'
+                activeTab === 'destination'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-300'
               }`}
             >
-              <Plane className={isExpanded ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
-              <span>{getTab1Label()}</span>
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">1. Destination</span>
               {name.trim() && (
-                <Check className={`w-3.5 h-3.5 ${activeTab === 'flight' ? 'text-white' : 'text-emerald-500'}`} />
+                <Check className={`w-3 h-3 shrink-0 ${activeTab === 'destination' ? 'text-white' : 'text-emerald-500'}`} />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('carrier')}
+              className={`py-2 px-2 sm:px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                isExpanded ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'
+              } ${
+                activeTab === 'carrier'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-300'
+              }`}
+            >
+              <Plane className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">2. Carrier & Dates</span>
+              {(companyName.trim() || departureDate) && (
+                <Check className={`w-3 h-3 shrink-0 ${activeTab === 'carrier' ? 'text-white' : 'text-emerald-500'}`} />
               )}
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('baggage')}
-              className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                isExpanded ? 'text-sm' : 'text-xs'
+              className={`py-2 px-2 sm:px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                isExpanded ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'
               } ${
                 activeTab === 'baggage'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-300'
               }`}
             >
-              <Briefcase className={isExpanded ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
-              <span>2. Baggage & Travelers</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
-                activeTab === 'baggage' 
-                  ? 'bg-purple-500 text-white' 
-                  : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-              }`}>
-                {bags.length} bags
-              </span>
+              <Briefcase className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">3. Luggage ({bags.length})</span>
             </button>
           </div>
 
@@ -733,9 +744,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
           isExpanded ? 'p-6 sm:p-8 space-y-6' : 'p-5 sm:p-6 space-y-4'
         }`}>
           {/* ======================================================== */}
-          {/* TAB 1: JOURNEY / TRANSIT DETAILS                         */}
+          {/* STEP 1: DESTINATION & TRAVEL MODE                        */}
           {/* ======================================================== */}
-          {activeTab === 'flight' && (
+          {activeTab === 'destination' && (
             <div className={`animate-in fade-in duration-150 ${isExpanded ? 'space-y-6' : 'space-y-4'}`}>
               {/* Trip Name & Preset Chips */}
               <div>
@@ -870,7 +881,14 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   />
                 </div>
               </div>
+            </div>
+          )}
 
+          {/* ======================================================== */}
+          {/* STEP 2: CARRIER, DATES & FARE CLASS                      */}
+          {/* ======================================================== */}
+          {activeTab === 'carrier' && (
+            <div className={`animate-in fade-in duration-150 ${isExpanded ? 'space-y-6' : 'space-y-4'}`}>
               {/* Carrier / Operator & Seat Class */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
@@ -1503,7 +1521,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         <div className={`bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 ${
           isExpanded ? 'p-5' : 'p-4'
         }`}>
-          {activeTab === 'flight' ? (
+          {activeTab === 'destination' ? (
             <>
               <button
                 type="button"
@@ -1522,9 +1540,46 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   className={`rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 text-purple-700 dark:text-purple-300 font-bold transition-all cursor-pointer shadow-2xs ${
                     isExpanded ? 'h-11 px-4 text-xs' : 'h-10 px-3.5 text-xs'
                   }`}
-                  title="Skip baggage setup for now — default carry-on will be created"
+                  title="Quick create with defaults"
                 >
-                  ⚡ Skip to Create
+                  ⚡ Quick Create
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('carrier')}
+                  className={`rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer ${
+                    isExpanded ? 'h-11 px-6 text-sm' : 'h-10 px-5 text-xs'
+                  }`}
+                >
+                  <span>Next: Carrier & Dates</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </>
+          ) : activeTab === 'carrier' ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setActiveTab('destination')}
+                className={`rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  isExpanded ? 'h-11 px-5 text-xs' : 'h-10 px-4 text-xs'
+                }`}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Destination</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleFinalSubmit}
+                  className={`rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 text-purple-700 dark:text-purple-300 font-bold transition-all cursor-pointer shadow-2xs ${
+                    isExpanded ? 'h-11 px-4 text-xs' : 'h-10 px-3.5 text-xs'
+                  }`}
+                  title="Quick create with defaults"
+                >
+                  ⚡ Quick Create
                 </button>
 
                 <button
@@ -1534,7 +1589,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     isExpanded ? 'h-11 px-6 text-sm' : 'h-10 px-5 text-xs'
                   }`}
                 >
-                  <span>Set Up Baggage</span>
+                  <span>Next: Luggage & Travelers</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -1543,13 +1598,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
             <>
               <button
                 type="button"
-                onClick={() => setActiveTab('flight')}
+                onClick={() => setActiveTab('carrier')}
                 className={`rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer ${
                   isExpanded ? 'h-11 px-5 text-xs' : 'h-10 px-4 text-xs'
                 }`}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back to Journey</span>
+                <span>Back to Dates</span>
               </button>
 
               <div className="flex items-center gap-2">

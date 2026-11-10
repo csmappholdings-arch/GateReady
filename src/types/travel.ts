@@ -274,6 +274,7 @@ export interface Trip {
   modeProfiles?: Partial<Record<TravelType, ModeProfile>>;
   isArchived?: boolean;
   sharedWith?: SharedTripMember[];
+  isDemo?: boolean;
 }
 
 export interface LuggageProfile {
@@ -289,6 +290,7 @@ export interface LuggageProfile {
   color?: string;
   assignedTraveler?: string;
   notes?: string;
+  isDemo?: boolean;
   createdAt?: string;
 }
 

@@ -9,6 +9,7 @@ import {
   deleteTripFromCloud, 
   syncLocalTripsToCloud 
 } from '../lib/firebase';
+import { clearDemoLuggageProfiles } from '../utils/luggageLibrary';
 
 export type CloudSyncStatus = 'synced' | 'syncing' | 'offline' | 'guest';
 
@@ -51,6 +52,7 @@ interface PackingContextType {
     }
   ) => Trip;
   loadDemoTrip: () => Trip;
+  clearDemoData: () => void;
   deleteTrip: (tripId: string) => Promise<void>;
   addItemToBag: (
     tripId: string,
@@ -593,13 +595,13 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         emptyBagWeightLbs: 7.0,
         maxWeightLimitLbs: 22,
         items: [
-          { id: 'item-1', name: '3x T-Shirts & Polos', location: 'Main Compartment', quantity: 3, isPacked: true, customWeightLbs: 1.5, category: 'Clothing' },
-          { id: 'item-2', name: 'Denim Jeans & Chinos', location: 'Main Compartment', quantity: 2, isPacked: true, customWeightLbs: 2.2, category: 'Clothing' },
-          { id: 'item-3', name: 'Travel Blazer / Windbreaker', location: 'Main Compartment', quantity: 1, isPacked: false, customWeightLbs: 1.8, category: 'Clothing' },
+          { id: 'item-1', name: '3x T-Shirts & Polos', location: 'Main Compartment', quantity: 3, isPacked: true, customWeightLbs: 0.5, category: 'Clothing' },
+          { id: 'item-2', name: 'Denim Jeans & Chinos', location: 'Main Compartment', quantity: 2, isPacked: true, customWeightLbs: 1.1, category: 'Clothing' },
+          { id: 'item-3', name: 'Travel Blazer / Windbreaker', location: 'Main Compartment', quantity: 1, isPacked: false, customWeightLbs: 1.5, category: 'Clothing' },
           { id: 'item-4', name: 'TSA 3-1-1 Toiletry Pouch (3.0 oz)', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.8, category: 'Toiletries' },
-          { id: 'item-5', name: 'Running / Walking Shoes', location: 'Shoe Compartment', quantity: 1, isPacked: false, customWeightLbs: 2.0, category: 'Shoes' },
-          { id: 'item-6', name: 'Underwear & Socks (5 Pairs)', location: 'Main Compartment', quantity: 5, isPacked: true, customWeightLbs: 1.1, category: 'Clothing' },
-          { id: 'item-7', name: 'Universal UK/EU Plug Adapter', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.4, category: 'Electronics' }
+          { id: 'item-5', name: 'Running / Walking Shoes', location: 'Shoe Compartment', quantity: 1, isPacked: false, customWeightLbs: 1.8, category: 'Shoes' },
+          { id: 'item-6', name: 'Underwear & Socks (5 Pairs)', location: 'Main Compartment', quantity: 5, isPacked: true, customWeightLbs: 0.2, category: 'Clothing' },
+          { id: 'item-7', name: 'Universal UK/EU Plug Adapter', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.3, category: 'Electronics' }
         ]
       },
       {
@@ -611,11 +613,11 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         emptyBagWeightLbs: 1.5,
         maxWeightLimitLbs: 15,
         items: [
-          { id: 'item-8', name: 'MacBook Air & 65W GaN Charger', location: 'Laptop Sleeve', quantity: 1, isPacked: true, customWeightLbs: 3.2, category: 'Electronics' },
-          { id: 'item-9', name: 'Noise-Cancelling Headphones', location: 'Main Compartment', quantity: 1, isPacked: true, customWeightLbs: 0.6, category: 'Electronics' },
-          { id: 'item-10', name: 'Passport & Boarding Pass', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.2, category: 'Documents' },
-          { id: 'item-11', name: 'Sunglasses & Hard Case', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.3, category: 'Accessories' },
-          { id: 'item-12', name: '10,000mAh Power Bank (Carry-On Only)', location: 'Front Zipper Pocket', quantity: 1, isPacked: false, customWeightLbs: 0.6, category: 'Electronics' }
+          { id: 'item-8', name: 'MacBook Air & 65W GaN Charger', location: 'Laptop Sleeve', quantity: 1, isPacked: true, customWeightLbs: 2.8, category: 'Electronics' },
+          { id: 'item-9', name: 'Noise-Cancelling Headphones', location: 'Main Compartment', quantity: 1, isPacked: true, customWeightLbs: 0.5, category: 'Electronics' },
+          { id: 'item-10', name: 'Passport & Boarding Pass', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.1, category: 'Documents' },
+          { id: 'item-11', name: 'Sunglasses & Hard Case', location: 'Front Zipper Pocket', quantity: 1, isPacked: true, customWeightLbs: 0.2, category: 'Accessories' },
+          { id: 'item-12', name: '10,000mAh Power Bank (Carry-On Only)', location: 'Front Zipper Pocket', quantity: 1, isPacked: false, customWeightLbs: 0.5, category: 'Electronics' }
         ]
       }
     ];
@@ -638,6 +640,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       departureReminders: getDefaultDepartureReminders(),
       familyMembers: ['Alex'],
       bags: demoBags,
+      isDemo: true,
       gateChecklist: [
         { id: `gc-demo-1`, text: 'Valid Government Photo ID or Passport ready for all travelers', completed: true, required: true },
         { id: `gc-demo-2`, text: 'Boarding pass / reservation ticket saved offline', completed: true, required: true },
@@ -653,6 +656,41 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setActivePackerFilter('ALL');
     persistTripToCloud(demoTrip);
     return demoTrip;
+  };
+
+  const clearDemoData = () => {
+    // 1. Remove all demo trips
+    setTrips((prev) => {
+      const remaining = prev.filter(
+        (t) => !t.isDemo && !t.id.startsWith('trip-demo-') && !t.name.includes('Paris & London')
+      );
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+        } catch {}
+      }
+      return remaining;
+    });
+
+    // 2. Clear currentTrip if it was a demo trip
+    if (
+      currentTrip &&
+      (currentTrip.isDemo || currentTrip.id.startsWith('trip-demo-') || currentTrip.name.includes('Paris & London'))
+    ) {
+      const realTrips = trips.filter(
+        (t) => !t.isDemo && !t.id.startsWith('trip-demo-') && !t.name.includes('Paris & London')
+      );
+      if (realTrips.length > 0) {
+        setCurrentTripId(realTrips[0].id);
+        setSelectedBagId(realTrips[0].bags[0]?.id || null);
+      } else {
+        setCurrentTripId('');
+        setSelectedBagId(null);
+      }
+    }
+
+    // 3. Clear demo luggage profiles
+    clearDemoLuggageProfiles();
   };
 
   const deleteTrip = async (tripId: string): Promise<void> => {
@@ -1470,6 +1508,7 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setDarkMode,
         addTrip,
         loadDemoTrip,
+        clearDemoData,
         deleteTrip,
         addItemToBag,
         toggleItemPacked,
