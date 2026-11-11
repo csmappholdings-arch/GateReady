@@ -43,7 +43,7 @@ export const AboutPage: React.FC = () => {
               <span>Per-Bag Weight Meters & Tare Deduction</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Accounts for empty luggage shell weight (e.g. 7.0 lbs carry-on, 10.5 lbs checked hardcase) plus individual packed items to predict actual airport scale readings.
+              Accounts for empty luggage shell weight (e.g. 7.0 lbs carry-on, 10.5 lbs checked hardcase) plus individual packed items to model actual airport scale readings.
             </p>
           </div>
 
@@ -123,7 +123,7 @@ export const AboutPage: React.FC = () => {
           <li><strong>No live flight or gate data:</strong> We do not stream live telemetry or tail numbers.</li>
           <li><strong>No GPS bag tracking:</strong> GateReady is not an Apple AirTag or physical hardware beacon.</li>
           <li><strong>No camera scanning:</strong> We do not scan bags through your camera; luggage weights and items are selected by the user.</li>
-          <li><strong>No physical scale hardware:</strong> The app predicts and models weights based on tare estimates and item catalog benchmarks.</li>
+          <li><strong>No physical scale hardware:</strong> The app models and estimates luggage weight based on tare benchmarks and item catalog baselines.</li>
           <li><strong>Fees are estimates:</strong> All baggage fee calculations are calculated from published airline fee tables. Because airlines frequently change rates and seat-tier terms, you should always verify with your airline prior to departure.</li>
         </ul>
       </section>

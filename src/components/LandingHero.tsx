@@ -46,7 +46,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
   onOpenAccountSync,
   onExploreTools
 }) => {
-  const [activeDemoTab, setActiveDemoTab] = useState<'scale' | 'tsa' | 'airlines' | 'checklist' | 'wallet' | 'pdf'>('scale');
+  const [activeDemoTab, setActiveDemoTab] = useState<'dashboard' | 'meters' | 'tare' | 'checklist' | 'readiness'>('dashboard');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const handlePrimaryClick = () => {
@@ -347,12 +347,11 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         {/* Feature Demo Tabs */}
         <div className="flex items-center justify-center gap-2 flex-wrap border-b border-slate-200 dark:border-slate-800 pb-3">
           {[
-            { id: 'scale', label: 'Smart Luggage Scale & Tare', icon: Scale },
-            { id: 'tsa', label: 'TSA 3-1-1 Liquids Detector', icon: Droplets },
-            { id: 'airlines', label: '42+ Airline Allowances', icon: Plane },
-            { id: 'checklist', label: 'Intelligent Checklist', icon: CheckCircle2 },
-            { id: 'wallet', label: 'Travel Documents Wallet', icon: Wallet },
-            { id: 'pdf', label: 'PDF Manifests & QR Tags', icon: FileText }
+            { id: 'dashboard', label: 'Trip Dashboard', icon: Plane },
+            { id: 'meters', label: 'Dynamic Weight Meters', icon: Scale },
+            { id: 'tare', label: 'Tare Weight Deduction', icon: Luggage },
+            { id: 'checklist', label: 'Packing & TSA 3-1-1', icon: CheckCircle2 },
+            { id: 'readiness', label: 'Departure Readiness', icon: ShieldCheck }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeDemoTab === tab.id;
@@ -376,133 +375,197 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
         {/* Demo Content Box */}
         <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200/90 dark:border-purple-900/60 shadow-xl">
-          {activeDemoTab === 'scale' && (
+          {activeDemoTab === 'dashboard' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-xs font-bold">
+                  <Plane className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Central Trip Command Center</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  Your Entire Flight &amp; Luggage in One View
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  GateReady organizes your trip from the moment you book. View flight departure countdowns, operating airline rules, baggage capacity gauges, and your live readiness score all in a unified workspace.
+                </p>
+                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Real-time departure countdown and airline aircraft intel</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Per-bag weight gauges showing checked and carry-on allowances</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Single-click navigation to checklists, rebalance tools, and travel wallet</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Realistic Dashboard Preview Card */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3.5 shadow-sm">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-black text-slate-900 dark:text-white">Summer in Lisbon</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                      Air Canada AC849
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                    85% Ready
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5 text-xs">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] text-slate-400 block">Route &amp; Aircraft:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">YYZ → LIS · Boeing 787</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] text-slate-400 block">Departure:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">14 days left (May 25)</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">Checked Spinner (50 lb Limit)</span>
+                    <span className="font-bold text-emerald-600">42.8 / 50.0 lbs (Safe)</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '85.6%' }} />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-purple-600 text-white shadow-2xs">
+                    Open Workspace
+                  </span>
+                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                    Packing Checklist
+                  </span>
+                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                    Rebalance Bags
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeDemoTab === 'meters' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-xs font-bold">
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Deduct 6–9 lbs of empty suitcase weight</span>
+                  <Scale className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Dynamic Weight &amp; Capacity Meters</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                   Know Your Exact Weight Before Leaving Home
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Most travelers forget that standard hard-shell suitcases weigh 6 to 9 lbs before adding a single piece of clothing. GateReady automatically subtracts suitcase tare weight so your bag stays strictly within airline limits.
+                  GateReady computes your luggage weight as you pack. Our dynamic progress meters show exactly how close you are to the airline limit and alert you before you trigger expensive excess baggage charges.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Real-time gauge bar showing total vs capacity</span>
+                    <span>Dynamic capacity meter showing total packed weight vs published airline allowance</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Presets for hard-shell, soft fabric, and ultralight luggage</span>
+                    <span>Color-coded risk indicators: Green (Safe), Amber (Caution ≥75%), Red (Overweight)</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Instant rebalance suggestions across companion bags</span>
+                    <span>Overweight fee avoidance alert calculated from published carrier tariffs</span>
                   </li>
                 </ul>
               </div>
+
+              {/* Realistic Meter Preview Card */}
               <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs uppercase text-slate-500">Checked Spinner · 50 lbs Limit</span>
+                  <span className="font-bold text-xs uppercase text-slate-500">Checked Hardcase · 50.0 lbs Limit</span>
                   <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                    42.8 lbs / 50 lbs
+                    42.8 lbs / 50.0 lbs (Safe)
                   </span>
                 </div>
-                <div className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full w-[85%]" />
+
+                <div className="w-full h-3.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden p-0.5">
+                  <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full w-[85.6%]" />
                 </div>
-                <div className="grid grid-cols-2 gap-3 text-xs pt-2">
-                  <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                    <div className="text-slate-400 text-[11px]">Suitcase Tare:</div>
-                    <div className="font-bold text-slate-900 dark:text-white">7.5 lbs (Deducted)</div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                    <div className="text-slate-400 text-[11px]">Packed Items:</div>
-                    <div className="font-bold text-slate-900 dark:text-white">35.3 lbs (Safe)</div>
-                  </div>
+
+                <div className="flex justify-between text-[11px] text-slate-500 font-medium">
+                  <span>0 lbs</span>
+                  <span>37.5 lbs (Caution)</span>
+                  <span className="font-bold text-rose-500">50.0 lbs Limit</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-between">
+                  <span className="font-bold">Remaining Capacity Buffer:</span>
+                  <span className="font-black text-sm">7.2 lbs Safe</span>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-[11px] text-purple-900 dark:text-purple-200">
+                  💡 <strong>Fee Avoidance:</strong> Staying under 50.0 lbs avoids a $100 to $150 airline overweight surcharge at the check-in desk.
                 </div>
               </div>
             </div>
           )}
 
-          {activeDemoTab === 'tsa' && (
+          {activeDemoTab === 'tare' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-200 text-xs font-bold">
-                  <Droplets className="w-3.5 h-3.5 text-sky-600" />
-                  <span>TSA 3-1-1 & CATSA Security Guard</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-xs font-bold">
+                  <Luggage className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Suitcase Tare Weight Deduction</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Stop Losing Toiletries at Security Checkpoints
+                  Deduct 6–9 lbs of Empty Suitcase Weight
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Airport security checkpoints confiscate bottles larger than 3.4 oz (100ml) in carry-on bags. GateReady automatically audits every liquid item and tells you exactly what must move into checked baggage before you head to the airport.
+                  Most travelers weigh their packed bags on a bathroom scale and forget that empty hard-shell suitcases alone weigh 6 to 9 lbs (2.7 to 4.1 kg). On a 50 lb airline limit, that is nearly 20% of your allowance! GateReady automatically calibrates your suitcase shell weight so you know your true packing capacity.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Automatic volume checking against 3.4 oz / 100ml limit</span>
+                    <span>Calibrated presets for hard-shell, soft-side fabric, and ultralight luggage</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Visual 1-quart bag compliance tracker</span>
+                    <span>Custom tare calibration: set your exact suitcase model's empty weight</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Instant warning badges for aerosol and oversized bottles</span>
+                    <span>Accurate net capacity formula matching airport check-in scale readings</span>
                   </li>
                 </ul>
               </div>
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
-                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 flex items-center justify-between">
-                  <span className="font-semibold text-emerald-950 dark:text-emerald-200 text-xs">Toothpaste & Sunscreen (3.0 oz)</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">✓ TSA Pass</span>
-                </div>
-                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 flex items-center justify-between">
-                  <span className="font-semibold text-rose-950 dark:text-rose-200 text-xs">Body Lotion Bottle (6.7 oz)</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-300">⚠ Move to Checked Bag</span>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {activeDemoTab === 'airlines' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-200 text-xs font-bold">
-                  <Plane className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>42+ Airlines Verified Tables</span>
+              {/* Realistic Tare Preview Card */}
+              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs uppercase text-slate-500">Away The Large Spinner · Tare Preset</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Hard-Shell</span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Overhead Sizer Dimensions & Fare Families
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Every airline enforces different sizer box dimensions and ticket rules. Basic Economy on United bans overhead rollers entirely, while Southwest includes 2 free checked bags. GateReady tracks the exact rules so you never get forced gate-check fees.
-                </p>
-                <div className="pt-2">
-                  <a
-                    href="/airlines"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-purple-600 hover:text-purple-700 underline"
-                  >
-                    <span>Browse all 42 airline policy guides →</span>
-                  </a>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Empty Suitcase Shell:</span>
+                    <span className="text-base font-black text-purple-600">8.5 lbs</span>
+                    <span className="text-[10px] text-slate-500 block">Deducted automatically</span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Packed Belongings:</span>
+                    <span className="text-base font-black text-slate-900 dark:text-white">34.3 lbs</span>
+                    <span className="text-[10px] text-slate-500 block">Clothes, shoes &amp; toiletries</span>
+                  </div>
                 </div>
-              </div>
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-xs">Air Canada</span>
-                  <span className="text-xs text-slate-500">Carry-On: 21.5 x 15.5 x 9 in · No weight limit</span>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-xs">WestJet</span>
-                  <span className="text-xs text-slate-500">Carry-On: 21 x 15 x 9 in · Max 22 lbs</span>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-xs">Delta Air Lines</span>
-                  <span className="text-xs text-slate-500">Carry-On: 22 x 14 x 9 in · No weight limit</span>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Total Airport Scale Reading:</span>
+                  <span className="font-black text-sm text-emerald-600">42.8 lbs (7.2 lbs buffer left)</span>
                 </div>
               </div>
             </div>
@@ -511,84 +574,144 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           {activeDemoTab === 'checklist' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div className="space-y-4">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-200 text-xs font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Packing Checklist &amp; TSA 3-1-1 Audit</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  Organized Packing with Liquids Security Compliance
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Build custom packing lists organized by suitcase and traveler. GateReady automatically checks liquid bottles against TSA 3.4 oz (100ml) rules and enforces airline safety guidelines (such as keeping lithium power banks in carry-ons).
+                </p>
+                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Automatic bottle volume audit against TSA 3.4 oz / 100ml security limits</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Airline hazardous materials warnings (lithium batteries, medications, passports)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Pre-calibrated item catalog with realistic weights for fast list creation</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Realistic Checklist & TSA Preview Card */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider pb-1">
+                  Packing List &amp; Security Compliance
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">Passport &amp; Travel Visas</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono">0.2 lbs · Carry-On</span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">20,000mAh Power Bank (Lithium)</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-md">
+                      Carry-On Only Rule
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
+                    <div>
+                      <span className="font-semibold text-emerald-950 dark:text-emerald-200 block">Travel Shampoo (3.0 fl oz)</span>
+                      <span className="text-[10px] text-emerald-700 dark:text-emerald-400">Within TSA 3.4 oz limit</span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                      ✓ TSA Compliant
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 flex items-center justify-between">
+                    <div>
+                      <span className="font-semibold text-rose-950 dark:text-rose-200 block">Sunscreen Lotion (6.7 fl oz)</span>
+                      <span className="text-[10px] text-rose-700 dark:text-rose-400">Exceeds 3.4 oz carry-on maximum</span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-100 text-rose-800">
+                      ⚠ Move to Checked Bag
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeDemoTab === 'readiness' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="space-y-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-xs font-bold">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Personalized Packing Checklist</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Departure Readiness &amp; Luggage Optimization</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Never Forget Essential Travel Items
+                  Leave for the Airport Completely Prepared
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Tailored by destination, season, travel duration, and airline restrictions. Mark items as packed, assign belongings to specific suitcases, and view real-time packing progress.
+                  Before you head out, GateReady validates your Departure Readiness Score. If one suitcase is overweight, our Rebalance Bags optimizer suggests intelligent item transfers to bring every bag under limit. Print clean PDF manifests and generate privacy-safe emergency QR recovery tags.
                 </p>
+                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Smart bag rebalancing: suggest safe transfers to lighter bags before leaving home</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Privacy-safe emergency QR luggage tags with direct phone/WhatsApp contact</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Travel wallet storing booking PNR codes, TSA PreCheck, and loyalty numbers</span>
+                  </li>
+                </ul>
               </div>
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-2">
-                {['Passport & boarding pass', 'Universal travel adapter (Type G)', 'Noise-canceling headphones', 'Prescription medication (in carry-on)'].map((item, idx) => (
-                  <div key={item} className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs">
-                    <CheckCircle2 className={`w-4 h-4 ${idx < 3 ? 'text-emerald-500' : 'text-slate-300'}`} />
-                    <span className={idx < 3 ? 'line-through text-slate-400' : 'font-semibold text-slate-800 dark:text-slate-200'}>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {activeDemoTab === 'wallet' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 text-xs font-bold">
-                  <Wallet className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Travel Wallet & Document Hub</span>
+              {/* Realistic Readiness Preview Card */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+                  <span className="font-bold text-xs uppercase text-slate-500">Departure Readiness Status</span>
+                  <span className="text-xs font-black text-purple-600 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 rounded-full border border-purple-200">
+                    85% Prepared
+                  </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Keep Frequent Flyer Numbers & Bookings in One Place
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Securely store airline reservation codes (PNRs), loyalty numbers, passport expiry alerts, and hotel reservations offline so you can access them mid-flight without roaming fees.
-                </p>
-              </div>
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-bold">Air Canada Aeroplan</div>
-                    <div className="font-mono font-bold text-xs">AC-849-204-119</div>
-                  </div>
-                  <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-md">Saved</span>
-                </div>
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-bold">Booking Reference (PNR)</div>
-                    <div className="font-mono font-bold text-xs">7K2W9Q · YYZ to LHR</div>
-                  </div>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-md">Confirmed</span>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {activeDemoTab === 'pdf' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 text-xs font-bold">
-                  <FileText className="w-3.5 h-3.5 text-rose-600" />
-                  <span>Printable Manifests & Luggage QR Tags</span>
+                <div className="p-3 rounded-xl bg-purple-100/60 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-purple-900 dark:text-purple-200">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Rebalance Bags Suggestion</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                    Bag 1 is 54.2 lbs (4.2 lbs overweight). Move hiking boots (4.5 lbs) to Bag 2 (32.0 lbs) to bring all bags under 50 lbs and avoid excess fees.
+                  </p>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Luggage Loss Protection & Customs Documentation
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Generate clean PDF manifests for insurance claims and border declarations. Print an emergency luggage recovery card with a private QR tag so airlines or finders can contact you if luggage goes missing.
-                </p>
-              </div>
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-purple-600 text-white flex items-center justify-center mx-auto shadow-md">
-                  <QrCode className="w-8 h-8" />
-                </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  GateReady Emergency Bag Recovery Tag
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Scannable by airline staff or bag handlers worldwide without exposing your home address.
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-bold">Travel Wallet:</span>
+                      <span className="font-mono font-bold text-[11px]">PNR: 7K2W9Q</span>
+                    </div>
+                    <span className="text-[10px] text-purple-600 font-bold">Ready</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-bold">QR Bag Tag:</span>
+                      <span className="font-bold text-[11px]">Tag #GR-8841</span>
+                    </div>
+                    <span className="text-[10px] text-emerald-600 font-bold">Active</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -799,10 +922,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <div className="text-3xl font-black text-slate-900 dark:text-white">$1.99 <span className="text-xs text-slate-500">/mo</span></div>
             <div className="text-xs text-slate-500">or $19.99 /year</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              <li>✓ 1 traveler & 2 active trips</li>
+              <li>✓ 1 traveler &amp; 2 active trips</li>
               <li>✓ <strong>Unlimited bags</strong></li>
               <li>✓ Suitcase tare weight deduction</li>
-              <li>✓ Travel wallet & PDF manifests</li>
+              <li>✓ Smart bag rebalance optimizer</li>
+              <li>✓ Emergency QR tags &amp; terminal maps</li>
+              <li>✓ Travel wallet &amp; PDF manifests</li>
             </ul>
           </div>
 
@@ -816,8 +941,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <ul className="text-xs space-y-1.5 pt-2 border-t border-amber-200 dark:border-amber-900/60 text-slate-700 dark:text-slate-300">
               <li>✓ <strong>2 travelers</strong> (couples)</li>
               <li>✓ <strong>Unlimited active trips</strong></li>
-              <li>✓ Unlimited bags & tare scales</li>
+              <li>✓ Unlimited bags &amp; tare scales</li>
               <li>✓ Companion real-time sync</li>
+              <li>✓ Everything in Silver included</li>
             </ul>
           </div>
 

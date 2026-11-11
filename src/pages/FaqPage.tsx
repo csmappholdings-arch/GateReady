@@ -16,7 +16,7 @@ const FAQS: FaqItem[] = [
           GateReady is completely free to start. When you create a free account with your email, your account is <strong>automatically upgraded to a 7-day full Platinum trial</strong>.
         </p>
         <p>
-          No credit card is required at any point during signup. You get immediate access to unlimited trips, unlimited bags, tare weight calibration, terminal maps, and emergency QR luggage tags.
+          No credit card is required at any point during signup. While the trial is active, you get immediate access to unlimited trips, unlimited bags, suitcase tare deduction, smart bag rebalancing, terminal maps, and emergency QR luggage tags. Free starter access (1 active trip, 2 bags, 42+ airline allowance lookup, and personal cloud sync) remains yours forever.
         </p>
       </div>
     )

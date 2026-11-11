@@ -173,11 +173,19 @@ export const PricingPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Travel wallet & documents</span>
+                <span>Smart bag rebalance optimizer</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Rebalance suggestions across bags</span>
+                <span>Emergency QR luggage recovery tags</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-purple-600 shrink-0" />
+                <span>Terminal maps &amp; cabin intel</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-purple-600 shrink-0" />
+                <span>Travel wallet &amp; documents</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
@@ -207,7 +215,7 @@ export const PricingPage: React.FC = () => {
           <div className="space-y-3 pt-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider">Gold</span>
-              <span className="text-[10px] font-bold text-amber-700 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-full">Couples & Small Families</span>
+              <span className="text-[10px] font-bold text-amber-700 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-full">Couples &amp; Small Families</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
@@ -231,15 +239,11 @@ export const PricingPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
                 <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Unlimited bags & luggage scales</span>
+                <span>Unlimited bags &amp; luggage scales</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Companion sync (2 travelers)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Emergency QR luggage recovery tags</span>
+                <span>Companion real-time sync (2 travelers)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-500 shrink-0" />
@@ -363,6 +367,13 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
+                <td className="p-4 font-semibold">Smart Bag Rebalance Optimizer</td>
+                <td className="p-4 text-slate-400">—</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+              </tr>
+              <tr>
                 <td className="p-4 font-semibold">TSA 3-1-1 Liquids Compliance</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
@@ -370,32 +381,39 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">42+ Airline Baggage Rules & Fees</td>
+                <td className="p-4 font-semibold">42+ Airline Baggage Rules &amp; Fees</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">Travel Wallet & PNR Storage</td>
-                <td className="p-4 text-slate-400">—</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 font-semibold">Terminal Maps &amp; Cabin Intel</td>
+                <td className="p-4 text-slate-500">Basic Preview</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Hub Intel</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Hub Intel</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Hub Intel</td>
+              </tr>
+              <tr>
+                <td className="p-4 font-semibold">Travel Wallet &amp; PNR Storage</td>
+                <td className="p-4 text-slate-500">Local Browser Storage</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Cloud Synced</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Cloud Synced</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Cloud Synced</td>
               </tr>
               <tr>
                 <td className="p-4 font-semibold">Printable PDF Packing Manifests</td>
-                <td className="p-4 text-slate-400">—</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-slate-500">Preview / Watermarked</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Clean Unwatermarked</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Clean Unwatermarked</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Clean Unwatermarked</td>
               </tr>
               <tr>
                 <td className="p-4 font-semibold">Emergency QR Luggage Recovery Tag</td>
-                <td className="p-4 text-slate-400">—</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-slate-500">Preview / Watermarked</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tag</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tag</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tag</td>
               </tr>
               <tr>
                 <td className="p-4 font-semibold">Personal Cloud Sync (All Your Devices)</td>
@@ -408,7 +426,7 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 font-semibold">Companion &amp; Family Member Sync</td>
                 <td className="p-4">1 traveler (self)</td>
                 <td className="p-4">1 traveler (self)</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ 2 Travelers</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ 2 Travelers (Couples)</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Unlimited Family</td>
               </tr>
             </tbody>

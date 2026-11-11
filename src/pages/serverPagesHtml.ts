@@ -159,7 +159,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">Per-Bag Weight Meters & Tare Deduction</h3>
-            <p class="text-xs text-slate-600 mt-1">Accounts for empty luggage shell weight (e.g. 7.0 lbs carry-on, 10.5 lbs checked hardcase) plus individual packed items to predict actual airport scale readings.</p>
+            <p class="text-xs text-slate-600 mt-1">Accounts for empty luggage shell weight (e.g. 7.0 lbs carry-on, 10.5 lbs checked hardcase) plus individual packed items to model actual airport scale readings.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">TSA 3-1-1 Liquids Compliance Rule</h3>
@@ -188,7 +188,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           <li><strong>No live flight or gate data:</strong> We do not stream live telemetry or tail numbers.</li>
           <li><strong>No GPS bag tracking:</strong> GateReady is not an Apple AirTag or physical hardware beacon.</li>
           <li><strong>No camera scanning:</strong> We do not scan bags through your camera; luggage weights and items are selected by the user.</li>
-          <li><strong>No physical scale hardware:</strong> The app predicts and models weights based on tare estimates and item catalog benchmarks.</li>
+          <li><strong>No physical scale hardware:</strong> The app models and estimates luggage weight based on tare benchmarks and item catalog baselines.</li>
           <li><strong>Fees are estimates:</strong> All baggage fee calculations are calculated from published airline fee tables. Because airlines frequently change rates and seat-tier terms, you should always verify with your airline prior to departure.</li>
         </ul>
       </section>
@@ -317,18 +317,18 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
             <h3 class="font-bold text-purple-900">Silver ($1.99/mo · $19.99/yr)</h3>
             <p class="text-[11px] font-semibold text-purple-700">For individual travellers who want more luggage management and saved travel functionality.</p>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, travel wallet, rebalance suggestions, printable PDF manifests.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, smart rebalance optimizer, emergency QR luggage tags, terminal maps, travel wallet, printable PDF manifests.</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
             <h3 class="font-bold text-slate-900 mt-0.5">Gold ($3.99/mo · $29.99/yr)</h3>
             <p class="text-[11px] font-semibold text-amber-800">For couples and small families who want a more complete travel planning experience.</p>
-            <p class="text-xs text-slate-600 mt-1">2 travelers, unlimited active trips, unlimited bags & scales, companion sync, emergency QR luggage recovery tags, everything in Silver included.</p>
+            <p class="text-xs text-slate-600 mt-1">2 travelers (couples & companions), unlimited active trips, unlimited bags & scales, companion real-time sync, everything in Silver included.</p>
           </div>
           <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2">
             <h3 class="font-bold text-indigo-900">Platinum ($4.99/mo · $39.99/yr)</h3>
             <p class="text-[11px] font-semibold text-indigo-700">For frequent travellers and families who want the complete GateReady experience.</p>
-            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited devices, unlimited active trips, unlimited bags & scales, family sharing, priority fee updates, VIP fast support.</p>
+            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited active trips, unlimited bags & scales, family sharing across devices, priority fee updates, VIP fast support.</p>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-slate-100 text-xs text-slate-600 space-y-1">
@@ -343,24 +343,24 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">How GateReady Works in 5 Steps</h2>
         <div class="space-y-3 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">1. Select Destination & Operating Airline</h3>
-            <p class="text-xs text-slate-600 mt-1">Choose from 42+ airlines to load pre-calibrated carry-on sizer dimensions and checked luggage weight limits.</p>
+            <h3 class="font-bold text-slate-900">1. Create Your Trip &amp; Set Travel Dates</h3>
+            <p class="text-xs text-slate-600 mt-1">Enter your destination, departure countdown, and travel dates to activate your personalized travel preparation workspace.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">2. Calibrate Luggage Tare Weight</h3>
-            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (typically 7 to 11 lbs) to ensure packed items match airport ticket counter scales.</p>
+            <h3 class="font-bold text-slate-900">2. Select Travel Mode &amp; Operating Airline</h3>
+            <p class="text-xs text-slate-600 mt-1">Choose from 42+ verified airlines and fare families to load published carry-on sizer dimensions and checked luggage weight limits.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">3. Pack Items & Check TSA 3-1-1 Liquids</h3>
-            <p class="text-xs text-slate-600 mt-1">Check liquid bottles against the 3.4 oz (100ml) limit to keep carry-ons compliant with security checkpoints.</p>
+            <h3 class="font-bold text-slate-900">3. Add Luggage &amp; Calibrate Suitcase Tare Weight</h3>
+            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (typically 6 to 9 lbs) to ensure packed belongings remain strictly within airline allowances.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">4. Real-Time Baggage Limit Meters</h3>
-            <p class="text-xs text-slate-600 mt-1">Predict overweight surcharges before leaving home and redistribute weight across your luggage.</p>
+            <h3 class="font-bold text-slate-900">4. Dynamic Weight Meters &amp; TSA 3-1-1 Liquids Audit</h3>
+            <p class="text-xs text-slate-600 mt-1">Monitor dynamic capacity meters as you pack and automatically audit carry-on bottles against the TSA 3.4 oz (100ml) security limit.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">5. Departure Readiness Checklist & Manifests</h3>
-            <p class="text-xs text-slate-600 mt-1">Check off power bank safety rules, medications, passports, and print clean manifests.</p>
+            <h3 class="font-bold text-slate-900">5. Review Departure Readiness, Rebalance &amp; Print Manifests</h3>
+            <p class="text-xs text-slate-600 mt-1">Check your 0–100% Departure Readiness Score, rebalance overweight bags with 1 click, and generate emergency QR luggage tags.</p>
           </div>
         </div>
       </section>

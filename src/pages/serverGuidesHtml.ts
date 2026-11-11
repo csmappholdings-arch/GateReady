@@ -643,17 +643,17 @@ export function getHomepageHtml(): string {
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <div class="text-xs font-bold text-purple-700 uppercase">Solo Pro</div>
             <h3 class="font-black text-lg text-purple-900">Silver ($1.99/mo)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, suitcase tare deduction, travel wallet (loyalty numbers, TSA PreCheck, PNRs).</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, suitcase tare deduction, smart rebalance optimizer, emergency QR tags, terminal maps, travel wallet, printable PDF manifests ($19.99/yr).</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
             <div class="text-[10px] font-black uppercase text-amber-800">MOST POPULAR</div>
             <h3 class="font-black text-lg text-slate-900">Gold ($3.99/mo)</h3>
-            <p class="text-xs text-slate-600 mt-1">2 travelers, unlimited active trips, unlimited bags & scales, multi-device sync, printable PDF manifests ($29.99/yr).</p>
+            <p class="text-xs text-slate-600 mt-1">2 travelers (couples & companions), unlimited active trips, unlimited bags & scales, companion real-time sync, everything in Silver included ($29.99/yr).</p>
           </div>
           <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
             <div class="text-xs font-bold text-indigo-700 uppercase">Family & Frequent</div>
             <h3 class="font-black text-lg text-indigo-900">Platinum ($4.99/mo)</h3>
-            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited devices, unlimited trips, unlimited bags & scales, priority fee updates ($39.99/yr).</p>
+            <p class="text-xs text-slate-600 mt-1">Unlimited travelers & family, unlimited active trips, unlimited bags & scales, family sharing across devices, priority fee updates ($39.99/yr).</p>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 text-xs text-purple-950 space-y-1">

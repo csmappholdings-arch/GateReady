@@ -48,16 +48,18 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
     travelersCount: 1,
     activeTripsCount: 2,
     maxBags: 999,
-    tagline: 'For solo flyers and business travelers who want unlimited bags and tare weight subtraction.',
+    tagline: 'For solo flyers and business travelers who want unlimited bags, tare subtraction, and luggage tools.',
     features: [
       '1 traveler',
       '2 active trips',
       'Unlimited bags & scales',
       'Suitcase tare weight deduction',
-      'Smart bag rebalance suggestions',
+      'Smart bag rebalance optimizer',
+      'Emergency QR luggage recovery tag',
+      'Terminal maps & cabin intel',
       'Travel wallet (loyalty numbers & PNR codes)',
       'Printable PDF packing lists',
-      'Personal cloud sync (all your personal devices)'
+      'Personal cloud sync (all your devices)'
     ]
   },
   GOLD: {
@@ -78,8 +80,6 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       'Unlimited active trips',
       'Unlimited bags & luggage scales',
       'Companion real-time sync (2 travelers)',
-      'Emergency QR luggage recovery tag',
-      'Terminal maps & cabin intel',
       'Everything in Silver included'
     ]
   },
@@ -99,10 +99,10 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       'Unlimited travelers & family members',
       'Unlimited active trips',
       'Unlimited bags & luggage scales',
-      'Family sharing across unlimited devices',
-      'Emergency QR luggage recovery tags',
+      'Family group sharing across unlimited devices',
       'Priority baggage fee update requests',
-      'VIP fast support response'
+      'VIP fast support response',
+      'Everything in Gold included'
     ]
   }
 };
