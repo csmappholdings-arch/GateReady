@@ -47,6 +47,8 @@ import { trackEvent } from '../utils/analytics';
 interface AddTripDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  editingTripId?: string;
+  initialTripTitle?: string;
   initialTravelType?: TravelType;
   initialDestinationCity?: string;
   initialOriginCity?: string;
@@ -54,6 +56,11 @@ interface AddTripDialogProps {
   initialSeatClass?: string;
   initialFareFamily?: string;
   initialDepartureDate?: string;
+  initialDepartureTime?: string;
+  initialReturnTripDate?: string;
+  initialReturnTripTime?: string;
+  initialAircraftType?: string;
+  initialPassportExpiryDate?: string;
   initialTravelers?: string[];
   isOnboarding?: boolean;
   initialBags?: Array<{ 
@@ -68,6 +75,8 @@ interface AddTripDialogProps {
 export const AddTripDialog: React.FC<AddTripDialogProps> = ({ 
   isOpen, 
   onClose, 
+  editingTripId,
+  initialTripTitle,
   initialTravelType, 
   initialDestinationCity,
   initialOriginCity,
@@ -75,11 +84,16 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   initialSeatClass,
   initialFareFamily,
   initialDepartureDate,
+  initialDepartureTime,
+  initialReturnTripDate,
+  initialReturnTripTime,
+  initialAircraftType,
+  initialPassportExpiryDate,
   initialTravelers,
   isOnboarding,
   initialBags
 }) => {
-  const { addTrip } = usePacking();
+  const { addTrip, updateTripDetails } = usePacking();
   const { isPro, tier, canAddTraveler, canAddBag, canAddTrip, openPaywall } = useSubscription();
   const { user } = useAuth();
 
@@ -207,7 +221,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       const safeDest = initialDestinationCity || '';
       setDestinationCity(safeDest);
 
-      if (safeDest) {
+      if (initialTripTitle) {
+        setName(initialTripTitle);
+      } else if (safeDest) {
         setName(`${safeDest.split(',')[0].trim()} Trip`);
       } else if (safeCarrier) {
         setName(`${safeCarrier} Journey`);
@@ -216,11 +232,11 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       }
 
       setDepartureDate(initialDepartureDate || '');
-      setDepartureTime('');
-      setReturnTripDate('');
-      setReturnTripTime('');
-      setAircraftType('');
-      setPassportExpiryDate('');
+      setDepartureTime(initialDepartureTime || '');
+      setReturnTripDate(initialReturnTripDate || '');
+      setReturnTripTime(initialReturnTripTime || '');
+      setAircraftType(initialAircraftType || '');
+      setPassportExpiryDate(initialPassportExpiryDate || '');
       const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
       if (initialTravelers && initialTravelers.length > 0) {
         setFamilyMembers(initialTravelers);
@@ -503,6 +519,35 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       }
     }
 
+    if (editingTripId) {
+      updateTripDetails(editingTripId, {
+        name: tripTitle,
+        travelType,
+        companyName,
+        seatClassOrCarSize: seatOrSize,
+        originCity: originCity.trim(),
+        destinationCity: destinationCity.trim(),
+        departureDate,
+        departureTime,
+        returnTripDate,
+        returnTripTime,
+        aircraftType,
+        fareFamily,
+        passportExpiryDate: passportExpiryDate.trim() || undefined,
+        familyMembers: finalFamily
+      });
+
+      trackEvent('trip_updated', {
+        trip_id: editingTripId,
+        carrier: companyName,
+        destination: destinationCity.trim(),
+        travelType
+      });
+
+      onClose();
+      return;
+    }
+
     addTrip(
       tripTitle,
       travelType,
@@ -615,7 +660,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
               <h3 className={`font-black leading-tight flex items-center gap-2 ${
                 isExpanded ? 'text-xl' : 'text-base sm:text-lg'
               }`}>
-                <span>{isOnboarding ? "Let's Get Your Next Trip Ready!" : 'Set Trip Details & Luggage'}</span>
+                <span>{editingTripId ? 'Edit Trip Details' : isOnboarding ? "Let's Get Your Next Trip Ready!" : 'Set Trip Details & Luggage'}</span>
                 {isExpanded && (
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full text-purple-200">
                     Spacious Mode
@@ -623,7 +668,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 )}
               </h3>
               <p className={`text-purple-200/90 mt-0.5 ${isExpanded ? 'text-xs' : 'text-[11px]'}`}>
-                {isOnboarding 
+                {editingTripId
+                  ? 'Update departure, destination, airline, schedule & travelers'
+                  : isOnboarding 
                   ? 'Step 1: Enter route and flight · Step 2: Configure luggage & travelers'
                   : 'Plan your departure, transit hubs, luggage allowances & travelers'}
               </p>
@@ -1577,9 +1624,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   className={`rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:bg-purple-50 text-purple-700 dark:text-purple-300 font-bold transition-all cursor-pointer shadow-2xs ${
                     isExpanded ? 'h-11 px-4 text-xs' : 'h-10 px-3.5 text-xs'
                   }`}
-                  title="Quick create with defaults"
+                  title={editingTripId ? "Save with current values" : "Quick create with defaults"}
                 >
-                  ⚡ Quick Create
+                  {editingTripId ? 'Save Now' : '⚡ Quick Create'}
                 </button>
 
                 <button
@@ -1616,7 +1663,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   }`}
                 >
                   <Check className="w-4 h-4 stroke-[2.5]" />
-                  <span>Finish & Create Trip</span>
+                  <span>{editingTripId ? 'Save Changes' : 'Finish & Create Trip'}</span>
                 </button>
               </div>
             </>

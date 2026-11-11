@@ -11,6 +11,7 @@ export type AnalyticsEventType =
   | 'registration_started'
   | 'registration_completed'
   | 'first_trip_created'
+  | 'trip_updated'
   | 'first_suitcase_added'
   | 'first_packing_checklist_created'
   | 'pricing_page_viewed'

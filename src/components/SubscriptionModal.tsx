@@ -332,15 +332,11 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Rebalance Bags (suggest first)</span>
+                    <span className="text-slate-700 dark:text-slate-300">Smart bag rebalance suggestions</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Emergency QR luggage recovery tag</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Terminal maps & cabin intel</span>
+                    <span className="text-slate-700 dark:text-slate-300">Travel wallet (loyalty &amp; PNR codes)</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
@@ -348,7 +344,7 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Travel wallet (loyalty numbers, TSA PreCheck, PNRs)</span>
+                    <span className="text-slate-700 dark:text-slate-300">Personal cloud sync (all your devices)</span>
                   </div>
                 </div>
               </div>
@@ -442,15 +438,23 @@ export const SubscriptionModal: React.FC = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">Multi-device &amp; family member sync (2 travelers)</span>
+                    <span className="text-slate-900 dark:text-white font-bold">Companion real-time sync (2 travelers)</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Unlimited bags & scales</span>
+                    <span className="text-slate-700 dark:text-slate-300">Unlimited bags & luggage scales</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">All core packing tools & intel</span>
+                    <span className="text-slate-700 dark:text-slate-300">Emergency QR luggage recovery tag</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Terminal maps & cabin intel</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 dark:text-slate-300">Everything in Silver included</span>
                   </div>
                 </div>
               </div>

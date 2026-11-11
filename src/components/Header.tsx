@@ -1406,6 +1406,62 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 )}
 
+                {/* Product & Navigation (Crucial for mobile viewports <1280px) */}
+                <div className="py-1 border-b border-slate-100 dark:border-slate-800">
+                  <div className="px-3.5 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Product & Navigation
+                  </div>
+                  {onOpenDashboard && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSettingsOpen(false);
+                        onOpenDashboard();
+                      }}
+                      className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <LayoutDashboard className="w-3.5 h-3.5 text-amber-500" />
+                        Travel Dashboard
+                      </span>
+                      <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Home Base</span>
+                    </button>
+                  )}
+                  <a
+                    href="/pricing"
+                    onClick={() => setSettingsOpen(false)}
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <CreditCard className="w-3.5 h-3.5 text-emerald-500" />
+                      Pricing & Plans
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">from $1.99</span>
+                  </a>
+                  <a
+                    href="/how-it-works"
+                    onClick={() => setSettingsOpen(false)}
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Zap className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                      How It Works
+                    </span>
+                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">5 Steps</span>
+                  </a>
+                  <a
+                    href="/faq"
+                    onClick={() => setSettingsOpen(false)}
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <HelpCircle className="w-3.5 h-3.5 text-indigo-500" />
+                      Frequently Asked Questions
+                    </span>
+                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">FAQ</span>
+                  </a>
+                </div>
+
                 {/* Travel Guides & Public Directory Tools */}
                 <div className="py-1 border-b border-slate-100 dark:border-slate-800">
                   <div className="px-3.5 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">

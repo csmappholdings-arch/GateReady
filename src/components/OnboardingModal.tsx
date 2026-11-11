@@ -140,6 +140,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     trackEvent('onboarding_completed');
     setOnboardingCompleted(true);
     onClose();
+    onExploreTools();
   };
 
   const handleStartTripFromStep3 = () => {

@@ -30,6 +30,7 @@ interface AccountSyncModalProps {
   origin?: 'save_gate' | 'header' | 'referral' | 'workspace_banner';
   initialEmail?: string;
   initialMode?: 'signin' | 'signup';
+  onRegistrationSuccess?: () => void;
 }
 
 export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({ 
@@ -37,7 +38,8 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
   onClose, 
   origin, 
   initialEmail,
-  initialMode 
+  initialMode,
+  onRegistrationSuccess
 }) => {
   const { user, signIn, signInWithGithub, signUpWithEmail, signInWithEmail, resetPassword, error, clearError } = useAuth();
 
@@ -112,6 +114,9 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
       if (res?.isNewUser) {
         trackAccountCreated('google', getEffectiveOrigin());
         trackEvent('registration_completed', { method: 'google', origin: getEffectiveOrigin() });
+        if (onRegistrationSuccess) {
+          onRegistrationSuccess();
+        }
       }
       onClose();
     } catch (err: any) {
@@ -184,6 +189,9 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
         await signUpWithEmail(email, password, displayName);
         trackAccountCreated('email', getEffectiveOrigin());
         trackEvent('registration_completed', { method: 'email', origin: getEffectiveOrigin() });
+        if (onRegistrationSuccess) {
+          onRegistrationSuccess();
+        }
       } else {
         await signInWithEmail(email, password);
       }

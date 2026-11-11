@@ -26,7 +26,7 @@ import { TravelDashboard } from './components/TravelDashboard';
 import { TripWorkspace, WorkspaceTab } from './components/TripWorkspace';
 import { NotificationsModal } from './components/NotificationsModal';
 import { LuggageLibraryModal } from './components/LuggageLibraryModal';
-import { OnboardingModal, isOnboardingCompleted, saveUserPreferences } from './components/OnboardingModal';
+import { OnboardingModal, isOnboardingCompleted, setOnboardingCompleted, saveUserPreferences } from './components/OnboardingModal';
 import { InAppNotification, LuggageProfile } from './types/travel';
 import { generateTripNotifications } from './utils/notifications';
 import { trackEvent } from './utils/analytics';
@@ -126,6 +126,7 @@ function PackingAppContent() {
       emptyBagWeightLbs?: number;
     }>;
   } | null>(null);
+  const [editingTripId, setEditingTripId] = useState<string | undefined>(undefined);
   const [addTripKey, setAddTripKey] = useState(0);
   const [pendingCheckerConfig, setPendingCheckerConfig] = useState<{
     carrier: string;
@@ -165,6 +166,13 @@ function PackingAppContent() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/\/+$/, '') || '/';
+      // Suppress if user already has trips created (returning user)
+      if (trips.length > 0) {
+        if (!isOnboardingCompleted()) {
+          setOnboardingCompleted(true);
+        }
+        return;
+      }
       if ((p === '/' || p === '/dashboard') && !isOnboardingCompleted()) {
         const timer = setTimeout(() => {
           setShowOnboardingModal(true);
@@ -172,7 +180,7 @@ function PackingAppContent() {
         return () => clearTimeout(timer);
       }
     }
-  }, []);
+  }, [trips.length]);
 
   useEffect(() => {
     setNotifications(generateTripNotifications(trips));
@@ -350,6 +358,7 @@ function PackingAppContent() {
     }
     setSelectedTravelTypeForAdd(safeTravelType);
     setSelectedDestinationForAdd(safeDest);
+    setEditingTripId(undefined);
     if (prefillCarrier || prefillOriginCity) {
       setAddTripPreFill({
         carrier: prefillCarrier,
@@ -706,12 +715,20 @@ function PackingAppContent() {
               setShowAddItemModal(true);
             }}
             onOpenTripEdit={() => {
+              setEditingTripId(currentTrip.id);
               setAddTripPreFill({
                 originCity: currentTrip.originCity,
                 carrier: currentTrip.companyName,
                 seatClass: currentTrip.seatClassOrCarSize,
                 departureDate: currentTrip.departureDate,
-                travelers: currentTrip.familyMembers
+                travelers: currentTrip.familyMembers,
+                bags: currentTrip.bags.map((b) => ({
+                  type: b.type,
+                  label: b.label,
+                  assignedTo: b.assignedTo,
+                  material: b.material,
+                  emptyBagWeightLbs: b.emptyBagWeightLbs
+                }))
               });
               setSelectedTravelTypeForAdd(currentTrip.travelType);
               setSelectedDestinationForAdd(currentTrip.destinationCity);
@@ -778,13 +795,23 @@ function PackingAppContent() {
       <AddTripDialog
         key={addTripKey}
         isOpen={showAddTripModal}
-        onClose={() => setShowAddTripModal(false)}
+        onClose={() => {
+          setShowAddTripModal(false);
+          setEditingTripId(undefined);
+        }}
+        editingTripId={editingTripId}
+        initialTripTitle={editingTripId && currentTrip ? currentTrip.name : undefined}
         initialTravelType={selectedTravelTypeForAdd}
         initialDestinationCity={selectedDestinationForAdd}
         initialOriginCity={addTripPreFill?.originCity}
         initialCarrier={addTripPreFill?.carrier}
         initialSeatClass={addTripPreFill?.seatClass}
         initialDepartureDate={addTripPreFill?.departureDate}
+        initialDepartureTime={editingTripId && currentTrip ? currentTrip.departureTime : undefined}
+        initialReturnTripDate={editingTripId && currentTrip ? currentTrip.returnTripDate : undefined}
+        initialReturnTripTime={editingTripId && currentTrip ? currentTrip.returnTripTime : undefined}
+        initialAircraftType={editingTripId && currentTrip ? currentTrip.aircraftType : undefined}
+        initialPassportExpiryDate={editingTripId && currentTrip ? currentTrip.passportExpiryDate : undefined}
         initialTravelers={addTripPreFill?.travelers}
         isOnboarding={trips.length === 0}
         initialBags={addTripPreFill?.bags}
@@ -819,6 +846,15 @@ function PackingAppContent() {
         isOpen={showAccountModal}
         onClose={() => setShowAccountModal(false)}
         origin={accountModalOrigin}
+        onRegistrationSuccess={() => {
+          setAppView('dashboard');
+          if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
+            try {
+              window.history.pushState({}, '', '/dashboard');
+            } catch {}
+          }
+          setShowOnboardingModal(true);
+        }}
       />
 
       {/* Feature 1: First-run & 3rd Visit Save Gate Modal */}
