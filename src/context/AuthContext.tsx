@@ -244,3 +244,8 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export const useAuthOptional = () => {
+  return useContext(AuthContext);
+};
+

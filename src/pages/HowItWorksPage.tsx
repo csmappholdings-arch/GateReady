@@ -147,10 +147,10 @@ export const HowItWorksPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <h3 className="font-black text-lg text-slate-900 dark:text-white">
-                Add Packed Items, Monitor Weight &amp; Audit TSA 3-1-1 Liquids
+                Add Packed Items &amp; Monitor Baggage Weights with Live Packing Weight Meters
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Add items using our pre-calibrated weight catalog or custom entries. Dynamic capacity meters track cumulative bag weight against airline limits in real time. When adding toiletries to carry-ons, the TSA 3-1-1 liquids checker flags oversized bottles (&gt;3.4 oz) so you can repack them safely.
+                Add items using our pre-calibrated weight catalog or custom entries. Live Packing Weight Meters track cumulative bag weight against airline limits in real time. When adding toiletries to carry-ons, the TSA 3-1-1 liquids checker flags oversized bottles (&gt;3.4 oz) so you can repack them safely.
               </p>
             </div>
           </div>
@@ -158,7 +158,7 @@ export const HowItWorksPage: React.FC = () => {
           {/* Step 4 UI Preview */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 max-w-xl mx-auto space-y-3">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">Checked Bag Dynamic Weight:</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Checked Bag Live Packing Weight Meter:</span>
               <span className="font-bold text-emerald-600">42.8 / 50.0 lbs (Safe · 7.2 lbs buffer left)</span>
             </div>
             <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -179,10 +179,10 @@ export const HowItWorksPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <h3 className="font-black text-lg text-slate-900 dark:text-white">
-                Review Departure Readiness, Rebalance &amp; Print Manifests
+                Review Packing &amp; Departure Readiness
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Before heading to the airport, inspect your Departure Readiness Score. If any bag exceeds limits, our Rebalance Bags optimizer suggests 1-click item shifts to lighter luggage. Save loyalty accounts to your Travel Wallet and print clean manifests or privacy-safe emergency QR luggage recovery tags.
+                Before heading to the airport, review your packing list and Departure Readiness Score. If any bag exceeds limits, our Rebalance Bags optimizer suggests 1-click item shifts to lighter luggage. Save loyalty accounts to your Travel Wallet and print clean manifests or privacy-safe emergency QR luggage recovery tags.
               </p>
             </div>
           </div>

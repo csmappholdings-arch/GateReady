@@ -982,7 +982,13 @@ export default function App() {
   if (pathname === '/terms') return <TermsPage />;
   if (pathname === '/contact') return <ContactPage />;
   if (pathname === '/faq') return <FaqPage />;
-  if (pathname === '/pricing') return <PricingPage />;
+  if (pathname === '/pricing') {
+    return (
+      <AuthProvider>
+        <PricingPage />
+      </AuthProvider>
+    );
+  }
   if (pathname === '/how-it-works') return <HowItWorksPage />;
   if (pathname === '/cookies') return <CookiesPage />;
   if (pathname === '/refunds') return <RefundsPage />;

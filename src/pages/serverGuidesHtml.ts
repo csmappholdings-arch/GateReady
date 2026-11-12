@@ -577,7 +577,7 @@ export function getHomepageHtml(): string {
       <section class="space-y-4">
         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.</h2>
         <p class="text-base text-slate-700 leading-relaxed">
-          Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home. GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42+ worldwide airlines.
+          Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home. GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42+ worldwide airlines.
         </p>
         <div class="flex flex-wrap gap-3 pt-2">
           <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">

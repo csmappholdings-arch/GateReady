@@ -14,6 +14,28 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Nov 11, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 11, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Pricing Route Reliability &amp; Auth Context Resolution</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Dedicated /pricing Route Reliability Fix</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Resolved a client-side error boundary failure when navigating to or loading /pricing directly. Provided resilient authentication context resolution with safe fallbacks across guest and authenticated sessions, ensuring all four subscription tiers, the full feature comparison table, and Lemon Squeezy checkout load instantly without runtime exceptions.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Nov 2, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">

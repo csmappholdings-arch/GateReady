@@ -18,10 +18,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     const meta: StaticPageMeta = {
       path: '/',
       title: 'GateReady.ca – Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.',
-      description: 'Pack smart, fly prepared, and avoid surprise baggage fees. Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home.',
+      description: 'Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home.',
       keywords: 'airline baggage allowance, carry-on baggage restrictions, airline baggage fees, luggage weight calculator, carry-on size checker, travel packing checklist, checked baggage allowance, avoid overweight baggage fees',
       heading: 'Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.',
-      subheading: 'Know exactly what you can bring, how much your luggage will weigh, and what your airline will charge before you leave home.',
+      subheading: 'Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home.',
       schemaType: 'WebApplication'
     };
 
@@ -355,8 +355,8 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (typically 6 to 9 lbs) to ensure packed belongings remain strictly within airline allowances.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">4. Dynamic Weight Meters &amp; TSA 3-1-1 Liquids Audit</h3>
-            <p class="text-xs text-slate-600 mt-1">Monitor dynamic capacity meters as you pack and automatically audit carry-on bottles against the TSA 3.4 oz (100ml) security limit.</p>
+            <h3 class="font-bold text-slate-900">4. Live Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit</h3>
+            <p class="text-xs text-slate-600 mt-1">Monitor Live Packing Weight Meters as you pack and automatically audit carry-on bottles against the TSA 3.4 oz (100ml) security limit.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">5. Review Departure Readiness, Rebalance &amp; Print Manifests</h3>

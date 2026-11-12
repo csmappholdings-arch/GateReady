@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PageLayout } from './PageLayout';
 import { Check, Sparkles, Shield, ArrowRight, HelpCircle, Mail, Zap, Crown, X } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
-import { useAuth } from '../context/AuthContext';
+import { useAuthOptional } from '../context/AuthContext';
 import { openLemonCheckout } from '../lib/lemonSqueezy';
 
 export const PricingPage: React.FC = () => {
@@ -13,7 +13,8 @@ export const PricingPage: React.FC = () => {
     trackEvent('upgrade_page_viewed', { source: 'pricing_page' });
   }, []);
 
-  const { user } = useAuth();
+  const auth = useAuthOptional();
+  const user = auth?.user ?? null;
 
   const handleSelectPlan = (plan: string) => {
     trackEvent('subscription_plan_selected', { plan, billing_cycle: billingCycle });

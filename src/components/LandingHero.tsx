@@ -323,7 +323,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               Arrive at the Gate Confidently
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Walk up to check-in knowing your baggage is within limits, your liquids pass security, and your documents are ready. Zero airport surprises and zero gate-check fees.
+              Walk up to check-in with your baggage estimates within limits, your liquids audited for security, and your documents organized. Travel prepared with zero surprises.
             </p>
           </div>
         </div>
@@ -348,7 +348,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         <div className="flex items-center justify-center gap-2 flex-wrap border-b border-slate-200 dark:border-slate-800 pb-3">
           {[
             { id: 'dashboard', label: 'Trip Dashboard', icon: Plane },
-            { id: 'meters', label: 'Dynamic Weight Meters', icon: Scale },
+            { id: 'meters', label: 'Live Packing Weight Meters', icon: Scale },
             { id: 'tare', label: 'Tare Weight Deduction', icon: Luggage },
             { id: 'checklist', label: 'Packing & TSA 3-1-1', icon: CheckCircle2 },
             { id: 'readiness', label: 'Departure Readiness', icon: ShieldCheck }
@@ -459,18 +459,18 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-xs font-bold">
                   <Scale className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Dynamic Weight &amp; Capacity Meters</span>
+                  <span>Live Packing Weight Meters</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Know Your Exact Weight Before Leaving Home
+                  Estimate Your Luggage Weight Before Leaving Home
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  GateReady computes your luggage weight as you pack. Our dynamic progress meters show exactly how close you are to the airline limit and alert you before you trigger expensive excess baggage charges.
+                  GateReady computes your luggage weight as you pack. Live Packing Weight Meters show how close you are to the airline limit and alert you before you exceed allowances or trigger unexpected fees.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Dynamic capacity meter showing total packed weight vs published airline allowance</span>
+                    <span>Live capacity meter showing estimated packed weight vs published airline allowance</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
@@ -911,7 +911,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <div className="text-xs text-slate-500">Forever · No Card Needed</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
               <li>✓ 1 traveler & 1 active trip</li>
-              <li>✓ Up to 2 bags max</li>
+              <li>✓ Up to 2 bags total (max 1 checked bag)</li>
               <li>✓ 42+ airline allowance tables</li>
               <li>✓ Personal cloud sync included</li>
             </ul>

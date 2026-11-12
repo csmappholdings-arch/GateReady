@@ -46,7 +46,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   HelpCircle,
-  FileText
+  FileText,
+  Menu,
+  ChevronRight
 } from 'lucide-react';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
@@ -138,12 +140,45 @@ export const Header: React.FC<HeaderProps> = ({
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [whyMenuOpen, setWhyMenuOpen] = useState(false);
 
+  // Mobile navigation hamburger drawer state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSections, setMobileSections] = useState<{
+    plan: boolean;
+    tools: boolean;
+    why: boolean;
+    settings: boolean;
+  }>({
+    plan: true,
+    tools: false,
+    why: false,
+    settings: false
+  });
+
+  const toggleMobileSection = (key: 'plan' | 'tools' | 'why' | 'settings') => {
+    setMobileSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const settingsRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const tripMenuRef = useRef<HTMLDivElement>(null);
   const planMenuRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
   const whyMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (mobileMenuOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = '';
+      }
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
@@ -175,6 +210,7 @@ export const Header: React.FC<HeaderProps> = ({
         setPlanMenuOpen(false);
         setToolsMenuOpen(false);
         setWhyMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     };
 
@@ -1590,6 +1626,25 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
           </div>
+
+          {/* Mobile Hamburger Menu Toggle Button (visible ONLY below xl) */}
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(!mobileMenuOpen);
+              setSettingsOpen(false);
+              setUserMenuOpen(false);
+            }}
+            className="xl:hidden w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-0.5"
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? (
+              <X className="w-5 h-5 text-white" />
+            ) : (
+              <Menu className="w-5 h-5 text-white" />
+            )}
+          </button>
         </div>
       </div>
 
@@ -1813,6 +1868,703 @@ export const Header: React.FC<HeaderProps> = ({
                 <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>{isDeletingAccount ? 'Deleting Account...' : 'Permanently Delete Account'}</span>
               </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Mobile Hamburger Drawer Navigation Portal (visible ONLY below xl) */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[99990] xl:hidden flex justify-end animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation and Settings"
+        >
+          {/* Dark Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Drawer Panel */}
+          <div className="relative w-full max-w-[340px] sm:max-w-sm h-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col z-10 overflow-hidden animate-in slide-in-from-right duration-250 border-l border-purple-100 dark:border-purple-900/60">
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-purple-100 dark:border-purple-900/60 bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-700 text-white flex items-center justify-between gap-3 shrink-0 shadow-xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-purple-950/80 border border-purple-300/40 flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <Luggage className="w-4 h-4 text-purple-200" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-black text-sm tracking-tight text-white flex items-center">
+                    <span>Gate<span className="text-fuchsia-300">Ready</span>.ca</span>
+                  </div>
+                  <span className="text-[10px] text-purple-200/90 font-medium truncate block">
+                    Travel Navigation &amp; Settings
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                aria-label="Close menu"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
+              {/* 1. Account & Subscription Card */}
+              <div className="rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/50 p-3.5 space-y-3">
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-3">
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt=""
+                          className="w-10 h-10 rounded-full border-2 border-emerald-400 object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shrink-0">
+                          {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-xs font-black text-slate-900 dark:text-white truncate">
+                            {user.displayName || 'GateReady Traveler'}
+                          </p>
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-1.5 py-0.2 rounded-md shrink-0">
+                            {isMasterKey ? 'VIP Master' : tier}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                          {user.email}
+                        </p>
+                        {user.emailVerified ? (
+                          <span className="inline-flex items-center gap-1 mt-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle className="w-3 h-3 text-emerald-500" />
+                            <span>Verified</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 mt-0.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                            <span>Email unverified</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Trial / Referral timer if active */}
+                    {isReferralPlatinumActive && (
+                      <div className="p-2 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800 text-[11px] text-fuchsia-800 dark:text-fuchsia-300 flex items-center justify-between">
+                        <span className="font-bold flex items-center gap-1">
+                          <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
+                          <span>Referral Platinum:</span>
+                        </span>
+                        <span className="font-mono font-black text-amber-600 dark:text-amber-400">
+                          {referralTimeLeftText}
+                        </span>
+                      </div>
+                    )}
+                    {isTrialActive && (
+                      <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                        <span className="font-bold flex items-center gap-1">
+                          <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                          <span>Platinum Trial:</span>
+                        </span>
+                        <span className="font-mono font-black text-purple-700 dark:text-purple-300">
+                          {trialTimeLeftText}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Sync status & actions */}
+                    <div className="pt-2 border-t border-purple-200/50 dark:border-purple-900/50 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleManualSync}
+                        disabled={isManualSyncing}
+                        className="flex-1 h-8 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-purple-900 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isManualSyncing ? 'animate-spin' : ''}`} />
+                        <span>Sync Now</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          signOut();
+                        }}
+                        className="h-8 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+
+                    {!isPro ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          openPaywall("Upgrade to unlock unlimited bags, active trips, and multi-traveler packing.");
+                        }}
+                        className="w-full h-8.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98 transition-all cursor-pointer"
+                      >
+                        <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                        <span>Upgrade Plan (from $1.99/mo)</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          openPaywall();
+                        }}
+                        className="w-full h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Crown className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                        <span>Manage Subscription ({tier})</span>
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-purple-200 dark:bg-purple-900 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0 font-bold text-xs">
+                          <UserIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-slate-900 dark:text-white">
+                            You're browsing as a guest
+                          </p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Saved locally · Sign in for free cloud sync
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setAccountSyncModalMode('signin');
+                          if (onOpenAccountSync) onOpenAccountSync();
+                          else setAccountSyncModalOpen(true);
+                        }}
+                        className="h-8.5 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-purple-900 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                      >
+                        <span>Log In</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setAccountSyncModalMode('signup');
+                          if (onOpenAccountSync) onOpenAccountSync();
+                          else setAccountSyncModalOpen(true);
+                        }}
+                        className="h-8.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 active:scale-98 text-purple-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-purple-950" />
+                        <span>Sign Up Free</span>
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        openPaywall();
+                      }}
+                      className="w-full h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                      <span>View All Plans &amp; Pricing</span>
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* 2. Primary Navigation: Dashboard & Create Trip */}
+              <div className="space-y-1.5">
+                {onOpenDashboard && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenDashboard();
+                    }}
+                    className={`w-full p-2.5 rounded-xl font-bold text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                      currentView === 'dashboard'
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <LayoutDashboard className={`w-4 h-4 ${currentView === 'dashboard' ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
+                      <span>Travel Dashboard</span>
+                    </div>
+                    {currentView === 'dashboard' && (
+                      <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">
+                        Active
+                      </span>
+                    )}
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAddTrip();
+                  }}
+                  className="w-full p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-200 font-bold text-xs flex items-center justify-between transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Plus className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <span>Create a Trip</span>
+                  </div>
+                  <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold">New</span>
+                </button>
+              </div>
+
+              {/* 3. Section: PLAN YOUR TRIP Accordion */}
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => toggleMobileSection('plan')}
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-xs font-black text-slate-800 dark:text-slate-200 cursor-pointer"
+                >
+                  <span className="tracking-wider uppercase text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                    <Plane className="w-3.5 h-3.5" />
+                    <span>PLAN YOUR TRIP</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileSections.plan ? 'rotate-180' : ''}`} />
+                </button>
+
+                {mobileSections.plan && (
+                  <div className="p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/60">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenAddTrip();
+                      }}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 cursor-pointer pt-2"
+                    >
+                      <Plus className="w-4 h-4 text-purple-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Create a Trip</div>
+                        <div className="text-[10px] text-slate-500">Plan dates, route &amp; airlines</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        if (onOpenDashboard) onOpenDashboard();
+                        else {
+                          const el = document.getElementById('interactive-trip-preview');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 cursor-pointer pt-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Packing Lists &amp; Bags</div>
+                        <div className="text-[10px] text-slate-500">Tailored packing checklist &amp; scale</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        openWalletModal();
+                      }}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 cursor-pointer pt-2"
+                    >
+                      <Wallet className="w-4 h-4 text-amber-500 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Travel Wallet</div>
+                        <div className="text-[10px] text-slate-500">PNR codes &amp; loyalty numbers</div>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* 4. Section: TRAVEL TOOLS Accordion */}
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => toggleMobileSection('tools')}
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-xs font-black text-slate-800 dark:text-slate-200 cursor-pointer"
+                >
+                  <span className="tracking-wider uppercase text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                    <Calculator className="w-3.5 h-3.5" />
+                    <span>TRAVEL TOOLS &amp; CALCULATORS</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileSections.tools ? 'rotate-180' : ''}`} />
+                </button>
+
+                {mobileSections.tools && (
+                  <div className="p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/60">
+                    <a
+                      href="/airlines"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <Plane className="w-4 h-4 text-purple-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Airline Baggage Guides</div>
+                        <div className="text-[10px] text-slate-500">42+ carriers audited tariffs</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/baggage-fee-calculator"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <Calculator className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Baggage Fee Calculator</div>
+                        <div className="text-[10px] text-slate-500">Calculate total checked fees</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/entry-requirements"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-sky-500 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Carry-on &amp; Entry Checker</div>
+                        <div className="text-[10px] text-slate-500">Passport validity &amp; sizer rules</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/travel-preparation"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <Luggage className="w-4 h-4 text-amber-500 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Travel Preparation</div>
+                        <div className="text-[10px] text-slate-500">Departure checklist guides</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/tare-weight"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <Scale className="w-4 h-4 text-purple-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Suitcase Tare Weight</div>
+                        <div className="text-[10px] text-slate-500">Calibrated empty bag deduction</div>
+                      </div>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Section: WHY GATEREADY Accordion */}
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => toggleMobileSection('why')}
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-xs font-black text-slate-800 dark:text-slate-200 cursor-pointer"
+                >
+                  <span className="tracking-wider uppercase text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>WHY GATEREADY</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileSections.why ? 'rotate-180' : ''}`} />
+                </button>
+
+                {mobileSections.why && (
+                  <div className="p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/60">
+                    <a
+                      href="/how-it-works"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <Zap className="w-4 h-4 text-purple-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">How It Works</div>
+                        <div className="text-[10px] text-slate-500">3-step travel readiness</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Features Overview</div>
+                        <div className="text-[10px] text-slate-500">Smart scale, tare &amp; TSA 3-1-1</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/pricing"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <CreditCard className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Pricing &amp; Plans</div>
+                        <div className="text-[10px] text-slate-500">Free, Silver, Gold, Platinum</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/faq"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
+                    >
+                      <HelpCircle className="w-4 h-4 text-indigo-500 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">FAQs</div>
+                        <div className="text-[10px] text-slate-500">Frequently asked questions</div>
+                      </div>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* 6. Section: ACCOUNT SETTINGS & PREFERENCES Accordion */}
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => toggleMobileSection('settings')}
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-xs font-black text-slate-800 dark:text-slate-200 cursor-pointer"
+                >
+                  <span className="tracking-wider uppercase text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                    <Settings className="w-3.5 h-3.5" />
+                    <span>ACCOUNT SETTINGS &amp; PREFERENCES</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileSections.settings ? 'rotate-180' : ''}`} />
+                </button>
+
+                {mobileSections.settings && (
+                  <div className="p-3 space-y-3 text-xs">
+                    {/* Weight Unit */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <Scale className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <div>
+                          <p className="font-semibold text-slate-800 dark:text-slate-200">Weight Unit</p>
+                          <p className="text-[10px] text-slate-400">Currently: {weightUnit === 'LBS' ? 'Pounds (lbs)' : 'Kilograms (kg)'}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={toggleWeightUnit}
+                        className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer"
+                      >
+                        {weightUnit === 'LBS' ? 'Switch to KG' : 'Switch to LBS'}
+                      </button>
+                    </div>
+
+                    {/* Temperature Unit */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <Thermometer className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <div>
+                          <p className="font-semibold text-slate-800 dark:text-slate-200">Temperature</p>
+                          <p className="text-[10px] text-slate-400">Currently: {tempUnit === 'F' ? 'Fahrenheit (°F)' : 'Celsius (°C)'}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={toggleTempUnit}
+                        className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors cursor-pointer"
+                      >
+                        {tempUnit === 'F' ? 'Switch to °C' : 'Switch to °F'}
+                      </button>
+                    </div>
+
+                    {/* Appearance */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2">
+                        {isDarkMode ? <Moon className="w-4 h-4 text-purple-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
+                        <div>
+                          <p className="font-semibold text-slate-800 dark:text-slate-200">Appearance</p>
+                          <p className="text-[10px] text-slate-400">{isDarkMode ? 'Dark theme' : 'Light theme'}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setDarkMode(!isDarkMode)}
+                        className="w-10 h-6 rounded-full bg-slate-200 dark:bg-purple-600 p-0.5 flex items-center transition-colors cursor-pointer"
+                      >
+                        <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${isDarkMode ? 'translate-x-4' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+
+                    {/* Tour & Guides */}
+                    {onOpenTour && (
+                      <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Play className="w-4 h-4 text-purple-600 shrink-0" />
+                          <div>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Video Walkthrough</p>
+                            <p className="text-[10px] text-slate-400">App feature guide</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            onOpenTour();
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-100 cursor-pointer"
+                        >
+                          Watch
+                        </button>
+                      </div>
+                    )}
+
+                    {onOpenOnboarding && (
+                      <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                          <div>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Onboarding Guide</p>
+                            <p className="text-[10px] text-slate-400">Interactive walkthrough</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            onOpenOnboarding();
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-100 cursor-pointer"
+                        >
+                          Start
+                        </button>
+                      </div>
+                    )}
+
+                    {onOpenReferral && (
+                      <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Gift className="w-4 h-4 text-fuchsia-500 shrink-0" />
+                          <div>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Refer a Friend</p>
+                            <p className="text-[10px] text-slate-400">Get 1 Month Platinum Free</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            onOpenReferral();
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-xs font-bold bg-fuchsia-50 dark:bg-fuchsia-950/60 text-fuchsia-600 dark:text-fuchsia-300 cursor-pointer"
+                        >
+                          Invite
+                        </button>
+                      </div>
+                    )}
+
+                    {onOpenNotifications && (
+                      <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-purple-600 shrink-0" />
+                          <div>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Departure Alerts</p>
+                            <p className="text-[10px] text-slate-400">{unreadNotificationsCount > 0 ? `${unreadNotificationsCount} unread alert${unreadNotificationsCount > 1 ? 's' : ''}` : 'No unread alerts'}</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            onOpenNotifications();
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 cursor-pointer"
+                        >
+                          View
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Batch Actions for active trip if any */}
+                    {currentTrip && (
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            markAllPacked(currentTrip.id);
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 cursor-pointer"
+                        >
+                          <CheckCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span className="font-semibold">Mark All Items Packed</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            resetAllPacked(currentTrip.id);
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 cursor-pointer"
+                        >
+                          <RotateCcw className="w-4 h-4 text-slate-400 shrink-0" />
+                          <span className="font-semibold">Uncheck All Items</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Delete account button in mobile settings */}
+                    {user && (
+                      <div className="pt-2 border-t border-rose-100 dark:border-rose-950/40">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            setShowDeleteAccountModal(true);
+                          }}
+                          className="w-full text-left p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-2 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 text-rose-500 shrink-0" />
+                          <span>Delete Account &amp; Erase Cloud Data</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 text-center shrink-0">
+              <p className="text-[10px] text-slate-400">
+                GateReady.ca · Smart Trip Packing &amp; Baggage Intel
+              </p>
             </div>
           </div>
         </div>,
