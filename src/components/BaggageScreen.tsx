@@ -43,6 +43,7 @@ import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
 import { EntryRequirementsCard } from './EntryRequirementsCard';
 import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
 import { PrintPackingListModal } from './PrintPackingListModal';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT } from '../data/planEntitlements';
 import { SharePackingListModal } from './SharePackingListModal';
 import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 import { RebalanceBagsModal } from './RebalanceBagsModal';
@@ -238,7 +239,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   // Safe Add Bag check (strictly limits Free to 2 bags)
   const handleOpenAddBagSafe = () => {
     if (!isPro && trip.bags.length >= 2) {
-      openPaywall('Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.');
+      openPaywall(`Free plan is limited to 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
     onOpenAddBag();
@@ -246,7 +247,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
   const handleOpenQrTagSafe = (bag: Bag) => {
     if (!isPro) {
-      openPaywall("Emergency QR Luggage Tag generator is a Silver+ feature. Upgrade to create and print privacy-safe recovery tags.");
+      openPaywall(`Emergency QR Luggage Tags are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
     setShowQrModalForBag(bag);
@@ -257,11 +258,11 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     const primary = trip.familyMembers?.[0] || 'Traveler 1';
     if (!isPro) {
       if (bundle === 'CHECKED_PLUS_CARRY') {
-        openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
+        openPaywall(`Free plan allows 1 Checked Bag per trip (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
       if (trip.bags.length >= 2) {
-        openPaywall('Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.');
+        openPaywall(`Free plan is limited to 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
     }
@@ -281,7 +282,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       }
     } else if (bundle === 'CHECKED_PLUS_CARRY') {
       if (!isPro) {
-        openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
+        openPaywall(`Free plan allows 1 Checked Bag per trip (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
       addBagToTrip(trip.id, 'CHECKED', 'Checked Suitcase (50 lbs)', primary);
@@ -497,16 +498,16 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 Free Plan: 2 Bags Included ({Math.min(trip.bags.length, 2)}/2 used)
               </span>
               <p className="text-[11px] text-purple-800/80 dark:text-purple-300/80">
-                Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags and unlock multiple checked suitcases.
+                {TRIAL_CTA_LABEL} to unlock unlimited bags &amp; multiple checked suitcases — {TRIAL_TERMS_EXACT.charAt(0).toLowerCase() + TRIAL_TERMS_EXACT.slice(1)}
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => openPaywall('Upgrade to Silver, Gold, or Platinum for unlimited luggage and bags.')}
+            onClick={() => openPaywall(`Free plan includes 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
             className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs hover:from-amber-500 hover:to-amber-600"
           >
-            Upgrade
+            Try 7 days free
           </button>
         </div>
       )}
@@ -544,7 +545,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               </div>
               <p className="text-xs mt-0.5 opacity-90 leading-relaxed">
                 {isFlight 
-                  ? `Major airlines charge steep fees for bags over limits. Shift dense items into ${lightestBag?.bag.label || 'another bag'} to travel free of fees.`
+                  ? `Major airlines charge $100–$150 fees for bags over limits. Shift dense items into ${lightestBag?.bag.label || 'another bag'} to avoid overweight fees.`
                   : `Shift dense items into ${lightestBag?.bag.label || 'another bag'} to keep your luggage easy to manage and within limits.`}
               </p>
             </div>
@@ -561,7 +562,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               }`}
             >
               <Scale className="w-4 h-4" />
-              <span>{isPro ? 'Rebalance Bags' : 'Unlock Rebalance (Silver+)'}</span>
+              <span>{isPro ? 'Rebalance Bags' : 'Rebalance (7-Day Trial)'}</span>
             </button>
           </div>
         </div>
@@ -1275,7 +1276,10 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           isOpen={showRebalanceUpgradeModal}
           onClose={() => setShowRebalanceUpgradeModal(false)}
           onSeePlans={() =>
-            openPaywall('Rebalance Bags is a Silver+ feature ($1.99/mo or $19.99/yr). Upgrade to balance weight across bags and avoid airline overweight baggage fees.')
+            openPaywall(
+              `Rebalance Bags is included on Silver ($1.99/mo or $19.99/yr). ${FEE_MATH_STATEMENT} ${TRIAL_TERMS_EXACT}`,
+              { defaultShowPlans: true }
+            )
           }
         />
       )}

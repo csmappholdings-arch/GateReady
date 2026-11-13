@@ -41,6 +41,7 @@ import {
   CURATED_TERMINAL_DATA, 
   resolveTerminalHub 
 } from '../data/terminalHubsData';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface TerminalHubMapsAdvisorProps {
   trip: Trip;
@@ -342,7 +343,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
               type="button"
               onClick={() => {
                 if (!isPro) {
-                  openPaywall('Upgrade to Gate Ready Pro to download offline vector floorplans and live refill telemetry for all worldwide hubs.');
+                  openPaywall(`Worldwide terminal floorplans & refill station locators are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
                 } else {
                   alert(`Offline floorplan vector bundle for ${hub.name} (${hub.code}) downloaded to your device cache!`);
                 }

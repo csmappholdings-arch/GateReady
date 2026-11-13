@@ -43,6 +43,7 @@ import { DatePickerInput } from './DatePickerInput';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { checkPassportValidity } from '../utils/passportValidity';
 import { trackEvent } from '../utils/analytics';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface AddTripDialogProps {
   isOpen: boolean;
@@ -385,7 +386,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     } else if (bundle === 'CHECKED_PLUS_CARRY') {
       // 3 Bags Bundle: Requires Silver+
       if (!isPro) {
-        openPaywall('Packing 3 or more bags (Checked + Carry-On + Personal Item) is a Silver+ feature. The Free plan includes 2 bags maximum.');
+        openPaywall(`Packing 3 or more bags (Checked + Carry-On + Personal Item) requires unlocking beyond the 2-bag Free limit. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
       setBags([
@@ -510,11 +511,11 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     if (!isPro) {
       const checkedCount = finalBags.filter((b) => b.type === 'CHECKED').length;
       if (checkedCount > 1) {
-        openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
+        openPaywall(`Free plan allows 1 Checked Bag per trip (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
       if (finalBags.length > 2) {
-        openPaywall('Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.');
+        openPaywall(`Free plan is limited to 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
     }
@@ -1132,11 +1133,11 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   {!isPro ? (
                     <button
                       type="button"
-                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Track return departure schedules, 2-way weight limits, and return day departure alerts.")}
+                      onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                       className="h-7 px-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-[10px] flex items-center justify-center gap-1 shadow-xs cursor-pointer active:scale-95 transition-all shrink-0 self-start sm:self-auto"
                     >
                       <Lock className="w-3 h-3" />
-                      <span>Unlock with Silver+</span>
+                      <span>Try 7 days free</span>
                     </button>
                   ) : (
                     <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
@@ -1167,13 +1168,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 <div className="relative">
                   {!isPro && (
                     <div 
-                      onClick={() => openPaywall("Round-Trip & Return Date tracking is a Silver+ feature. Upgrade to track your return journey.")}
+                      onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                       className="absolute inset-0 z-10 bg-slate-900/5 dark:bg-slate-950/20 backdrop-blur-[1px] rounded-xl flex items-center justify-center cursor-pointer group"
-                      title="Click to unlock return schedule with Silver+"
+                      title="Click to unlock with your free 7-day Platinum trial"
                     >
                       <div className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-md border border-purple-200 dark:border-purple-800 text-[11px] font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1.5 group-hover:scale-105 transition-transform">
                         <Lock className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Return Date Locked (Silver+ Feature) — Tap to Upgrade</span>
+                        <span>Return Date Locked — Try 7 days free</span>
                       </div>
                     </div>
                   )}
@@ -1275,7 +1276,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   {tier === 'FREE' ? (
                     <button
                       type="button"
-                      onClick={() => openPaywall("Free Plan includes 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for companions and family.")}
+                      onClick={() => openPaywall(`Free plan allows 1 traveler. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                       className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-200 cursor-pointer"
                     >
                       <Crown className="w-3 h-3 fill-amber-500 text-amber-500" />

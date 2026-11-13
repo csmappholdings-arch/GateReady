@@ -103,7 +103,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
 
           {/* Benefit-led body text */}
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            This list currently lives only in this browser. Clear your site data or switch devices and it's gone. Create a free account to keep it safe and synced.
+            This trip is only saved in this browser — a free account keeps it and syncs it across devices.
           </p>
 
           <div className="grid grid-cols-2 gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-300 pt-1">
@@ -124,7 +124,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
               onClick={onSave}
               className="w-full h-11 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-md shadow-purple-600/30 active:scale-98 transition-all cursor-pointer"
             >
-              <span>Create Free Account</span>
+              <span>Create free account</span>
               <Sparkles className="w-4 h-4 text-amber-300" />
             </button>
 

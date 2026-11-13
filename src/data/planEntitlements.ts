@@ -1,3 +1,12 @@
+export const TRIAL_CTA_LABEL = 'Try everything free for 7 days';
+export const TRIAL_SECONDARY_CTA_LABEL = 'See plans';
+export const TRIAL_TERMS_EXACT =
+  'The 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.';
+export const FEE_MATH_STATEMENT =
+  'One overweight bag fee is $100–$150. Silver is $19.99/year — one avoided fee pays for 5+ years of Silver.';
+export const FEE_MATH_YEARLY_FRAME =
+  'Even if you only travel once a year, year-round Silver coverage pays for itself the moment it prevents one $100–$150 overweight bag fee.';
+
 export interface PlanDefinition {
   id: 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
   name: string;

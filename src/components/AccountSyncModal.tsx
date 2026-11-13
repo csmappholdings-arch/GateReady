@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { trackAccountCreated } from '../lib/firebase';
 import { trackEvent } from '../utils/analytics';
+import { TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface AccountSyncModalProps {
   isOpen: boolean;
@@ -568,22 +569,14 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
                 <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50 to-purple-50 dark:from-amber-950/30 dark:to-purple-950/30 border border-amber-200 dark:border-amber-900/60 text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
                   <div className="flex items-center gap-1.5 font-black text-amber-900 dark:text-amber-300 text-[11px] uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span>Includes 7-Day Platinum Trial</span>
+                    <span>Includes 7-Day Full Platinum Trial</span>
                   </div>
-                  <ul className="text-[11px] space-y-1 text-slate-600 dark:text-slate-300">
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">·</span>
-                      <span><strong>What&apos;s included:</strong> Unlimited bags, empty suitcase tare deduction, travel wallet, and companion sharing.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">·</span>
-                      <span><strong>No payment required:</strong> Zero credit card or billing details asked.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">·</span>
-                      <span><strong>After 7 days:</strong> Gracefully returns to the Free Plan with zero surprise charges. All your trips remain saved safely.</span>
-                    </li>
-                  </ul>
+                  <p className="text-[11px] text-slate-700 dark:text-slate-200 font-semibold leading-snug">
+                    {TRIAL_TERMS_EXACT}
+                  </p>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
+                    Unlocks all tiers for 7 days (unlimited trips &amp; bags, empty suitcase tare deduction, Rebalance Bags, PDF manifests, QR tags, terminal maps, and family sync). All your trips stay safely preserved.
+                  </p>
                 </div>
               </div>
             )}

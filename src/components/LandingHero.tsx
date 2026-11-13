@@ -28,14 +28,14 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
-import { PLAN_DEFINITIONS } from '../data/planEntitlements';
+import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT } from '../data/planEntitlements';
 
 interface LandingHeroProps {
   onOpenAddTrip: () => void;
   onLoadDemo: () => void;
   onOpenPricing: () => void;
   onOpenAirlineGuides?: () => void;
-  onOpenAccountSync?: () => void;
+  onOpenAccountSync?: (mode?: 'signin' | 'signup') => void;
   onExploreTools?: () => void;
 }
 
@@ -76,7 +76,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
     },
     {
       q: 'What is included in the 7-day Platinum trial?',
-      a: 'When you create a free account, you instantly unlock 7 full days of GateReady Platinum. This allows you to test unlimited bags, suitcase tare weight deduction, multi-traveler family coordination, PDF export manifests, and emergency QR luggage tags. When the 7 days end, your account automatically safely reverts to the Free plan with zero surprise charges.'
+      a: `${TRIAL_TERMS_EXACT} This lets you test unlimited bags, suitcase tare weight deduction, multi-traveler family coordination, PDF export manifests, and emergency QR luggage tags with zero surprise charges.`
     },
     {
       q: 'Does cloud sync work on the Free plan?',
@@ -84,7 +84,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
     },
     {
       q: 'How does empty suitcase tare deduction save money?',
-      a: 'Most travelers weigh their packed bags on a bathroom scale and forget that empty hard-shell suitcases alone weigh 6 to 9 lbs (2.7 to 4.1 kg). On a strict 50 lb (23 kg) airline limit, that is nearly 20% of your allowance! GateReady automatically subtracts your bag’s empty tare weight so you never face a $100+ airport overweight baggage fee.'
+      a: 'Most travelers weigh their packed bags on a bathroom scale and forget that empty hard-shell suitcases alone weigh 6 to 9 lbs (2.7 to 4.1 kg). On a strict 50 lb (23 kg) airline limit, that is nearly 20% of your allowance! GateReady automatically subtracts your bag’s empty tare weight so you never face a $100–$150 airport overweight baggage fee.'
     },
     {
       q: 'How current is your airline baggage information?',
@@ -179,11 +179,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     type="button"
                     onClick={() => {
                       trackEvent('registration_started', { origin: 'hero_link' });
-                      onOpenAccountSync();
+                      onOpenAccountSync('signup');
                     }}
                     className="text-slate-600 dark:text-slate-300 hover:text-purple-600 font-semibold cursor-pointer underline decoration-dotted"
+                    title={TRIAL_TERMS_EXACT}
                   >
-                    Free signup includes 7-day Platinum trial
+                    7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7
                   </button>
                 </>
               )}
@@ -234,7 +235,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               💸
             </div>
             <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Overweight Bag Penalties ($100+)
+              Overweight Bag Penalties ($100–$150)
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Exceeding the 50 lb (23 kg) limit by even 1.5 lbs can trigger a punitive $100 to $150 overweight fee at the check-in desk. Most people forget to account for empty suitcase weight.
@@ -928,6 +929,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                 </li>
               ))}
             </ul>
+            <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl p-2">
+              {FEE_MATH_STATEMENT}
+            </p>
           </div>
 
           <div className="p-6 rounded-3xl bg-amber-500/10 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xl space-y-3 relative">
@@ -1099,7 +1103,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               type="button"
               onClick={() => {
                 trackEvent('registration_started', { origin: 'footer_cta' });
-                onOpenAccountSync();
+                onOpenAccountSync('signup');
               }}
               className="w-full sm:w-auto h-13 px-7 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-2 border-purple-300 dark:border-purple-600 text-purple-900 dark:text-purple-100 font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
             >
@@ -1110,11 +1114,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         </div>
 
         <div className="text-xs text-slate-400 pt-2 flex items-center justify-center gap-4 flex-wrap">
-          <span>Free starter plan forever</span>
-          <span>·</span>
-          <span>Includes 7-day Platinum trial</span>
-          <span>·</span>
-          <span>No credit card required</span>
+          <span>{TRIAL_TERMS_EXACT}</span>
         </div>
       </section>
 

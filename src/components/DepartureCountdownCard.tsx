@@ -24,6 +24,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { DatePickerInput } from './DatePickerInput';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface DepartureCountdownCardProps {
   trip: Trip;
@@ -42,7 +43,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
   const handleToggleReturnTrip = () => {
     if (!isPro) {
-      openPaywall("Return Trip Repack Mode is a Pro feature. It preserves all your packed items from flight #1 and gives you a fresh repack checklist so nothing gets left behind in your hotel room.");
+      openPaywall(`Return Trip Repack Mode is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
     const nextMode = !trip.isReturnRepackMode;
@@ -132,7 +133,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
 
   const handleReminderToggle = (reminderId: string) => {
     if (!isPro) {
-      openPaywall("Smart Day-Of Travel Reminders are exclusive to Gate Ready Pro. Upgrade to check off cash, passport, and pre-departure alerts.");
+      openPaywall(`Smart Day-Of Travel Reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
     toggleDepartureReminder(trip.id, reminderId);
@@ -143,7 +144,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
     if (!newReminderTitle.trim()) return;
     if (!isPro) {
       setShowAddReminderModal(false);
-      openPaywall("Custom Day-Of Travel Reminders are exclusive to Gate Ready Pro. Upgrade to create custom alerts.");
+      openPaywall(`Custom Day-Of Travel Reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
     addCustomReminder(trip.id, newReminderTitle.trim(), newReminderCategory);
@@ -177,13 +178,13 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
         <button
           onClick={() =>
             openPaywall(
-              "The Departure Countdown Clock & Day-of Alerts (passports, foreign cash, and home security) are exclusive to Silver+ plans."
+              `The Departure Countdown Clock & Day-of Reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`
             )
           }
           className="h-8.5 px-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-purple-600/30 shrink-0 cursor-pointer active:scale-95 transition-all"
         >
           <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-          <span>Unlock with Silver+</span>
+          <span>Try 7 days free</span>
         </button>
       </div>
     );
@@ -208,7 +209,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                 </span>
               ) : (
                 <button
-                  onClick={() => openPaywall("Silver+ includes the interactive Departure Countdown Clock, smart day-of alerts for passports and cash, and PDF packing exports.")}
+                  onClick={() => openPaywall(`Departure Countdown Clock & Day-of Reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                   className="text-[10px] bg-amber-400/25 border border-amber-300/40 text-amber-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-400/40 transition-colors cursor-pointer"
                 >
                   <Crown className="w-2.5 h-2.5 fill-amber-300" /> Silver+ Feature
@@ -236,7 +237,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
           <button
             onClick={() => {
               if (!isPro) {
-                openPaywall("Upgrading to Gate Ready Pro unlocks the interactive Departure Countdown Clock and travel day alerts.");
+                openPaywall(`Departure Countdown Clock & Travel Day Reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
                 return;
               }
               setIsEditingSchedule(!isEditingSchedule);
@@ -409,7 +410,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                   </span>
                 </div>
                 <button
-                  onClick={() => openPaywall("Upgrade to Silver, Gold, or Platinum to activate live departure countdown timers and day-of packing reminders.")}
+                  onClick={() => openPaywall(`Live departure countdown timers and day-of packing reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                   className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-all cursor-pointer shrink-0"
                 >
                   Unlock

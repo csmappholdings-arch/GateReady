@@ -1,7 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { BagType, BagMaterial, getUserPresetWeightLbs } from '../types/travel';
-import { Zap, Luggage, X, ArrowRight, ShieldAlert, Sparkles } from 'lucide-react';
+import { TRIAL_CTA_LABEL, TRIAL_SECONDARY_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
+import { Zap, X, ArrowRight, ShieldAlert, Sparkles } from 'lucide-react';
 
 interface FreeLimitCheckerModalProps {
   isOpen: boolean;
@@ -142,10 +143,13 @@ export const FreeLimitCheckerModal: React.FC<FreeLimitCheckerModalProps> = ({
           </button>
         </div>
 
-        {/* Stated Limit Copy */}
-        <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 mb-4">
+        {/* Stated Limit Copy & Exact Trial Promise */}
+        <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 mb-4 space-y-1.5">
           <p className="text-xs sm:text-sm font-semibold text-purple-950 dark:text-purple-200 leading-relaxed">
-            Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.
+            Free plan allows 1 Checked Bag per trip (up to 2 bags total). Unlock unlimited bags with your free 7-day trial or any paid plan.
+          </p>
+          <p className="text-[11px] font-bold text-purple-800 dark:text-purple-300 leading-relaxed">
+            {TRIAL_TERMS_EXACT}
           </p>
         </div>
 
@@ -165,24 +169,43 @@ export const FreeLimitCheckerModal: React.FC<FreeLimitCheckerModalProps> = ({
           </div>
         </div>
 
-        {/* Two Clear Options */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
-          <button
-            type="button"
-            onClick={() => onContinueFree(allowedBags, leftOutNote)}
-            className="h-11 px-5 rounded-xl border border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-xs font-bold transition-all cursor-pointer shadow-xs"
-          >
-            Continue with 2 bags free
-          </button>
+        {/* Trial Primary CTA, See Plans Secondary, Continue Free Tertiary */}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(
+                    new CustomEvent('gateready:open-account-sync', {
+                      detail: { mode: 'signup', origin: 'save_gate' }
+                    })
+                  );
+                }
+              }}
+              className="flex-1 h-11 px-5 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-98 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-purple-600/30 transition-all cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
+              <span>{TRIAL_CTA_LABEL}</span>
+              <ArrowRight className="w-4 h-4 shrink-0" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onSeePlans}
+              className="h-11 px-5 rounded-xl border border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-200 hover:bg-purple-50 dark:hover:bg-slate-700 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
+            >
+              {TRIAL_SECONDARY_CTA_LABEL}
+            </button>
+          </div>
 
           <button
             type="button"
-            onClick={onSeePlans}
-            className="h-11 px-6 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-98 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-purple-600/30 transition-all cursor-pointer"
+            onClick={() => onContinueFree(allowedBags, leftOutNote)}
+            className="h-9 px-4 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition-all cursor-pointer"
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>See plans</span>
-            <ArrowRight className="w-4 h-4" />
+            Continue with 2 bags free
           </button>
         </div>
       </div>

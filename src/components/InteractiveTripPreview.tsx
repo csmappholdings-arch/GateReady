@@ -28,6 +28,7 @@ import { AirportCitySearchInput } from './AirportCitySearchInput';
 import { AirportCity } from '../data/airportsData';
 import { BagType } from '../types/travel';
 import { trackEvent } from '../utils/analytics';
+import { TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 export interface TripPreviewConfig {
   originCity: string;
@@ -534,11 +535,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
               </div>
 
               <div className="text-[11px] text-purple-200/90 pt-1 flex items-center justify-center gap-3 flex-wrap">
-                <span>✓ 100% Free Forever Plan</span>
-                <span>·</span>
-                <span>✓ Includes 7-day Platinum trial automatically</span>
-                <span>·</span>
-                <span>✓ No credit card required</span>
+                <span>✓ {TRIAL_TERMS_EXACT}</span>
               </div>
             </div>
 

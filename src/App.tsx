@@ -90,7 +90,7 @@ function PackingAppContent() {
     deleteTrip,
     updateTripDetails
   } = usePacking();
-  const { isPro, isTrialActive, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
+  const { isPro, isTrialActive, isPaywallOpen, canAddTrip, openPaywall, hasPendingReferralCode, clearPendingReferralCode } = useSubscription();
   const { user, resendVerificationEmail } = useAuth();
   const [resentEmailNotice, setResentEmailNotice] = useState(false);
   const [dismissedEmailVerify, setDismissedEmailVerify] = useState(() => {
@@ -141,6 +141,7 @@ function PackingAppContent() {
   const [showTourModal, setShowTourModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [accountModalOrigin, setAccountModalOrigin] = useState<'save_gate' | 'header' | 'referral' | 'workspace_banner'>('header');
+  const [accountModalMode, setAccountModalMode] = useState<'signin' | 'signup' | undefined>(undefined);
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showAirlineGuidesModal, setShowAirlineGuidesModal] = useState(false);
   const [targetBagId, setTargetBagId] = useState<string>('');
@@ -245,11 +246,21 @@ function PackingAppContent() {
     } catch {}
   }, []);
 
-  // Listen for open referral modal events from Pricing dialog or Header
+  // Listen for open referral modal & trial signup modal events from paywalls / Header
   useEffect(() => {
     const handleOpenReferralEvent = () => setShowReferralModal(true);
+    const handleOpenAccountSyncEvent = (evt: Event) => {
+      const detail = (evt as CustomEvent<{ mode?: 'signin' | 'signup'; origin?: 'save_gate' | 'header' | 'referral' | 'workspace_banner' }>).detail;
+      setAccountModalOrigin(detail?.origin || 'save_gate');
+      setAccountModalMode(detail?.mode || 'signup');
+      setShowAccountModal(true);
+    };
     window.addEventListener('gateready:open-referral', handleOpenReferralEvent);
-    return () => window.removeEventListener('gateready:open-referral', handleOpenReferralEvent);
+    window.addEventListener('gateready:open-account-sync', handleOpenAccountSyncEvent);
+    return () => {
+      window.removeEventListener('gateready:open-referral', handleOpenReferralEvent);
+      window.removeEventListener('gateready:open-account-sync', handleOpenAccountSyncEvent);
+    };
   }, []);
 
   const totalBags = currentTrip?.bags.length ?? 0;
@@ -290,7 +301,7 @@ function PackingAppContent() {
     }
   }, [trips, tripNotice]);
 
-  // Fix 1: Trigger Save Gate once per session when anonymous user builds a real list (e.g. 3rd item added)
+  // Trigger Guest Save-Your-Work prompt after creating first trip / at save step or when adding items
   useEffect(() => {
     if (user) {
       setShowSaveGateModal(false);
@@ -301,7 +312,11 @@ function PackingAppContent() {
       return;
     }
 
-    const isSessionDismissed = 
+    if (showAddTripModal || showOnboardingModal || isPaywallOpen || showAccountModal || pendingCheckerConfig !== null) {
+      return;
+    }
+
+    const isSessionDismissed =
       sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
       sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
 
@@ -309,20 +324,17 @@ function PackingAppContent() {
       return;
     }
 
-    // Trigger during normal list-building when user adds item(s) to a trip (totalItems >= 1)
-    if (totalItems >= 1) {
-      const timer = setTimeout(() => {
-        const stillDismissed = 
-          sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
-          sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
-        if (!stillDismissed && !user) {
-          setShowSaveGateModal(true);
-        }
-      }, 350);
+    const timer = setTimeout(() => {
+      const stillDismissed =
+        sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
+        sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
+      if (!stillDismissed && !user && !showAddTripModal && !showAccountModal && !isPaywallOpen) {
+        setShowSaveGateModal(true);
+      }
+    }, 350);
 
-      return () => clearTimeout(timer);
-    }
-  }, [user, currentTrip?.id, totalItems]);
+    return () => clearTimeout(timer);
+  }, [user, currentTrip?.id, totalItems, showAddTripModal, showOnboardingModal, isPaywallOpen, showAccountModal, pendingCheckerConfig]);
 
   const handleDismissSaveGate = () => {
     setShowSaveGateModal(false);
@@ -339,6 +351,7 @@ function PackingAppContent() {
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
     } catch {}
     setAccountModalOrigin('save_gate');
+    setAccountModalMode('signup');
     setShowAccountModal(true);
   };
 
@@ -572,8 +585,9 @@ function PackingAppContent() {
         onOpenAddTrip={handleOpenAddTrip}
         onOpenAddBag={() => setShowAddBagModal(true)}
         onOpenTour={() => setShowTourModal(true)}
-        onOpenAccountSync={() => {
+        onOpenAccountSync={(mode) => {
           setAccountModalOrigin('header');
+          setAccountModalMode(mode);
           setShowAccountModal(true);
         }}
         onOpenReferral={() => setShowReferralModal(true)}
@@ -765,8 +779,9 @@ function PackingAppContent() {
               onLoadDemo={handleLoadDemo}
               onOpenPricing={() => openPaywall()}
               onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
-              onOpenAccountSync={() => {
+              onOpenAccountSync={(mode) => {
                 setAccountModalOrigin('header');
+                setAccountModalMode(mode || 'signup');
                 setShowAccountModal(true);
               }}
               onExploreTools={() => {
@@ -844,8 +859,12 @@ function PackingAppContent() {
       {/* Universal Cross-Device Account Sync Modal */}
       <AccountSyncModal
         isOpen={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
+        onClose={() => {
+          setShowAccountModal(false);
+          setAccountModalMode(undefined);
+        }}
         origin={accountModalOrigin}
+        initialMode={accountModalMode}
         onRegistrationSuccess={() => {
           setAppView('dashboard');
           if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
@@ -853,7 +872,9 @@ function PackingAppContent() {
               window.history.pushState({}, '', '/dashboard');
             } catch {}
           }
-          setShowOnboardingModal(true);
+          if (trips.length === 0) {
+            setShowOnboardingModal(true);
+          }
         }}
       />
 
@@ -893,7 +914,10 @@ function PackingAppContent() {
         onContinueFree={handleContinueWithTwoBagsFree}
         onSeePlans={() => {
           setPendingCheckerConfig(null);
-          openPaywall('Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.');
+          openPaywall(
+            'Free plan allows 1 Checked Bag per trip (up to 2 bags total). Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.',
+            { defaultShowPlans: true }
+          );
         }}
       />
 

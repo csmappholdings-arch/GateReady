@@ -1,7 +1,7 @@
 import { AIRLINE_GUIDES, AirlineGuideItem } from '../data/airlineGuidesData';
 import { getSplitBagUsdNotes } from '../data/baggageFeeData';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
-import { PLAN_DEFINITIONS } from '../data/planEntitlements';
+import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT } from '../data/planEntitlements';
 
 export function getAirlinePageHtml(guide: AirlineGuideItem): string {
   const isNoLimit = (guide.limits.carryOnWeightLimit || '').toLowerCase().includes('no');
@@ -645,6 +645,7 @@ export function getHomepageHtml(): string {
             <div class="text-xs font-bold text-purple-700 uppercase">Solo Pro</div>
             <h3 class="font-black text-lg text-purple-900">Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo)</h3>
             <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.SILVER.features.join(', ')} (${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr).</p>
+            <p class="text-[11px] font-bold text-emerald-900 mt-2">${FEE_MATH_STATEMENT}</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
             <div class="text-[10px] font-black uppercase text-amber-800">MOST POPULAR</div>
@@ -658,7 +659,7 @@ export function getHomepageHtml(): string {
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 text-xs text-purple-950 space-y-1">
-          <div><strong>7-Day Free Platinum Trial:</strong> Free signup automatically activates 7 days of full Platinum features. No credit card required. Returns to Free on day 7.</div>
+          <div><strong>7-Day Free Platinum Trial:</strong> ${TRIAL_TERMS_EXACT}</div>
           <div><strong>14-Day Refund Guarantee:</strong> 100% money-back guarantee on all paid plans. Contact <a href="mailto:csmappholdings@gmail.com" class="text-purple-700 underline font-semibold">csmappholdings@gmail.com</a>.</div>
         </div>
       </section>
@@ -669,7 +670,7 @@ export function getHomepageHtml(): string {
         <div class="space-y-3">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900 text-sm">How does the 7-day free trial work?</h3>
-            <p class="text-xs text-slate-600 mt-1">Creating a free account immediately grants full Platinum access for 7 days without requiring a payment method. At day 7, your account automatically returns to the Free plan with all saved lists intact.</p>
+            <p class="text-xs text-slate-600 mt-1">${TRIAL_TERMS_EXACT} All your saved trips and packing lists stay intact.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900 text-sm">Are baggage fees guaranteed?</h3>

@@ -9,7 +9,7 @@ import {
   getHomepageHtml,
   getRequirementsHubHtml
 } from './serverGuidesHtml';
-import { PLAN_DEFINITIONS } from '../data/planEntitlements';
+import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT, FEE_MATH_YEARLY_FRAME } from '../data/planEntitlements';
 
 export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bodyHtml: string } | null {
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
@@ -243,7 +243,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
         <h3 class="text-xl font-bold text-slate-900">2. Plans, Billing & 7-Day Free Platinum Trial</h3>
-        <p class="text-xs text-slate-600">GateReady offers: Free (${PLAN_DEFINITIONS.FREE.formattedMonthly}; ${PLAN_DEFINITIONS.FREE.features.join(', ').toLowerCase()}); Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo or ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr; ${PLAN_DEFINITIONS.SILVER.features.join(', ').toLowerCase()}); Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo or ${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr); Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo or ${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr). Free account signup auto-activates a 7-day full Platinum trial with no credit card required, which drops back to Free on day 7. All paid subscriptions are billed via Lemon Squeezy with a 14-day money-back guarantee.</p>
+        <p class="text-xs text-slate-600">GateReady offers: Free (${PLAN_DEFINITIONS.FREE.formattedMonthly}; ${PLAN_DEFINITIONS.FREE.features.join(', ').toLowerCase()}); Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo or ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr; ${PLAN_DEFINITIONS.SILVER.features.join(', ').toLowerCase()}); Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo or ${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr); Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo or ${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr). ${TRIAL_TERMS_EXACT} All paid subscriptions are billed via Lemon Squeezy with a 14-day money-back guarantee.</p>
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
         <h3 class="text-xl font-bold text-slate-900">3. Contact</h3>
@@ -273,11 +273,11 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <div class="space-y-4 pt-3">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">How do the free account and 7-day Platinum trial work?</h3>
-            <p class="text-xs text-slate-600 mt-1">Creating a free account automatically activates a 7-day full Platinum trial. No credit card is required. You get immediate access to unlimited trips, bags, tare weight calibration, and terminal maps.</p>
+            <p class="text-xs text-slate-600 mt-1">${TRIAL_TERMS_EXACT} You get immediate access to unlimited trips, bags, tare weight calibration, and terminal maps.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">What happens at day 7?</h3>
-            <p class="text-xs text-slate-600 mt-1">Your account drops back to the Free plan ($0 forever). All your packing lists stay saved in your account. You will never be billed automatically without explicit checkout.</p>
+            <p class="text-xs text-slate-600 mt-1">${TRIAL_TERMS_EXACT} All your packing lists stay saved in your account. You will never be billed automatically without explicit checkout.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">Are baggage fees exact or estimates?</h3>
@@ -307,7 +307,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       <section class="space-y-6">
         <div class="space-y-2">
           <h2 class="text-2xl font-black text-slate-900 tracking-tight">Transparent Plans for Every Type of Traveler</h2>
-          <p class="text-slate-700 leading-relaxed">Start 100% free with no credit card required. Free account signup automatically unlocks a 7-day full Platinum trial.</p>
+          <p class="text-slate-700 leading-relaxed">Start 100% free with no credit card required. ${TRIAL_TERMS_EXACT}</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
@@ -319,6 +319,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             <h3 class="font-bold text-purple-900">Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo · ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr)</h3>
             <p class="text-[11px] font-semibold text-purple-700">${PLAN_DEFINITIONS.SILVER.tagline}</p>
             <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.SILVER.features.join(', ')}.</p>
+            <p class="text-[11px] font-bold text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-xl p-2 mt-2">${FEE_MATH_STATEMENT}</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
@@ -332,8 +333,13 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.PLATINUM.features.join(', ')}.</p>
           </div>
         </div>
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 space-y-1">
+          <div class="font-black uppercase tracking-wider text-[11px] text-emerald-700">Only travel once a year? Annual baggage insurance math</div>
+          <div class="font-bold text-sm text-slate-900">${FEE_MATH_STATEMENT}</div>
+          <div>${FEE_MATH_YEARLY_FRAME}</div>
+        </div>
         <div class="p-4 rounded-2xl bg-slate-100 text-xs text-slate-600 space-y-1">
-          <div><strong>7-Day Free Platinum Trial:</strong> Free signup includes 7 days full Platinum, no credit card required. Drops back to Free on day 7 with all trips safely preserved.</div>
+          <div><strong>7-Day Free Platinum Trial:</strong> ${TRIAL_TERMS_EXACT} All trips stay safely preserved.</div>
           <div><strong>14-Day Guarantee:</strong> 100% money-back guarantee on paid plans via Lemon Squeezy. Contact csmappholdings@gmail.com.</div>
         </div>
       </section>
@@ -381,7 +387,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       <section class="space-y-3 mt-3">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">Refund Policy & 14-Day Guarantee</h2>
         <p class="text-slate-700 leading-relaxed">All paid GateReady plans (Silver, Gold, Platinum) carry a full 14-day money-back guarantee. If unsatisfied, email <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a> with your email or Lemon Squeezy order number for a 100% refund processed in 3 to 5 business days.</p>
-        <p class="text-xs text-slate-600">Cancel renewals anytime via account settings. The 7-day Platinum trial on free signup never bills automatically.</p>
+        <p class="text-xs text-slate-600">Cancel renewals anytime via account settings. ${TRIAL_TERMS_EXACT} It will never bill automatically.</p>
       </section>
     `;
   } else if (pathname === '/changelog') {

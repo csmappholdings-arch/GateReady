@@ -4,7 +4,14 @@ import { useSubscription, BillingCycle, PaidTier } from '../context/Subscription
 import { useAuth } from '../context/AuthContext';
 import { openLemonCheckout, buildLemonCheckoutUrl } from '../lib/lemonSqueezy';
 import { trackEvent } from '../utils/analytics';
-import { PLAN_DEFINITIONS } from '../data/planEntitlements';
+import {
+  PLAN_DEFINITIONS,
+  TRIAL_CTA_LABEL,
+  TRIAL_SECONDARY_CTA_LABEL,
+  TRIAL_TERMS_EXACT,
+  FEE_MATH_STATEMENT,
+  FEE_MATH_YEARLY_FRAME
+} from '../data/planEntitlements';
 import { 
   Crown, 
   Check, 
@@ -18,7 +25,8 @@ import {
   Luggage,
   Cloud,
   CheckCircle2,
-  Gift
+  Gift,
+  ArrowRight
 } from 'lucide-react';
 
 export const SubscriptionModal: React.FC = () => {
@@ -26,32 +34,64 @@ export const SubscriptionModal: React.FC = () => {
     isPaywallOpen, 
     closePaywall, 
     upgradeToTier, 
-    paywallReason, 
-    tier, 
+    paywallReason,
+    paywallDefaultShowPlans,
+    tier,
+    isTrialExpired,
     applyLicenseKey 
   } = useSubscription();
   const { user } = useAuth();
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>('yearly');
   const [processingTier, setProcessingTier] = useState<PaidTier | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [showPlansGrid, setShowPlansGrid] = useState<boolean>(true);
+  const [trialUsedNotice, setTrialUsedNotice] = useState(false);
 
   const [showLicenseEntry, setShowLicenseEntry] = useState(false);
   const [licenseInput, setLicenseInput] = useState('');
   const [licenseError, setLicenseError] = useState('');
   const [licenseSuccessMsg, setLicenseSuccessMsg] = useState('');
 
-  // Re-initialize Lemon.js when paywall opens & track upgrade_page_viewed
   useEffect(() => {
     if (isPaywallOpen) {
+      setShowPlansGrid(tier !== 'FREE' || paywallDefaultShowPlans);
+      setTrialUsedNotice(false);
       trackEvent('upgrade_page_viewed', { reason: paywallReason || undefined, current_tier: tier });
       if (typeof window !== 'undefined' && window.createLemonSqueezy) {
         window.createLemonSqueezy();
       }
     }
-  }, [isPaywallOpen, paywallReason, tier]);
+  }, [isPaywallOpen, paywallReason, paywallDefaultShowPlans, tier]);
 
   if (!isPaywallOpen) return null;
   if (typeof document === 'undefined') return null;
+
+  const handleStartFreeTrial = () => {
+    trackEvent('registration_started', { origin: 'paywall_modal', reason: paywallReason || 'pricing' });
+    if (user && isTrialExpired) {
+      setTrialUsedNotice(true);
+      setShowPlansGrid(true);
+      setTimeout(() => {
+        document.getElementById('subscription-plans-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+      return;
+    }
+    closePaywall();
+    if (!user && typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('gateready:open-account-sync', {
+          detail: { mode: 'signup', origin: 'save_gate' }
+        })
+      );
+    }
+  };
+
+  const handleSeePlansClick = () => {
+    setShowPlansGrid(true);
+    setTimeout(() => {
+      document.getElementById('subscription-plans-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  };
 
   const handleChooseTier = (chosenTier: PaidTier) => {
     trackEvent('upgrade_button_clicked', { tier: chosenTier, billing_cycle: selectedCycle, source: 'modal' });
@@ -147,17 +187,86 @@ export const SubscriptionModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Scrollable Content: 4-Column Comparison Table */}
+        {/* Scrollable Content */}
         <div className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
-          {/* Paywall Context Reason (if triggered by a limit) */}
-          {paywallReason && (
+          {/* Primary Trial Unlock Card for Free Plan / Guests */}
+          {tier === 'FREE' && (
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-50 via-indigo-50 to-amber-50/70 dark:from-purple-950/60 dark:via-indigo-950/40 dark:to-slate-900 border-2 border-purple-300 dark:border-purple-700 shadow-md space-y-4">
+              {paywallReason && (
+                <div className="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/70 flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <Zap className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-black text-purple-950 dark:text-purple-100">
+                      Unlock Full Access Free for 7 Days
+                    </p>
+                    <p className="text-[11px] text-purple-900/85 dark:text-purple-200/85 mt-0.5 leading-snug">
+                      {paywallReason}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                      7-Day Full Platinum Trial
+                    </h4>
+                    <span className="text-[10px] font-bold bg-amber-400 text-purple-950 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      No Card Required
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
+                    {TRIAL_TERMS_EXACT}
+                  </p>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Unlocks every tier feature for 7 days — unlimited trips, unlimited bags, empty suitcase tare deduction, smart bag rebalance optimizer, terminal maps, emergency QR tags, printable PDF manifests, and companion sync.
+                  </p>
+                </div>
+              </div>
+
+              {trialUsedNotice && (
+                <div className="p-3 rounded-xl bg-amber-100/90 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-xs font-semibold text-amber-950 dark:text-amber-200">
+                  Your account&apos;s 7-day full Platinum trial has already been used. Pick a plan below (14-day money-back guarantee) to keep full access.
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={handleStartFreeTrial}
+                  className="flex-1 h-11 px-5 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-98 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition-all cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
+                  <span>{TRIAL_CTA_LABEL}</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSeePlansClick}
+                  className="h-11 px-5 rounded-xl border-2 border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 text-purple-900 dark:text-purple-100 font-bold text-xs sm:text-sm flex items-center justify-center transition-all cursor-pointer shrink-0"
+                >
+                  {TRIAL_SECONDARY_CTA_LABEL}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Contextual Reason Banner for Paid Users upgrading (e.g., Silver -> Gold) */}
+          {tier !== 'FREE' && paywallReason && (
             <div className="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/60 flex items-start gap-3">
               <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
                 <Zap className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold text-purple-950 dark:text-purple-200">
-                  Feature Upgrade Required
+                  Plan Upgrade Options
                 </p>
                 <p className="text-[11px] text-purple-800/80 dark:text-purple-300/80 mt-0.5 leading-snug">
                   {paywallReason}
@@ -166,43 +275,9 @@ export const SubscriptionModal: React.FC = () => {
             </div>
           )}
 
-          {/* Fix 7: 7-Day Platinum Trial Explanation */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-purple-950/40 border border-purple-200 dark:border-purple-800/80 shadow-xs">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex items-start gap-3 w-full">
-                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5 sm:mt-0">
-                  <Sparkles className="w-5 h-5 text-amber-300" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                      7-Day Full Platinum Trial
-                    </h4>
-                    <span className="text-[10px] font-bold bg-amber-400 text-purple-950 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      Free Account Bonus
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2.5 text-xs text-slate-600 dark:text-slate-300">
-                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
-                      <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">What it includes:</span>
-                      Full access to all Platinum features — unlimited bags, multiple travelers, terminal maps &amp; hub cabin intelligence, emergency QR luggage recovery tags, and printable PDF packing manifests.
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
-                      <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">How it activates:</span>
-                      Activates automatically when you create a free GateReady account. No credit card or payment method required upfront.
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
-                      <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">What happens at day 7:</span>
-                      When the 7 days end, your account automatically returns to the Free plan. No surprise charges, and your lists stay saved.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* 4-Column Grid: Free / Silver / Gold / Platinum */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-stretch">
+          {showPlansGrid && (
+          <div id="subscription-plans-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-stretch">
             {/* COLUMN 1: FREE */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-4 flex flex-col justify-between transition-all">
               <div>
@@ -287,8 +362,8 @@ export const SubscriptionModal: React.FC = () => {
                       Billed monthly · Cancel anytime
                     </p>
                   )}
-                  <div className="mt-1 px-2 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/60 text-[10px] text-purple-900 dark:text-purple-200 font-bold leading-tight">
-                    ~$0.38/trip · Less than 1/35th of one overweight bag fee
+                  <div className="mt-1 px-2 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/60 text-[10px] text-purple-900 dark:text-purple-200 font-bold leading-snug">
+                    {FEE_MATH_STATEMENT}
                   </div>
                 </div>
 
@@ -375,7 +450,7 @@ export const SubscriptionModal: React.FC = () => {
                     </p>
                   )}
                   <div className="mt-1.5 px-2.5 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 text-[10px] text-amber-950 dark:text-amber-200 font-extrabold leading-tight">
-                    ~$0.25 per family trip · Less than the cost of one overweight-bag fee per year
+                    Year-round protection for 2 travelers ($29.99/yr) — far below one $100–$150 airport overweight fee
                   </div>
                 </div>
 
@@ -460,8 +535,8 @@ export const SubscriptionModal: React.FC = () => {
                       Billed monthly · Cancel anytime
                     </p>
                   )}
-                  <div className="mt-1 px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-900/60 text-[10px] text-indigo-900 dark:text-indigo-200 font-bold leading-tight">
-                    ~$0.33/trip · Total group &amp; family travel peace of mind
+                  <div className="mt-1 px-2 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-900/60 text-[10px] text-indigo-900 dark:text-indigo-200 font-bold leading-tight">
+                    Year-round coverage for unlimited travelers ($39.99/yr) — well under one $100–$150 overweight fee
                   </div>
                 </div>
 
@@ -502,6 +577,7 @@ export const SubscriptionModal: React.FC = () => {
               </div>
             </div>
           </div>
+          )}
 
           {/* Payment Success state */}
           {paymentSuccess && (

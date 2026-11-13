@@ -53,12 +53,13 @@ import {
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
 import { deleteUserAccountAndData } from '../lib/firebase';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface HeaderProps {
   onOpenAddTrip: () => void;
   onOpenAddBag: () => void;
   onOpenTour?: () => void;
-  onOpenAccountSync?: () => void;
+  onOpenAccountSync?: (mode?: 'signin' | 'signup') => void;
   onOpenReferral?: () => void;
   onOpenDashboard?: () => void;
   onOpenNotifications?: () => void;
@@ -569,7 +570,7 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={() => {
                   setAccountSyncModalMode('signup');
-                  if (onOpenAccountSync) onOpenAccountSync();
+                  if (onOpenAccountSync) onOpenAccountSync('signup');
                   else setAccountSyncModalOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-fuchsia-600 to-purple-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-amber-300/50 cursor-pointer hover:brightness-110 active:scale-95 transition-all animate-pulse"
@@ -600,7 +601,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : !isPro ? (
             <button
               type="button"
-              onClick={() => openPaywall("Upgrade to Silver ($1.99/mo), Gold, or Platinum to unlock unlimited bags, active trips, and multi-traveler packing.")}
+              onClick={() => openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`)}
               className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
               title="Upgrade GateReady Plan"
             >
@@ -698,7 +699,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => {
                     setAccountSyncModalMode('signin');
                     if (onOpenAccountSync) {
-                      onOpenAccountSync();
+                      onOpenAccountSync('signin');
                     } else {
                       setAccountSyncModalOpen(true);
                     }
@@ -714,7 +715,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => {
                     setAccountSyncModalMode('signup');
                     if (onOpenAccountSync) {
-                      onOpenAccountSync();
+                      onOpenAccountSync('signup');
                     } else {
                       setAccountSyncModalOpen(true);
                     }
@@ -888,7 +889,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <button
                         onClick={() => {
                           setUserMenuOpen(false);
-                          openPaywall("Upgrade to Silver ($1.99/mo), Gold ($3.99/mo), or Platinum ($4.99/mo) to unlock unlimited bags and travelers.");
+                          openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Or compare Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo).`);
                         }}
                         className="w-full h-8 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:from-purple-700 cursor-pointer"
                       >
@@ -1016,7 +1017,7 @@ export const Header: React.FC<HeaderProps> = ({
                           setSettingsOpen(false);
                           setAccountSyncModalMode('signin');
                           if (onOpenAccountSync) {
-                            onOpenAccountSync();
+                            onOpenAccountSync('signin');
                           } else {
                             setAccountSyncModalOpen(true);
                           }
@@ -1675,7 +1676,7 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={() => {
                   setAccountSyncModalMode('signup');
-                  if (onOpenAccountSync) onOpenAccountSync();
+                  if (onOpenAccountSync) onOpenAccountSync('signup');
                   else setAccountSyncModalOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-amber-500 via-fuchsia-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/50 cursor-pointer min-h-[32px]"
@@ -2013,7 +2014,7 @@ export const Header: React.FC<HeaderProps> = ({
                         type="button"
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          openPaywall("Upgrade to unlock unlimited bags, active trips, and multi-traveler packing.");
+                          openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`);
                         }}
                         className="w-full h-8.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98 transition-all cursor-pointer"
                       >
@@ -2058,7 +2059,7 @@ export const Header: React.FC<HeaderProps> = ({
                         onClick={() => {
                           setMobileMenuOpen(false);
                           setAccountSyncModalMode('signin');
-                          if (onOpenAccountSync) onOpenAccountSync();
+                          if (onOpenAccountSync) onOpenAccountSync('signin');
                           else setAccountSyncModalOpen(true);
                         }}
                         className="h-8.5 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-purple-900 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
@@ -2070,7 +2071,7 @@ export const Header: React.FC<HeaderProps> = ({
                         onClick={() => {
                           setMobileMenuOpen(false);
                           setAccountSyncModalMode('signup');
-                          if (onOpenAccountSync) onOpenAccountSync();
+                          if (onOpenAccountSync) onOpenAccountSync('signup');
                           else setAccountSyncModalOpen(true);
                         }}
                         className="h-8.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 active:scale-98 text-purple-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"

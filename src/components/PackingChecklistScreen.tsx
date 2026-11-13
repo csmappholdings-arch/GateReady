@@ -43,6 +43,7 @@ import { RouteIntelBanner } from './RouteIntelBanner';
 import { DestinationWeatherAdvisor } from './DestinationWeatherAdvisor';
 import { EntryRequirementsCard } from './EntryRequirementsCard';
 import { LuggageQrTagModal } from './LuggageQrTagModal';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface PackingChecklistScreenProps {
   trip: Trip;
@@ -339,7 +340,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
 
   const handleExportPDF = () => {
     if (!isPro) {
-      openPaywall("PDF Packing List Export is included with Silver, Gold, and Platinum plans. Upgrade to download beautifully organized PDF lists formatted by baggage and travelers.");
+      openPaywall(`PDF Packing List Export is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
     exportTripToPDF(trip, weightUnit);
@@ -432,12 +433,12 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                       <button
                         onClick={() => {
                           setPackerDropdownOpen(false);
-                          openPaywall("Free Plan allows 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for companions and family.");
+                          openPaywall(`Free plan allows 1 traveler. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Or see plans for Gold (2 travelers) or Platinum (unlimited).`);
                         }}
                         className="text-[10px] text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 hover:bg-amber-200 transition-colors cursor-pointer"
                       >
                         <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
-                        <span>1 Traveler Max (Upgrade)</span>
+                        <span>1 Traveler Max · Try Free</span>
                       </button>
                     ) : (
                       <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold flex items-center gap-1">
@@ -1148,7 +1149,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Silver, Gold, or Platinum to load pre-built frequent traveler packing kits and custom bag templates.");
+                  openPaywall(`Frequent traveler packing kits & custom templates are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
                   return;
                 }
                 setShowPresetsModal(true);
@@ -1166,7 +1167,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
             <button
               onClick={() => {
                 if (!isPro) {
-                  openPaywall("Upgrade to Silver, Gold, or Platinum to generate privacy-safe emergency luggage QR tags and recovery claim cards.");
+                  openPaywall(`Emergency luggage QR tags are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
                   return;
                 }
                 setShowLuggageQrModal(true);

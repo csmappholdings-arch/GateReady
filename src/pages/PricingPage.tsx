@@ -4,7 +4,7 @@ import { Check, Sparkles, Shield, ArrowRight, HelpCircle, Mail, Zap, Crown, X } 
 import { trackEvent } from '../utils/analytics';
 import { useAuthOptional } from '../context/AuthContext';
 import { openLemonCheckout } from '../lib/lemonSqueezy';
-import { PLAN_DEFINITIONS } from '../data/planEntitlements';
+import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT, FEE_MATH_YEARLY_FRAME } from '../data/planEntitlements';
 
 export const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -48,7 +48,7 @@ export const PricingPage: React.FC = () => {
           Transparent Plans for Every Type of Traveler
         </h1>
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
-          Start 100% free with no credit card required. Free account registration automatically unlocks an unrestricted <strong>7-day full Platinum trial</strong> with unlimited bags and tare weight deduction.
+          Start 100% free with no credit card required. {TRIAL_TERMS_EXACT}
         </p>
 
         {/* Monthly / Yearly Switch */}
@@ -145,6 +145,9 @@ export const PricingPage: React.FC = () => {
                 </div>
               ))}
             </div>
+            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold text-emerald-900 dark:text-emerald-200 leading-snug">
+              {FEE_MATH_STATEMENT}
+            </div>
           </div>
           <button
             type="button"
@@ -240,6 +243,28 @@ export const PricingPage: React.FC = () => {
             Choose Platinum
           </button>
         </div>
+      </section>
+
+      {/* Annual Insurance Fee Math Callout */}
+      <section className="rounded-3xl border border-emerald-200 dark:border-emerald-800/70 bg-emerald-50/80 dark:bg-emerald-950/30 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="text-[11px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+            Only travel once a year? Think of Silver as annual baggage insurance
+          </div>
+          <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+            {FEE_MATH_STATEMENT}
+          </p>
+          <p className="text-xs text-slate-600 dark:text-slate-300">
+            {FEE_MATH_YEARLY_FRAME}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => handlePaidCheckout('SILVER')}
+          className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs whitespace-nowrap shadow-sm transition-colors cursor-pointer shrink-0"
+        >
+          Get Silver ($19.99/yr)
+        </button>
       </section>
 
       {/* Feature Comparison Table */}
@@ -368,7 +393,7 @@ export const PricingPage: React.FC = () => {
           <div className="space-y-1">
             <div className="font-bold text-amber-900 dark:text-amber-200 text-xs">7-Day Full Platinum Trial</div>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Every free account registration automatically includes 7 full days of Platinum access with no credit card required. Drops back to the Free plan automatically on day 7, with your trips and packing lists safely preserved.
+              {TRIAL_TERMS_EXACT} All your trips and packing lists stay safely preserved.
             </p>
           </div>
         </div>

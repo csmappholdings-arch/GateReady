@@ -531,7 +531,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                       <div className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full w-[85%]" />
                     </div>
                     <p className="text-[10px] text-emerald-300 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Safe weight — 7.5 lbs headroom before steep fees for overweight baggage
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Safe weight — 7.5 lbs headroom before $100–$150 overweight baggage fees trigger
                     </p>
                   </div>
 

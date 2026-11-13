@@ -36,6 +36,7 @@ import { useAuth } from '../context/AuthContext';
 import { AccountSyncModal } from './AccountSyncModal';
 import { recordCapturedEmail } from '../lib/firebase';
 import { airlineLimits } from '../data/allowances';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface PrintPackingListModalProps {
   isOpen: boolean;
@@ -351,12 +352,12 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
             {!isPro ? (
               <button
                 type="button"
-                onClick={() => openPaywall("Unlock unwatermarked printable PDF packing manifests with Silver ($1.99/mo).")}
+                onClick={() => openPaywall(`Clean unwatermarked PDF packing manifests are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                 className="h-9 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition-all cursor-pointer border border-amber-300/40"
-                title="Unlock with Silver to print unwatermarked PDF"
+                title={TRIAL_TERMS_EXACT}
               >
                 <Crown className="w-4 h-4 fill-white" />
-                <span>Unlock with Silver ($1.99/mo)</span>
+                <span>{TRIAL_CTA_LABEL}</span>
               </button>
             ) : (
               <button
@@ -576,17 +577,17 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                   <span className="text-[10px] bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-extrabold px-1.5 py-0.2 rounded">SILVER FEATURE</span>
                 </p>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                  Upgrade to Silver ($1.99/mo) to unlock clean, unwatermarked PDF manifests and unwatermarked luggage tags.
+                  {TRIAL_TERMS_EXACT} Unlock clean, unwatermarked PDF manifests (Silver+).
                 </p>
               </div>
             </div>
             <button
               type="button"
-              onClick={() => openPaywall("Unlock unwatermarked printable PDF packing manifests with Silver ($1.99/mo).")}
+              onClick={() => openPaywall(`Clean unwatermarked PDF packing manifests are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
               className="w-full sm:w-auto h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 active:scale-95 transition-all cursor-pointer shrink-0"
             >
               <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-              <span>Unlock with Silver ($1.99/mo)</span>
+              <span>{TRIAL_CTA_LABEL}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -885,6 +886,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
           isOpen={showAccountModal}
           onClose={() => setShowAccountModal(false)}
           origin="save_gate"
+          initialMode="signup"
           initialEmail={emailInput}
         />
       )}

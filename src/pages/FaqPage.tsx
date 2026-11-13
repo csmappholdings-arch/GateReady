@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PageLayout } from './PageLayout';
 import { ChevronDown, HelpCircle, Sparkles, Scale, Droplets, ShieldCheck, Mail } from 'lucide-react';
+import { TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface FaqItem {
   question: string;
@@ -13,10 +14,10 @@ const FAQS: FaqItem[] = [
     answer: (
       <div className="space-y-2">
         <p>
-          GateReady is completely free to start. When you create a free account with your email, your account is <strong>automatically upgraded to a 7-day full Platinum trial</strong>.
+          GateReady is completely free to start. <strong>{TRIAL_TERMS_EXACT}</strong>
         </p>
         <p>
-          No credit card is required at any point during signup. While the trial is active, you get immediate access to unlimited trips, unlimited bags, suitcase tare deduction, smart bag rebalancing, terminal maps, and emergency QR luggage tags. Free starter access (1 active trip, 2 bags, 42+ airline allowance lookup, and personal cloud sync) remains yours forever.
+          While the 7-day trial is active, all tiers and features are unlocked: unlimited trips, unlimited bags, suitcase tare deduction, smart bag rebalancing, terminal maps, and emergency QR luggage tags. Free starter access (1 active trip, 2 bags, 42+ airline allowance lookup, and personal cloud sync) remains yours forever.
         </p>
       </div>
     )
@@ -26,10 +27,10 @@ const FAQS: FaqItem[] = [
     answer: (
       <div className="space-y-2">
         <p>
-          At the end of day 7, your account seamlessly drops back to the <strong>Free plan</strong> ($0 forever).
+          <strong>{TRIAL_TERMS_EXACT}</strong>
         </p>
         <p>
-          <strong>Your lists remain saved in your account.</strong> You are never automatically charged or billed. If you wish to continue using Platinum or Silver features, you can upgrade voluntarily via Lemon Squeezy; otherwise, your basic packing lists and Free tier access continue indefinitely.
+          <strong>Your lists remain saved in your account.</strong> You are never automatically charged or billed. If you wish to continue using Silver, Gold, or Platinum features, you can upgrade voluntarily via Lemon Squeezy; otherwise, your packing lists and Free tier access continue indefinitely.
         </p>
       </div>
     )

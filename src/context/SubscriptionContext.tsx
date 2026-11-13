@@ -59,7 +59,8 @@ interface SubscriptionContextType {
   isMasterKey: boolean;
   isPaywallOpen: boolean;
   paywallReason: string | null;
-  openPaywall: (reason?: string) => void;
+  paywallDefaultShowPlans: boolean;
+  openPaywall: (reason?: string, options?: { defaultShowPlans?: boolean }) => void;
   closePaywall: () => void;
   upgradeToTier: (tier: PaidTier, cycle: BillingCycle) => Promise<void>;
   upgradeToPro: (cycle: BillingCycle) => Promise<void>;
@@ -539,6 +540,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [paywallReason, setPaywallReason] = useState<string | null>(null);
+  const [paywallDefaultShowPlans, setPaywallDefaultShowPlans] = useState(false);
 
   // Sync subscription from Firestore when user signs in
   useEffect(() => {
@@ -658,14 +660,17 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [tier, billingCycle]);
 
-  const openPaywall = (reason?: string) => {
+  const openPaywall = (reason?: string, options?: { defaultShowPlans?: boolean }) => {
+    const showPlans = options?.defaultShowPlans ?? !reason;
     setPaywallReason(reason || null);
+    setPaywallDefaultShowPlans(showPlans);
     setIsPaywallOpen(true);
   };
 
   const closePaywall = () => {
     setIsPaywallOpen(false);
     setPaywallReason(null);
+    setPaywallDefaultShowPlans(false);
   };
 
   const upgradeToTier = async (newTier: PaidTier, cycle: BillingCycle) => {
@@ -910,7 +915,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (currentCount >= MAX_FREE_TRAVELERS) {
       return {
         allowed: false,
-        reason: 'Free plan allows only 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for multiple family members or kids.'
+        reason: 'Free plan allows 1 traveler. Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7 — or see plans for Gold (2 travelers) or Platinum (unlimited).'
       };
     }
     return { allowed: true };
@@ -938,7 +943,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (currentCount >= MAX_FREE_ACTIVE_TRIPS) {
       return {
         allowed: false,
-        reason: 'Free plan allows 1 active trip. Upgrade to Silver for 2 active trips, or Gold / Platinum for unlimited active trips.'
+        reason: 'Free plan includes 1 active trip. Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.'
       };
     }
     return { allowed: true };
@@ -956,7 +961,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (newBagType === 'CHECKED' && existingBags.some((b) => b.type === 'CHECKED')) {
       return {
         allowed: false,
-        reason: 'Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.'
+        reason: 'Free plan allows 1 Checked Bag per trip (up to 2 bags total). Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.'
       };
     }
 
@@ -965,8 +970,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return {
         allowed: false,
         reason: newBagType === 'CHECKED'
-          ? 'Free Plan allows only 1 Checked Bag per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.'
-          : 'Free Plan is limited to a maximum of 2 bags total. Upgrade to Silver ($1.99/mo), Gold, or Platinum to pack unlimited bags.'
+          ? 'Free plan allows 1 Checked Bag per trip (up to 2 bags total). Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.'
+          : 'Free plan includes up to 2 bags per trip. Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.'
       };
     }
 
@@ -980,7 +985,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
           : 'Checked Bag';
       return {
         allowed: false,
-        reason: `Free Plan allows only 1 ${bagLabel} per trip (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack unlimited bags.`
+        reason: `Free plan allows 1 ${bagLabel} per trip (up to 2 bags total). Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.`
       };
     }
 
@@ -1007,6 +1012,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isMasterKey,
         isPaywallOpen,
         paywallReason,
+        paywallDefaultShowPlans,
         openPaywall,
         closePaywall,
         upgradeToTier,

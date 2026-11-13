@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 import { usePacking } from '../context/PackingContext';
 import { useTravelWallet } from '../context/TravelWalletContext';
 import { calculateTravelReadinessScore } from '../utils/readinessScore';
@@ -391,12 +392,16 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                 onClick={() => {
                   trackEvent('premium_feature_clicked', { feature: 'plan_card_upgrade', target_tier: planLimits.nextUpgrade });
                   trackEvent('upgrade_button_clicked', { source: 'dashboard_plan_card' });
-                  openPaywall(`Upgrade to ${planLimits.nextUpgrade} for more active trips and companion luggage sharing.`);
+                  openPaywall(
+                    tier === 'FREE'
+                      ? `Free plan includes 1 active trip and 2 bags. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`
+                      : `Upgrade to ${planLimits.nextUpgrade} for more active trips and companion luggage sharing.`
+                  );
                 }}
                 className="h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/20 active:scale-95 transition-all cursor-pointer"
               >
                 <Crown className="w-3.5 h-3.5 text-amber-300" />
-                <span>Upgrade: {planLimits.nextUpgrade}</span>
+                <span>{tier === 'FREE' ? 'Try 7 days free' : `Upgrade: ${planLimits.nextUpgrade}`}</span>
               </button>
             ) : (
               <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-3 py-1.5 rounded-xl border border-indigo-200">

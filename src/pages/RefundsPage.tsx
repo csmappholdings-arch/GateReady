@@ -1,6 +1,7 @@
 import React from 'react';
 import { PageLayout } from './PageLayout';
 import { ShieldCheck, RefreshCw, Mail, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 export const RefundsPage: React.FC = () => {
   return (
@@ -83,7 +84,7 @@ export const RefundsPage: React.FC = () => {
           <span>7-Day Free Platinum Trial Reminder</span>
         </div>
         <p>
-          The 7-day Platinum trial automatically granted upon free account creation does not require a credit card. It will never charge you or convert into a paid subscription automatically.
+          {TRIAL_TERMS_EXACT} It will never charge you or convert into a paid subscription automatically.
         </p>
       </section>
     </PageLayout>

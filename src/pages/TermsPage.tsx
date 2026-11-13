@@ -1,7 +1,7 @@
 import React from 'react';
 import { PageLayout } from './PageLayout';
 import { ShieldCheck, Scale, CreditCard, RefreshCw, AlertCircle, Mail, Ban, Clock } from 'lucide-react';
-import { PLAN_DEFINITIONS } from '../data/planEntitlements';
+import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 export const TermsPage: React.FC = () => {
   return (
@@ -72,7 +72,7 @@ export const TermsPage: React.FC = () => {
 
         <div className="space-y-2 pt-2 text-xs">
           <p>
-            <strong>7-Day Free Platinum Trial:</strong> Free account creation automatically activates a 7-day full Platinum trial. No credit card is required. At the end of 7 days, your account seamlessly drops back to the Free plan. You will never be billed automatically.
+            <strong>7-Day Free Platinum Trial:</strong> {TRIAL_TERMS_EXACT} You will never be billed automatically.
           </p>
           <p>
             <strong>Merchant of Record & Payments:</strong> All payment transactions and subscriptions are securely processed by <strong>Lemon Squeezy</strong> as our Merchant of Record.

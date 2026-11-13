@@ -43,6 +43,7 @@ import {
 import { AirportCitySearchInput } from './AirportCitySearchInput';
 import { TerminalHubMapsAdvisor } from './TerminalHubMapsAdvisor';
 import { getDestinationSafetyIntel } from '../data/emergencyNumbers';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface TripPrepChecklistScreenProps {
   trip: Trip;
@@ -435,11 +436,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 type="button"
-                onClick={() => openPaywall("Upgrade to Silver, Gold, or Platinum to unlock full Trip Intel, Terminal Maps & Weather Forecaster.")}
+                onClick={() => openPaywall(`Full Trip Intel, Terminal Maps & Weather Forecaster are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                 className="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 transition-all"
               >
                 <Crown className="w-4 h-4 fill-purple-950" />
-                <span>Upgrade to Silver+ to Unlock Trip Intel</span>
+                <span>{TRIAL_CTA_LABEL}</span>
               </button>
             </div>
           </div>
@@ -950,10 +951,10 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </div>
             </div>
             <button
-              onClick={() => openPaywall("Unlock Destination Payment Intelligence & ATM FX Traps with Silver+.")}
+              onClick={() => openPaywall(`Destination Payment Intelligence & ATM FX Traps are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
               className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs"
             >
-              Upgrade
+              Try 7 days free
             </button>
           </div>
         ) : (
@@ -1043,10 +1044,10 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </p>
             </div>
             <button
-              onClick={() => openPaywall("Unlock Customs Exemption Radar with Silver+.")}
+              onClick={() => openPaywall(`Customs Exemption Radar is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
               className="h-8 px-3 rounded-xl bg-purple-600 text-white font-bold text-xs uppercase tracking-wider hover:bg-purple-700 cursor-pointer shrink-0"
             >
-              Unlock Tracker
+              Try 7 days free
             </button>
           </div>
         ) : (
@@ -1148,10 +1149,10 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </div>
             </div>
             <button
-              onClick={() => openPaywall(`Unlock ${isFlight ? 'Jet Lag & Circadian Rhythm' : isCar ? 'Driver Fatigue & Rest Stop' : 'Travel Rest & Fatigue'} Advisor with Silver+.`)}
+              onClick={() => openPaywall(`${isFlight ? 'Jet Lag & Circadian Rhythm' : isCar ? 'Driver Fatigue & Rest Stop' : 'Travel Rest & Fatigue'} Advisor is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
               className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-purple-950 font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-xs"
             >
-              Upgrade
+              Try 7 days free
             </button>
           </div>
         ) : (

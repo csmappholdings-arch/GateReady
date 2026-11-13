@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 import { Trip, Bag, LuggageTagInfo } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
+import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 import { 
   X, 
   QrCode, 
@@ -211,17 +212,17 @@ ${rewardOffered ? '★ REWARD OFFERED FOR SAFE RETURN' : ''}`;
                   <span className="text-[10px] bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-extrabold px-1.5 py-0.2 rounded">SILVER FEATURE</span>
                 </p>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                  Upgrade to Silver ($1.99/mo) to unlock high-resolution printable emergency QR luggage tags without watermarks.
+                  {TRIAL_TERMS_EXACT} Unlock high-resolution printable QR luggage tags without watermarks (Silver+).
                 </p>
               </div>
             </div>
             <button
               type="button"
-              onClick={() => openPaywall("Unlock printable emergency QR luggage tags with Silver ($1.99/mo).")}
+              onClick={() => openPaywall(`Unwatermarked printable emergency QR luggage tags are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
               className="w-full sm:w-auto h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 active:scale-95 transition-all cursor-pointer shrink-0"
             >
               <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-              <span>Unlock with Silver ($1.99/mo)</span>
+              <span>{TRIAL_CTA_LABEL}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -273,12 +274,12 @@ ${rewardOffered ? '★ REWARD OFFERED FOR SAFE RETURN' : ''}`;
                 {!isPro ? (
                   <button
                     type="button"
-                    onClick={() => openPaywall("Unlock printable emergency QR luggage tags with Silver ($1.99/mo).")}
+                    onClick={() => openPaywall(`Unwatermarked printable emergency QR luggage tags are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                     className="w-full h-10 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 cursor-pointer active:scale-95 transition-all"
-                    title="Unlock with Silver to download & print without watermarks"
+                    title={TRIAL_TERMS_EXACT}
                   >
                     <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                    <span>Unlock with Silver ($1.99/mo)</span>
+                    <span>{TRIAL_CTA_LABEL}</span>
                   </button>
                 ) : (
                   <>

@@ -4,6 +4,7 @@ import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { BagType, BagMaterial, Trip, getUserPresetWeightLbs, BAG_MATERIAL_PRESETS } from '../types/travel';
 import { X, Backpack, Briefcase, Luggage, User, Crown, AlertTriangle, Shield, Layers, Scale, Check } from 'lucide-react';
+import { TRIAL_CTA_LABEL, TRIAL_SECONDARY_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 
 interface AddBagDialogProps {
   isOpen: boolean;
@@ -53,7 +54,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
     e.preventDefault();
     if (!label.trim()) return;
 
-    // Check Free Plan limits: max 3 bags total & max 1 of each bag type
+    // Check Free Plan limits: max 2 bags total & max 1 of each bag type
     const bagCheck = canAddBag(trip.bags, bagType);
     if (!bagCheck.allowed) {
       onClose();
@@ -74,7 +75,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
     // If on Free plan and they already have this type, prompt paywall
     if (!isPro && trip.bags.some(b => b.type === type)) {
       onClose();
-      openPaywall(`You already have a ${type === 'PERSONAL' ? 'Personal Item' : type === 'CARRY_ON' ? 'Carry-On' : 'Checked Bag'}. The Free Plan allows 1 of each bag type (up to 2 bags total). Upgrade to Silver, Gold, or Platinum to pack multiple bags of the same type.`);
+      openPaywall(`You already have a ${type === 'PERSONAL' ? 'Personal Item' : type === 'CARRY_ON' ? 'Carry-On' : 'Checked Bag'}. Free plan allows 1 of each bag type (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
       return;
     }
 
@@ -108,7 +109,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
             </h3>
             {!isPro && (
               <span className="text-[10px] text-slate-400">
-                Free Plan: {trip.bags.length}/3 bags total
+                Free Plan: {trip.bags.length}/2 bags total
               </span>
             )}
           </div>
@@ -121,15 +122,46 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Plan limit warning banner if already at max */}
-          {!isPro && trip.bags.length >= 3 && (
-            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-xs flex items-start gap-2">
+          {/* Plan limit warning banner if already at max (2 bags on Free) */}
+          {!isPro && trip.bags.length >= 2 && (
+            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-xs flex items-start gap-2.5">
               <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-amber-900 dark:text-amber-200">Bag Limit Reached</p>
-                <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-0.5">
-                  Free plan is limited to 2 bags total. Adding more bags requires Silver, Gold, or Platinum.
-                </p>
+              <div className="space-y-2">
+                <div>
+                  <p className="font-bold text-amber-900 dark:text-amber-200">2-Bag Free Limit Reached</p>
+                  <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
+                    Free plan is limited to 2 bags total. {TRIAL_TERMS_EXACT}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      window.dispatchEvent(
+                        new CustomEvent('gateready:open-account-sync', {
+                          detail: { mode: 'signup', origin: 'bag_limit_banner' }
+                        })
+                      );
+                    }}
+                    className="h-8 px-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] cursor-pointer transition-colors"
+                  >
+                    {TRIAL_CTA_LABEL}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      openPaywall(
+                        `Free plan allows 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`,
+                        { defaultShowPlans: true }
+                      );
+                    }}
+                    className="h-8 px-3 rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-200 font-bold text-[11px] cursor-pointer hover:bg-amber-100/60 transition-colors"
+                  >
+                    {TRIAL_SECONDARY_CTA_LABEL}
+                  </button>
+                </div>
               </div>
             </div>
           )}
