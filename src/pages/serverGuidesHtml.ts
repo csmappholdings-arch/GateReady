@@ -1,6 +1,7 @@
 import { AIRLINE_GUIDES, AirlineGuideItem } from '../data/airlineGuidesData';
 import { getSplitBagUsdNotes } from '../data/baggageFeeData';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
+import { PLAN_DEFINITIONS } from '../data/planEntitlements';
 
 export function getAirlinePageHtml(guide: AirlineGuideItem): string {
   const isNoLimit = (guide.limits.carryOnWeightLimit || '').toLowerCase().includes('no');
@@ -637,23 +638,23 @@ export function getHomepageHtml(): string {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <div class="text-xs font-bold text-slate-500 uppercase">Starter</div>
-            <h3 class="font-black text-lg text-slate-900">Free ($0)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (max 1 checked), TSA liquids rule check.</p>
+            <h3 class="font-black text-lg text-slate-900">Free (${PLAN_DEFINITIONS.FREE.formattedMonthly})</h3>
+            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.FREE.features.join(', ')}.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <div class="text-xs font-bold text-purple-700 uppercase">Solo Pro</div>
-            <h3 class="font-black text-lg text-purple-900">Silver ($1.99/mo)</h3>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, suitcase tare deduction, smart rebalance optimizer, emergency QR tags, terminal maps, travel wallet, printable PDF manifests ($19.99/yr).</p>
+            <h3 class="font-black text-lg text-purple-900">Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo)</h3>
+            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.SILVER.features.join(', ')} (${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr).</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500">
             <div class="text-[10px] font-black uppercase text-amber-800">MOST POPULAR</div>
-            <h3 class="font-black text-lg text-slate-900">Gold ($3.99/mo)</h3>
-            <p class="text-xs text-slate-600 mt-1">2 travelers (couples & companions), unlimited active trips, unlimited bags & scales, companion real-time sync, everything in Silver included ($29.99/yr).</p>
+            <h3 class="font-black text-lg text-slate-900">Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo)</h3>
+            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.GOLD.features.join(', ')} (${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr).</p>
           </div>
           <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
             <div class="text-xs font-bold text-indigo-700 uppercase">Family & Frequent</div>
-            <h3 class="font-black text-lg text-indigo-900">Platinum ($4.99/mo)</h3>
-            <p class="text-xs text-slate-600 mt-1">Unlimited travelers & family, unlimited active trips, unlimited bags & scales, family sharing across devices, priority fee updates ($39.99/yr).</p>
+            <h3 class="font-black text-lg text-indigo-900">Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo)</h3>
+            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.PLATINUM.features.join(', ')} (${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr).</p>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 text-xs text-purple-950 space-y-1">

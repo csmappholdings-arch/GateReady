@@ -4,6 +4,7 @@ import { useSubscription, BillingCycle, PaidTier } from '../context/Subscription
 import { useAuth } from '../context/AuthContext';
 import { openLemonCheckout, buildLemonCheckoutUrl } from '../lib/lemonSqueezy';
 import { trackEvent } from '../utils/analytics';
+import { PLAN_DEFINITIONS } from '../data/planEntitlements';
 import { 
   Crown, 
   Check, 
@@ -184,7 +185,7 @@ export const SubscriptionModal: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2.5 text-xs text-slate-600 dark:text-slate-300">
                     <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
                       <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">What it includes:</span>
-                      Full access to all Platinum features — unlimited bags, multiple travelers, offline terminal maps, privacy QR luggage tags, and PDF exports.
+                      Full access to all Platinum features — unlimited bags, multiple travelers, terminal maps &amp; hub cabin intelligence, emergency QR luggage recovery tags, and printable PDF packing manifests.
                     </div>
                     <div className="p-2.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-purple-100 dark:border-purple-900/40">
                       <span className="font-bold text-purple-900 dark:text-purple-300 block mb-0.5">How it activates:</span>
@@ -230,34 +231,12 @@ export const SubscriptionModal: React.FC = () => {
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300"><strong>1</strong> traveler</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300"><strong>1</strong> active trip</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300"><strong>2</strong> bags total (max 1 checked)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Smart Luggage Scales</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">TSA 3-1-1 liquids checker</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Climate forecast</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Basic personal cloud sync</span>
-                  </div>
+                  {PLAN_DEFINITIONS.FREE.features.map((feat) => (
+                    <div key={feat} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      <span className="text-slate-700 dark:text-slate-300">{feat}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -314,46 +293,14 @@ export const SubscriptionModal: React.FC = () => {
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-800 dark:text-slate-200 font-semibold">1 traveler</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-800 dark:text-slate-200 font-semibold">2 active trips</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-800 dark:text-slate-200 font-semibold">Unlimited bags</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Suitcase tare weight deduction</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Smart bag rebalance optimizer</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Emergency QR luggage recovery tags</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Terminal maps &amp; cabin intel</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Travel wallet (loyalty &amp; PNR codes)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Printable PDF packing manifests</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Personal cloud sync (all your devices)</span>
-                  </div>
+                  {PLAN_DEFINITIONS.SILVER.features.map((feat, idx) => (
+                    <div key={feat} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                      <span className={idx < 3 ? 'text-slate-800 dark:text-slate-200 font-semibold' : 'text-slate-700 dark:text-slate-300'}>
+                        {feat}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -436,26 +383,14 @@ export const SubscriptionModal: React.FC = () => {
                   <p className="font-bold text-amber-600 dark:text-amber-400 text-[11px] uppercase tracking-wider">
                     Everything in Silver, plus:
                   </p>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">2 travelers (couples &amp; companions)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">Unlimited active trips</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">Companion real-time sync (2 travelers)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Unlimited bags &amp; luggage scales</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Everything in Silver included</span>
-                  </div>
+                  {PLAN_DEFINITIONS.GOLD.features.map((feat, idx) => (
+                    <div key={feat} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                      <span className={idx < 3 ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-slate-300'}>
+                        {feat}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -534,26 +469,14 @@ export const SubscriptionModal: React.FC = () => {
                   <p className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px] uppercase tracking-wider">
                     Everything in Gold, plus:
                   </p>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">Unlimited travelers</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-900 dark:text-white font-bold">Unlimited devices / family sharing</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Unlimited active trips</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Unlimited bags & scales</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                    <span className="text-slate-700 dark:text-slate-300">Unlimited group &amp; family cloud sync</span>
-                  </div>
+                  {PLAN_DEFINITIONS.PLATINUM.features.map((feat, idx) => (
+                    <div key={feat} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
+                      <span className={idx < 2 ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-slate-300'}>
+                        {feat}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 

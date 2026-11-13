@@ -28,6 +28,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
+import { PLAN_DEFINITIONS } from '../data/planEntitlements';
 
 interface LandingHeroProps {
   onOpenAddTrip: () => void;
@@ -906,29 +907,26 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-            <div className="text-xs font-black uppercase text-slate-500">Free Starter</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">$0</div>
+            <div className="text-xs font-black uppercase text-slate-500">{PLAN_DEFINITIONS.FREE.name}</div>
+            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.FREE.formattedMonthly}</div>
             <div className="text-xs text-slate-500">Forever · No Card Needed</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              <li>✓ 1 traveler & 1 active trip</li>
-              <li>✓ Up to 2 bags total (max 1 checked bag)</li>
-              <li>✓ 42+ airline allowance tables</li>
-              <li>✓ Personal cloud sync included</li>
+              {PLAN_DEFINITIONS.FREE.features.map((feat) => (
+                <li key={feat}>✓ {feat}</li>
+              ))}
             </ul>
           </div>
 
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-900 shadow-md space-y-3">
-            <div className="text-xs font-black uppercase text-purple-600">Silver</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">$1.99 <span className="text-xs text-slate-500">/mo</span></div>
-            <div className="text-xs text-slate-500">or $19.99 /year</div>
+            <div className="text-xs font-black uppercase text-purple-600">{PLAN_DEFINITIONS.SILVER.name}</div>
+            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.SILVER.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
+            <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.SILVER.formattedYearly} /year</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              <li>✓ 1 traveler &amp; 2 active trips</li>
-              <li>✓ <strong>Unlimited bags</strong></li>
-              <li>✓ Suitcase tare weight deduction</li>
-              <li>✓ Smart bag rebalance optimizer</li>
-              <li>✓ Emergency QR luggage recovery tags &amp; terminal maps</li>
-              <li>✓ Travel wallet (loyalty &amp; PNR codes)</li>
-              <li>✓ Printable PDF packing manifests</li>
+              {PLAN_DEFINITIONS.SILVER.features.map((feat, idx) => (
+                <li key={feat} className={idx === 2 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
+                  ✓ {feat}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -936,28 +934,28 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase">
               Popular
             </span>
-            <div className="text-xs font-black uppercase text-amber-600">Gold</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">$3.99 <span className="text-xs text-slate-500">/mo</span></div>
-            <div className="text-xs text-slate-500">or $29.99 /year</div>
+            <div className="text-xs font-black uppercase text-amber-600">{PLAN_DEFINITIONS.GOLD.name}</div>
+            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.GOLD.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
+            <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.GOLD.formattedYearly} /year</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-amber-200 dark:border-amber-900/60 text-slate-700 dark:text-slate-300">
-              <li>✓ <strong>2 travelers</strong> (couples)</li>
-              <li>✓ <strong>Unlimited active trips</strong></li>
-              <li>✓ Unlimited bags &amp; tare scales</li>
-              <li>✓ Companion real-time sync</li>
-              <li>✓ Everything in Silver included</li>
+              {PLAN_DEFINITIONS.GOLD.features.map((feat, idx) => (
+                <li key={feat} className={idx < 2 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
+                  ✓ {feat}
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-900 shadow-md space-y-3">
             <div className="text-xs font-black uppercase text-indigo-600">Platinum</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">$4.99 <span className="text-xs text-slate-500">/mo</span></div>
-            <div className="text-xs text-slate-500">or $39.99 /year</div>
+            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.PLATINUM.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
+            <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.PLATINUM.formattedYearly} /year</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              <li>✓ <strong>Unlimited travelers &amp; family</strong></li>
-              <li>✓ Unlimited active trips &amp; bags</li>
-              <li>✓ Family sharing across devices</li>
-              <li>✓ VIP fast support &amp; priority updates</li>
-              <li>✓ Everything in Gold included</li>
+              {PLAN_DEFINITIONS.PLATINUM.features.map((feat, idx) => (
+                <li key={feat} className={idx === 0 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
+                  ✓ {feat}
+                </li>
+              ))}
             </ul>
           </div>
         </div>

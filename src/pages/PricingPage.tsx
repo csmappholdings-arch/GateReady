@@ -4,6 +4,7 @@ import { Check, Sparkles, Shield, ArrowRight, HelpCircle, Mail, Zap, Crown, X } 
 import { trackEvent } from '../utils/analytics';
 import { useAuthOptional } from '../context/AuthContext';
 import { openLemonCheckout } from '../lib/lemonSqueezy';
+import { PLAN_DEFINITIONS } from '../data/planEntitlements';
 
 export const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -98,34 +99,12 @@ export const PricingPage: React.FC = () => {
               Ideal for occasional travelers exploring GateReady and organizing basic trip preparation.
             </p>
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span><strong>1</strong> traveler</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span><strong>1</strong> active trip</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span><strong>2</strong> bags max (1 checked + 1 carry-on)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Smart Luggage Scales</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>TSA 3-1-1 liquids checker</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>42-airline baggage allowance lookup</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Personal cloud sync (all your devices)</span>
-              </div>
+              {PLAN_DEFINITIONS.FREE.features.map((feat) => (
+                <div key={feat} className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>{feat}</span>
+                </div>
+              ))}
             </div>
           </div>
           <a
@@ -156,46 +135,15 @@ export const PricingPage: React.FC = () => {
               For solo flyers and business travelers who want unlimited bags, tare subtraction, and saved documents.
             </p>
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span><strong>1</strong> traveler</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span><strong>2</strong> active trips</span>
-              </div>
-              <div className="flex items-center gap-2 font-bold text-purple-950 dark:text-purple-200">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Unlimited bags</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Suitcase tare weight deduction</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Smart bag rebalance optimizer</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Emergency QR luggage recovery tags</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Terminal maps &amp; cabin intel</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Travel wallet &amp; documents</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Printable PDF packing manifests</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Personal cloud sync (all your devices)</span>
-              </div>
+              {PLAN_DEFINITIONS.SILVER.features.map((feat, idx) => (
+                <div
+                  key={feat}
+                  className={`flex items-center gap-2 ${idx === 2 ? 'font-bold text-purple-950 dark:text-purple-200' : ''}`}
+                >
+                  <Check className="w-4 h-4 text-purple-600 shrink-0" />
+                  <span>{feat}</span>
+                </div>
+              ))}
             </div>
           </div>
           <button
@@ -230,26 +178,15 @@ export const PricingPage: React.FC = () => {
               For couples and small families who want unlimited trips, multi-device companion sync, and complete baggage management.
             </p>
             <div className="pt-3 border-t border-amber-200 dark:border-amber-900/60 space-y-2 text-xs">
-              <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span><strong>2</strong> travelers</span>
-              </div>
-              <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span><strong>Unlimited</strong> active trips</span>
-              </div>
-              <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Unlimited bags &amp; luggage scales</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Companion real-time sync (2 travelers)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Everything in Silver included</span>
-              </div>
+              {PLAN_DEFINITIONS.GOLD.features.map((feat, idx) => (
+                <div
+                  key={feat}
+                  className={`flex items-center gap-2 ${idx < 3 ? 'font-bold text-slate-900 dark:text-white' : ''}`}
+                >
+                  <Check className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>{feat}</span>
+                </div>
+              ))}
             </div>
           </div>
           <button
@@ -280,34 +217,19 @@ export const PricingPage: React.FC = () => {
               For frequent flyers and large families who want the ultimate travel planning experience with priority updates and VIP support.
             </p>
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
-              <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span><strong>Unlimited</strong> travelers & kids</span>
-              </div>
-              <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span><strong>Unlimited</strong> active trips</span>
-              </div>
-              <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span>Unlimited bags & luggage scales</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span>Family sharing across unlimited devices</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span>Priority baggage fee update requests</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span>VIP fast support response</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span>Everything in Gold included</span>
-              </div>
+              {PLAN_DEFINITIONS.PLATINUM.features.map((feat, idx) => (
+                <div
+                  key={feat}
+                  className={`flex items-center gap-2 ${idx < 3 ? 'font-bold text-slate-900 dark:text-white' : ''}`}
+                >
+                  {idx < 3 ? (
+                    <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+                  ) : (
+                    <Check className="w-4 h-4 text-indigo-600 shrink-0" />
+                  )}
+                  <span>{feat}</span>
+                </div>
+              ))}
             </div>
           </div>
           <button
@@ -393,18 +315,18 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">Terminal Maps &amp; Cabin Intel</td>
-                <td className="p-4 text-slate-500">Basic Preview</td>
+                <td className="p-4 font-semibold">Terminal Maps &amp; Hub Cabin Intelligence</td>
+                <td className="p-4 text-slate-500">Locked / Preview</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Full Hub Intel</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Full Hub Intel</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Full Hub Intel</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">Travel Wallet &amp; PNR Storage</td>
-                <td className="p-4 text-slate-500">Local Browser Storage</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Cloud Synced</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Cloud Synced</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Cloud Synced</td>
+                <td className="p-4 font-semibold">Travel Wallet (Loyalty Numbers &amp; PNR Codes)</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
                 <td className="p-4 font-semibold">Printable PDF Packing Manifests</td>
@@ -414,11 +336,11 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Clean Unwatermarked</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">Emergency QR Luggage Recovery Tag</td>
+                <td className="p-4 font-semibold">Emergency QR Luggage Recovery Tags</td>
                 <td className="p-4 text-slate-500">Preview / Watermarked</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tag</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tag</td>
-                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tag</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tags</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tags</td>
+                <td className="p-4 text-emerald-600 font-bold">✓ Full Printable Tags</td>
               </tr>
               <tr>
                 <td className="p-4 font-semibold">Personal Cloud Sync (All Your Devices)</td>

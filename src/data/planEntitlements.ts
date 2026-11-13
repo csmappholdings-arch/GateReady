@@ -31,10 +31,10 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       '1 traveler',
       '1 active trip',
       '2 bags max (1 checked + 1 carry-on)',
-      'Smart Luggage Scales & weight meter',
-      'TSA 3-1-1 liquids volume audit',
-      '42+ global airline baggage allowance lookup',
-      'Personal cloud sync (all your personal devices)'
+      'Smart Luggage Scales',
+      'TSA 3-1-1 liquids checker',
+      '42-airline baggage allowance lookup',
+      'Personal cloud sync (all your devices)'
     ]
   },
   SILVER: {
@@ -55,8 +55,8 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       'Unlimited bags & scales',
       'Suitcase tare weight deduction',
       'Smart bag rebalance optimizer',
-      'Emergency QR luggage recovery tag',
-      'Terminal maps & cabin intel',
+      'Emergency QR luggage recovery tags',
+      'Terminal maps & hub cabin intelligence',
       'Travel wallet (loyalty numbers & PNR codes)',
       'Printable PDF packing manifests',
       'Personal cloud sync (all your devices)'
@@ -99,7 +99,7 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       'Unlimited travelers & family members',
       'Unlimited active trips',
       'Unlimited bags & luggage scales',
-      'Family group sharing across unlimited devices',
+      'Family sharing across unlimited devices',
       'Priority baggage fee update requests',
       'VIP fast support response',
       'Everything in Gold included'
