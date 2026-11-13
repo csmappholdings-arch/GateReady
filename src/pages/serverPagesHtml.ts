@@ -10,6 +10,7 @@ import {
   getRequirementsHubHtml
 } from './serverGuidesHtml';
 import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT, FEE_MATH_YEARLY_FRAME } from '../data/planEntitlements';
+import { OFFICIAL_SOCIAL_LINKS, FACEBOOK_SVG_ICON, INSTAGRAM_SVG_ICON } from '../data/socialLinks';
 
 export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bodyHtml: string } | null {
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
@@ -197,7 +198,17 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       <section class="space-y-3 pt-6 border-t border-slate-200">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">Who Makes GateReady</h2>
         <p class="text-slate-700">GateReady is developed and operated by <strong>CSM App Holdings</strong>.</p>
-        <p class="text-xs text-slate-600">Sole Support Contact: <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a></p>
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <div class="font-bold text-slate-900 text-xs">CSM App Holdings</div>
+            <div class="text-[11px] text-slate-600">Sole Support Contact: <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a></div>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <a href="${OFFICIAL_SOCIAL_LINKS.facebook}" target="_blank" rel="noopener noreferrer" aria-label="GateReady on Facebook" title="Follow GateReady on Facebook" class="w-8 h-8 rounded-xl border border-purple-200 bg-white text-slate-600 hover:text-purple-700 hover:border-purple-400 hover:bg-purple-50 inline-flex items-center justify-center transition-colors">${FACEBOOK_SVG_ICON}</a>
+            <a href="${OFFICIAL_SOCIAL_LINKS.instagram}" target="_blank" rel="noopener noreferrer" aria-label="GateReady on Instagram" title="Follow GateReady on Instagram" class="w-8 h-8 rounded-xl border border-purple-200 bg-white text-slate-600 hover:text-purple-700 hover:border-purple-400 hover:bg-purple-50 inline-flex items-center justify-center transition-colors">${INSTAGRAM_SVG_ICON}</a>
+            <a href="/contact" class="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5">Contact Team</a>
+          </div>
+        </div>
       </section>
     `;
   } else if (pathname === '/privacy') {
@@ -615,7 +626,13 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
         </div>
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 pt-4 border-t border-slate-800/80">
           <div>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</div>
-          <div>Sole official contact: <a href="mailto:csmappholdings@gmail.com" class="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></div>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <span>Sole official contact: <a href="mailto:csmappholdings@gmail.com" class="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></span>
+            <span class="inline-flex items-center gap-2">
+              <a href="${OFFICIAL_SOCIAL_LINKS.facebook}" target="_blank" rel="noopener noreferrer" aria-label="GateReady on Facebook" title="Follow GateReady on Facebook" class="w-8 h-8 rounded-xl border border-slate-700/80 bg-slate-800/70 text-slate-400 hover:text-purple-300 hover:border-purple-500/60 hover:bg-slate-800 inline-flex items-center justify-center transition-colors">${FACEBOOK_SVG_ICON}</a>
+              <a href="${OFFICIAL_SOCIAL_LINKS.instagram}" target="_blank" rel="noopener noreferrer" aria-label="GateReady on Instagram" title="Follow GateReady on Instagram" class="w-8 h-8 rounded-xl border border-slate-700/80 bg-slate-800/70 text-slate-400 hover:text-purple-300 hover:border-purple-500/60 hover:bg-slate-800 inline-flex items-center justify-center transition-colors">${INSTAGRAM_SVG_ICON}</a>
+            </span>
+          </div>
         </div>
       </div>
     </footer>

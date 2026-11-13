@@ -3,6 +3,7 @@ import {
   Gift, 
   Crown
 } from 'lucide-react';
+import { SocialLinks } from './SocialLinks';
 
 interface AppFooterProps {
   onOpenPricing?: () => void;
@@ -191,9 +192,12 @@ export const AppFooter: React.FC<AppFooterProps> = ({
         </div>
 
         {/* Bottom Copyright line: © CSM App Holdings */}
-        <div className="pt-2 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-900">
+        <div className="pt-3 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-900">
           <span>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</span>
-          <span>Sole official support contact: <a href="mailto:csmappholdings@gmail.com" className="text-purple-600 dark:text-purple-400 hover:underline">csmappholdings@gmail.com</a></span>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span>Sole official support contact: <a href="mailto:csmappholdings@gmail.com" className="text-purple-600 dark:text-purple-400 hover:underline">csmappholdings@gmail.com</a></span>
+            <SocialLinks variant="footer" />
+          </div>
         </div>
       </div>
     </footer>

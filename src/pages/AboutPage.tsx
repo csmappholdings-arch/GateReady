@@ -14,6 +14,7 @@ import {
   Building2,
   ArrowRightLeft
 } from 'lucide-react';
+import { SocialLinks } from '../components/SocialLinks';
 
 export const AboutPage: React.FC = () => {
   return (
@@ -144,13 +145,16 @@ export const AboutPage: React.FC = () => {
               <div className="text-[11px] text-slate-500">Sole Support Contact: csmappholdings@gmail.com</div>
             </div>
           </div>
-          <a
-            href="/contact"
-            className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5"
-          >
-            <Mail className="w-3.5 h-3.5" />
-            <span>Contact Team</span>
-          </a>
+          <div className="flex items-center gap-2.5">
+            <SocialLinks variant="card" />
+            <a
+              href="/contact"
+              className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>Contact Team</span>
+            </a>
+          </div>
         </div>
       </section>
     </PageLayout>

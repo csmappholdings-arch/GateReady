@@ -6,6 +6,7 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import { getPageHtmlContent } from './src/pages/serverPagesHtml';
 import { getAirlineGuideByAnySlug } from './src/data/airlineGuidesData';
+import { OFFICIAL_SAME_AS } from './src/data/socialLinks';
 
 dotenv.config();
 
@@ -353,18 +354,32 @@ async function startServer() {
           ];
 
       // Inject page-specific JSON-LD structured data for rich snippets
+      const isHomepage = meta.path === '/';
       const pageStructuredData = {
         '@context': 'https://schema.org',
-        '@type': meta.schemaType || 'WebPage',
+        '@type': isHomepage ? 'SoftwareApplication' : (meta.schemaType || 'WebPage'),
         'name': meta.title,
         'headline': meta.heading,
         'description': meta.description,
         'keywords': meta.keywords,
         'url': `https://gateready.ca${meta.path}`,
+        ...(isHomepage
+          ? {
+              'applicationCategory': 'TravelApplication',
+              'operatingSystem': 'All',
+              'sameAs': OFFICIAL_SAME_AS,
+              'offers': {
+                '@type': 'Offer',
+                'price': '0',
+                'priceCurrency': 'USD'
+              }
+            }
+          : {}),
         'publisher': {
           '@type': 'Organization',
           'name': 'CSM App Holdings',
           'url': 'https://gateready.ca',
+          'sameAs': OFFICIAL_SAME_AS,
           'contactPoint': {
             '@type': 'ContactPoint',
             'email': 'csmappholdings@gmail.com',

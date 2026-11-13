@@ -6,6 +6,7 @@ import {
 } from '../data/baggageFeeData';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { AIRLINE_GUIDES } from '../data/airlineGuidesData';
+import { SocialLinks } from '../components/SocialLinks';
 import { 
   Receipt, 
   Calculator, 
@@ -544,7 +545,10 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
             <div>© CSM App Holdings · GateReady (gateready.ca) · All rights reserved.</div>
-            <div>Sole official contact: <a href="mailto:csmappholdings@gmail.com" className="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></div>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <span>Sole official contact: <a href="mailto:csmappholdings@gmail.com" className="text-slate-400 hover:text-purple-300 underline">csmappholdings@gmail.com</a></span>
+              <SocialLinks variant="darkFooter" />
+            </div>
           </div>
         </div>
       </footer>

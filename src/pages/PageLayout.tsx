@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Plane, Luggage } from 'lucide-react';
 import { AppFooter } from '../components/AppFooter';
 import { STATIC_PAGES } from './pageMetadata';
+import { OFFICIAL_SAME_AS } from '../data/socialLinks';
 
 interface PageLayoutProps {
   pathname: string;
@@ -67,6 +68,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children }) =>
         '@type': 'Organization',
         'name': 'CSM App Holdings',
         'url': 'https://gateready.ca',
+        'sameAs': OFFICIAL_SAME_AS,
         'contactPoint': {
           '@type': 'ContactPoint',
           'email': 'csmappholdings@gmail.com',

@@ -29,28 +29,60 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "GateReady.ca",
-      "alternateName": "GateReady",
-      "url": "https://gateready.ca",
-      "applicationCategory": "TravelApplication",
-      "operatingSystem": "All",
-      "description": "Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home.",
-      "keywords": [
-        "airline baggage allowance",
-        "carry-on baggage restrictions",
-        "airline baggage fees",
-        "luggage weight calculator",
-        "carry-on size checker",
-        "travel packing checklist",
-        "checked baggage allowance",
-        "avoid overweight baggage fees"
-      ],
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://gateready.ca/#organization",
+          "name": "GateReady",
+          "legalName": "CSM App Holdings",
+          "url": "https://gateready.ca",
+          "email": "csmappholdings@gmail.com",
+          "logo": "https://gateready.ca/thumbnail.jpg",
+          "sameAs": [
+            "https://www.facebook.com/Gateready.ca",
+            "https://www.instagram.com/gateready.ca/",
+            "https://www.reddit.com/r/GateReady/"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "csmappholdings@gmail.com",
+            "contactType": "customer support"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://gateready.ca/#software",
+          "name": "GateReady.ca",
+          "alternateName": "GateReady",
+          "url": "https://gateready.ca",
+          "applicationCategory": "TravelApplication",
+          "operatingSystem": "All",
+          "description": "Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home.",
+          "keywords": [
+            "airline baggage allowance",
+            "carry-on baggage restrictions",
+            "airline baggage fees",
+            "luggage weight calculator",
+            "carry-on size checker",
+            "travel packing checklist",
+            "checked baggage allowance",
+            "avoid overweight baggage fees"
+          ],
+          "publisher": {
+            "@id": "https://gateready.ca/#organization"
+          },
+          "sameAs": [
+            "https://www.facebook.com/Gateready.ca",
+            "https://www.instagram.com/gateready.ca/",
+            "https://www.reddit.com/r/GateReady/"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        }
+      ]
     }
     </script>
     <link rel="icon" type="image/jpeg" href="/thumbnail.jpg" />
