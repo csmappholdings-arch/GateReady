@@ -2536,6 +2536,17 @@ export const Header: React.FC<HeaderProps> = ({
                           <RotateCcw className="w-4 h-4 text-slate-400 shrink-0" />
                           <span className="font-semibold">Uncheck All Items</span>
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTripToDeleteFromSettings(currentTrip);
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 transition-colors flex items-center gap-2 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 text-rose-500 shrink-0" />
+                          <span className="font-semibold">Delete Current Trip</span>
+                        </button>
                       </div>
                     )}
 

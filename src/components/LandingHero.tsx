@@ -128,7 +128,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               </span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
-              Plan your trip, check airline baggage limits, organize your luggage and know what to expect before you leave home.
+              Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home.
             </p>
             <p className="text-xs sm:text-sm font-semibold tracking-wide text-purple-600 dark:text-purple-400 uppercase">
               One simple travel companion. From packing to departure.
@@ -926,8 +926,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               <li>✓ <strong>Unlimited bags</strong></li>
               <li>✓ Suitcase tare weight deduction</li>
               <li>✓ Smart bag rebalance optimizer</li>
-              <li>✓ Emergency QR tags &amp; terminal maps</li>
-              <li>✓ Travel wallet &amp; PDF manifests</li>
+              <li>✓ Emergency QR luggage recovery tags &amp; terminal maps</li>
+              <li>✓ Travel wallet (loyalty &amp; PNR codes)</li>
+              <li>✓ Printable PDF packing manifests</li>
             </ul>
           </div>
 
@@ -952,10 +953,11 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <div className="text-3xl font-black text-slate-900 dark:text-white">$4.99 <span className="text-xs text-slate-500">/mo</span></div>
             <div className="text-xs text-slate-500">or $39.99 /year</div>
             <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              <li>✓ <strong>Unlimited travelers & family</strong></li>
-              <li>✓ Unlimited active trips & bags</li>
+              <li>✓ <strong>Unlimited travelers &amp; family</strong></li>
+              <li>✓ Unlimited active trips &amp; bags</li>
               <li>✓ Family sharing across devices</li>
-              <li>✓ VIP fast support & priority updates</li>
+              <li>✓ VIP fast support &amp; priority updates</li>
+              <li>✓ Everything in Gold included</li>
             </ul>
           </div>
         </div>

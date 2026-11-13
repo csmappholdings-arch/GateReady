@@ -147,7 +147,7 @@ export const HowItWorksPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <h3 className="font-black text-lg text-slate-900 dark:text-white">
-                Add Packed Items &amp; Monitor Baggage Weights with Live Packing Weight Meters
+                Live Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Add items using our pre-calibrated weight catalog or custom entries. Live Packing Weight Meters track cumulative bag weight against airline limits in real time. When adding toiletries to carry-ons, the TSA 3-1-1 liquids checker flags oversized bottles (&gt;3.4 oz) so you can repack them safely.

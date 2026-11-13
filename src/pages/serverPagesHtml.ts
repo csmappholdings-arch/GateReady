@@ -242,7 +242,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
         <h3 class="text-xl font-bold text-slate-900">2. Plans, Billing & 7-Day Free Platinum Trial</h3>
-        <p class="text-xs text-slate-600">GateReady offers: Free ($0; 1 traveler, 2 bags max, max 1 checked, 1 active trip); Silver ($1.99/mo or $19.99/yr); Gold ($3.99/mo or $29.99/yr); Platinum ($4.99/mo or $39.99/yr). Free account signup auto-activates a 7-day full Platinum trial with no credit card required, which drops back to Free on day 7. All paid subscriptions are billed via Lemon Squeezy with a 14-day money-back guarantee.</p>
+        <p class="text-xs text-slate-600">GateReady offers: Free ($0; 1 traveler, 2 bags max, max 1 checked, 1 active trip, personal cloud sync); Silver ($1.99/mo or $19.99/yr); Gold ($3.99/mo or $29.99/yr); Platinum ($4.99/mo or $39.99/yr). Free account signup auto-activates a 7-day full Platinum trial with no credit card required, which drops back to Free on day 7. All paid subscriptions are billed via Lemon Squeezy with a 14-day money-back guarantee.</p>
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
         <h3 class="text-xl font-bold text-slate-900">3. Contact</h3>
@@ -312,12 +312,12 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
             <h3 class="font-bold text-slate-900">Free ($0)</h3>
             <p class="text-[11px] font-semibold text-slate-500">For people who want to explore GateReady and organize basic travel preparation.</p>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (1 checked + 1 carry-on), Smart Scales, TSA 3-1-1 liquids checker, 42-airline baggage allowance lookup.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 1 active trip, 2 bags max (1 checked + 1 carry-on), Smart Scales, TSA 3-1-1 liquids checker, 42-airline baggage allowance lookup, personal cloud sync.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
             <h3 class="font-bold text-purple-900">Silver ($1.99/mo · $19.99/yr)</h3>
             <p class="text-[11px] font-semibold text-purple-700">For individual travellers who want more luggage management and saved travel functionality.</p>
-            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, smart rebalance optimizer, emergency QR luggage tags, terminal maps, travel wallet, printable PDF manifests.</p>
+            <p class="text-xs text-slate-600 mt-1">1 traveler, 2 active trips, unlimited bags, empty suitcase tare deduction, smart rebalance optimizer, emergency QR luggage recovery tags, terminal maps, travel wallet, printable PDF packing manifests, personal cloud sync.</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
@@ -328,7 +328,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2">
             <h3 class="font-bold text-indigo-900">Platinum ($4.99/mo · $39.99/yr)</h3>
             <p class="text-[11px] font-semibold text-indigo-700">For frequent travellers and families who want the complete GateReady experience.</p>
-            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited active trips, unlimited bags & scales, family sharing across devices, priority fee updates, VIP fast support.</p>
+            <p class="text-xs text-slate-600 mt-1">Unlimited travelers, unlimited active trips, unlimited bags & scales, family sharing across devices, priority fee updates, VIP fast support, everything in Gold included.</p>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-slate-100 text-xs text-slate-600 space-y-1">

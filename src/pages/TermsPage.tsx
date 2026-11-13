@@ -53,11 +53,11 @@ export const TermsPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
             <div className="font-bold text-slate-900 dark:text-white">Free Plan ($0)</div>
-            <div className="text-xs text-slate-600 dark:text-slate-400">1 traveler, 2 bags total (max 1 checked), 1 active trip. No credit card required.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">1 traveler, 2 bags total (max 1 checked), 1 active trip, personal cloud sync. No credit card required.</div>
           </div>
           <div className="p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
             <div className="font-bold text-purple-900 dark:text-purple-200">Silver Plan ($1.99/mo or $19.99/yr)</div>
-            <div className="text-xs text-slate-600 dark:text-slate-400">1 traveler, 2 active trips, unlimited bags, tare deduction, rebalance optimizer, emergency QR tags, terminal maps, travel wallet, PDF manifests.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">1 traveler, 2 active trips, unlimited bags, tare deduction, rebalance optimizer, emergency QR tags, terminal maps, travel wallet, printable PDF packing manifests.</div>
           </div>
           <div className="p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
             <div className="font-bold text-purple-900 dark:text-purple-200">Gold Plan ($3.99/mo or $29.99/yr) — Most Popular</div>
@@ -65,7 +65,7 @@ export const TermsPage: React.FC = () => {
           </div>
           <div className="p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40">
             <div className="font-bold text-purple-900 dark:text-purple-200">Platinum Plan ($4.99/mo or $39.99/yr)</div>
-            <div className="text-xs text-slate-600 dark:text-slate-400">Unlimited travelers, unlimited active trips, unlimited bags &amp; scales, family sharing across devices, priority fee update requests.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">Unlimited travelers, unlimited active trips, unlimited bags &amp; scales, family sharing across devices, priority fee update requests, everything in Gold included.</div>
           </div>
         </div>
 

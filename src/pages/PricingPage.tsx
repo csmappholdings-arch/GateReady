@@ -190,7 +190,7 @@ export const PricingPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Printable PDF packing lists</span>
+                <span>Printable PDF packing manifests</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600 shrink-0" />
@@ -303,6 +303,10 @@ export const PricingPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-indigo-600 shrink-0" />
                 <span>VIP fast support response</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span>Everything in Gold included</span>
               </div>
             </div>
           </div>

@@ -58,7 +58,7 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       'Emergency QR luggage recovery tag',
       'Terminal maps & cabin intel',
       'Travel wallet (loyalty numbers & PNR codes)',
-      'Printable PDF packing lists',
+      'Printable PDF packing manifests',
       'Personal cloud sync (all your devices)'
     ]
   },
