@@ -355,13 +355,13 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
 
               {isTrialActive && (
                 <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  <span>⏳ 7-Day Platinum Trial · {trialTimeLeftText} left</span>
+                  <span>⏳ 7-Day Platinum Trial · {trialTimeLeftText}</span>
                 </span>
               )}
 
               {isReferralPlatinumActive && (
                 <span className="text-xs font-bold text-fuchsia-700 dark:text-fuchsia-300 bg-fuchsia-50 dark:bg-fuchsia-950/60 border border-fuchsia-200 dark:border-fuchsia-800 px-2.5 py-0.5 rounded-full">
-                  🎁 Referral Platinum · {referralTimeLeftText} left
+                  🎁 Referral Platinum · {referralTimeLeftText}
                 </span>
               )}
             </div>
@@ -490,7 +490,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                 Luggage Library & Tare Scales
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Subtract 6–9 lbs of empty hard-shell suitcase tare weight and calibrate your bags before packing.
+                Subtract empty suitcase tare weight (5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked) and calibrate your bags before packing.
               </p>
             </div>
             <div className="pt-2 flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 border-t border-slate-100 dark:border-slate-800">

@@ -17,7 +17,6 @@ import {
   ExternalLink, 
   ArrowRight,
   ShieldCheck,
-  Calendar,
   HelpCircle,
   Info
 } from 'lucide-react';
@@ -204,13 +203,9 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1 font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Verified: November 4, 2026</span>
-            </span>
             <span className="flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Published Carrier Fare Tables</span>
+              <span>Published Carrier Fare Tables · Always confirm at booking</span>
             </span>
           </div>
         </div>
@@ -435,7 +430,7 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
                 {/* Estimate Disclaimer with Last-Verified Date */}
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-1">
                   <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="leading-snug">Estimate from published airline fee tables, last verified November 4, 2026. Airlines change fees — confirm at booking.</span>
+                  <span className="leading-snug">Estimate from published airline fee tables. Airlines change fees — confirm at booking.</span>
                 </div>
               </div>
             )}

@@ -132,10 +132,6 @@ export const EntryRequirementsPage: React.FC = () => {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1 font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Verified: October 15, 2026</span>
-            </span>
             <span className="flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Direct Government Advisories (travel.gc.ca & travel.state.gov)</span>
@@ -163,10 +159,6 @@ export const EntryRequirementsPage: React.FC = () => {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-[10px] font-black uppercase tracking-wider text-purple-700">
                         Entry Requirements Quick-Check
-                      </span>
-                      <span className="text-slate-300">·</span>
-                      <span className="text-[10px] font-bold text-slate-500">
-                        Last verified October 15, 2026
                       </span>
                     </div>
                     <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-0.5">

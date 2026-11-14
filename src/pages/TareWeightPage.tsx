@@ -67,7 +67,7 @@ export const TareWeightPage: React.FC = () => {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Why your empty suitcase consumes up to 25% of your airline baggage allowance, and how accounting for tare weight stops surprise $100+ overweight surcharges.
+            Why your empty suitcase consumes up to 21% of a 50 lb checked allowance (or 32% of a 22 lb carry-on cap), and how accounting for tare weight stops surprise $100+ overweight surcharges.
           </p>
         </div>
       </section>
@@ -121,7 +121,7 @@ export const TareWeightPage: React.FC = () => {
             Average Tare Weights by Luggage Type & Material
           </h2>
           <p className="text-xs text-slate-600">
-            GateReady benchmarks empty weights across hundreds of production suitcases:
+            GateReady uses six standard material presets in its bag builder (and supports custom tare down to 0.1 lbs):
           </p>
 
           <div className="overflow-x-auto rounded-2xl border border-slate-200">
@@ -130,40 +130,46 @@ export const TareWeightPage: React.FC = () => {
                 <tr>
                   <th className="py-3 px-4">Luggage Category</th>
                   <th className="py-3 px-4">Shell Material</th>
-                  <th className="py-3 px-4">Average Empty Tare</th>
-                  <th className="py-3 px-4">% of 50 lb Limit Consumed</th>
+                  <th className="py-3 px-4">Preset Empty Tare</th>
+                  <th className="py-3 px-4">% of Airline Limit Consumed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 <tr>
                   <td className="py-3 px-4 font-bold text-slate-900">Personal Item Backpack (16–18")</td>
-                  <td className="py-3 px-4">Canvas / Lightweight Polyester</td>
-                  <td className="py-3 px-4 font-black text-purple-700">1.8 lbs (0.8 kg)</td>
-                  <td className="py-3 px-4 text-slate-500">N/A (under seat)</td>
+                  <td className="py-3 px-4">Soft Fabric / Polyester</td>
+                  <td className="py-3 px-4 font-black text-purple-700">1.5 lbs (0.7 kg)</td>
+                  <td className="py-3 px-4 text-slate-500">10% of 15-lb personal guide</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-bold text-slate-900">Personal Item Structured Case</td>
+                  <td className="py-3 px-4">Hard-Shell / Rigid Trim</td>
+                  <td className="py-3 px-4 font-black text-purple-700">3.0 lbs (1.4 kg)</td>
+                  <td className="py-3 px-4 text-slate-500">20% of 15-lb personal guide</td>
                 </tr>
                 <tr>
                   <td className="py-3 px-4 font-bold text-slate-900">Carry-On Roller (21–22")</td>
+                  <td className="py-3 px-4">Soft Fabric / Ballistic Nylon</td>
+                  <td className="py-3 px-4 font-black text-purple-700">5.5 lbs (2.5 kg)</td>
+                  <td className="py-3 px-4 text-slate-500">25% of 22-lb cabin cap</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-bold text-slate-900">Carry-On Spinner (21–22")</td>
                   <td className="py-3 px-4">Hard-Shell Polycarbonate / ABS</td>
                   <td className="py-3 px-4 font-black text-purple-700">7.0 lbs (3.2 kg)</td>
                   <td className="py-3 px-4 text-slate-500">32% of 22-lb cabin cap</td>
                 </tr>
                 <tr>
-                  <td className="py-3 px-4 font-bold text-slate-900">Carry-On Spinner (21–22")</td>
-                  <td className="py-3 px-4">Soft Ballistic Nylon</td>
-                  <td className="py-3 px-4 font-black text-purple-700">6.2 lbs (2.8 kg)</td>
-                  <td className="py-3 px-4 text-slate-500">28% of 22-lb cabin cap</td>
+                  <td className="py-3 px-4 font-bold text-slate-900">Checked Suitcase (Fabric)</td>
+                  <td className="py-3 px-4">Soft Fabric / Nylon</td>
+                  <td className="py-3 px-4 font-black text-purple-700">8.5 lbs (3.9 kg)</td>
+                  <td className="py-3 px-4 text-slate-500">17% of 50-lb allowance</td>
                 </tr>
                 <tr>
-                  <td className="py-3 px-4 font-bold text-slate-900">Checked Suitcase Medium (24–26")</td>
-                  <td className="py-3 px-4">Hard Polycarbonate / Composite</td>
-                  <td className="py-3 px-4 font-black text-purple-700">8.8 lbs (4.0 kg)</td>
-                  <td className="py-3 px-4 text-slate-500">17.6% of 50-lb allowance</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-bold text-slate-900">Large Checked Suitcase (28–30")</td>
-                  <td className="py-3 px-4">Rigid Aluminum or Heavy ABS</td>
-                  <td className="py-3 px-4 font-black text-rose-600">11.5–13.0 lbs (5.2–5.9 kg)</td>
-                  <td className="py-3 px-4 text-rose-600 font-bold">Up to 26% of allowance!</td>
+                  <td className="py-3 px-4 font-bold text-slate-900">Checked Suitcase (Hard-Shell)</td>
+                  <td className="py-3 px-4">Hard-Shell Polycarbonate / ABS</td>
+                  <td className="py-3 px-4 font-black text-rose-600">10.5 lbs (4.8 kg)</td>
+                  <td className="py-3 px-4 text-rose-600 font-bold">21% of 50-lb allowance</td>
                 </tr>
               </tbody>
             </table>
@@ -236,7 +242,7 @@ export const TareWeightPage: React.FC = () => {
                 Are soft-sided suitcases lighter than hard-shell suitcases?
               </h3>
               <p className="text-slate-600 leading-relaxed">
-                Generally yes. A soft-sided nylon or polyester carry-on weighs approximately 5.5 to 6.5 lbs, whereas hard polycarbonate or aluminum cases typically weigh 7.0 to 9.5 lbs empty.
+                Generally yes. In GateReady&apos;s presets, a soft fabric carry-on defaults to 5.5 lbs (2.5 kg) versus 7.0 lbs (3.2 kg) for hard-shell, and checked suitcases default to 8.5 lbs (3.9 kg) fabric versus 10.5 lbs (4.8 kg) hard-shell — plus you can enter a custom shell weight down to 0.1 lbs.
               </p>
             </div>
 

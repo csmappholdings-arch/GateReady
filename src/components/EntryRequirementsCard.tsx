@@ -168,7 +168,7 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
                 </span>
                 <span className="text-slate-300 dark:text-slate-700">·</span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                  Entry data last verified {entryData.lastVerified}
+                  Official Government Advisories
                 </span>
               </div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight mt-0.5">

@@ -88,7 +88,7 @@ export const RequirementsPage: React.FC = () => {
                   Baggage Fee Calculator
                 </h2>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">
-                  Verified November 4, 2026 · Real Carrier Fare Tables
+                  Real Carrier Fare Tables · Confirm at booking
                 </p>
               </div>
 
@@ -125,7 +125,7 @@ export const RequirementsPage: React.FC = () => {
                   Entry Requirements Quick-Check
                 </h2>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">
-                  Verified October 15, 2026 · Official Government Portals
+                  Official Government Portals · Reference summary
                 </p>
               </div>
 

@@ -16,7 +16,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
           <span class="text-2xl">${guide.flag}</span>
           <div>
             <div class="font-black text-slate-900 text-sm">${guide.name} Baggage Verification</div>
-            <div class="text-[11px] text-purple-700 font-semibold">${guide.countryLabel} · Verified ${guide.fees.lastVerified}</div>
+            <div class="text-[11px] text-purple-700 font-semibold">${guide.countryLabel} · Published Carrier Rules</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -201,11 +201,11 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
       <!-- Section 4: Data Integrity Disclaimer & Trust Standards -->
       <section class="p-5 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-700 space-y-2">
         <div class="flex items-center justify-between flex-wrap gap-2">
-          <strong class="text-slate-900 font-bold">GateReady Verification Standard</strong>
-          <span class="text-slate-600 font-bold">Last checked: ${guide.fees.lastVerified}</span>
+          <strong class="text-slate-900 font-bold">GateReady Policy Source Standard</strong>
+          <span class="text-slate-600 font-bold">Published carrier policy reference</span>
         </div>
         <p class="leading-relaxed">
-          Estimate from published airline fee tables, last verified ${guide.fees.lastVerified}. Airlines change fees and conditions frequently — always confirm at booking or on the carrier's official website.
+          Estimate from published airline fee tables. Airlines change fees and conditions frequently — always confirm at booking or on the carrier's official website.
         </p>
         <div class="pt-1 flex items-center justify-between flex-wrap gap-3">
           <a href="${guide.fees.officialBaggagePageUrl}" target="_blank" rel="noopener noreferrer" class="text-purple-700 hover:text-purple-900 font-bold underline">
@@ -403,7 +403,7 @@ export function getBaggageFeeCalculatorHtml(): string {
             </tbody>
           </table>
         </div>
-        <p class="text-[11px] text-slate-500">*UltraBasic fares on WestJet exclude carry-on bags. Estimate from published airline fee tables, last verified November 4, 2026. Airlines change fees — confirm at booking.</p>
+        <p class="text-[11px] text-slate-500">*UltraBasic fares on WestJet exclude carry-on bags. Estimate from published airline fee tables. Airlines change fees — confirm at booking.</p>
       </section>
 
       <section class="p-5 rounded-2xl bg-purple-600 text-white space-y-3">
@@ -448,40 +448,46 @@ export function getTareWeightHtml(): string {
               <tr>
                 <th class="py-3 px-4">Bag Type</th>
                 <th class="py-3 px-4">Material</th>
-                <th class="py-3 px-4">Average Tare Weight</th>
-                <th class="py-3 px-4">Impact on 50 lb Limit</th>
+                <th class="py-3 px-4">Preset Tare Weight</th>
+                <th class="py-3 px-4">Impact on Limit</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-700">
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900">Personal Item Backpack (16–18")</td>
-                <td class="py-3 px-4">Lightweight Fabric</td>
-                <td class="py-3 px-4 font-bold text-purple-700">1.8 lbs (0.8 kg)</td>
-                <td class="py-3 px-4 text-slate-500">Under seat storage</td>
+                <td class="py-3 px-4">Soft Fabric / Polyester</td>
+                <td class="py-3 px-4 font-bold text-purple-700">1.5 lbs (0.7 kg)</td>
+                <td class="py-3 px-4 text-slate-500">10% of 15-lb personal guide</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-bold text-slate-900">Personal Item Structured Case</td>
+                <td class="py-3 px-4">Hard-Shell / Rigid Trim</td>
+                <td class="py-3 px-4 font-bold text-purple-700">3.0 lbs (1.4 kg)</td>
+                <td class="py-3 px-4 text-slate-500">20% of 15-lb personal guide</td>
               </tr>
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900">Carry-On Roller (21–22")</td>
-                <td class="py-3 px-4">Polycarbonate Hard-Shell</td>
+                <td class="py-3 px-4">Soft Fabric / Ballistic Nylon</td>
+                <td class="py-3 px-4 font-bold text-purple-700">5.5 lbs (2.5 kg)</td>
+                <td class="py-3 px-4 text-slate-500">25% of 22-lb cabin cap</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-bold text-slate-900">Carry-On Spinner (21–22")</td>
+                <td class="py-3 px-4">Hard-Shell Polycarbonate / ABS</td>
                 <td class="py-3 px-4 font-bold text-purple-700">7.0 lbs (3.2 kg)</td>
-                <td class="py-3 px-4 text-slate-500">Consumes 32% of 22-lb limit</td>
+                <td class="py-3 px-4 text-slate-500">32% of 22-lb cabin cap</td>
               </tr>
               <tr>
-                <td class="py-3 px-4 font-bold text-slate-900">Carry-On Roller (21–22")</td>
-                <td class="py-3 px-4">Ballistic Soft Nylon</td>
-                <td class="py-3 px-4 font-bold text-purple-700">6.2 lbs (2.8 kg)</td>
-                <td class="py-3 px-4 text-slate-500">Consumes 28% of 22-lb limit</td>
+                <td class="py-3 px-4 font-bold text-slate-900">Checked Suitcase (Fabric)</td>
+                <td class="py-3 px-4">Soft Fabric / Nylon</td>
+                <td class="py-3 px-4 font-bold text-purple-700">8.5 lbs (3.9 kg)</td>
+                <td class="py-3 px-4 text-slate-500">17% of 50-lb allowance</td>
               </tr>
               <tr>
-                <td class="py-3 px-4 font-bold text-slate-900">Medium Checked Bag (24–26")</td>
-                <td class="py-3 px-4">Hard Polycarbonate</td>
-                <td class="py-3 px-4 font-bold text-purple-700">8.8 lbs (4.0 kg)</td>
-                <td class="py-3 px-4 text-slate-500">17.6% of 50-lb allowance</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900">Large Checked Suitcase (28–30")</td>
-                <td class="py-3 px-4">Heavy Hard Shell / Aluminum</td>
-                <td class="py-3 px-4 font-bold text-rose-600">11.5–13.0 lbs (5.2–5.9 kg)</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">Up to 26% of allowance!</td>
+                <td class="py-3 px-4 font-bold text-slate-900">Checked Suitcase (Hard-Shell)</td>
+                <td class="py-3 px-4">Hard-Shell Polycarbonate / ABS</td>
+                <td class="py-3 px-4 font-bold text-rose-600">10.5 lbs (4.8 kg)</td>
+                <td class="py-3 px-4 text-rose-600 font-bold">21% of 50-lb allowance</td>
               </tr>
             </tbody>
           </table>
@@ -507,7 +513,7 @@ export function getEntryRequirementsHtml(): string {
   return `
     <div class="space-y-6">
       <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs text-purple-950 leading-relaxed">
-        <strong>International Entry Verification Hub:</strong> Review passport validity standards, 6-month validity rules, electronic travel authorizations (ESTA, eTA), and direct links to official national travel advisory portals. Last verified October 15, 2026.
+        <strong>International Entry Reference Hub:</strong> Review passport validity standards, 6-month validity rules, electronic travel authorizations (ESTA, eTA), and direct links to official national travel advisory portals.
       </div>
 
       <section class="space-y-3">
@@ -614,7 +620,7 @@ export function getHomepageHtml(): string {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900 text-sm">Per-Bag Weight Meters with Tare Calibration</h3>
-            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (e.g., 7.2 lbs carry-on, 10.4 lbs checked roller) to track true airline scale totals.</p>
+            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (e.g., 5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked roller) to track true airline scale totals.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900 text-sm">TSA 3-1-1 Liquids Compliance Rule</h3>
@@ -678,7 +684,7 @@ export function getHomepageHtml(): string {
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900 text-sm">What is tare weight and why does it matter?</h3>
-            <p class="text-xs text-slate-600 mt-1">Tare weight is the weight of an empty suitcase. Hardcase checked luggage typically weighs 8 to 11 lbs empty, which consumes up to 22% of a standard 50-lb baggage allowance before a single item is packed.</p>
+            <p class="text-xs text-slate-600 mt-1">Tare weight is the weight of an empty suitcase. Checked suitcases default to 8.5 lbs fabric or 10.5 lbs hard-shell (consuming 21% of a standard 50-lb allowance), while carry-ons default to 5.5 lbs fabric or 7.0 lbs hard-shell.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900 text-sm">How does the TSA 3-1-1 checker work?</h3>
@@ -718,7 +724,7 @@ export function getRequirementsHubHtml(): string {
             <p class="text-xs text-slate-600 leading-relaxed">
               Calculate checked and carry-on luggage fees across 42 airlines, compare fare-family inclusions, and estimate total costs.
             </p>
-            <p class="text-[11px] text-slate-400">Verified November 4, 2026 · Real Carrier Fare Tables</p>
+            <p class="text-[11px] text-slate-400">Real Carrier Fare Tables · Confirm at booking</p>
           </div>
           <div class="pt-4 border-t border-purple-100">
             <a href="/baggage-fee-calculator" class="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">
@@ -737,7 +743,7 @@ export function getRequirementsHubHtml(): string {
             <p class="text-xs text-slate-600 leading-relaxed">
               Check passport validity rules, visa requirements, and official government advisories for Canadian and US passport holders.
             </p>
-            <p class="text-[11px] text-slate-400">Verified October 15, 2026 · Official Government Portals</p>
+            <p class="text-[11px] text-slate-400">Official Government Portals · Reference summary</p>
           </div>
           <div class="pt-4 border-t border-purple-100">
             <a href="/entry-requirements" class="w-full h-11 px-5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">

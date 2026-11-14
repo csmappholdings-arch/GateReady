@@ -920,7 +920,7 @@ export function calculateTripBaggageFees(
     }
   }
 
-  const disclaimer = `Estimate from published airline fee tables, last verified ${feeRecord.lastVerified}. Airlines change fees — confirm at booking.`;
+  const disclaimer = 'Estimate from published airline fee tables. Airlines change fees — confirm at booking.';
 
   return {
     hasFeeData: true,

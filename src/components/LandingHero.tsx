@@ -24,7 +24,6 @@ import {
   ChevronRight,
   Shield,
   HelpCircle,
-  Star,
   RefreshCw
 } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
@@ -84,7 +83,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
     },
     {
       q: 'How does empty suitcase tare deduction save money?',
-      a: 'Most travelers weigh their packed bags on a bathroom scale and forget that empty hard-shell suitcases alone weigh 6 to 9 lbs (2.7 to 4.1 kg). On a strict 50 lb (23 kg) airline limit, that is nearly 20% of your allowance! GateReady automatically subtracts your bag’s empty tare weight so you never face a $100–$150 airport overweight baggage fee.'
+      a: 'Most travelers weigh their packed bags on a bathroom scale and forget that empty suitcases alone weigh 5.5–7.0 lbs for carry-ons and 8.5–10.5 lbs for checked bags (1.5–3.0 lbs for personal items). On a strict 50 lb (23 kg) airline limit, a 10.5 lb hard-shell checked bag consumes 21% of your allowance before anything goes in! GateReady automatically subtracts your bag’s empty tare weight so you never face a $100–$150 airport overweight baggage fee.'
     },
     {
       q: 'How current is your airline baggage information?',
@@ -313,7 +312,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               Pack & Deduct Suitcase Tare
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Add your bags and items. GateReady subtracts empty suitcase tare (6–9 lbs), validates TSA 3-1-1 liquids, and warns you before you ever get close to airline weight limits.
+              Add your bags and items. GateReady subtracts empty suitcase tare (5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked), validates TSA 3-1-1 liquids, and warns you before you ever get close to airline weight limits.
             </p>
           </div>
 
@@ -524,15 +523,15 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                   <span>Suitcase Tare Weight Deduction</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  Deduct 6–9 lbs of Empty Suitcase Weight
+                  Deduct Empty Suitcase Tare Automatically
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Most travelers weigh their packed bags on a bathroom scale and forget that empty hard-shell suitcases alone weigh 6 to 9 lbs (2.7 to 4.1 kg). On a 50 lb airline limit, that is nearly 20% of your allowance! GateReady automatically calibrates your suitcase shell weight so you know your true packing capacity.
+                  Most travelers weigh their packed bags on a bathroom scale and forget that empty suitcases weigh 5.5–7.0 lbs (carry-on) or 8.5–10.5 lbs (checked). On a 50 lb airline limit, a 10.5 lb hard-shell checked suitcase consumes 21% of your allowance! GateReady calibrates your bag’s shell weight so you know your true packing capacity.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Calibrated presets for hard-shell, soft-side fabric, and ultralight luggage</span>
+                    <span>Calibrated presets: 1.5–3.0 lbs personal, 5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
@@ -548,19 +547,19 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               {/* Realistic Tare Preview Card */}
               <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs uppercase text-slate-500">Away The Large Spinner · Tare Preset</span>
+                  <span className="font-bold text-xs uppercase text-slate-500">Checked Suitcase · Tare Preset</span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Hard-Shell</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
                     <span className="text-slate-400 text-[10px] uppercase font-bold block">Empty Suitcase Shell:</span>
-                    <span className="text-base font-black text-purple-600">8.5 lbs</span>
+                    <span className="text-base font-black text-purple-600">10.5 lbs</span>
                     <span className="text-[10px] text-slate-500 block">Deducted automatically</span>
                   </div>
                   <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
                     <span className="text-slate-400 text-[10px] uppercase font-bold block">Packed Belongings:</span>
-                    <span className="text-base font-black text-slate-900 dark:text-white">34.3 lbs</span>
+                    <span className="text-base font-black text-slate-900 dark:text-white">32.3 lbs</span>
                     <span className="text-[10px] text-slate-500 block">Clothes, shoes &amp; toiletries</span>
                   </div>
                 </div>
@@ -802,23 +801,23 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               <span>Smart Tare Technology</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Empty Suitcases Aren’t Weightless: Deduct 6–9 lbs Automatically
+              Empty Suitcases Aren’t Weightless: Deduct 5.5–10.5 lbs Automatically
             </h2>
             <p className="text-sm sm:text-base text-purple-200 leading-relaxed">
-              When an airline says your bag limit is 50 lbs (23 kg), that includes the weight of your suitcase itself. A typical polycarbonate hard-shell spinner weighs 7.5 to 9.2 lbs before packing. GateReady factors in your suitcase's empty tare weight so you never get caught over the limit.
+              When an airline says your bag limit is 50 lbs (23 kg), that includes the weight of your suitcase itself. Standard rolling suitcase tare presets are 5.5–7.0 lbs for carry-ons and 8.5–10.5 lbs for checked suitcases (1.5–3.0 lbs for personal items). GateReady factors in your bag's empty tare weight so you never get caught over the limit.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
-              <div className="text-amber-300 font-black text-2xl">8.5 lbs</div>
-              <div className="text-xs font-bold text-white">Large Hard-Shell Spinner</div>
-              <p className="text-[11px] text-purple-200">Consumes 17% of your airline 50 lb checked allowance.</p>
+              <div className="text-amber-300 font-black text-2xl">10.5 lbs</div>
+              <div className="text-xs font-bold text-white">Hard-Shell Checked Suitcase</div>
+              <p className="text-[11px] text-purple-200">Consumes 21% of a 50 lb checked allowance (8.5 lbs for fabric checked bags).</p>
             </div>
             <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
-              <div className="text-emerald-300 font-black text-2xl">6.2 lbs</div>
-              <div className="text-xs font-bold text-white">Carry-On Roller</div>
-              <p className="text-[11px] text-purple-200">Consumes 28% of a 22 lb carry-on limit on airlines with weight caps.</p>
+              <div className="text-emerald-300 font-black text-2xl">7.0 lbs</div>
+              <div className="text-xs font-bold text-white">Hard-Shell Carry-On Roller</div>
+              <p className="text-[11px] text-purple-200">Consumes 32% of a 22 lb carry-on limit on capped airlines (5.5 lbs for fabric).</p>
             </div>
             <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
               <div className="text-fuchsia-300 font-black text-2xl">0 Surprise Fees</div>
@@ -975,66 +974,6 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         </div>
       </section>
 
-      {/* ================= SECTION 9: REALISTIC CUSTOMER TESTIMONIALS ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span>Traveler Experiences</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Trusted by Smart Flyers Across Canada & the US
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-            Real feedback from travelers who avoid airport chaos with GateReady.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-3">
-            <div className="flex items-center gap-1 text-amber-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400" />
-              ))}
-            </div>
-            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
-              "Saved me $100 in overweight luggage fees on our vacation to London. We balanced our bags between my suitcase and my son’s the night before. GateReady showed us we were 3 lbs over before we left the house."
-            </p>
-            <div className="pt-2 text-xs font-bold text-slate-900 dark:text-white">
-              David K. <span className="text-slate-400 font-normal">· Calgary, AB (Family Traveler)</span>
-            </div>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-3">
-            <div className="flex items-center gap-1 text-amber-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400" />
-              ))}
-            </div>
-            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
-              "The empty suitcase tare weight deduction is brilliant. My hard-shell spinner weighed 8.4 lbs before I put anything inside! Bathroom scales just don't give you that breakdown."
-            </p>
-            <div className="pt-2 text-xs font-bold text-slate-900 dark:text-white">
-              Sarah M. <span className="text-slate-400 font-normal">· Toronto, ON (Frequent Business Flyer)</span>
-            </div>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-3">
-            <div className="flex items-center gap-1 text-amber-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400" />
-              ))}
-            </div>
-            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
-              "Finally an app that flags United Basic Economy's roller bag ban. I would have been hit with a $60 gate-check fee if GateReady hadn't alerted me to pack a personal backpack instead."
-            </p>
-            <div className="pt-2 text-xs font-bold text-slate-900 dark:text-white">
-              Marcus T. <span className="text-slate-400 font-normal">· Chicago, IL (Weekend Getaway)</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ================= SECTION 10: FREQUENTLY ASKED QUESTIONS ================= */}
       <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
         <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
@@ -1084,7 +1023,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             Ready for a Stress-Free Flight?
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of travelers who pack with confidence and avoid unexpected baggage fees at the airport.
+            Start free with your first trip and check airline limits, suitcase tare weight, and TSA 3-1-1 rules before leaving home.
           </p>
         </div>
 

@@ -230,7 +230,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-left space-y-2.5 max-w-md mx-auto">
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Deduct 6–9 lbs of empty hard-shell suitcase weight</span>
+                  <span>Deduct empty suitcase tare weight (5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -468,7 +468,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     <span>Suitcase Tare Scales</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-snug">
-                    Automatically subtracts empty bag weight (6–9 lbs) from your allowance.
+                    Automatically subtracts empty bag weight (1.5–3.0 lbs personal, 5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked) from your allowance.
                   </p>
                 </div>
 

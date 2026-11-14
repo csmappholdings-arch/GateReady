@@ -465,7 +465,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
                   </li>
                   <li className="flex items-start gap-1.5">
                     <span className="text-amber-400 font-bold">·</span>
-                    <span>Suitcase tare weight averages 6–9 lbs of your 50 lbs limit.</span>
+                    <span>Empty suitcase tare averages 5.5–7.0 lbs for carry-ons and 8.5–10.5 lbs for checked bags.</span>
                   </li>
                   {airlineLimit.notes && (
                     <li className="flex items-start gap-1.5 text-slate-400 text-[11px]">
@@ -482,7 +482,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
             <div className="flex items-center justify-between flex-wrap gap-2 text-xs text-slate-400 px-2">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Verified {airlineRecord.lastVerified} · Published airline fee tables</span>
+                <span>Published airline fee tables · Always confirm at booking</span>
               </span>
               {airlineRecord.officialBaggagePageUrl && (
                 <a

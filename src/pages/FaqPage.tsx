@@ -113,7 +113,7 @@ const FAQS: FaqItem[] = [
     answer: (
       <div className="space-y-2">
         <p>
-          An empty carry-on suitcase typically weighs 6 to 9 lbs (2.7 to 4.1 kg), while an empty hard-shell checked suitcase often weighs 9 to 13 lbs (4.1 to 5.9 kg).
+          An empty carry-on suitcase defaults to 5.5 to 7.0 lbs (2.5 to 3.2 kg) in GateReady&apos;s fabric and hard-shell presets, while a checked suitcase defaults to 8.5 to 10.5 lbs (3.9 to 4.8 kg) empty and personal items run 1.5 to 3.0 lbs (0.7 to 1.4 kg).
         </p>
         <p>
           On carriers with strict weight limits (such as European and Asian airlines with 15.4 lb / 7 kg carry-on limits), the empty bag alone eats up <strong>40% to 50%</strong> of your total weight allowance before you pack a single shirt. GateReady factors in empty tare weight so your bag matches what airport ticket counter scales actually weigh.

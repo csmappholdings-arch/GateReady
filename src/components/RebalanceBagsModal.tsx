@@ -205,28 +205,30 @@ export const RebalanceBagsModal: React.FC<RebalanceBagsModalProps> = ({
                       </div>
                       <span
                         className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md shrink-0 ${
-                          isOver
-                            ? 'bg-rose-600 text-white'
-                            : isNear
-                              ? 'bg-amber-500 text-white'
-                              : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                          snap.hasNoLimit
+                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                            : isOver
+                              ? 'bg-rose-600 text-white'
+                              : isNear
+                                ? 'bg-amber-500 text-white'
+                                : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
                         }`}
                       >
-                        {isOver ? 'Over Limit' : isNear ? '85%+ Limit' : 'Within Limit'}
+                        {snap.hasNoLimit ? 'No Weight Limit' : isOver ? 'Over Limit' : isNear ? '85%+ Limit' : 'Within Limit'}
                       </span>
                     </div>
 
                     <div className="flex items-baseline justify-between text-[11px]">
                       <span className="font-black text-slate-800 dark:text-slate-200">
                         {formatWeight(snap.totalLbs)}
-                        {snap.limitLbs && (
+                        {!snap.hasNoLimit && snap.limitLbs && (
                           <span className="font-normal text-slate-500 dark:text-slate-400 ml-1">
                             / {formatWeight(snap.limitLbs)} max
                           </span>
                         )}
                         {snap.hasNoLimit && (
-                          <span className="font-normal text-slate-500 dark:text-slate-400 ml-1">
-                            (No limit)
+                          <span className="font-normal text-emerald-600 dark:text-emerald-400 ml-1">
+                            (No airline weight limit)
                           </span>
                         )}
                       </span>

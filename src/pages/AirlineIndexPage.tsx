@@ -8,7 +8,6 @@ import {
   ArrowRight, 
   Calculator, 
   ShieldCheck, 
-  Calendar,
   ExternalLink,
   ChevronRight
 } from 'lucide-react';
@@ -203,7 +202,7 @@ export const AirlineIndexPage: React.FC = () => {
               {/* Action Link */}
               <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                 <span className="text-[10px] text-slate-400">
-                  Verified: {item.fees.lastVerified}
+                  Published carrier rules
                 </span>
                 <a
                   href={item.canonicalPath}

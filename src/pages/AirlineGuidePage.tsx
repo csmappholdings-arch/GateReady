@@ -10,7 +10,6 @@ import {
   Briefcase, 
   AlertCircle, 
   CheckCircle2, 
-  Calendar, 
   Calculator, 
   ExternalLink, 
   ShieldCheck, 
@@ -122,13 +121,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1 font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Verified: {guide.fees.lastVerified}</span>
-            </span>
             <span className="flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Published Carrier Rules</span>
+              <span>Published Carrier Rules · Confirm at booking</span>
             </span>
           </div>
         </div>
@@ -447,7 +442,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
               <ShieldCheck className="w-4 h-4 text-purple-600" />
               <span>GateReady Data Integrity & Verification Standard</span>
             </span>
-            <span className="text-slate-600 font-bold">Last checked: {guide.fees.lastVerified}</span>
+            <span className="text-slate-600 font-bold">Published carrier policy reference</span>
           </div>
           <p className="leading-relaxed">
             All allowances, size sizer limits, and baggage fees shown above are compiled directly from published tables provided by {guide.name}. Airlines frequently adjust fee structures, seasonal baggage embargoes, and cabin tier allowances. You should always verify your specific itinerary baggage rules on the carrier's website before arriving at the airport.

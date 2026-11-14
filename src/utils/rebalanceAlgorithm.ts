@@ -1,6 +1,6 @@
-import { Trip, Bag, PackingItem, BagType, WeightUnit, getBagEmptyWeightLbs } from '../types/travel';
+import { Trip, Bag, PackingItem, BagType, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
-import { getCarrierCarryOnPolicy } from './bagWeightAnalysis';
+import { computeBagWeightStatus } from './bagWeightAnalysis';
 
 export interface BagWeightSnapshot {
   bagId: string;
@@ -144,34 +144,15 @@ export function getItemWeightLbs(item: PackingItem): number | null {
 }
 
 /**
- * Get effective weight cap for a bag on a trip.
+ * Get effective weight cap for a bag on a trip using the single source of truth (computeBagWeightStatus).
+ * Ensures carriers with no carry-on weight limit (e.g. Delta Air Lines, Air Canada) never get assigned an artificial limit.
  */
 export function getBagWeightCapLbs(bag: Bag, companyName: string | undefined, travelType: Trip['travelType']): { limitLbs: number | null; hasNoLimit: boolean } {
-  if (bag.maxWeightLimitLbs && bag.maxWeightLimitLbs > 0) {
-    return { limitLbs: bag.maxWeightLimitLbs, hasNoLimit: false };
-  }
-
-  const policy = getCarrierCarryOnPolicy(companyName, travelType);
-
-  if (travelType === 'PLANE') {
-    if (bag.type === 'CARRY_ON') {
-      if (policy.hasNoWeightLimit) return { limitLbs: null, hasNoLimit: true };
-      return { limitLbs: policy.limitLbs || 22, hasNoLimit: false };
-    }
-    if (bag.type === 'PERSONAL') {
-      // Standard personal item headroom warning limit: 15 lbs
-      return { limitLbs: 15, hasNoLimit: false };
-    }
-    if (bag.type === 'CHECKED') {
-      // Standard airline checked bag limit: 50 lbs
-      return { limitLbs: 50, hasNoLimit: false };
-    }
-  }
-
-  if (policy.hasNoWeightLimit) {
-    return { limitLbs: null, hasNoLimit: true };
-  }
-  return { limitLbs: policy.limitLbs || null, hasNoLimit: policy.hasNoWeightLimit };
+  const status = computeBagWeightStatus(bag, 'LBS', companyName, travelType || 'PLANE');
+  return {
+    limitLbs: status.limitLbs,
+    hasNoLimit: status.hasNoWeightLimit
+  };
 }
 
 export function calculateBagTotalWeightLbs(bag: Bag): number {
@@ -187,33 +168,23 @@ export function calculateBagTotalWeightLbs(bag: Bag): number {
 }
 
 /**
- * Compute snapshot for a bag.
+ * Compute snapshot for a bag using the shared computeBagWeightStatus analysis.
  */
 export function computeBagSnapshot(bag: Bag, companyName: string | undefined, travelType: Trip['travelType']): BagWeightSnapshot {
-  const emptyLbs = getBagEmptyWeightLbs(bag);
-  const itemsLbs = (bag.items || []).reduce((sum, item) => {
-    const w = getItemWeightLbs(item);
-    return sum + (w ?? 0);
-  }, 0);
-  const totalLbs = calculateBagTotalWeightLbs(bag);
-  const { limitLbs, hasNoLimit } = getBagWeightCapLbs(bag, companyName, travelType);
-
-  const isOverweight = limitLbs !== null && totalLbs > limitLbs;
-  const isNearLimit = limitLbs !== null && !isOverweight && totalLbs >= limitLbs * 0.85;
-  const headroomPct = limitLbs !== null && limitLbs > 0 ? (totalLbs / limitLbs) * 100 : 0;
+  const status = computeBagWeightStatus(bag, 'LBS', companyName, travelType || 'PLANE');
 
   return {
     bagId: bag.id,
     label: bag.label,
     type: bag.type,
-    emptyLbs,
-    itemsLbs,
-    totalLbs,
-    limitLbs,
-    hasNoLimit,
-    isOverweight,
-    isNearLimit,
-    headroomPct
+    emptyLbs: status.emptyLbs,
+    itemsLbs: status.itemsLbs,
+    totalLbs: status.displayedWeightLbs,
+    limitLbs: status.limitLbs,
+    hasNoLimit: status.hasNoWeightLimit,
+    isOverweight: status.isOverweight,
+    isNearLimit: status.isNearLimit,
+    headroomPct: status.pct
   };
 }
 

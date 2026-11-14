@@ -209,7 +209,7 @@ export const TarePresetsModal: React.FC<TarePresetsModalProps> = ({
           <div className="space-y-1">
             <p className="font-bold">Real-World Luggage Weight Fact:</p>
             <p className="text-[11px] text-purple-800 dark:text-purple-300 leading-relaxed">
-              Suitcases themselves weigh 5 to 11 lbs empty. Gate Ready incorporates your empty bag weight into the live airline scales so you never get surprised by airport check-in scales.
+              Default empty bag presets range from 1.5–3.0 lbs (personal items), 5.5–7.0 lbs (carry-ons), and 8.5–10.5 lbs (checked suitcases). GateReady incorporates your empty bag weight into live airline weight meters so you never get surprised at airport check-in scales.
             </p>
           </div>
         </div>

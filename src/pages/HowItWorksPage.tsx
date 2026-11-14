@@ -111,7 +111,7 @@ export const HowItWorksPage: React.FC = () => {
                 Add Luggage &amp; Calibrate Suitcase Tare Weight
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Add personal items, carry-on rollers, or checked suitcases. Select an empty suitcase tare preset (e.g. 8.5 lbs for large hard-shell spinners) or enter custom dimensions. GateReady deducts the empty shell weight automatically so you know your net capacity for clothes.
+                Add personal items (1.5–3.0 lbs), carry-on rollers (5.5–7.0 lbs), or checked suitcases (8.5–10.5 lbs). Select an empty suitcase tare preset (e.g. 10.5 lbs for a hard-shell checked bag) or enter custom dimensions. GateReady deducts the empty shell weight automatically so you know your net capacity for clothes.
               </p>
             </div>
           </div>
@@ -119,13 +119,13 @@ export const HowItWorksPage: React.FC = () => {
           {/* Step 3 UI Preview */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 max-w-xl mx-auto space-y-2.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-900 dark:text-white">Away The Large · Checked Bag</span>
+              <span className="font-bold text-slate-900 dark:text-white">Hard-Shell Checked Suitcase</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Polycarbonate Hard-Shell</span>
             </div>
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center">
                 <span className="text-[10px] text-slate-400 block">Empty Tare</span>
-                <span className="font-bold text-purple-600">8.5 lbs</span>
+                <span className="font-bold text-purple-600">10.5 lbs</span>
               </div>
               <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center">
                 <span className="text-[10px] text-slate-400 block">Dimensions</span>

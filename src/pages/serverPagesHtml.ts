@@ -92,10 +92,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     const meta: StaticPageMeta = {
       path: '/tare-weight',
       title: 'What is Tare Weight? Empty Suitcase Weight Guide – GateReady',
-      description: 'Learn what luggage tare weight is, why empty suitcases consume up to 25% of baggage allowances, and how GateReady stops overweight fees.',
+      description: 'Learn what luggage tare weight is, why empty suitcases consume up to 21% of checked baggage allowances (or 32% of carry-on caps), and how GateReady stops overweight fees.',
       keywords: 'what is tare weight, luggage tare weight, empty suitcase weight, baggage weight scale, overweight luggage fee prevention',
       heading: 'What is Tare Weight in Luggage & Travel?',
-      subheading: 'Why your empty suitcase consumes up to 25% of your airline baggage allowance.',
+      subheading: 'Why your empty suitcase consumes up to 21% of checked allowances (or 32% of carry-on caps).',
       schemaType: 'Article'
     };
 
@@ -370,7 +370,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">3. Add Luggage &amp; Calibrate Suitcase Tare Weight</h3>
-            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (typically 6 to 9 lbs) to ensure packed belongings remain strictly within airline allowances.</p>
+            <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (5.5–7.0 lbs for carry-ons, 8.5–10.5 lbs for checked suitcases, or 1.5–3.0 lbs for personal items) to ensure packed belongings remain strictly within airline allowances.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">4. Live Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit</h3>

@@ -45,7 +45,7 @@ import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT } from '../data/planEntitlements';
 import { SharePackingListModal } from './SharePackingListModal';
-import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
+import { getCarrierCarryOnPolicy, computeBagWeightStatus } from '../utils/bagWeightAnalysis';
 import { RebalanceBagsModal } from './RebalanceBagsModal';
 import { RebalanceUpgradeModal } from './RebalanceUpgradeModal';
 
@@ -108,58 +108,26 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     return getCarrierCarryOnPolicy(trip.companyName, trip.travelType);
   }, [trip.companyName, trip.travelType]);
 
-  // Overweight fee avoidance radar (incorporates empty luggage tare weight + packed items)
+  // Overweight fee avoidance radar (uses shared computeBagWeightStatus single source of truth)
   const bagWeightAnalysis = useMemo(() => {
     return (trip.bags || []).map((b) => {
-      const emptyLbs = getBagEmptyWeightLbs(b);
-      const itemsLbs = b.items.reduce(
-        (sum, item) => sum + (item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name)) * (item.quantity || 1),
-        0
-      );
-      const totalWeightLbs = emptyLbs + itemsLbs;
-      const displayedWeightNum = Number(totalWeightLbs.toFixed(1));
-      const formattedWeight = displayedWeightNum.toFixed(1);
-      const isCarryOn = b.type === 'CARRY_ON';
-      const hasNoLimit = isCar || (isCarryOn && carrierCarryOnPolicy.hasNoWeightLimit) || (!isFlight && b.type !== 'CHECKED');
-
-      const capLbs = isCar
-        ? 0
-        : b.type === 'CHECKED' 
-          ? 50 
-          : !isFlight
-            ? 50
-            : isCarryOn 
-              ? (carrierCarryOnPolicy.limitLbs ?? 22) 
-              : 15;
-
-      const rawPct = (capLbs > 0 && !hasNoLimit) ? (displayedWeightNum / capLbs) * 100 : 0;
-      const isOverweight = !hasNoLimit && displayedWeightNum > capLbs;
-      const isNearLimit = !hasNoLimit && displayedWeightNum >= capLbs * 0.85 && !isOverweight;
-
-      // Fix 3: Compute percentage FROM displayed weight so 21.9 / 22 = 99.5%, 22.5 / 22 = 102.3%
-      let formattedPct = '0%';
-      if (hasNoLimit) {
-        formattedPct = isCar ? 'No vehicle limit' : 'No limit';
-      } else {
-        formattedPct = `${rawPct.toFixed(1)}%`;
-      }
-
+      const status = computeBagWeightStatus(b, weightUnit, trip.companyName, trip.travelType);
       return {
         bag: b,
-        emptyLbs,
-        itemsLbs,
-        totalWeightLbs,
-        displayedWeightNum,
-        capLbs,
-        pct: rawPct,
-        formattedPct,
-        formattedWeight,
-        isOverweight,
-        isNearLimit,
-        hasNoLimit
+        emptyLbs: status.emptyLbs,
+        itemsLbs: status.itemsLbs,
+        totalWeightLbs: status.totalWeightLbs,
+        displayedWeightNum: status.displayedWeightLbs,
+        capLbs: status.limitLbs ?? 0,
+        pct: status.pct,
+        formattedPct: status.formattedPct,
+        formattedWeight: status.displayedWeightLbs.toFixed(1),
+        isOverweight: status.isOverweight,
+        isNearLimit: status.isNearLimit,
+        hasNoLimit: status.hasNoWeightLimit
       };
     });
-  }, [trip.bags, carrierCarryOnPolicy, isCar, isFlight]);
+  }, [trip.bags, weightUnit, trip.companyName, trip.travelType]);
 
   const overweightRiskBag = bagWeightAnalysis.find((b) => b.isOverweight || b.isNearLimit);
   const lightestBag = useMemo(() => {
@@ -205,27 +173,13 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
   };
 
   const getBagWeightCap = (bag: Bag): number => {
-    if (isCar) {
+    const status = computeBagWeightStatus(bag, weightUnit, trip.companyName, trip.travelType);
+    if (status.hasNoWeightLimit || status.limitLbs === null) {
       return 0;
     }
-    if (!isFlight) {
-      const capLbs = bag.maxWeightLimitLbs || 50;
-      return weightUnit === 'KG' ? Math.round(capLbs * 0.45359237) : capLbs;
-    }
-    if (bag.type === 'CARRY_ON' && carrierCarryOnPolicy.limitLbs) {
-      return weightUnit === 'KG'
-        ? Math.round(carrierCarryOnPolicy.limitLbs * 0.45359237)
-        : carrierCarryOnPolicy.limitLbs;
-    }
-    const standardCapLbs = bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15;
-    let rawLimitLbs = bag.maxWeightLimitLbs;
-    if (!rawLimitLbs || (bag.type !== 'CHECKED' && rawLimitLbs >= 40)) {
-      rawLimitLbs = standardCapLbs;
-    }
-    if (weightUnit === 'KG') {
-      return Math.round(rawLimitLbs * 0.45359237);
-    }
-    return rawLimitLbs;
+    return weightUnit === 'KG'
+      ? Math.round(status.limitLbs * 0.45359237)
+      : status.limitLbs;
   };
 
   const getNoLimitNote = () => {
@@ -325,14 +279,18 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
     ? DefaultSuggestions.convertLbsToKg(activeBagItemsWeightLbs)
     : activeBagItemsWeightLbs;
 
-  const activeBagHasNoWeightLimit = isCar || (activeBag?.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit) || (!isFlight && activeBag?.type !== 'CHECKED');
+  const activeBagStatus = useMemo(() => {
+    if (!activeBag) return null;
+    return computeBagWeightStatus(activeBag, weightUnit, trip.companyName, trip.travelType);
+  }, [activeBag, weightUnit, trip.companyName, trip.travelType]);
+
+  const activeBagHasNoWeightLimit = activeBagStatus ? activeBagStatus.hasNoWeightLimit : false;
   const activeWeightCap = activeBag ? getBagWeightCap(activeBag) : (weightUnit === 'KG' ? 10 : 22);
-  const isOverweight = !activeBagHasNoWeightLimit && activeDisplayWeight > activeWeightCap;
-  const isNearLimit = !activeBagHasNoWeightLimit && activeDisplayWeight > activeWeightCap * 0.85 && !isOverweight;
-  const rawWeightPct = activeWeightCap > 0 ? (activeDisplayWeight / activeWeightCap) * 100 : 0;
+  const isOverweight = activeBagStatus ? activeBagStatus.isOverweight : false;
+  const isNearLimit = activeBagStatus ? activeBagStatus.isNearLimit : false;
   const weightPct = activeBagHasNoWeightLimit
     ? Math.min((activeDisplayWeight / (weightUnit === 'KG' ? 18 : 40)) * 100, 100)
-    : Math.min(rawWeightPct, 150);
+    : Math.min(activeBagStatus ? activeBagStatus.pct : 0, 150);
 
   const handleQuickUpdateMaterial = (targetBag: Bag, newMat: BagMaterial) => {
     const targetTare = getUserPresetWeightLbs(targetBag.type, newMat);
@@ -608,8 +566,9 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
             const dispWeight = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(totalWeight) : totalWeight;
             const dispEmpty = weightUnit === 'KG' ? DefaultSuggestions.convertLbsToKg(emptyLbs) : emptyLbs;
             const limit = getBagWeightCap(bag);
-            const bagMat: BagMaterial = bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
-            const bagHasNoWeightLimit = isCar || (bag.type === 'CARRY_ON' && carrierCarryOnPolicy.hasNoWeightLimit) || (!isFlight && bag.type !== 'CHECKED');
+            const bagStatus = bagWeightAnalysis.find((s) => s.bag.id === bag.id);
+            const bagHasNoWeightLimit = bagStatus ? bagStatus.hasNoLimit : false;
+            const bagMat = bag.material || (bag.type === 'PERSONAL' ? 'FABRIC' : 'HARD_SHELL');
 
             return (
               <div

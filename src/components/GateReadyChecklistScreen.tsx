@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePacking } from '../context/PackingContext';
 import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
-import { computeTripWeightStatus, getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
+import { computeBagWeightStatus, computeTripWeightStatus, getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { airlineLimits } from '../data/allowances';
 import { 
@@ -298,38 +298,12 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
 
         <div className="space-y-3">
           {trip.bags.map((bag) => {
-            const emptyLbs = getBagEmptyWeightLbs(bag);
-            const itemsLbs = bag.items.reduce((sum, item) => {
-              const w = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
-              return sum + w * item.quantity;
-            }, 0);
-            const bagWeightLbs = emptyLbs + itemsLbs;
-
-            const displayBagWeight = weightUnit === 'KG'
-              ? DefaultSuggestions.convertLbsToKg(bagWeightLbs).toFixed(1) + ' kg'
-              : bagWeightLbs.toFixed(1) + ' lbs';
-
-            const carrierPolicy = getCarrierCarryOnPolicy(trip.companyName);
-            const hasNoWeightLimit = bag.type === 'CARRY_ON' && carrierPolicy.hasNoWeightLimit;
-            const displayedBagWeightLbs = Number(bagWeightLbs.toFixed(1));
-
-            const limitLbs = hasNoWeightLimit
-              ? null
-              : (bag.type === 'CARRY_ON'
-                  ? (carrierPolicy.limitLbs ?? 22)
-                  : (bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : 15)));
-
-            const displayLimit = limitLbs
-              ? (weightUnit === 'KG'
-                  ? DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0) + ' kg'
-                  : limitLbs + ' lbs')
-              : 'No airline limit';
-
-            const rawPct = (limitLbs && limitLbs > 0 && !hasNoWeightLimit)
-              ? (displayedBagWeightLbs / limitLbs) * 100
-              : 0;
-            const pct = Number(rawPct.toFixed(1));
-            const isBagOverweight = !hasNoWeightLimit && limitLbs !== null && displayedBagWeightLbs > limitLbs;
+            const weightStatus = computeBagWeightStatus(bag, weightUnit, trip.companyName, trip.travelType);
+            const displayBagWeight = weightStatus.displayTotalWeight;
+            const hasNoWeightLimit = weightStatus.hasNoWeightLimit;
+            const displayLimit = weightStatus.displayLimit;
+            const pct = weightStatus.pct;
+            const isBagOverweight = weightStatus.isOverweight;
 
             return (
               <div
@@ -398,7 +372,9 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                       <ChevronDown className="w-3.5 h-3.5" />
                     )}
                   </button>
-                  <span className="text-[11px] font-bold text-slate-400">{pct}% of limit</span>
+                  <span className="text-[11px] font-bold text-slate-400">
+                    {hasNoWeightLimit ? 'No weight limit' : `${pct}% of limit`}
+                  </span>
                 </div>
 
                 {/* Itemized List of Packed Items in this Bag */}

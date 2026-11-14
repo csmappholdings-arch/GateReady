@@ -56,7 +56,7 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = () =>
                 Baggage Fee Calculator
               </h3>
               <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5">
-                Verified November 4, 2026 · Real Carrier Fare Tables
+                Published Carrier Fare Tables
               </p>
             </div>
 
@@ -93,7 +93,7 @@ const LandingQuickCheckersComponent: React.FC<LandingQuickCheckersProps> = () =>
                 Entry Requirements Quick-Check
               </h3>
               <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5">
-                Verified October 15, 2026 · Official Government Portals
+                Official Government Portals
               </p>
             </div>
 

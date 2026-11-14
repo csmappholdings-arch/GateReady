@@ -6,6 +6,7 @@ import { DefaultSuggestions } from '../data/suggestions';
 import { DepartureCountdownCard } from './DepartureCountdownCard';
 import { exportTripToPDF } from '../utils/pdfExport';
 import { EditBagDialog } from './EditBagDialog';
+import { computeBagWeightStatus } from '../utils/bagWeightAnalysis';
 import { 
   Plus, 
   Trash2, 
@@ -219,26 +220,23 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
     : emptyTareLbs;
   const unitLabel = weightUnit === 'KG' ? 'kg' : 'lbs';
 
-  const typicalLimitLbs = useMemo(() => {
-    if (!currentBag) return 22;
-    if (currentBag.maxWeightLimitLbs) return currentBag.maxWeightLimitLbs;
-    switch (currentBag.type) {
-      case 'PERSONAL':
-        return 15;
-      case 'CARRY_ON':
-        return 22;
-      case 'CHECKED':
-        return 50;
-    }
-  }, [currentBag]);
+  const bagWeightStatus = useMemo(() => {
+    if (!currentBag) return null;
+    return computeBagWeightStatus(currentBag, weightUnit, trip.companyName, trip.travelType);
+  }, [currentBag, weightUnit, trip.companyName, trip.travelType]);
+
+  const hasNoWeightLimit = bagWeightStatus?.hasNoWeightLimit ?? false;
+  const typicalLimitLbs = bagWeightStatus?.limitLbs ?? 22;
 
   const typicalLimitDisplay = weightUnit === 'KG'
-    ? DefaultSuggestions.convertLbsToKg(typicalLimitLbs)
+    ? Math.round(DefaultSuggestions.convertLbsToKg(typicalLimitLbs))
     : typicalLimitLbs;
 
-  const weightPercentage = Math.min(Math.round((totalWeightLbs / typicalLimitLbs) * 100), 150);
-  const isOverweight = totalWeightLbs > typicalLimitLbs;
-  const isNearLimit = totalWeightLbs > typicalLimitLbs * 0.85 && !isOverweight;
+  const weightPercentage = hasNoWeightLimit
+    ? Math.min(Math.round((displayWeight / (weightUnit === 'KG' ? 18 : 40)) * 100), 100)
+    : Math.min(Math.round(bagWeightStatus?.pct ?? 0), 150);
+  const isOverweight = bagWeightStatus?.isOverweight ?? false;
+  const isNearLimit = bagWeightStatus?.isNearLimit ?? false;
 
   // Filtered items (search, packed status, and traveler filter)
   const filteredItems = useMemo(() => {
@@ -993,9 +991,15 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     <span className="text-xs font-bold text-slate-900 dark:text-white">
                       {displayWeight.toFixed(1)} {unitLabel}
                     </span>
-                    <span className="text-xs text-slate-400">
-                      / {typicalLimitDisplay.toFixed(0)} {unitLabel}
-                    </span>
+                    {hasNoWeightLimit ? (
+                      <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        (No airline weight limit)
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">
+                        / {typicalLimitDisplay.toFixed(0)} {unitLabel}
+                      </span>
+                    )}
                   </div>
                   <p className="text-[10px] text-slate-400 font-medium">
                     incl. {displayTare.toFixed(1)} {unitLabel} {(currentBag.material || 'HARD_SHELL') === 'FABRIC' ? 'fabric' : 'hard shell'} bag
@@ -1019,17 +1023,19 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
               <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all duration-300 ${
-                    isOverweight
-                      ? 'bg-rose-500'
-                      : isNearLimit
-                      ? 'bg-amber-500'
-                      : 'bg-purple-600'
+                    hasNoWeightLimit
+                      ? 'bg-purple-600'
+                      : isOverweight
+                        ? 'bg-rose-500'
+                        : isNearLimit
+                          ? 'bg-amber-500'
+                          : 'bg-purple-600'
                   }`}
                   style={{ width: `${Math.min(weightPercentage, 100)}%` }}
                 />
               </div>
 
-              {isOverweight && (
+              {!hasNoWeightLimit && isOverweight && (
                 <div className="flex items-center gap-1.5 mt-2 text-rose-600 dark:text-rose-400 text-xs font-semibold">
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                   <span>
@@ -1039,7 +1045,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
               )}
 
               {/* Souvenir Buffer Warning Bar */}
-              {weightPercentage >= 75 && !isOverweight && (
+              {!hasNoWeightLimit && weightPercentage >= 75 && !isOverweight && (
                 <div className="flex items-center justify-between p-3 mt-3 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/70 text-xs text-amber-950 dark:text-amber-200 animate-in fade-in">
                   <div className="flex items-center gap-2.5">
                     <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />

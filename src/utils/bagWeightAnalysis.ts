@@ -178,7 +178,8 @@ export function computeBagWeightStatus(
     limitLbs = bag.maxWeightLimitLbs || 50;
   } else {
     // Personal item default
-    limitLbs = isFlight ? (bag.maxWeightLimitLbs || 15) : (bag.maxWeightLimitLbs || 50);
+    const safePersonalMax = bag.maxWeightLimitLbs && bag.maxWeightLimitLbs < 40 ? bag.maxWeightLimitLbs : 15;
+    limitLbs = isFlight ? safePersonalMax : (bag.maxWeightLimitLbs || 50);
   }
 
   let pct = 0;
@@ -205,7 +206,7 @@ export function computeBagWeightStatus(
     overweightAmountLbs = isOverweight ? Math.max(0, displayedWeightLbs - limitLbs) : 0;
 
     displayLimit = weightUnit === 'KG'
-      ? `${DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0)} kg`
+      ? `${Math.round(DefaultSuggestions.convertLbsToKg(limitLbs))} kg`
       : `${limitLbs} lbs`;
   }
 

@@ -811,7 +811,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs space-y-1.5">
                       <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-200 text-[11px]">
                         <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-                        <span>Platinum trial · {trialTimeLeftText} left</span>
+                        <span>Platinum trial · {trialTimeLeftText}</span>
                       </div>
                       <p className="text-[10px] text-amber-800/90 dark:text-amber-300/90 leading-snug">
                         Returns to Free automatically on day 7. No card, no charge.
@@ -831,7 +831,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="p-2.5 rounded-xl bg-fuchsia-50/70 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800/80 text-xs space-y-1.5">
                       <div className="flex items-center gap-1.5 font-bold text-fuchsia-900 dark:text-fuchsia-200 text-[11px]">
                         <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
-                        <span>Referral Platinum · {referralTimeLeftText} left</span>
+                        <span>Referral Platinum · {referralTimeLeftText}</span>
                       </div>
                       <p className="text-[10px] text-fuchsia-800/90 dark:text-fuchsia-300/90 leading-snug">
                         1 Month Free Platinum unlocked via referral. No card, no charge.
