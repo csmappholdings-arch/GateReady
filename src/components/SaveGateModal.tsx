@@ -133,7 +133,7 @@ export const SaveGateModal: React.FC<SaveGateModalProps> = ({
               onClick={onDismiss}
               className="w-full h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
-              Keep editing
+              Maybe Later
             </button>
           </div>
         </div>

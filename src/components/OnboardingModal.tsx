@@ -223,7 +223,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   Pack Smart. Fly Prepared.
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  GateReady helps you organize your luggage, deduct empty suitcase tare weight, audit TSA 3-1-1 liquids, and check published baggage allowances across 42+ airlines before you leave home.
+                  GateReady helps you organize your luggage, deduct empty suitcase tare weight, audit TSA 3-1-1 liquids, and check published baggage allowances across 42 airlines before you leave home.
                 </p>
               </div>
 
@@ -234,7 +234,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Compare 42+ carrier fare families & overhead sizers</span>
+                  <span>Compare 42 carrier fare families &amp; overhead sizers</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -417,7 +417,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       Explore Free Tools
                     </h4>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug mt-0.5">
-                      Calculate checked baggage fees or browse 42+ airline sizer dimensions first.
+                      Calculate checked baggage fees or browse 42 airline sizer dimensions first.
                     </p>
                   </div>
                   <span className="text-xs font-bold text-slate-600 dark:text-slate-400 inline-flex items-center gap-1 pt-1">
@@ -455,7 +455,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 space-y-1">
                   <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
                     <Plane className="w-4 h-4 text-purple-600" />
-                    <span>42+ Airline Guides</span>
+                    <span>42 Airline Guides</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-snug">
                     Overhead bin sizers, weight caps, and baggage tariffs verified continuously.
@@ -478,7 +478,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     <span>Travel Wallet & PNRs</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-snug">
-                    Save reservation codes, frequent flyer accounts, and passport expiry alerts.
+                    Save reservation codes, frequent flyer accounts, and passport expiry warnings.
                   </p>
                 </div>
               </div>

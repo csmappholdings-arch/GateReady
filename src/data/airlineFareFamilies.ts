@@ -316,7 +316,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: '1st checked bag is $45 USD, 2nd bag is $55 USD (Rapid Rewards cardholders & A-List receive 1st bag free). Free overhead carry-on + personal item included.'
+      fareNote: '1st checked bag is $45 USD, 2nd bag is $55 USD (Rapid Rewards cardholders, A-List & active-duty military with ID receive checked-bag fee waivers). Free overhead carry-on + personal item included.'
     },
     {
       id: 'choice_extra',
@@ -326,7 +326,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 0,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Choice Extra (and A-List Preferred) include 2 free checked bags (Included) up to 50 lbs each + free carry-on + personal item.'
+      fareNote: 'Choice Extra (and A-List Preferred / active-duty military) include 2+ free checked bags (Included) up to 50 lbs each + free carry-on + personal item.'
     }
   ],
 
@@ -479,18 +479,18 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       isDefault: true,
       includedCheckedBags: 0,
       firstCheckedFee: 35,
-      secondCheckedFee: 50,
+      secondCheckedFee: 45,
       carryOnAllowed: false,
       carryOnFee: 35,
       carryOnRestrictionNotice: 'ULCC unbundled: Carry-on roller costs ~$35 USD. Only 1 personal item is free.',
-      fareNote: 'Allegiant Basic: Unbundled fees. Carry-on bag is ~$35 USD; 1st checked bag ~$35 USD online.'
+      fareNote: 'Allegiant Basic: Unbundled fees. Carry-on bag is ~$35 USD; 1st checked bag ~$35 USD, 2nd ~$45 USD online.'
     },
     {
       id: 'bundle',
       name: 'Bonus / Total Bundle',
       includedCheckedBags: 1,
       firstCheckedFee: 0,
-      secondCheckedFee: 50,
+      secondCheckedFee: 45,
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'Bonus and Total bundles include carry-on and 1 checked bag ($0).'
@@ -627,26 +627,26 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
 
   ryanair: [
     {
+      id: 'basic',
+      name: 'Basic Fare',
+      isDefault: true,
+      includedCheckedBags: 0,
+      firstCheckedFee: 25,
+      secondCheckedFee: 40,
+      carryOnAllowed: false,
+      carryOnFee: 15,
+      carryOnRestrictionNotice: 'Small personal bag ONLY (40 x 30 x 20 cm). Overhead wheelie bag requires Priority fee (€15–€25).',
+      fareNote: 'Ryanair Basic: 1 small personal item under seat only. Overhead carry-on wheelie bag starts at €15; 1st checked bag €25, 2nd €40.'
+    },
+    {
       id: 'regular',
       name: 'Regular / Priority & 2 Cabin Bags',
-      isDefault: true,
       includedCheckedBags: 0,
       firstCheckedFee: 25,
       secondCheckedFee: 40,
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'Priority & 2 Cabin Bags includes 1 small personal bag + 1 10 kg overhead wheelie bag. 1st checked bag (20 kg) is €25.'
-    },
-    {
-      id: 'basic',
-      name: 'Basic Fare',
-      includedCheckedBags: 0,
-      firstCheckedFee: 25,
-      secondCheckedFee: 40,
-      carryOnAllowed: false,
-      carryOnFee: 15,
-      carryOnRestrictionNotice: 'Small personal bag ONLY (40 x 30 x 20 cm). Overhead wheelie bag requires Priority fee (€12–€36).',
-      fareNote: 'Ryanair Basic: 1 small personal item under seat only. Overhead carry-on wheelie bag costs €12–€36; 20 kg checked bag €25.'
     },
     {
       id: 'plus',
@@ -936,33 +936,33 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
 
   wizzair: [
     {
-      id: 'priority',
-      name: 'WIZZ Priority / Plus',
+      id: 'basic',
+      name: 'Basic Fare',
       isDefault: true,
       includedCheckedBags: 0,
       firstCheckedFee: 25,
-      secondCheckedFee: 40,
-      carryOnAllowed: true,
-      carryOnFee: 0,
-      fareNote: 'WIZZ Priority includes 1 free carry-on trolley (55 x 40 x 23 cm) + personal item. 1st checked bag €25.'
+      secondCheckedFee: 45,
+      carryOnAllowed: false,
+      carryOnFee: 18,
+      carryOnRestrictionNotice: 'Small personal bag ONLY (40 x 30 x 20 cm). Overhead trolley bag requires Priority fee (€15–€25).',
+      fareNote: 'Wizz Basic: 1 free small personal bag under seat. Trolley carry-on starts around €18; checked bags €25 1st / €45 2nd.'
     },
     {
-      id: 'basic',
-      name: 'Basic Fare',
+      id: 'priority',
+      name: 'WIZZ Priority / Plus',
       includedCheckedBags: 0,
       firstCheckedFee: 25,
-      secondCheckedFee: 40,
-      carryOnAllowed: false,
-      carryOnFee: 20,
-      carryOnRestrictionNotice: 'Small personal bag ONLY (40 x 30 x 20 cm). Overhead trolley bag requires Priority fee (€15–€35).',
-      fareNote: 'Wizz Basic: 1 free small personal bag under seat. Trolley carry-on costs €15–€35; checked bag €25–€45.'
+      secondCheckedFee: 45,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: 'WIZZ Priority includes 1 free carry-on trolley (55 x 40 x 23 cm) + personal item. 1st checked bag €25, 2nd €45.'
     },
     {
       id: 'plus',
       name: 'WIZZ Smart / All-In',
       includedCheckedBags: 1,
       firstCheckedFee: 0,
-      secondCheckedFee: 40,
+      secondCheckedFee: 45,
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'Smart bundles include 1 trolley carry-on + 1 20 kg checked bag (Included).'
@@ -1161,14 +1161,24 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
   qantas: [
     {
       id: 'standard',
-      name: 'Economy Standard',
+      name: 'Economy Standard (Americas / Transpacific)',
       isDefault: true,
+      includedCheckedBags: 2,
+      firstCheckedFee: 0,
+      secondCheckedFee: 0,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: 'Transpacific flights to/from USA & Canada include 2 FREE checked bags (23 kg each) + 7 kg carry-on.'
+    },
+    {
+      id: 'domestic',
+      name: 'Domestic Australia / Trans-Tasman',
       includedCheckedBags: 1,
       firstCheckedFee: 0,
       secondCheckedFee: 70,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'International Americas routes include 1-2 free checked bags (23 kg each) (Included).'
+      fareNote: 'Domestic Australian & Trans-Tasman Economy includes 1 free checked bag (23 kg); 2nd bag ~$70 AUD.'
     },
     {
       id: 'business',
@@ -1399,11 +1409,15 @@ export function getAirlineFareFamilies(airlineKeyOrName: string): AirlineFareFam
     'sy': 'suncountry',
     'british airways': 'britishairways',
     'ba': 'britishairways',
+    'airfrance': 'airfrance_klm',
     'air france': 'airfrance_klm',
     'klm': 'airfrance_klm',
     'air france-klm': 'airfrance_klm',
+    'air france / klm': 'airfrance_klm',
     'af': 'airfrance_klm',
     'lufthansa': 'lufthansa',
+    'lufthansa group': 'lufthansa',
+    'lufthansa group (swiss / austrian)': 'lufthansa',
     'lh': 'lufthansa',
     'ryanair': 'ryanair',
     'fr': 'ryanair',
@@ -1419,10 +1433,13 @@ export function getAirlineFareFamilies(airlineKeyOrName: string): AirlineFareFam
     'scandinavian airlines (sas)': 'sas',
     'sk': 'sas',
     'virgin': 'virgin',
+    'virginatlantic': 'virgin',
     'virgin atlantic': 'virgin',
     'vs': 'virgin',
     'ita': 'ita',
+    'itaairways': 'ita',
     'ita airways': 'ita',
+    'ita airways (alitalia)': 'ita',
     'az': 'ita',
     'tap': 'tap',
     'tap air portugal': 'tap',
@@ -1437,16 +1454,21 @@ export function getAirlineFareFamilies(airlineKeyOrName: string): AirlineFareFam
     'sq': 'singapore',
     'ana': 'ana',
     'all nippon airways': 'ana',
+    'all nippon airways (ana)': 'ana',
     'nh': 'ana',
     'jal': 'jal',
+    'japanairlines': 'jal',
     'japan airlines': 'jal',
+    'japan airlines (jal)': 'jal',
     'jl': 'jal',
     'cathay': 'cathay',
+    'cathaypacific': 'cathay',
     'cathay pacific': 'cathay',
     'cx': 'cathay',
     'korean air': 'koreanair',
     'ke': 'koreanair',
     'eva': 'eva',
+    'evaair': 'eva',
     'eva air': 'eva',
     'br': 'eva',
     'emirates': 'emirates',
@@ -1454,6 +1476,7 @@ export function getAirlineFareFamilies(airlineKeyOrName: string): AirlineFareFam
     'qantas': 'qantas',
     'qf': 'qantas',
     'qatar': 'qatar',
+    'qatarairways': 'qatar',
     'qatar airways': 'qatar',
     'qr': 'qatar',
     'etihad': 'etihad',
@@ -1465,6 +1488,7 @@ export function getAirlineFareFamilies(airlineKeyOrName: string): AirlineFareFam
     'asiana airlines': 'asiana',
     'oz': 'asiana',
     'vietnam': 'vietnam',
+    'vietnamairlines': 'vietnam',
     'vietnam airlines': 'vietnam',
     'vn': 'vietnam'
   };

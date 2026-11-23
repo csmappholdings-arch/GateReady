@@ -141,7 +141,9 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
                 ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200'
                 : liquidScan.status === 'CHECKED_PERMITTED'
                 ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-200'
-                : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200'
+                : liquidScan.status === 'COMPLIANT'
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200'
+                : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200'
             }`}>
               <Droplets className="w-4 h-4 shrink-0 mt-0.5 text-current" />
               <div className="flex-1 min-w-0">

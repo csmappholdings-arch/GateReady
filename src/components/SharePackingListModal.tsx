@@ -64,16 +64,10 @@ Collaborate & verify luggage weight limits before the gate: ${shareUrl}`;
     setTimeout(() => setCopiedSummary(false), 2200);
   };
 
-  const handleShareWhatsApp = () => {
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareSummaryText)}`;
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleShareEmail = () => {
-    const subject = encodeURIComponent(`Packing List: ${trip.name} (${trip.destinationCity || 'GateReady'})`);
-    const body = encodeURIComponent(`Hi!\n\nHere is our collaborative travel packing list for ${trip.name}:\n\n${shareSummaryText}\n\nCheck what's packed and make sure we stay under the carrier weight limits!`);
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-  };
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareSummaryText)}`;
+  const emailSubject = encodeURIComponent(`Packing List: ${trip.name} (${trip.destinationCity || 'GateReady'})`);
+  const emailBody = encodeURIComponent(`Hi!\n\nHere is our collaborative travel packing list for ${trip.name}:\n\n${shareSummaryText}\n\nCheck what's packed and make sure we stay under the carrier weight limits!`);
+  const mailtoUrl = `mailto:?subject=${emailSubject}&body=${emailBody}`;
 
   return createPortal(
     <div 
@@ -123,11 +117,11 @@ Collaborate & verify luggage weight limits before the gate: ${shareUrl}`;
                 {trip.name}
               </p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                {trip.destinationCity ? `Destination: ${trip.destinationCity} · ` : ''}{trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'} · {packedItems}/{totalItems} {totalItems === 1 ? 'item' : 'items'} packed
+                {trip.destinationCity ? `Destination: ${trip.destinationCity} · ` : ''}{trip.bags.length} {trip.bags.length === 1 ? 'bag' : 'bags'} · {packedItems}/{totalItems} {totalItems === 1 ? 'item' : 'items'} packed
               </p>
             </div>
             <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-              Live Link
+              Share Link
             </span>
           </div>
 
@@ -160,23 +154,23 @@ Collaborate & verify luggage weight limits before the gate: ${shareUrl}`;
 
           {/* Quick Share Buttons (WhatsApp & Email) */}
           <div className="grid grid-cols-2 gap-2.5 pt-1">
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="h-10 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 font-bold text-xs flex items-center justify-center gap-2 hover:bg-emerald-100 dark:hover:bg-emerald-950/80 transition-all cursor-pointer"
             >
               <MessageSquare className="w-4 h-4 text-emerald-600" />
               <span>Send via WhatsApp</span>
-            </button>
+            </a>
 
-            <button
-              type="button"
-              onClick={handleShareEmail}
+            <a
+              href={mailtoUrl}
               className="h-10 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-300 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200 font-bold text-xs flex items-center justify-center gap-2 hover:bg-indigo-100 dark:hover:bg-indigo-950/80 transition-all cursor-pointer"
             >
               <Mail className="w-4 h-4 text-indigo-600" />
               <span>Send via Email</span>
-            </button>
+            </a>
           </div>
 
           {/* Copy Full Text Summary */}
@@ -199,7 +193,7 @@ Collaborate & verify luggage weight limits before the gate: ${shareUrl}`;
                 <span>Refer a Friend · Both Get 1 Month Free</span>
               </p>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">
-                Give your traveling companion a free month of Silver. When they subscribe, you automatically receive a free month credit!
+                Give a friend 1 free month of Platinum ($4.99 value) on signup — and automatically receive 1 free month of Platinum when they create an account!
               </p>
               {onOpenReferral && (
                 <button

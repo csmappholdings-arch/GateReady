@@ -16,7 +16,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
           <span class="text-2xl">${guide.flag}</span>
           <div>
             <div class="font-black text-slate-900 text-sm">${guide.name} Baggage Verification</div>
-            <div class="text-[11px] text-purple-700 font-semibold">${guide.countryLabel} · Published Carrier Rules</div>
+            <div class="text-[11px] text-purple-700 font-semibold">${guide.countryLabel} · Published Carrier Rules · Verified ${guide.fees.lastVerified}</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -202,7 +202,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
       <section class="p-5 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-700 space-y-2">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <strong class="text-slate-900 font-bold">GateReady Policy Source Standard</strong>
-          <span class="text-slate-600 font-bold">Published carrier policy reference</span>
+          <span class="text-emerald-700 font-bold">Verified ${guide.fees.lastVerified}</span>
         </div>
         <p class="leading-relaxed">
           Estimate from published airline fee tables. Airlines change fees and conditions frequently — always confirm at booking or on the carrier's official website.
@@ -265,6 +265,7 @@ export function getAirlineIndexPageHtml(): string {
         <td class="py-3 px-4 font-black text-purple-700">
           ${a.fees.firstCheckedFee === 0 ? 'FREE ($0)' : `${a.fees.currencySymbol}${a.fees.firstCheckedFee}`}
         </td>
+        <td class="py-3 px-4 text-emerald-700 font-semibold whitespace-nowrap">Verified ${a.fees.lastVerified}</td>
         <td class="py-3 px-4 text-right">
           <a href="${a.canonicalPath}" class="text-xs font-bold text-purple-600 hover:text-purple-800">
             View Guide →
@@ -284,6 +285,7 @@ export function getAirlineIndexPageHtml(): string {
                 <th class="py-3 px-4">Carry-On Size</th>
                 <th class="py-3 px-4">Carry-On Weight Cap</th>
                 <th class="py-3 px-4">1st Checked Bag</th>
+                <th class="py-3 px-4">Policy Verified</th>
                 <th class="py-3 px-4 text-right">Details</th>
               </tr>
             </thead>
@@ -409,7 +411,7 @@ export function getBaggageFeeCalculatorHtml(): string {
       <section class="p-5 rounded-2xl bg-purple-600 text-white space-y-3">
         <h3 class="text-base font-black">Run Interactive Baggage Calculations in GateReady</h3>
         <p class="text-xs text-purple-100">
-          Open our live interactive builder to add suitcases, simulate item weights, deduct suitcase tare weight, and prevent fees before departure.
+          Open our interactive builder to add suitcases, simulate item weights, deduct suitcase tare weight, and prevent fees before departure.
         </p>
         <div class="flex flex-wrap gap-3">
           <a href="/" class="h-9 px-4 rounded-xl bg-white text-purple-950 font-black text-xs inline-flex items-center justify-center hover:bg-purple-50">
@@ -584,7 +586,7 @@ export function getHomepageHtml(): string {
       <section class="space-y-4">
         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Pack Smart. Fly Prepared. Avoid Surprise Baggage Fees.</h2>
         <p class="text-base text-slate-700 leading-relaxed">
-          Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home. GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42+ worldwide airlines.
+          Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home. GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42 worldwide airlines.
         </p>
         <div class="flex flex-wrap gap-3 pt-2">
           <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">
@@ -724,7 +726,7 @@ export function getRequirementsHubHtml(): string {
             <p class="text-xs text-slate-600 leading-relaxed">
               Calculate checked and carry-on luggage fees across 42 airlines, compare fare-family inclusions, and estimate total costs.
             </p>
-            <p class="text-[11px] text-slate-400">Real Carrier Fare Tables · Confirm at booking</p>
+            <p class="text-[11px] text-slate-400">Published Carrier Fare Tables · Confirm at booking</p>
           </div>
           <div class="pt-4 border-t border-purple-100">
             <a href="/baggage-fee-calculator" class="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">

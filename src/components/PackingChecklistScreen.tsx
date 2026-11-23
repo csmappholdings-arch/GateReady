@@ -7,6 +7,7 @@ import { DepartureCountdownCard } from './DepartureCountdownCard';
 import { exportTripToPDF } from '../utils/pdfExport';
 import { EditBagDialog } from './EditBagDialog';
 import { computeBagWeightStatus } from '../utils/bagWeightAnalysis';
+import { scanItemForLiquids } from '../utils/liquidScanner';
 import { 
   Plus, 
   Trash2, 
@@ -827,14 +828,14 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                    Return Flight & Hotel Checkout Repack Mode
+                    Return {isFlight ? 'Flight' : 'Leg'} &amp; Hotel Checkout Repack Mode
                   </h3>
                   <span className="text-[10px] font-black uppercase tracking-wider bg-purple-600 text-white px-2 py-0.2 rounded-md">
                     Return Active
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                  All items are assigned to their exact bags & compartments from flight #1. Check off each item as you pack your hotel room so no chargers or passports are left behind.
+                  All items are assigned to their exact bags &amp; compartments from {isFlight ? 'flight #1' : 'your outbound trip'}. Check off each item as you pack your hotel room so no chargers or passports are left behind.
                 </p>
               </div>
             </div>
@@ -993,7 +994,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     </span>
                     {hasNoWeightLimit ? (
                       <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        (No airline weight limit)
+                        (No {isFlight ? 'airline ' : ''}weight limit)
                       </span>
                     ) : (
                       <span className="text-xs text-slate-400">
@@ -1051,7 +1052,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                     <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
                     <div>
                       <span className="font-extrabold text-amber-900 dark:text-amber-300">
-                        Souvenir & Return Buffer Alert ({weightPercentage.toFixed(0)}% full):
+                        Souvenir &amp; Return Buffer Notice ({weightPercentage.toFixed(0)}% full):
                       </span>
                       <p className="text-[11px] text-amber-800/90 dark:text-amber-200/90 mt-0.5">
                         You're nearing the {typicalLimitDisplay} {unitLabel} maximum! Frequent flyers recommend leaving 15%–20% weight and volume free so you have room for souvenirs, conference materials, and hotel gifts on the way back.
@@ -1074,7 +1075,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
               No Luggage Added Yet
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto mb-5 leading-relaxed">
-              Add a Personal Item (backpack, purse), Carry-On Bag, or Checked Suitcase to track items, check airline limits, and calculate bag weight.
+              Add a Personal Item (backpack, purse), Carry-On Bag, or Checked Suitcase to track items, check {isFlight ? 'airline' : 'carrier'} limits, and calculate bag weight.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
@@ -1279,8 +1280,43 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                               : 'text-slate-900 dark:text-white'
                           }`}
                         >
-                          {item.name}
+                        {item.name}
                         </span>
+
+                        {isFlight && (() => {
+                          const lq = scanItemForLiquids(item.name, currentBag.type);
+                          if (!lq.isLiquid) return null;
+                          if (lq.status === 'NON_COMPLIANT') {
+                            return (
+                              <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 flex items-center gap-1 shrink-0" title={lq.alertMessage}>
+                                <AlertTriangle className="w-2.5 h-2.5" />
+                                <span>Exceeds 100 ml — checked bags only</span>
+                              </span>
+                            );
+                          }
+                          if (lq.status === 'COMPLIANT') {
+                            return (
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-0.5 shrink-0">
+                                <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                <span>TSA Pass ({lq.capacityOz ? `${lq.capacityOz}oz` : lq.capacityMl ? `${lq.capacityMl}ml` : '≤100ml'})</span>
+                              </span>
+                            );
+                          }
+                          if (lq.status === 'CHECKED_PERMITTED') {
+                            return (
+                              <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex items-center gap-0.5 shrink-0">
+                                <Droplets className="w-2.5 h-2.5" />
+                                <span>Checked Liquid</span>
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-0.5 shrink-0">
+                              <Droplets className="w-2.5 h-2.5" />
+                              <span>TSA 3-1-1 (≤100 ml / 3.4 oz)</span>
+                            </span>
+                          );
+                        })()}
 
                         {item.quantity > 1 && (
                           <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">

@@ -29,7 +29,8 @@ import {
   ArrowRight,
   Mail,
   Send,
-  Loader2
+  Loader2,
+  AlertTriangle
 } from 'lucide-react';
 import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
@@ -37,6 +38,7 @@ import { AccountSyncModal } from './AccountSyncModal';
 import { recordCapturedEmail } from '../lib/firebase';
 import { airlineLimits } from '../data/allowances';
 import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
+import { scanItemForLiquids } from '../utils/liquidScanner';
 
 interface PrintPackingListModalProps {
   isOpen: boolean;
@@ -73,6 +75,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
     }
   }, [user?.email]);
 
+  const isFlight = !trip.travelType || trip.travelType === 'PLANE';
   const familyMembers = trip.familyMembers && trip.familyMembers.length > 0 
     ? trip.familyMembers 
     : ['Traveler 1'];
@@ -169,7 +172,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
       summary += `\n`;
     });
 
-    summary += `\nGateReady.ca • Calibrated luggage tare weights, TSA limits & transit manifests\n`;
+    summary += `\nGateReady.ca • Calibrated luggage tare weights, ${isFlight ? 'TSA limits & ' : ''}transit manifests\n`;
     return summary;
   };
 
@@ -212,7 +215,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
 
         <div style="padding:20px;background:#ffffff;border:1px solid #e2e8f0;border-top:none;">
           <div style="display:flex;gap:12px;background:#f1f5f9;padding:12px;border-radius:10px;margin-bottom:20px;font-size:12px;">
-            <div><strong>Luggage:</strong> ${trip.bags.length} bags</div>
+            <div><strong>Luggage:</strong> ${trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'}</div>
             <div><strong>Total Weight:</strong> ${displayTotalWeight}</div>
             <div><strong>Progress:</strong> ${packedItemsCount}/${totalItemsCount} packed (${packingPct}%)</div>
           </div>
@@ -222,7 +225,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
         </div>
 
         <div style="padding:16px;background:#f8fafc;border-radius:0 0 16px 16px;border:1px solid #e2e8f0;border-top:none;text-align:center;font-size:11px;color:#64748b;">
-          <p style="margin:0 0 6px 0;">Generated with <strong>GateReady.ca</strong> &bull; Calibrated luggage tare weights, TSA limits & transit manifests.</p>
+          <p style="margin:0 0 6px 0;">Generated with <strong>GateReady.ca</strong> &bull; Calibrated luggage tare weights, ${isFlight ? 'TSA limits & ' : ''}transit manifests.</p>
           <p style="margin:0;">Access your full packing list on any device at <a href="https://gateready.ca" style="color:#7c3aed;text-decoration:none;font-weight:bold;">gateready.ca</a></p>
         </div>
       </div>
@@ -594,20 +597,21 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
         )}
 
         {/* Printable Document Content (Scrollable on screen, expands in print) */}
-        <div className="relative p-6 sm:p-8 overflow-y-auto space-y-6 flex-1 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950">
-          {/* Watermark Diagonal Overlay on Free Preview */}
+        <div className="relative p-6 sm:p-8 overflow-y-auto flex-1 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950">
+          {/* Watermark Diagonal Overlay Behind Content on Free Preview */}
           {!isPro && (
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden z-20 select-none">
-              <div className="transform -rotate-25 text-center p-6 sm:p-10 rounded-3xl border-4 border-dashed border-purple-500/40 bg-purple-500/5 backdrop-blur-[1px]">
-                <p className="text-2xl sm:text-4xl md:text-5xl font-black text-purple-600/25 dark:text-purple-400/25 tracking-widest uppercase">
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden z-0 select-none">
+              <div className="transform -rotate-25 text-center p-6 sm:p-10 rounded-3xl border-4 border-dashed border-purple-500/15 bg-transparent">
+                <p className="text-2xl sm:text-4xl md:text-5xl font-black text-purple-600/12 dark:text-purple-400/12 tracking-widest uppercase">
                   GATEREADY.CA PREVIEW
                 </p>
-                <p className="text-sm sm:text-xl font-black text-purple-700/35 dark:text-purple-300/35 uppercase tracking-wider mt-2">
+                <p className="text-sm sm:text-xl font-black text-purple-700/15 dark:text-purple-300/15 uppercase tracking-wider mt-2">
                   UNLOCK WITH SILVER · $1.99/MO
                 </p>
               </div>
             </div>
           )}
+          <div className="relative z-10 space-y-6">
           {/* Printable Manifest Header */}
           <div className="border-b-2 border-purple-600 pb-5">
             <div className="flex items-start justify-between gap-4">
@@ -637,7 +641,17 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                   ) : null}
                   {trip.companyName && (
                     <span className="flex items-center gap-1">
-                      <Plane className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      {trip.travelType === 'TRAIN' ? (
+                        <Train className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      ) : trip.travelType === 'CRUISE' ? (
+                        <Ship className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      ) : trip.travelType === 'CAR' ? (
+                        <Car className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      ) : trip.travelType === 'BUS' ? (
+                        <Bus className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      ) : (
+                        <Plane className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      )}
                       <span>{trip.companyName} • {trip.seatClassOrCarSize || 'Standard'}</span>
                     </span>
                   )}
@@ -736,7 +750,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                       <span className="flex items-center gap-1">
                         <Scale className="w-3.5 h-3.5 text-purple-600" />
                         {bagHasNoWeightLimit ? (
-                          <span>{displayBagWeight} (No airline limit · {trip.companyName || 'Carrier'})</span>
+                          <span>{displayBagWeight} (No {isFlight ? 'airline' : 'weight'} limit · {trip.companyName || 'Carrier'})</span>
                         ) : (
                           <span>{displayBagWeight} / {displayLimit} cap</span>
                         )}
@@ -800,12 +814,40 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                                       <span className={`font-bold ${item.isPacked ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200'}`}>
                                         {item.name}
                                       </span>
-                                      {(item.category === 'Toiletries' || /shampoo|lotion|liquid|toothpaste|perfume|sunscreen|gel|spray/i.test(item.name)) && (
-                                        <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                                          <Droplets className="w-2.5 h-2.5" />
-                                          <span>TSA 3-1-1</span>
-                                        </span>
-                                      )}
+                                      {isFlight && (() => {
+                                        const lq = scanItemForLiquids(item.name, bag.type);
+                                        if (!lq.isLiquid) return null;
+                                        if (lq.status === 'NON_COMPLIANT') {
+                                          return (
+                                            <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900">
+                                              <AlertTriangle className="w-2.5 h-2.5" />
+                                              <span>Exceeds 100 ml — checked bags only</span>
+                                            </span>
+                                          );
+                                        }
+                                        if (lq.status === 'COMPLIANT') {
+                                          return (
+                                            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                                              <Check className="w-2.5 h-2.5" />
+                                              <span>TSA Pass</span>
+                                            </span>
+                                          );
+                                        }
+                                        if (lq.status === 'CHECKED_PERMITTED') {
+                                          return (
+                                            <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                                              <Droplets className="w-2.5 h-2.5" />
+                                              <span>Checked Liquid</span>
+                                            </span>
+                                          );
+                                        }
+                                        return (
+                                          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                                            <Droplets className="w-2.5 h-2.5" />
+                                            <span>TSA 3-1-1 (≤100 ml)</span>
+                                          </span>
+                                        );
+                                      })()}
                                     </div>
                                   </td>
 
@@ -856,27 +898,46 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300">
               <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 <span className="w-3.5 h-3.5 rounded border border-slate-400 inline-block shrink-0" />
-                <span>Passports, IDs & Visas verified (&gt;6 mos validity)</span>
+                <span>
+                  {trip.travelType === 'CAR'
+                    ? 'Driver’s license, registration & IDs verified'
+                    : 'Passports, IDs & Visas verified (>6 mos validity)'}
+                </span>
               </div>
               <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 <span className="w-3.5 h-3.5 rounded border border-slate-400 inline-block shrink-0" />
-                <span>Carry-on liquids compliant with TSA 3-1-1 rule (≤3.4 oz)</span>
+                <span>
+                  {isFlight
+                    ? 'Carry-on liquids compliant with TSA 3-1-1 rule (≤3.4 oz)'
+                    : 'Toiletries & liquids sealed in leak-proof travel pouch'}
+                </span>
               </div>
               <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 <span className="w-3.5 h-3.5 rounded border border-slate-400 inline-block shrink-0" />
-                <span>Lithium battery power banks in carry-on / personal item</span>
+                <span>
+                  {isFlight
+                    ? 'Lithium battery power banks in carry-on / personal item'
+                    : 'Chargers, power banks & cables accessible in daypack'}
+                </span>
               </div>
               <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 <span className="w-3.5 h-3.5 rounded border border-slate-400 inline-block shrink-0" />
-                <span>Boarding passes saved offline to Apple/Google Wallet</span>
+                <span>
+                  {isFlight
+                    ? 'Boarding passes saved offline to Apple/Google Wallet'
+                    : trip.travelType === 'CAR'
+                      ? 'Offline maps, toll pass & roadside documents saved'
+                      : 'Tickets & reservations saved offline to phone'}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Document Footer */}
           <div className="pt-4 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span>GateReady.ca • Calibrated luggage tare weights, TSA limits & transit manifests</span>
+            <span>GateReady.ca • Calibrated luggage tare weights, {isFlight ? 'TSA limits & ' : ''}transit manifests</span>
             <span>Generated on {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          </div>
           </div>
         </div>
       </div>

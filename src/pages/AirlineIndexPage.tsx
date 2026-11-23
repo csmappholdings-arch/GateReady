@@ -201,8 +201,8 @@ export const AirlineIndexPage: React.FC = () => {
 
               {/* Action Link */}
               <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                <span className="text-[10px] text-slate-400">
-                  Published carrier rules
+                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/70">
+                  Verified {item.fees.lastVerified}
                 </span>
                 <a
                   href={item.canonicalPath}

@@ -73,7 +73,7 @@ export const HowItWorksPage: React.FC = () => {
                 Select Travel Mode &amp; Operating Airline
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Choose your travel mode (Flight, Road Trip, Train, Cruise). For flights, select from 42+ global airlines and your booked fare family (e.g. Basic Economy vs Standard). GateReady automatically loads published carry-on dimensions and checked baggage weight limits.
+                Choose your travel mode (Flight, Road Trip, Train, Cruise). For flights, select from 42 global airlines and your booked fare family (e.g. Basic Economy vs Standard). GateReady automatically loads published carry-on dimensions and checked baggage weight limits.
               </p>
             </div>
           </div>
@@ -147,10 +147,10 @@ export const HowItWorksPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <h3 className="font-black text-lg text-slate-900 dark:text-white">
-                Live Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit
+                Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Add items using our pre-calibrated weight catalog or custom entries. Live Packing Weight Meters track cumulative bag weight against airline limits in real time. When adding toiletries to carry-ons, the TSA 3-1-1 liquids checker flags oversized bottles (&gt;3.4 oz) so you can repack them safely.
+                Add items using our pre-calibrated weight catalog or custom entries. Packing Weight Meters calculate cumulative bag weight against airline limits as you edit your list. When adding toiletries to carry-ons, the TSA 3-1-1 liquids checker flags oversized bottles (&gt;3.4 oz) so you can repack them safely.
               </p>
             </div>
           </div>
@@ -158,7 +158,7 @@ export const HowItWorksPage: React.FC = () => {
           {/* Step 4 UI Preview */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 max-w-xl mx-auto space-y-3">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">Checked Bag Live Packing Weight Meter:</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Checked Bag Packing Weight Meter:</span>
               <span className="font-bold text-emerald-600">42.8 / 50.0 lbs (Safe · 7.2 lbs buffer left)</span>
             </div>
             <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">

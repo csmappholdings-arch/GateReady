@@ -48,7 +48,7 @@ export const airlineLimits: BaggageLimitInfo[] = [
     checkedLimit: '62 linear in (158 cm), 50 lbs (23 kg)',
     carryOnWeightLimit: 'No strict weight limit',
     checkedWeightLimit: '50 lbs (23 kg) Choice/Basic ($45 1st / $55 2nd); Choice Extra includes 2 FREE bags',
-    notes: 'Overhead carry-on stays free on all fares. Standard Choice/Basic fares charge $45 1st bag and $55 2nd bag (Choice Extra, A-List Preferred & Rapid Rewards cardholders get fee waivers).'
+    notes: 'Overhead carry-on stays free on all fares. Standard Choice/Basic fares charge $45 1st bag and $55 2nd bag (Choice Extra, A-List Preferred, Rapid Rewards cardholders & active-duty military get fee waivers).'
   },
   {
     id: 'jetblue',

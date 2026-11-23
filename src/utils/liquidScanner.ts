@@ -41,16 +41,21 @@ const LIQUID_KEYWORDS = [
   'contact solution',
   'saline solution',
   'eye drops',
+  'liquid soap',
   'liquid',
+  'liquids',
+  'toiletries',
+  'toiletry',
+  'dopp kit',
   'water bottle',
   'foundation makeup',
   'mascara',
-  'lip gloss',
-  'liquid soap'
+  'lip gloss'
 ];
 
 /**
- * Scan an item name for liquid keywords and capacity flags (TSA 3-1-1 rule: ≤3.4 oz / 100 ml for carry-on).
+ * Scan an item name for liquid/toiletry keywords and capacity flags (TSA 3-1-1 rule: ≤3.4 oz / 100 ml for carry-on).
+ * Single source of truth used by Rebalance Bags and all item badge views.
  */
 export function scanItemForLiquids(itemName: string, bagType: BagType = 'CARRY_ON'): ScannedLiquidResult {
   if (!itemName) {
@@ -64,7 +69,7 @@ export function scanItemForLiquids(itemName: string, bagType: BagType = 'CARRY_O
     return { isLiquid: false, status: 'NOT_LIQUID' };
   }
 
-  // Liquid is permitted in checked luggage without volume restriction (within typical airline max)
+  // Liquid / full-size toiletries are permitted in checked luggage (within typical airline max)
   if (bagType === 'CHECKED') {
     return {
       isLiquid: true,
@@ -94,31 +99,36 @@ export function scanItemForLiquids(itemName: string, bagType: BagType = 'CARRY_O
     }
   }
 
-  // TSA 3-1-1 limits: 3.4 oz (100ml)
-  const isOverLimit = (capacityOz !== undefined && capacityOz > 3.4) || (capacityMl !== undefined && capacityMl > 100);
+  const isExplicitFullSize = /\b(full[- ]?size|jumbo|family[- ]?size|value[- ]?size|oversized)\b/i.test(lower);
+  const isExplicitTravelSize = /\b(3-1-1|3\.1\.1|travel[- ]?size|tsa[- ]?approved|mini)\b/i.test(lower);
+
+  // TSA 3-1-1 limits: 3.4 oz (100 ml) — explicit over-limit volume OR full-size descriptor without <=100ml override
+  const hasExplicitNumericSize = capacityOz !== undefined || capacityMl !== undefined;
+  const isOverNumericLimit = (capacityOz !== undefined && capacityOz > 3.4) || (capacityMl !== undefined && capacityMl > 100);
+  const isOverLimit = isOverNumericLimit || (isExplicitFullSize && !hasExplicitNumericSize && !isExplicitTravelSize);
 
   if (isOverLimit) {
-    const sizeStr = capacityOz ? `${capacityOz} oz` : `${capacityMl} ml`;
+    const sizeStr = capacityOz ? `${capacityOz} oz` : capacityMl ? `${capacityMl} ml` : 'Full-size (>100 ml)';
     return {
       isLiquid: true,
       status: 'NON_COMPLIANT',
       detectedKeyword: matchedKeyword,
       capacityOz,
       capacityMl,
-      badgeLabel: `⚠️ TSA 3-1-1 Alert (${sizeStr} > 3.4 oz)`,
-      alertMessage: `${sizeStr} exceeds TSA 3.4 oz (100ml) security limit! Move to Checked Bag or transfer to a travel-size container to avoid security confiscation.`
+      badgeLabel: 'Exceeds 100 ml — checked bags only',
+      alertMessage: `${sizeStr} exceeds the TSA 3-1-1 100 ml (3.4 oz) cabin liquids rule! Keep in a Checked Bag or switch to travel-size containers.`
     };
   }
 
-  if (capacityOz !== undefined || capacityMl !== undefined) {
-    const sizeStr = capacityOz ? `${capacityOz} oz` : `${capacityMl} ml`;
+  if (hasExplicitNumericSize || isExplicitTravelSize) {
+    const sizeStr = capacityOz ? `${capacityOz} oz` : capacityMl ? `${capacityMl} ml` : '≤100 ml';
     return {
       isLiquid: true,
       status: 'COMPLIANT',
       detectedKeyword: matchedKeyword,
       capacityOz,
       capacityMl,
-      badgeLabel: `✓ TSA 3-1-1 Pass (${sizeStr})`,
+      badgeLabel: `TSA Pass (${sizeStr})`,
       alertMessage: undefined
     };
   }
@@ -128,7 +138,7 @@ export function scanItemForLiquids(itemName: string, bagType: BagType = 'CARRY_O
     isLiquid: true,
     status: 'LIQUID_UNSPECIFIED',
     detectedKeyword: matchedKeyword,
-    badgeLabel: '💧 TSA 3-1-1 Liquid (must be ≤3.4 oz / 100ml)',
+    badgeLabel: 'TSA 3-1-1 (must be ≤100 ml / 3.4 oz)',
     alertMessage: undefined
   };
 }

@@ -259,19 +259,27 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
       )}
 
       <div className="relative">
-        <input
-          id={id}
-          type="text"
-          value={query}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setIsOpen(true)}
-          placeholder={dynamicPlaceholder}
-          required={required}
-          autoFocus={autoFocus}
-          className={`w-full h-10 pl-3.5 pr-8 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors ${inputClassName}`}
-          autoComplete="off"
-        />
+        {(() => {
+          const hasCustomSurface = /\bbg-(slate|purple|indigo|zinc|neutral|black)\b/.test(inputClassName);
+          const defaultSurfaceClasses = hasCustomSurface
+            ? ''
+            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400';
+          return (
+            <input
+              id={id}
+              type="text"
+              value={query}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsOpen(true)}
+              placeholder={dynamicPlaceholder}
+              required={required}
+              autoFocus={autoFocus}
+              className={`w-full h-10 pl-3.5 pr-8 text-xs rounded-xl border ${defaultSurfaceClasses} focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors ${inputClassName}`}
+              autoComplete="off"
+            />
+          );
+        })()}
 
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
           <Search className="w-3.5 h-3.5" />

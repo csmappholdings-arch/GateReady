@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SubscriptionProvider, useSubscription } from './context/SubscriptionContext';
 import { PackingProvider, usePacking } from './context/PackingContext';
@@ -175,7 +175,16 @@ function PackingAppContent() {
         return;
       }
       if ((p === '/' || p === '/dashboard') && !isOnboardingCompleted()) {
+        try {
+          if (sessionStorage.getItem('gateready_onboarding_shown_session') === 'true') {
+            return;
+          }
+        } catch {}
         const timer = setTimeout(() => {
+          try {
+            if (sessionStorage.getItem('gateready_onboarding_shown_session') === 'true') return;
+            sessionStorage.setItem('gateready_onboarding_shown_session', 'true');
+          } catch {}
           setShowOnboardingModal(true);
         }, 900);
         return () => clearTimeout(timer);
@@ -197,15 +206,37 @@ function PackingAppContent() {
     }
   };
 
+  const prevTripsCountRef = useRef(trips.length);
+
+  // Guest last-trip deletion immediately returns to homepage and resets URL to '/'
+  useEffect(() => {
+    if (!user && prevTripsCountRef.current > 0 && trips.length === 0) {
+      setAppView('home');
+      if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+        try {
+          window.history.replaceState({}, '', '/');
+        } catch {}
+      }
+    }
+    prevTripsCountRef.current = trips.length;
+  }, [user, trips.length]);
+
   useEffect(() => {
     if (appView === 'workspace' && !currentTrip) {
       if (trips.length > 0) {
         selectTrip(trips[0]);
+      } else if (!user) {
+        setAppView('home');
+        if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+          try {
+            window.history.replaceState({}, '', '/');
+          } catch {}
+        }
       } else {
         setAppView('dashboard');
       }
     }
-  }, [appView, currentTrip, trips, selectTrip]);
+  }, [appView, currentTrip, trips, selectTrip, user]);
 
   // Track separate browser visits in localStorage & GA4
   useEffect(() => {
@@ -278,18 +309,11 @@ function PackingAppContent() {
   const tab1Title = isCar ? 'Luggage & Trunk Manifest' : 'Luggage & Packing Manifest';
   const tab2Title = isTrain ? 'Station & Rail Intel' : isBus ? 'Terminal & Bus Intel' : isCruise ? 'Port & Cruise Intel' : isCar ? 'Route & Road Trip Intel' : 'Airport & Trip Intel';
   const tab3Title = isTrain ? 'Train Coach & In-Seat Power' : isBus ? 'Bus Seating & Amenities' : isCruise ? 'Stateroom & Ship Amenities' : isCar ? 'Vehicle Cargo & 12V Power' : 'Aircraft Cabin & In-Seat Power';
-  const tab4Title = isTrain ? 'Rail Baggage Guidelines' : isBus ? 'Bus Luggage Guidelines' : isCruise ? 'Cruise Baggage Policies' : isCar ? 'Road Trip Packing Guide' : '42+ Airline Allowances';
+  const tab4Title = isTrain ? 'Rail Baggage Guidelines' : isBus ? 'Bus Luggage Guidelines' : isCruise ? 'Cruise Baggage Policies' : isCar ? 'Road Trip Packing Guide' : '42 Airline Allowances';
   const tab5Title = isTrain ? 'Train Departure Checklist' : isBus ? 'Bus Departure Checklist' : isCruise ? 'Embarkation Checklist' : isCar ? 'Road Departure Checklist' : 'Gate Clearance Checklist';
 
   const tab5MobileLabel = isCruise ? 'Embark' : isFlight ? 'Gate Ready' : 'Departure';
   const Tab5IconComponent = isTrain ? Train : isBus ? Bus : isCruise ? Ship : isCar ? Car : PlaneTakeoff;
-
-  // Cleanup legacy localStorage key so it never permanently blocks session save gate
-  useEffect(() => {
-    try {
-      localStorage.removeItem('gateready_organic_save_gate_dismissed');
-    } catch {}
-  }, []);
 
   // Fix 1: Plan-limit notice must die with its trip. Deleting a trip clears its notice immediately.
   useEffect(() => {
@@ -301,14 +325,14 @@ function PackingAppContent() {
     }
   }, [trips, tripNotice]);
 
-  // Trigger Guest Save-Your-Work prompt after creating first trip / at save step or when adding items
+  // Trigger Guest Save-Your-Work prompt only after adding at least 1 packing item; persist dismissal durably
   useEffect(() => {
     if (user) {
       setShowSaveGateModal(false);
       return;
     }
 
-    if (!currentTrip || currentTrip.id.startsWith('trip-demo-')) {
+    if (!currentTrip || currentTrip.id.startsWith('trip-demo-') || totalItems < 1) {
       return;
     }
 
@@ -316,19 +340,29 @@ function PackingAppContent() {
       return;
     }
 
-    const isSessionDismissed =
-      sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
-      sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
+    const isSaveGateDismissed = (() => {
+      try {
+        return (
+          localStorage.getItem('gateready_save_gate_dismissed') === 'true' ||
+          sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true'
+        );
+      } catch {
+        return false;
+      }
+    })();
 
-    if (isSessionDismissed) {
+    if (isSaveGateDismissed) {
       return;
     }
 
     const timer = setTimeout(() => {
-      const stillDismissed =
-        sessionStorage.getItem('gateready_save_gate_session_shown') === 'true' ||
-        sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
-      if (!stillDismissed && !user && !showAddTripModal && !showAccountModal && !isPaywallOpen) {
+      let stillDismissed = false;
+      try {
+        stillDismissed =
+          localStorage.getItem('gateready_save_gate_dismissed') === 'true' ||
+          sessionStorage.getItem('gateready_save_gate_session_dismissed') === 'true';
+      } catch {}
+      if (!stillDismissed && !user && totalItems >= 1 && !showAddTripModal && !showAccountModal && !isPaywallOpen) {
         setShowSaveGateModal(true);
       }
     }, 350);
@@ -339,7 +373,7 @@ function PackingAppContent() {
   const handleDismissSaveGate = () => {
     setShowSaveGateModal(false);
     try {
-      sessionStorage.setItem('gateready_save_gate_session_shown', 'true');
+      localStorage.setItem('gateready_save_gate_dismissed', 'true');
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
     } catch {}
   };
@@ -347,7 +381,7 @@ function PackingAppContent() {
   const handleSaveFromSaveGate = () => {
     setShowSaveGateModal(false);
     try {
-      sessionStorage.setItem('gateready_save_gate_session_shown', 'true');
+      localStorage.setItem('gateready_save_gate_dismissed', 'true');
       sessionStorage.setItem('gateready_save_gate_session_dismissed', 'true');
     } catch {}
     setAccountModalOrigin('save_gate');
@@ -872,8 +906,15 @@ function PackingAppContent() {
               window.history.pushState({}, '', '/dashboard');
             } catch {}
           }
-          if (trips.length === 0) {
-            setShowOnboardingModal(true);
+          if (trips.length === 0 && !isOnboardingCompleted()) {
+            let shownSession = false;
+            try {
+              shownSession = sessionStorage.getItem('gateready_onboarding_shown_session') === 'true';
+              sessionStorage.setItem('gateready_onboarding_shown_session', 'true');
+            } catch {}
+            if (!shownSession) {
+              setShowOnboardingModal(true);
+            }
           }
         }}
       />
@@ -899,7 +940,7 @@ function PackingAppContent() {
         }}
       />
 
-      {/* 42+ Airline Allowance Intel Directory Modal */}
+      {/* 42 Airline Allowance Intel Directory Modal */}
       <AirlineGuidesModal
         isOpen={showAirlineGuidesModal}
         onClose={() => setShowAirlineGuidesModal(false)}
@@ -1019,6 +1060,12 @@ export default function App() {
   if (pathname === '/changelog') return <ChangelogPage />;
   if (pathname === '/security') return <SecurityPage />;
   if (pathname === '/reviews') return <ReviewsPage />;
+  if (pathname === '/airline-guides') {
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({}, '', '/airlines/');
+    }
+    return <AirlineIndexPage />;
+  }
   if (pathname === '/airlines') return <AirlineIndexPage />;
   if (pathname.startsWith('/airlines/')) return <AirlineGuidePage />;
   if (pathname === '/baggage-fee-calculator') return <BaggageFeeCalculatorPage />;

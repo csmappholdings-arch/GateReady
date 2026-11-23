@@ -3,11 +3,13 @@ import { usePacking } from '../context/PackingContext';
 import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
 import { computeBagWeightStatus, computeTripWeightStatus, getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
+import { scanItemForLiquids } from '../utils/liquidScanner';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { airlineLimits } from '../data/allowances';
 import { 
   CheckCircle2, 
   AlertCircle, 
+  AlertTriangle,
   Copy, 
   Printer, 
   Check, 
@@ -155,7 +157,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                 {statusHeadline}
               </h2>
               <p className="text-xs sm:text-sm text-purple-200 mt-1 max-w-md">
-                {trip.name} · {trip.companyName || trip.travelType} · {trip.bags.length} bags tracked
+                {trip.name} · {trip.companyName || trip.travelType} · {trip.bags.length} {trip.bags.length === 1 ? 'bag' : 'bags'} tracked
               </p>
               {familyMembers.length > 1 && (
                 <div className="flex items-center gap-1.5 text-xs text-purple-300 mt-2">
@@ -330,7 +332,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                       <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                         {displayBagWeight}{' '}
                         <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                          (No airline limit)
+                          {isFlight ? '(No airline limit)' : '(No weight limit)'}
                         </span>
                       </span>
                     ) : (
@@ -402,15 +404,49 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                               }`}>
                                 {item.isPacked && <Check className="w-3 h-3 stroke-[3]" />}
                               </div>
-                              <div className="truncate">
-                                <span className={`font-semibold ${item.isPacked ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
+                              <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                                <span className={`font-semibold truncate ${item.isPacked ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
                                   {item.name}
                                 </span>
                                 {item.quantity > 1 && (
-                                  <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 ml-1.5 bg-purple-100 dark:bg-purple-950 px-1.5 py-0.2 rounded">
+                                  <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-950 px-1.5 py-0.2 rounded">
                                     x{item.quantity}
                                   </span>
                                 )}
+                                {isFlight && (() => {
+                                  const lq = scanItemForLiquids(item.name, bag.type);
+                                  if (!lq.isLiquid) return null;
+                                  if (lq.status === 'NON_COMPLIANT') {
+                                    return (
+                                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 inline-flex items-center gap-1 shrink-0" title={lq.alertMessage}>
+                                        <AlertTriangle className="w-2.5 h-2.5" />
+                                        <span>Exceeds 100 ml — checked bags only</span>
+                                      </span>
+                                    );
+                                  }
+                                  if (lq.status === 'COMPLIANT') {
+                                    return (
+                                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 inline-flex items-center gap-0.5 shrink-0">
+                                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                        <span>TSA Pass</span>
+                                      </span>
+                                    );
+                                  }
+                                  if (lq.status === 'CHECKED_PERMITTED') {
+                                    return (
+                                      <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 inline-flex items-center gap-0.5 shrink-0">
+                                        <Droplets className="w-2.5 h-2.5" />
+                                        <span>Checked Liquid</span>
+                                      </span>
+                                    );
+                                  }
+                                  return (
+                                    <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 inline-flex items-center gap-0.5 shrink-0">
+                                      <Droplets className="w-2.5 h-2.5" />
+                                      <span>TSA 3-1-1 (≤100 ml)</span>
+                                    </span>
+                                  );
+                                })()}
                               </div>
                             </div>
 

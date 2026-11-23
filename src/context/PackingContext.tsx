@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { Trip, Bag, BagType, BagMaterial, WeightUnit, DepartureReminder, getBagEmptyWeightLbs, TravelType } from '../types/travel';
+import { Trip, Bag, BagType, BagMaterial, WeightUnit, DepartureReminder, getBagEmptyWeightLbs, getUpdatedBagLabelForType, TravelType } from '../types/travel';
 import { initialTrips } from '../data/seedTrips';
 import { getDefaultDepartureReminders } from '../data/defaultReminders';
 import { getDefaultChecklistForMode } from '../data/allowances';
@@ -1280,14 +1280,18 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             if (b.id !== bagId) return b;
             const newType = updates.type !== undefined ? updates.type : b.type;
             let resolvedMaxWeight = updates.maxWeightLimitLbs !== undefined ? updates.maxWeightLimitLbs : b.maxWeightLimitLbs;
+            let resolvedLabel = updates.label !== undefined ? updates.label.trim() : b.label;
             if (updates.type !== undefined && updates.type !== b.type) {
               if (updates.maxWeightLimitLbs === undefined || (updates.type !== 'CHECKED' && (resolvedMaxWeight ?? 0) >= 40)) {
                 resolvedMaxWeight = updates.type === 'CHECKED' ? 50 : updates.type === 'CARRY_ON' ? 22 : 15;
               }
+              if (updates.label === undefined) {
+                resolvedLabel = getUpdatedBagLabelForType(b.label, updates.type);
+              }
             }
             return {
               ...b,
-              ...(updates.label !== undefined ? { label: updates.label.trim() } : {}),
+              label: resolvedLabel,
               ...(updates.type !== undefined ? { type: updates.type } : {}),
               ...(updates.assignedTo !== undefined ? { assignedTo: updates.assignedTo } : {}),
               ...(resolvedMaxWeight !== undefined ? { maxWeightLimitLbs: resolvedMaxWeight } : {}),

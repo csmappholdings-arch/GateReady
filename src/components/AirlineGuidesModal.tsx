@@ -74,7 +74,7 @@ export const AirlineGuidesModal: React.FC<AirlineGuidesModalProps> = ({
           </div>
 
           <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            42+ Airline Baggage Allowance Guides
+            42 Airline Baggage Allowance Guides
           </h3>
           <p className="text-xs text-purple-200/90 mt-1 max-w-2xl leading-relaxed">
             Exact sizer bin measurements, personal item dimensions, and checked weight limits across North American, European, and Asian carriers.

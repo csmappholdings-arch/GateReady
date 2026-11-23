@@ -66,7 +66,7 @@ export const STATIC_PAGES: Record<string, StaticPageMeta> = {
     description: 'Verified traveler feedback and community reviews for GateReady.',
     keywords: 'GateReady reviews, traveler testimonials, luggage packing app ratings, verified customer feedback, baggage fee savings, airline packing tool reviews',
     heading: 'Traveler Reviews',
-    subheading: 'Real feedback from travelers around the globe.',
+    subheading: 'Be the first to share your GateReady packing story.',
     schemaType: 'ItemPage'
   },
   '/contact': {

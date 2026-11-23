@@ -112,12 +112,15 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
       }
     };
 
+    const carrierWord = trip.travelType === 'PLANE' || !trip.travelType ? 'airline' : 'carrier';
+    const terminalWord = trip.travelType === 'PLANE' || !trip.travelType ? 'airport' : trip.travelType === 'TRAIN' ? 'train station' : trip.travelType === 'CRUISE' ? 'cruise terminal' : trip.travelType === 'BUS' ? 'bus terminal' : 'road';
+
     // 14 Days Check (triggers when strictly 8 to 14 days out)
     if (prefs.fourteenDaysNotice && daysRemaining <= 14 && daysRemaining >= 8) {
       addNotice(
         '14_DAYS',
         `${daysRemaining} Days Until Departure: ${trip.destinationCity || trip.name}`,
-        `Your departure is ${daysRemaining} days away. Now is a great time to review your airline baggage allowance and begin preparing your packing list.`,
+        `Your departure is ${daysRemaining} days away. Now is a great time to review your ${carrierWord} baggage allowance and begin preparing your packing list.`,
         'Review My Trip',
         'Overview'
       );
@@ -128,7 +131,7 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
       addNotice(
         '7_DAYS',
         `${daysRemaining} Days Until Departure: One Week to Travel!`,
-        `Your departure is ${daysRemaining} days away. Check your luggage weights, dimensions, and airline baggage restrictions.`,
+        `Your departure is ${daysRemaining} days away. Check your luggage weights, dimensions, and ${carrierWord} baggage restrictions.`,
         'Check My Luggage',
         'Luggage'
       );
@@ -139,7 +142,7 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
       addNotice(
         '3_DAYS',
         `${daysRemaining} Days Until Departure: Finalize Packing!`,
-        `Your trip is only ${daysRemaining} days away. Complete your packing checklist and make sure your luggage is within your airline's limits.`,
+        `Your trip is only ${daysRemaining} days away. Complete your packing checklist and make sure your luggage is within your ${carrierWord}'s limits.`,
         'Complete My Packing',
         'Checklist'
       );
@@ -151,8 +154,10 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
         '24_HOURS',
         daysRemaining === 0 ? 'Today is Departure Day!' : '1 Day Until Departure: Final Check',
         daysRemaining === 0
-          ? `Safe travels to ${trip.destinationCity || trip.name}! Have your boarding pass, photo ID, and carry-on liquids ready.`
-          : `Your trip is tomorrow! Review your packing checklist, luggage restrictions, and travel documents before heading to the airport.`,
+          ? `Safe travels to ${trip.destinationCity || trip.name}! Have your boarding pass, photo ID, and essentials ready.`
+          : trip.travelType === 'CAR'
+            ? `Your road trip starts tomorrow! Review your packing checklist, cargo space, and travel documents before heading out.`
+            : `Your trip is tomorrow! Review your packing checklist, luggage restrictions, and travel documents before heading to the ${terminalWord}.`,
         'Review My Travel Readiness',
         'Documents'
       );

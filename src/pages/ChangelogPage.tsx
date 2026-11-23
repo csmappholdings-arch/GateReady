@@ -14,6 +14,58 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Nov 22, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 22, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Mode-Aware Workspaces, Guest Save-Gate Timing, Carrier Verification &amp; UI Clarity</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Save-Gate Timing &amp; Last-Trip Guest Navigation</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Adjusted the guest save prompt to trigger only after packing items are added to a trip, persisted dismissal durably until account creation or list save, updated the secondary action label to "Maybe Later", and returned guests cleanly to the landing page when deleting their last remaining trip.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Mode-Aware Cruise, Train, Bus &amp; Road Trip Workspaces</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Removed flight-only headings, TSA rules, and airport terminology from non-flight trips, scoped baggage directories to the active transit mode, hid Terminal &amp; Station Maps on Car and Bus trips, and aligned print manifests with each mode&apos;s actual limits.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Carrier Policy Accuracy, Destination Search &amp; Print Watermark Clarity</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Added Southwest Airlines&apos; active-duty military checked-bag exemption, displayed dated Verified stamps across all 42 airline guides, updated UK entry references to uppercase ETA, prioritized London Heathrow (LHR) above disambiguated city matches, synced default bag labels when changing bag types, added the /airline-guides redirect to /airlines/, and softened the free PDF preview watermark behind manifest text.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Zero-Flash Header Badges, Homepage Preview Contrast &amp; Honest Copy</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Displayed the Free Plan badge consistently for guests and free users without blank pulse placeholders, fixed dark-theme input text contrast in the homepage trip preview, standardized singular/plural grammar, added onboarding re-open guards, and removed overstated live/alert labels from rule-based tools.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Nov 11, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
@@ -215,7 +267,7 @@ export const ChangelogPage: React.FC = () => {
                   <tr className="hover:bg-purple-50/40">
                     <td className="p-2 font-mono font-bold text-purple-700 dark:text-purple-300">/ (Homepage)</td>
                     <td className="p-2 font-mono">https://gateready.ca/</td>
-                    <td className="p-2">Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42+ airlines with GateReady.</td>
+                    <td className="p-2">Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42 airlines with GateReady.</td>
                     <td className="p-2 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">https://gateready.ca/thumbnail.jpg (Absolute URL)</td>
                   </tr>
                   <tr className="hover:bg-purple-50/40">
@@ -526,7 +578,7 @@ export const ChangelogPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
             <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Climate Forecast No-Date Guidance State</span>
+              <span>Seasonal Climate No-Date Guidance State</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Replaced unselected default month weather assumptions with informative placeholder guidance.

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trip, BaggageLimitInfo } from '../types/travel';
 import { airlineLimits, trainLimits, busLimits, cruiseLimits, carCapacities, tsa311Rules } from '../data/allowances';
 import { 
@@ -44,6 +44,14 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
     if (trip.travelType === 'CAR') return 'car';
     return 'plane';
   });
+
+  useEffect(() => {
+    if (trip.travelType === 'TRAIN') setSelectedCategory('train');
+    else if (trip.travelType === 'BUS') setSelectedCategory('bus');
+    else if (trip.travelType === 'CRUISE') setSelectedCategory('cruise');
+    else if (trip.travelType === 'CAR') setSelectedCategory('car');
+    else setSelectedCategory('plane');
+  }, [trip.travelType]);
 
   // Find user's matched carrier
   const matchedAirline = isFlight && trip.companyName
@@ -514,17 +522,19 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
 
           {/* Category Tabs */}
           <div className="flex items-center gap-1 bg-purple-50 dark:bg-slate-800 p-1 rounded-xl self-start sm:self-auto border border-purple-100 dark:border-purple-900/40 flex-wrap">
-            <button
-              onClick={() => setSelectedCategory('plane')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                selectedCategory === 'plane'
-                  ? 'bg-white dark:bg-slate-900 text-purple-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-purple-900 dark:hover:text-white'
-              }`}
-            >
-              <Plane className="w-3.5 h-3.5" />
-              <span>Airlines</span>
-            </button>
+            {isFlight && (
+              <button
+                onClick={() => setSelectedCategory('plane')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  selectedCategory === 'plane'
+                    ? 'bg-white dark:bg-slate-900 text-purple-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-purple-900 dark:hover:text-white'
+                }`}
+              >
+                <Plane className="w-3.5 h-3.5" />
+                <span>Airlines</span>
+              </button>
+            )}
             <button
               onClick={() => setSelectedCategory('train')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${

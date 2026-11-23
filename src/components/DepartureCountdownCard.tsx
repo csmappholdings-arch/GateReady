@@ -41,6 +41,8 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
     resetAllPacked
   } = usePacking();
 
+  const [showReturnConfirm, setShowReturnConfirm] = useState(false);
+
   const handleToggleReturnTrip = () => {
     if (!isPro) {
       openPaywall(`Return Trip Repack Mode is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
@@ -48,13 +50,17 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
     }
     const nextMode = !trip.isReturnRepackMode;
     if (nextMode) {
-      if (confirm("Switch to Return Trip Repack Mode? All your items will remain assigned to the same bags and compartments, and checkboxes will be reset so you can check items off as you pack your hotel room.")) {
-        updateTripDetails(trip.id, { isReturnRepackMode: true });
-        resetAllPacked(trip.id);
-      }
+      setShowReturnConfirm(true);
     } else {
+      setShowReturnConfirm(false);
       updateTripDetails(trip.id, { isReturnRepackMode: false });
     }
+  };
+
+  const handleConfirmReturnRepack = () => {
+    setShowReturnConfirm(false);
+    updateTripDetails(trip.id, { isReturnRepackMode: true });
+    resetAllPacked(trip.id);
   };
 
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
@@ -163,14 +169,14 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-bold text-slate-900 dark:text-white">
-                Departure Countdown Clock & Travel Day Alerts
+                Departure Countdown Clock &amp; Travel Day Reminders
               </span>
               <span className="text-[9px] font-black uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs shrink-0">
                 <Crown className="w-2.5 h-2.5 fill-white" /> Silver+ Required
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Live ticking countdown to travel time and critical day-of alerts (foreign cash pickup, passports & home security).
+              Live ticking countdown to travel time and critical day-of reminders (foreign cash pickup, passports &amp; home security).
             </p>
           </div>
         </div>
@@ -201,7 +207,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm sm:text-base font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                <span>Departure Countdown & Travel Day Alerts</span>
+                <span>Departure Countdown &amp; Travel Day Reminders</span>
               </h3>
               {isPro ? (
                 <span className="text-[10px] bg-gradient-to-r from-amber-400 to-amber-500 text-purple-950 font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
@@ -317,8 +323,8 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   {isFlight
-                    ? 'Pick your travel date to track takeoff and receive day-of alerts.'
-                    : 'Pick your travel date to track departure and receive day-of alerts.'}
+                    ? 'Pick your travel date to track takeoff and view day-of reminders.'
+                    : 'Pick your travel date to track departure and view day-of reminders.'}
                 </p>
                 <button
                   type="button"
@@ -337,7 +343,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                 </h4>
                 <p className="text-xs text-emerald-700 dark:text-emerald-400">
                   {trip.isReturnRepackMode 
-                    ? 'Packing to head home: All item baggage placements are preserved from flight #1.'
+                    ? `Packing to head home: All item baggage placements are preserved from ${isFlight ? 'flight #1' : 'your outbound trip'}.`
                     : 'Your departure time has arrived! Ready for the return trip?'}
                 </p>
 
@@ -353,6 +359,30 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>{trip.isReturnRepackMode ? 'Exit Return Repack Mode' : (!trip.travelType || trip.travelType === 'PLANE' ? 'Start Return Flight Repack (Silver+)' : 'Start Return Leg Repack (Silver+)')}</span>
                 </button>
+
+                {showReturnConfirm && !trip.isReturnRepackMode && (
+                  <div className="mt-2 p-3 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 text-left space-y-2 shadow-sm">
+                    <p className="text-[11px] text-slate-700 dark:text-slate-200 leading-snug">
+                      Switch to Return Trip Repack Mode? All items stay assigned to the same bags and compartments, and checkboxes will reset for packing your hotel room.
+                    </p>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowReturnConfirm(false)}
+                        className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleConfirmReturnRepack}
+                        className="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold cursor-pointer"
+                      >
+                        Reset &amp; Start Return Repack
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-4 gap-2 text-center">

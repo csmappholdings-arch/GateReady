@@ -48,7 +48,7 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
       recommendations.push({
         id: 'pack_remaining',
         title: `Complete Remaining Items (${totalItemsCount - packedItemsCount} left)`,
-        description: `Pack and check off the remaining items before heading to the airport.`,
+        description: `Pack and check off the remaining items before departure.`,
         actionLabel: 'Pack Remaining Items',
         targetTab: 'Checklist',
         priority: totalItemsCount - packedItemsCount > 5 ? 'HIGH' : 'MEDIUM'
@@ -99,23 +99,28 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
       }
     });
 
+    const isFlightTrip = trip.travelType === 'PLANE' || !trip.travelType;
+    const carrierNoun = isFlightTrip ? 'airline' : trip.travelType === 'TRAIN' ? 'rail' : trip.travelType === 'CRUISE' ? 'cruise' : trip.travelType === 'BUS' ? 'bus' : 'trip';
+
     if (overweightCount > 0) {
       baggageScore = 10;
-      baggageDetail = `${overweightCount} bag${overweightCount > 1 ? 's' : ''} exceed airline limit!`;
+      baggageDetail = `${overweightCount} bag${overweightCount > 1 ? 's' : ''} exceed ${carrierNoun} limit!`;
       recommendations.push({
         id: 'bag_overweight',
         title: 'Rebalance Overweight Luggage',
-        description: 'Redistribute packed items across bags or deduct excess weight to prevent airport fees.',
+        description: isFlightTrip
+          ? 'Redistribute packed items across bags or deduct excess weight to prevent airport fees.'
+          : 'Redistribute packed items across bags or deduct excess weight to stay comfortably within limits.',
         actionLabel: 'Rebalance Luggage',
         targetTab: 'Luggage',
         priority: 'HIGH'
       });
     } else if (approachingCount > 0) {
       baggageScore = 24;
-      baggageDetail = `${approachingCount} bag approaching weight limit`;
+      baggageDetail = `${approachingCount} bag${approachingCount > 1 ? 's' : ''} approaching weight limit`;
     } else {
       baggageScore = 30;
-      baggageDetail = `All ${trip.bags.length} bags within airline allowances`;
+      baggageDetail = `All ${trip.bags.length} ${trip.bags.length === 1 ? 'bag' : 'bags'} within ${carrierNoun} allowances`;
       baggageComplete = true;
     }
 
@@ -194,7 +199,8 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
     'travelInsuranceReviewed',
     'hotelConfirmationAvailable',
     'flightConfirmationAvailable',
-    'travelAuthorizationsReviewed'
+    'travelAuthorizationsReviewed',
+    'emergencyContactNoted'
   ];
 
   const totalDocsCount = docFields.length;
@@ -240,12 +246,14 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
   if (finalReviewScore >= 8) {
     finalReviewDetail = 'Schedule and departure route confirmed';
   } else {
-    finalReviewDetail = 'Departure date, flight numbers or schedule needed';
+    finalReviewDetail = trip.travelType === 'PLANE' || !trip.travelType
+      ? 'Departure date, flight numbers or schedule needed'
+      : 'Departure date, carrier or schedule needed';
     if (!hasDepartureDate) {
       recommendations.push({
         id: 'review_departure',
         title: 'Set Departure Schedule',
-        description: 'Enter departure date and time to enable the travel countdown timer and alerts.',
+        description: 'Enter departure date and time to enable the travel countdown timer and reminders.',
         actionLabel: 'Set Departure Date',
         targetTab: 'Overview',
         priority: 'HIGH'
@@ -316,7 +324,7 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
         score: finalReviewScore,
         max: 10,
         percentage: finalReviewPercentage,
-        label: 'Departure & Flight Review',
+        label: trip.travelType === 'PLANE' || !trip.travelType ? 'Departure & Flight Review' : 'Departure & Trip Review',
         detail: finalReviewDetail,
         complete: finalReviewComplete
       }

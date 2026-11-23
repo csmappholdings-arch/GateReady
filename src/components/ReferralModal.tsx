@@ -135,7 +135,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                 <div className="flex items-start gap-2.5">
                   <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                   <p className="text-slate-700 dark:text-slate-200">
-                    <strong className="text-slate-900 dark:text-white font-bold">Accurate Live Countdown</strong>: Tracks the time remaining until free access runs out, ensuring exactly 1 month of Platinum is granted and then removed.
+                    <strong className="text-slate-900 dark:text-white font-bold">Active 30-Day Countdown</strong>: Tracks the time remaining until free access runs out, ensuring exactly 1 month of Platinum is granted and then removed.
                   </p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                     </div>
                   </div>
                   <span className="text-[10px] uppercase font-black bg-fuchsia-500/40 text-fuchsia-100 px-2.5 py-1 rounded-full border border-fuchsia-300/40 shrink-0">
-                    Live Clock
+                    Countdown Active
                   </span>
                 </div>
               )}
@@ -276,7 +276,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                   <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     3
                   </span>
-                  <span>You automatically receive 1 Month of Free Platinum ($4.99 value) per signup, tracked with an accurate live countdown until the month ends and is removed.</span>
+                  <span>You automatically receive 1 Month of Free Platinum ($4.99 value) per signup, tracked with an active countdown until the month ends and is removed.</span>
                 </div>
               </div>
 
@@ -285,7 +285,7 @@ export const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, o
                 <div className="text-left">
                   <p className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                    <span>Test Referral Tracking (Live Simulator)</span>
+                    <span>Test Referral Tracking (Interactive Simulator)</span>
                   </p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400">
                     Simulate a friend using your code to create a free account to verify the instant credit calculation.

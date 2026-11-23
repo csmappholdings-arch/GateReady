@@ -74,13 +74,13 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300 block">
-                Destination Weather & Clothing Advisor
+                Destination Climate &amp; Clothing Advisor
               </span>
               <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                Add a destination to see weather advice
+                Add a destination to see seasonal climate advice
               </p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Set a destination city to view real-time 5-day climate forecasts and seasonal clothing packing advice.
+                Set a destination city to view monthly seasonal climate norms and clothing packing advice.
               </p>
             </div>
           </div>
@@ -127,7 +127,7 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
     );
   }
 
-  // Compute departure date window: <= 14 days = live/dated forecast; > 14 days (or no date) = climate norms
+  // Resolve trip departure month for seasonal climate norms (never claim a live forecast)
   let departureDateObj: Date | null = null;
   if (trip.departureDate && trip.departureDate.trim()) {
     try {
@@ -148,94 +148,15 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
     }
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  let daysUntilDep: number | null = null;
-  if (departureDateObj) {
-    const depMidnight = new Date(departureDateObj);
-    depMidnight.setHours(0, 0, 0, 0);
-    daysUntilDep = Math.round((depMidnight.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  }
-
-  // Check if a departure date is configured on the trip
   const hasDepartureDate = Boolean(trip.departureDate && trip.departureDate.trim() && departureDateObj);
-
-  // Active forecast mode if trip departs within 0 to 14 days
-  const isForecastMode = hasDepartureDate && daysUntilDep !== null && daysUntilDep >= 0 && daysUntilDep <= 14;
 
   const travelMonth = departureDateObj
     ? departureDateObj.toLocaleString('en-US', { month: 'long' })
     : 'December';
 
-  // Realistic seasonal weather simulation or historical climate norms
-  const getSimulatedForecast = (cityName: string): WeatherForecastDay[] => {
+  // Always present labeled seasonal historical climate norms (never live or dated forecasts)
+  const getSeasonalClimateNorms = (cityName: string): WeatherForecastDay[] => {
     const lower = cityName.toLowerCase();
-
-    if (isForecastMode && departureDateObj) {
-      // 5-Day dated forecast window starting from trip departure date
-      const result: WeatherForecastDay[] = [];
-      const baseDate = new Date(departureDateObj);
-
-      for (let i = 0; i < 5; i++) {
-        const dayDate = new Date(baseDate);
-        dayDate.setDate(baseDate.getDate() + i);
-        const dateLabel = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const weekday = dayDate.toLocaleDateString('en-US', { weekday: 'short' });
-        const dayName = i === 0 && daysUntilDep === 0 ? 'Today' : i === 1 && daysUntilDep === 0 ? 'Tomorrow' : `${weekday}, ${dateLabel}`;
-
-        if (lower.includes('london') || lower.includes('uk') || lower.includes('seattle') || lower.includes('ireland')) {
-          const specs = [
-            { condition: 'RAIN' as const, tempHighF: 59, tempLowF: 48, rainChance: 75, uvIndex: 3, summary: 'Intermittent brisk rain & overcast' },
-            { condition: 'RAIN' as const, tempHighF: 57, tempLowF: 46, rainChance: 80, uvIndex: 2, summary: 'Afternoon downpours & breeze' },
-            { condition: 'CLOUDY' as const, tempHighF: 62, tempLowF: 50, rainChance: 35, uvIndex: 4, summary: 'Mostly cloudy with mild breaks' },
-            { condition: 'CLOUDY' as const, tempHighF: 63, tempLowF: 51, rainChance: 25, uvIndex: 4, summary: 'Breezy & partly overcast' },
-            { condition: 'RAIN' as const, tempHighF: 60, tempLowF: 49, rainChance: 65, uvIndex: 3, summary: 'Scattered light showers' }
-          ][i % 5];
-          result.push({ dayName, date: dateLabel, ...specs });
-        } else if (lower.includes('tokyo') || lower.includes('japan') || lower.includes('seoul')) {
-          const specs = [
-            { condition: 'SUNNY' as const, tempHighF: 73, tempLowF: 59, rainChance: 15, uvIndex: 7, summary: 'Crisp sunshine & light breeze' },
-            { condition: 'SUNNY' as const, tempHighF: 75, tempLowF: 60, rainChance: 10, uvIndex: 8, summary: 'Pleasant & ideal walking weather' },
-            { condition: 'CLOUDY' as const, tempHighF: 70, tempLowF: 57, rainChance: 30, uvIndex: 5, summary: 'Passing high clouds' },
-            { condition: 'RAIN' as const, tempHighF: 66, tempLowF: 55, rainChance: 70, uvIndex: 3, summary: 'Light rain in metropolitan area' },
-            { condition: 'SUNNY' as const, tempHighF: 72, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear blue skies' }
-          ][i % 5];
-          result.push({ dayName, date: dateLabel, ...specs });
-        } else if (lower.includes('miami') || lower.includes('cancun') || lower.includes('orlando') || lower.includes('hawaii') || lower.includes('bali')) {
-          const specs = [
-            { condition: 'SUNNY' as const, tempHighF: 86, tempLowF: 76, rainChance: 20, uvIndex: 10, summary: 'Tropical heat & high humidity' },
-            { condition: 'THUNDERSTORM' as const, tempHighF: 84, tempLowF: 75, rainChance: 65, uvIndex: 8, summary: 'Afternoon coastal thunderstorm' },
-            { condition: 'SUNNY' as const, tempHighF: 87, tempLowF: 77, rainChance: 15, uvIndex: 11, summary: 'Intense sunshine & tropical warmth' },
-            { condition: 'SUNNY' as const, tempHighF: 88, tempLowF: 78, rainChance: 10, uvIndex: 11, summary: 'Clear skies with ocean breeze' },
-            { condition: 'CLOUDY' as const, tempHighF: 85, tempLowF: 76, rainChance: 30, uvIndex: 9, summary: 'Warm with passing sun clouds' }
-          ][i % 5];
-          result.push({ dayName, date: dateLabel, ...specs });
-        } else if (lower.includes('denver') || lower.includes('alps') || lower.includes('calgary') || lower.includes('tromso') || lower.includes('ski')) {
-          const specs = [
-            { condition: 'SNOW' as const, tempHighF: 34, tempLowF: 22, rainChance: 85, uvIndex: 4, summary: 'Snow flurries & crisp mountain air' },
-            { condition: 'CHILLY' as const, tempHighF: 38, tempLowF: 24, rainChance: 20, uvIndex: 6, summary: 'Sunny but sub-freezing mornings' },
-            { condition: 'SNOW' as const, tempHighF: 32, tempLowF: 19, rainChance: 70, uvIndex: 3, summary: 'Steady mountain snowfall' },
-            { condition: 'CHILLY' as const, tempHighF: 40, tempLowF: 26, rainChance: 15, uvIndex: 5, summary: 'Dry cold with crisp wind' },
-            { condition: 'SUNNY' as const, tempHighF: 42, tempLowF: 28, rainChance: 10, uvIndex: 6, summary: 'Bright alpine sunshine' }
-          ][i % 5];
-          result.push({ dayName, date: dateLabel, ...specs });
-        } else {
-          const specs = [
-            { condition: 'SUNNY' as const, tempHighF: 71, tempLowF: 56, rainChance: 20, uvIndex: 6, summary: 'Mild & pleasant traveling weather' },
-            { condition: 'CLOUDY' as const, tempHighF: 68, tempLowF: 54, rainChance: 40, uvIndex: 4, summary: 'Overcast with brief afternoon breeze' },
-            { condition: 'RAIN' as const, tempHighF: 64, tempLowF: 52, rainChance: 65, uvIndex: 3, summary: 'Passing showers; umbrella advised' },
-            { condition: 'SUNNY' as const, tempHighF: 73, tempLowF: 57, rainChance: 15, uvIndex: 7, summary: 'Sunny & warm walking conditions' },
-            { condition: 'SUNNY' as const, tempHighF: 74, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear skies through the evening' }
-          ][i % 5];
-          result.push({ dayName, date: dateLabel, ...specs });
-        }
-      }
-      return result;
-    }
-
-    // Beyond 14 days or far future (e.g. Dec 2027) or no departure date:
-    // Present labeled climate norms for that travel month
     const monthIdx = departureDateObj ? departureDateObj.getMonth() : 11; // default Dec
     const isWinter = [11, 0, 1].includes(monthIdx);
     const isSummer = [5, 6, 7].includes(monthIdx);
@@ -358,7 +279,7 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
     }
   };
 
-  const forecast = getSimulatedForecast(city);
+  const forecast = getSeasonalClimateNorms(city);
   const maxRain = Math.max(...forecast.map(f => f.rainChance));
   const minTemp = Math.min(...forecast.map(f => f.tempLowF));
   const maxTemp = Math.max(...forecast.map(f => f.tempHighF));
@@ -370,7 +291,7 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
     recommendations.push({
       name: 'Compact Travel Umbrella',
       category: 'Accessories',
-      why: `${maxRain}% rain expected during your trip`,
+      why: `${maxRain}% typical rainy-day frequency in ${travelMonth}`,
       priority: 'REQUIRED'
     });
     recommendations.push({
@@ -504,20 +425,18 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300">
-                Destination Weather & Clothing Advisor
+                Destination Climate &amp; Clothing Advisor
               </span>
               <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                 !hasDepartureDate
                   ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
-                  : isForecastMode 
-                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
-                    : 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
+                  : 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
               }`}>
-                {!hasDepartureDate ? `Example (${travelMonth})` : isForecastMode ? '5-Day Forecast' : `Typical ${travelMonth}`}
+                {!hasDepartureDate ? `Example (${travelMonth} Avg)` : `Typical ${travelMonth} · Historical Norm`}
               </span>
               <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400">
                 {!hasDepartureDate 
-                  ? `${city}: Example weather preview (${formatTemp(forecast[0]?.tempHighF)} / ${formatTemp(forecast[0]?.tempLowF)})`
+                  ? `${city}: Example seasonal climate preview (${formatTemp(forecast[0]?.tempHighF)} / ${formatTemp(forecast[0]?.tempLowF)})`
                   : `${city}: ${forecast[0]?.summary} (${formatTemp(forecast[0]?.tempHighF)} / ${formatTemp(forecast[0]?.tempLowF)})`}
               </span>
             </div>
@@ -608,36 +527,29 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
             </form>
           )}
 
-      {/* Forecast or Climate Norms Banner */}
+      {/* Seasonal Climate Norms Banner (Never present static climate data as a live forecast) */}
       {!hasDepartureDate ? (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/60 text-xs text-amber-950 dark:text-amber-200 mb-3">
           <div className="flex items-center gap-2">
             <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span className="font-semibold">
-              Example: typical {travelMonth} in {city} — set your departure date for your trip's weather
+              Example: typical {travelMonth} in {city} — not a live forecast. Set your departure date to match your travel month.
             </span>
           </div>
           <span className="text-[11px] text-amber-800/90 dark:text-amber-300/90 font-medium shrink-0">
-            Add a departure date to see the forecast or typical weather for your travel month
-          </span>
-        </div>
-      ) : !isForecastMode ? (
-        <div className="flex items-center gap-2 p-3 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-xs text-purple-900 dark:text-purple-200 mb-3">
-          <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-          <span className="font-semibold">
-            Typical for {travelMonth} in {city} — not a forecast
+            Seasonal historical averages for packing reference
           </span>
         </div>
       ) : (
-        <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 text-xs text-sky-900 dark:text-sky-200 mb-3">
-          <Info className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+        <div className="flex items-center gap-2 p-3 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-xs text-purple-900 dark:text-purple-200 mb-3">
+          <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
           <span className="font-semibold">
-            5-Day departure forecast for {city} starting {forecast[0]?.date || 'soon'}
+            Typical for {travelMonth} in {city} — not a live forecast
           </span>
         </div>
       )}
 
-      {/* 5-Day Weather Forecast or Climate Norms Strip */}
+      {/* Seasonal Climate Norms Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 my-3">
         {forecast.map((day, idx) => {
           let Icon = Sun;
@@ -707,7 +619,7 @@ export const DestinationWeatherAdvisor: React.FC<DestinationWeatherAdvisorProps>
           <div className="flex items-center gap-2">
             <Shirt className="w-4 h-4 text-purple-600 dark:text-purple-400" />
             <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-              Weather-Triggered Packing Recommendations
+              Climate-Based Packing Recommendations
             </h4>
           </div>
           <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">

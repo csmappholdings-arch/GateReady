@@ -113,7 +113,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     aliases: ['united kingdom', 'uk', 'great britain', 'britain', 'england', 'scotland', 'wales', 'northern ireland', 'london', 'manchester', 'edinburgh', 'glasgow', 'birmingham'],
     ca: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — up to 180 days',
+      visaBadgeText: 'ETA required before travel — up to 180 days',
       maxStay: 'Up to 180 days (6 months)',
       passportValidityRule: 'Must be valid for duration of intended stay',
       officialSourceUrl: 'https://travel.gc.ca/destinations/united-kingdom',
@@ -121,7 +121,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     },
     us: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — up to 180 days',
+      visaBadgeText: 'ETA required before travel — up to 180 days',
       maxStay: 'Up to 180 days (6 months)',
       passportValidityRule: 'Must be valid for duration of intended stay',
       officialSourceUrl: 'https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/UnitedKingdom.html',
@@ -353,7 +353,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     aliases: ['india', 'delhi', 'new delhi', 'mumbai', 'bengaluru', 'bangalore', 'goa', 'jaipur', 'chennai', 'hyderabad'],
     ca: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — apply online',
+      visaBadgeText: 'e-Visa required before travel — apply online',
       maxStay: '30 days to 90 days (depending on e-Visa category)',
       passportValidityRule: 'Must be valid at least 6 months from arrival date with 2 blank pages',
       officialSourceUrl: 'https://travel.gc.ca/destinations/india',
@@ -361,11 +361,11 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     },
     us: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — apply online',
+      visaBadgeText: 'e-Visa required before travel — apply online',
       maxStay: 'Up to 90 days per visit (1-year or 5-year tourist e-Visa allows 180 days/year)',
       passportValidityRule: 'Must be valid at least 6 months from arrival date with 2 blank pages',
       officialSourceUrl: 'https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/India.html',
-      notes: 'Electronic Travel Authorization (e-Visa) must be obtained online prior to departure.'
+      notes: 'Electronic Visa (e-Visa) must be obtained online prior to departure.'
     },
     lastVerified: 'October 15, 2026'
   },
@@ -377,7 +377,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     aliases: ['vietnam', 'hanoi', 'ho chi minh city', 'saigon', 'da nang', 'hoi an', 'phu quoc'],
     ca: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — up to 90 days',
+      visaBadgeText: 'e-Visa required before travel — up to 90 days',
       maxStay: 'Up to 90 days (Single or Multiple Entry eVisa)',
       passportValidityRule: 'Must be valid at least 6 months beyond arrival date',
       officialSourceUrl: 'https://travel.gc.ca/destinations/vietnam',
@@ -385,7 +385,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     },
     us: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — up to 90 days',
+      visaBadgeText: 'e-Visa required before travel — up to 90 days',
       maxStay: 'Up to 90 days',
       passportValidityRule: 'Must be valid at least 6 months beyond arrival date',
       officialSourceUrl: 'https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Vietnam.html',
@@ -593,7 +593,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     aliases: ['brazil', 'brasil', 'rio de janeiro', 'sao paulo', 'salvador', 'brasilia', 'fortaleza'],
     ca: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — apply online',
+      visaBadgeText: 'e-Visa required before travel — apply online',
       maxStay: 'Up to 90 days per year',
       passportValidityRule: 'Must be valid for duration of intended stay',
       officialSourceUrl: 'https://travel.gc.ca/destinations/brazil',
@@ -601,7 +601,7 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
     },
     us: {
       visaStatusType: 'ETA_ESTA_REQUIRED',
-      visaBadgeText: 'eTA required before travel — apply online',
+      visaBadgeText: 'e-Visa required before travel — apply online',
       maxStay: 'Up to 90 days',
       passportValidityRule: 'Must be valid for duration of intended stay',
       officialSourceUrl: 'https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Brazil.html',
@@ -667,17 +667,17 @@ export const ENTRY_REQUIREMENTS_DATABASE: EntryRequirementRecord[] = [
       visaStatusType: 'VISA_FREE',
       visaBadgeText: 'Visa-free — up to 90 days',
       maxStay: '90 days within any 180-day period',
-      passportValidityRule: 'Must be valid at least 6 months beyond entry date',
+      passportValidityRule: 'Must be valid at least 150 days from arrival date (6 months recommended)',
       officialSourceUrl: 'https://travel.gc.ca/destinations/turkiye',
-      notes: 'Turkey abolished visas for Canadian tourists. Passport must have at least 150 days validity from arrival.'
+      notes: 'Turkey abolished visas for Canadian tourists. Passport must have at least 150 days validity from arrival date (6 months recommended).'
     },
     us: {
       visaStatusType: 'VISA_FREE',
       visaBadgeText: 'Visa-free — up to 90 days',
       maxStay: '90 days within any 180-day period',
-      passportValidityRule: 'Must be valid at least 6 months beyond entry date',
+      passportValidityRule: 'Must be valid at least 150 days from arrival date (6 months recommended)',
       officialSourceUrl: 'https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Turkiye.html',
-      notes: 'US passport holders are exempt from tourist visa requirements for stays up to 90 days.'
+      notes: 'US passport holders are exempt from tourist visa requirements for stays up to 90 days. Passport must be valid at least 150 days from arrival date (6 months recommended).'
     },
     lastVerified: 'October 15, 2026'
   },

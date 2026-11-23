@@ -8,7 +8,8 @@ import {
   BAG_MATERIAL_PRESETS, 
   getBagEmptyWeightLbs,
   getUserPresetWeightLbs,
-  setUserPresetWeightLbs
+  setUserPresetWeightLbs,
+  getUpdatedBagLabelForType
 } from '../types/travel';
 import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 import { usePacking } from '../context/PackingContext';
@@ -127,6 +128,7 @@ export const EditBagDialog: React.FC<EditBagDialogProps> = ({
     }
 
     setType(newType);
+    setLabel((prev) => getUpdatedBagLabelForType(prev, newType));
     const newLbs = getUserPresetWeightLbs(newType, material);
     const displayVal = weightUnit === 'KG'
       ? (newLbs * 0.45359237).toFixed(1)

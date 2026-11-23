@@ -17,7 +17,7 @@ const FAQS: FaqItem[] = [
           GateReady is completely free to start. <strong>{TRIAL_TERMS_EXACT}</strong>
         </p>
         <p>
-          While the 7-day trial is active, all tiers and features are unlocked: unlimited trips, unlimited bags, suitcase tare deduction, smart bag rebalancing, terminal maps, and emergency QR luggage tags. Free starter access (1 active trip, 2 bags, 42+ airline allowance lookup, and personal cloud sync) remains yours forever.
+          While the 7-day trial is active, all tiers and features are unlocked: unlimited trips, unlimited bags, suitcase tare deduction, smart bag rebalancing, terminal maps, and emergency QR luggage tags. Free starter access (1 active trip, 2 bags, 42 airline allowance lookup, and personal cloud sync) remains yours forever.
         </p>
       </div>
     )
@@ -40,7 +40,7 @@ const FAQS: FaqItem[] = [
     answer: (
       <div className="space-y-2">
         <p>
-          Baggage fees shown in GateReady are <strong>estimates calculated from published airline fee tables</strong> for 42+ carriers.
+          Baggage fees shown in GateReady are <strong>estimates calculated from published airline fee tables</strong> for 42 carriers.
         </p>
         <p>
           Airlines frequently adjust luggage fees based on ticket class (Basic Economy vs Main Cabin vs Premium), route type (domestic vs transoceanic), frequent flyer status, and whether fees are prepaid online or paid at the airport ticket counter. Always confirm your specific allowance and fees on your airline's official booking confirmation or website before heading to the airport.
@@ -126,7 +126,7 @@ const FAQS: FaqItem[] = [
     answer: (
       <div className="space-y-2">
         <p>
-          GateReady includes 42+ major carriers including Air Canada, WestJet, Porter, Delta, United, American Airlines, Southwest, British Airways, Air France, Lufthansa, KLM, Emirates, Ryanair, easyJet, Japan Airlines, ANA, Singapore Airlines, and many others.
+          GateReady includes 42 major carriers including Air Canada, WestJet, Porter, Delta, United, American Airlines, Southwest, British Airways, Air France, Lufthansa, KLM, Emirates, Ryanair, easyJet, Japan Airlines, ANA, Singapore Airlines, and many others.
         </p>
       </div>
     )

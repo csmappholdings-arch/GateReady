@@ -96,10 +96,10 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-base text-white">
-                Travel Reminders &amp; Alerts
+                Travel Departure Reminders
               </h3>
               <p className="text-[11px] text-purple-200/90">
-                {unreadCount > 0 ? `${unreadCount} unread upcoming flight notifications` : 'All caught up on departure alerts'}
+                {unreadCount > 0 ? `${unreadCount} unread upcoming trip reminders` : 'All caught up on departure reminders'}
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   : 'text-slate-600 dark:text-slate-300 hover:bg-purple-100 dark:hover:bg-purple-900/40'
               }`}
             >
-              <span>Alerts</span>
+              <span>Reminders</span>
               {unreadCount > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-purple-950 text-[10px] font-black">
                   {unreadCount}
@@ -168,7 +168,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                 </div>
                 <div className="space-y-1">
                   <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                    No active departure alerts
+                    No active departure reminders
                   </p>
                   <p className="text-xs text-slate-500 max-w-xs mx-auto">
                     When you create an upcoming trip with departure dates, automated 14-day, 7-day, 3-day, and 24-hour reminders will appear here.
@@ -200,7 +200,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                       type="button"
                       onClick={(e) => handleDismiss(n.id, e)}
                       className="text-slate-400 hover:text-rose-500 transition-colors p-1"
-                      title="Dismiss alert"
+                      title="Dismiss reminder"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

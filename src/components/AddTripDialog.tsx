@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
-import { TravelType, BagType, BagMaterial, getUserPresetWeightLbs } from '../types/travel';
+import { TravelType, BagType, BagMaterial, getUserPresetWeightLbs, getUpdatedBagLabelForType } from '../types/travel';
 import { 
   X, 
   Plus, 
@@ -492,6 +492,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       return { 
         ...b, 
         type: newType,
+        label: getUpdatedBagLabelForType(b.label, newType),
         material: mat,
         emptyBagWeightLbs: getUserPresetWeightLbs(newType, mat)
       };
@@ -690,9 +691,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
               </h3>
               <p className={`text-purple-200/90 mt-0.5 ${isExpanded ? 'text-xs' : 'text-[11px]'}`}>
                 {editingTripId
-                  ? 'Update departure, destination, airline, schedule & travelers'
+                  ? `Update departure, destination, ${travelType === 'PLANE' ? 'airline' : 'carrier'}, schedule & travelers`
                   : isOnboarding 
-                  ? 'Step 1: Enter route and flight · Step 2: Configure luggage & travelers'
+                  ? `Step 1: Enter route and ${travelType === 'PLANE' ? 'flight' : 'carrier'} · Step 2: Configure luggage & travelers`
                   : 'Plan your departure, transit hubs, luggage allowances & travelers'}
               </p>
             </div>
@@ -1144,8 +1145,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       </div>
                       <p className="text-[10px] text-indigo-700/80 dark:text-indigo-300/80">
                         {travelType === 'PLANE'
-                          ? 'Track return flight countdowns, 2-way baggage allowances & return day alerts'
-                          : 'Track return departure countdowns, 2-way baggage allowances & return day alerts'}
+                          ? 'Track return flight countdowns, 2-way baggage allowances & return day reminders'
+                          : 'Track return departure countdowns, 2-way baggage allowances & return day reminders'}
                       </p>
                     </div>
                   </div>
@@ -1251,7 +1252,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       className={isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'}
                     />
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-                      Helps avoid denied boarding for international flights requiring 6 months remaining validity.
+                      Helps avoid denied boarding for {travelType === 'PLANE' ? 'international flights' : 'international borders'} requiring 6 months remaining validity.
                     </p>
                   </div>
 

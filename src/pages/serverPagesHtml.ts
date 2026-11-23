@@ -169,7 +169,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">42-Airline Baggage Allowance Reference</h3>
-            <p class="text-xs text-slate-600 mt-1">Pre-calibrated carry-on sizer dimensions (inches & cm) and checked weight caps for 42+ major global carriers, including Air Canada, WestJet, Delta, United, and British Airways.</p>
+            <p class="text-xs text-slate-600 mt-1">Pre-calibrated carry-on sizer dimensions (inches & cm) and checked weight caps for 42 major global carriers, including Air Canada, WestJet, Delta, United, and British Airways.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">Departure Readiness Tracking</h3>
@@ -292,7 +292,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">Are baggage fees exact or estimates?</h3>
-            <p class="text-xs text-slate-600 mt-1">Estimates derived from published airline baggage tables for 42+ carriers. Because airlines vary rates by fare class, route, and prepayment, always confirm with your airline at booking.</p>
+            <p class="text-xs text-slate-600 mt-1">Estimates derived from published airline baggage tables for 42 carriers. Because airlines vary rates by fare class, route, and prepayment, always confirm with your airline at booking.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">What happens to a guest list if you do not sign up?</h3>
@@ -300,7 +300,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">How does the TSA 3-1-1 checker work?</h3>
-            <p class="text-xs text-slate-600 mt-1">It is an item list rule check against the TSA 3.4 oz (100ml) limit, not a hardware scanner. It alerts you when toiletries in carry-on bags should be moved to checked luggage.</p>
+            <p class="text-xs text-slate-600 mt-1">It is an item list rule check against the TSA 3.4 oz (100ml) limit, not a hardware scanner. It flags toiletries in carry-on bags that should be moved to checked luggage.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <h3 class="font-bold text-slate-900">How do referrals work?</h3>
@@ -366,15 +366,15 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">2. Select Travel Mode &amp; Operating Airline</h3>
-            <p class="text-xs text-slate-600 mt-1">Choose from 42+ verified airlines and fare families to load published carry-on sizer dimensions and checked luggage weight limits.</p>
+            <p class="text-xs text-slate-600 mt-1">Choose from 42 verified airlines and fare families to load published carry-on sizer dimensions and checked luggage weight limits.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">3. Add Luggage &amp; Calibrate Suitcase Tare Weight</h3>
             <p class="text-xs text-slate-600 mt-1">Deduct empty bag shell weight (5.5–7.0 lbs for carry-ons, 8.5–10.5 lbs for checked suitcases, or 1.5–3.0 lbs for personal items) to ensure packed belongings remain strictly within airline allowances.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-            <h3 class="font-bold text-slate-900">4. Live Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit</h3>
-            <p class="text-xs text-slate-600 mt-1">Monitor Live Packing Weight Meters as you pack and automatically audit carry-on bottles against the TSA 3.4 oz (100ml) security limit.</p>
+            <h3 class="font-bold text-slate-900">4. Packing Weight Meters &amp; TSA 3-1-1 Liquids Audit</h3>
+            <p class="text-xs text-slate-600 mt-1">Monitor Packing Weight Meters as you pack and automatically audit carry-on bottles against the TSA 3.4 oz (100ml) security limit.</p>
           </div>
           <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
             <h3 class="font-bold text-slate-900">5. Review Departure Readiness, Rebalance &amp; Print Manifests</h3>
@@ -407,7 +407,22 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">November 2, 2026 — Rebalance Bags Luggage Optimizer, Server-Side Account Deletion, Fare-Family Single Source of Truth & Settings Reachability</div>
+            <div class="font-bold text-purple-900 text-sm">November 22, 2026 — Mode-Aware Workspaces, Guest Save-Gate Timing, Carrier Verification &amp; UI Clarity</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li><strong>Save-Gate Timing &amp; Last-Trip Navigation:</strong> Fired the guest save prompt only after packing items are added, kept dismissals durable across reloads until saved or signed in, renamed secondary button to "Maybe Later", and returned guests to the homepage after deleting their final trip.</li>
+              <li><strong>Mode-Aware Non-Flight Workspaces:</strong> Eliminated flight/airport/TSA terminology from Cruise, Train, Bus, and Road Trip workspaces, scoped baggage directories by mode, and hid Terminal Maps on Car and Bus trips.</li>
+              <li><strong>Carrier Accuracy, Destination Ranking &amp; Watermark Readability:</strong> Added Southwest active-duty military checked-bag exemptions, added dated Verified stamps to all 42 airline guides, updated UK entry badges to ETA, prioritized London Heathrow (LHR), synced bag labels with bag types, added /airline-guides redirect to /airlines/, and softened the free print watermark behind text.</li>
+              <li><strong>Zero-Flash Header, Input Contrast &amp; Honest Copy:</strong> Displayed the Free Plan badge for guests without pulse placeholders, fixed homepage preview input contrast, fixed singular grammar, and removed overstated live/alert labels on static rule tables.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">November 11, 2026 — Dedicated /pricing Route Reliability Fix</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li>Resolved a client-side error boundary failure when navigating directly to /pricing, with resilient authentication context fallbacks across guest and signed-in sessions.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">November 2, 2026 — Rebalance Bags Luggage Optimizer, Server-Side Account Deletion, Fare-Family Single Source of Truth & Settings Reachability</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li><strong>Rebalance Bags Luggage Optimizer (Silver+):</strong> When any suitcase exceeds weight limits, Rebalance evaluates your packed items to suggest safe transfers to lighter bags. Strictly suggest-first with 1-click apply and complete undo. Rigidly enforces airline safety rules (never moving keys, medications, or lithium power banks into checked luggage) and displays an honest notice when no safe move exists.</li>
               <li><strong>Permanent Server-Side Account Deletion & Local Purge:</strong> Deleting an account enforces complete server-side deletion of Cloud Firestore user profile, all synced trip records, and the Firebase Auth user record before reporting completion. Local device trip state is completely wiped at deletion time, preventing any resurrected trips or subsequent logins with the same credentials.</li>
@@ -446,7 +461,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
                     <tr>
                       <td class="p-1.5 font-mono font-bold">/</td>
                       <td class="p-1.5 font-mono">https://gateready.ca/</td>
-                      <td class="p-1.5">Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42+ airlines with GateReady.</td>
+                      <td class="p-1.5">Calculate baggage fees, tare luggage weight, check TSA 3-1-1 rules, and reference baggage policies for 42 airlines with GateReady.</td>
                       <td class="p-1.5 font-mono text-emerald-700">https://gateready.ca/thumbnail.jpg</td>
                     </tr>
                     <tr>
@@ -531,7 +546,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li>Strict Free plan enforcement (1 traveler, 2 bags max, max 1 checked).</li>
               <li>Referral program transparency ($4.99 value labeled).</li>
-              <li>Per-airline fee calculation matrix for 42+ carriers.</li>
+              <li>Per-airline fee calculation matrix for 42 carriers.</li>
               <li>Standardized luggage tare weight presets.</li>
               <li>Overweight warning percentages and carrier carry-on limits.</li>
             </ul>

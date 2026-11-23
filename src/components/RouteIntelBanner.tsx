@@ -149,10 +149,11 @@ const POPULAR_AIRPORTS = [
 export const RouteIntelBanner: React.FC<RouteIntelBannerProps> = ({ trip }) => {
   const { updateTripDetails } = usePacking();
 
+  const isFlight = !trip.travelType || trip.travelType === 'PLANE';
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isEditingRoute, setIsEditingRoute] = useState(false);
-  const [originInput, setOriginInput] = useState(trip.originCity || 'New York (JFK)');
-  const [destInput, setDestInput] = useState(trip.destinationCity || 'London (LHR)');
+  const [originInput, setOriginInput] = useState(trip.originCity || (isFlight ? 'New York (JFK)' : 'New York, NY'));
+  const [destInput, setDestInput] = useState(trip.destinationCity || (isFlight ? 'London (LHR)' : 'London, UK'));
 
   // Infer origin and destination country keys
   const getCountryKey = (text: string): string => {
@@ -253,47 +254,50 @@ export const RouteIntelBanner: React.FC<RouteIntelBannerProps> = ({ trip }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-purple-200 mb-1">
-                Flying From (Origin Airport / City)
+                {isFlight ? 'Flying From (Origin Airport / City)' : 'Departing From (Origin City)'}
               </label>
               <input
                 type="text"
                 value={originInput}
                 onChange={(e) => setOriginInput(e.target.value)}
-                placeholder="e.g. New York (JFK) or Chicago"
+                placeholder={isFlight ? 'e.g. New York (JFK) or Chicago' : 'e.g. New York or Chicago'}
                 className="w-full h-9 px-3 text-xs rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-hidden focus:border-amber-400"
               />
             </div>
 
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-amber-200 mb-1">
-                Destination (Arrival Airport / City)
+                {isFlight ? 'Destination (Arrival Airport / City)' : trip.travelType === 'CRUISE' ? 'Destination (Port / City)' : 'Destination City'}
               </label>
               <input
                 type="text"
                 value={destInput}
                 onChange={(e) => setDestInput(e.target.value)}
-                placeholder="e.g. London (LHR) or Tokyo"
+                placeholder={isFlight ? 'e.g. London (LHR) or Tokyo' : 'e.g. London or Tokyo'}
                 className="w-full h-9 px-3 text-xs rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-hidden focus:border-amber-400"
               />
             </div>
           </div>
 
-          {/* Quick Airport Preset Chips */}
+          {/* Quick Destination Preset Chips */}
           <div>
             <span className="text-[10px] text-purple-200/80 font-semibold block mb-1.5">
               Popular Destination Presets:
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {POPULAR_AIRPORTS.map((apt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setDestInput(apt.city)}
-                  className="px-2.5 py-1 rounded-lg text-[11px] bg-white/10 hover:bg-purple-600/60 border border-white/10 transition-colors cursor-pointer"
-                >
-                  {apt.city}
-                </button>
-              ))}
+              {POPULAR_AIRPORTS.map((apt, idx) => {
+                const displayCity = isFlight ? apt.city : apt.city.replace(/\s*\([A-Z]{3}\)/, '');
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setDestInput(displayCity)}
+                    className="px-2.5 py-1 rounded-lg text-[11px] bg-white/10 hover:bg-purple-600/60 border border-white/10 transition-colors cursor-pointer"
+                  >
+                    {displayCity}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -399,12 +403,14 @@ export const RouteIntelBanner: React.FC<RouteIntelBannerProps> = ({ trip }) => {
             </p>
 
             <p className="text-[11px] text-purple-200/90 mt-1.5 leading-relaxed">
-              <strong>Time Zone:</strong> {destIntel.timezoneOffsetVsUS}. Stay hydrated, avoid heavy alcohol on the inbound flight, and seek direct morning sunlight to reset your circadian rhythm.
+              <strong>Time Zone:</strong> {destIntel.timezoneOffsetVsUS}. Stay hydrated, pace yourself on arrival, and seek direct morning sunlight to reset your circadian rhythm.
             </p>
           </div>
 
           <div className="mt-3 pt-2.5 border-t border-white/10 text-[10px] text-purple-200/70">
-            Baggage: Never pack power banks or lithium items in checked bags!
+            {isFlight
+              ? 'Baggage: Never pack power banks or lithium items in checked bags!'
+              : 'Power Note: Keep portable battery banks accessible in your daypack or cabin.'}
           </div>
         </div>
       </div>

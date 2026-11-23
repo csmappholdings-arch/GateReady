@@ -377,14 +377,14 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
             {isFlight
-              ? 'Real-time weight meters, empty luggage tare deductions, TSA liquid regulation compliance, and airline overhead sizer auditing.'
+              ? 'Estimated weight meters, empty luggage tare deductions, TSA liquid regulation compliance, and airline overhead sizer auditing.'
               : trip.travelType === 'CAR'
-                ? 'Real-time weight meters, empty luggage tare deductions, and vehicle trunk & cargo space limits.'
+                ? 'Estimated weight meters, empty luggage tare deductions, and vehicle trunk & cargo space limits.'
                 : trip.travelType === 'TRAIN'
-                  ? 'Real-time weight meters, empty luggage tare deductions, and rail coach luggage allowances.'
+                  ? 'Estimated weight meters, empty luggage tare deductions, and rail coach luggage allowances.'
                   : trip.travelType === 'CRUISE'
-                    ? 'Real-time weight meters, empty luggage tare deductions, and cruise stateroom baggage allowances.'
-                    : 'Real-time weight meters, empty luggage tare deductions, and coach bus baggage limits.'}
+                    ? 'Estimated weight meters, empty luggage tare deductions, and cruise stateroom baggage allowances.'
+                    : 'Estimated weight meters, empty luggage tare deductions, and coach bus baggage limits.'}
           </p>
         </div>
 
@@ -477,7 +477,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
       <EntryRequirementsCard trip={trip} />
 
       {/* Feature 1: Baggage Fee Estimator (Airline Bag Fees & Overweight Calculator) */}
-      <BaggageFeeEstimatorCard trip={trip} />
+      {isFlight && <BaggageFeeEstimatorCard trip={trip} />}
 
       {/* Airline Overweight Risk Radar & Bag Rebalancer Banner */}
       {overweightRiskBag && (
@@ -674,7 +674,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               No bags added to this trip yet
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5 max-w-sm mx-auto">
-              Add a carry-on roller, personal backpack, or checked suitcase to start packing and checking airline weight limits.
+              Add a carry-on roller, personal backpack, or checked suitcase to start packing and {isFlight ? 'checking airline weight limits' : 'checking luggage weight limits'}.
             </p>
             <button
               onClick={handleOpenAddBagSafe}
@@ -1052,7 +1052,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                             return (
                               <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 flex items-center gap-1 shrink-0" title={lq.alertMessage}>
                                 <AlertTriangle className="w-2.5 h-2.5" />
-                                <span>TSA 3-1-1 Alert (&gt;3.4 oz)</span>
+                                <span>Exceeds 100 ml — checked bags only</span>
                               </span>
                             );
                           }

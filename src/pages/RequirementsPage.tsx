@@ -88,7 +88,7 @@ export const RequirementsPage: React.FC = () => {
                   Baggage Fee Calculator
                 </h2>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">
-                  Real Carrier Fare Tables · Confirm at booking
+                  Published Carrier Fare Tables · Confirm at booking
                 </p>
               </div>
 

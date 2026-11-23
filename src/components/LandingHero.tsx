@@ -77,7 +77,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
   const faqs = [
     {
       q: 'Is GateReady really free to use?',
-      a: 'Yes! GateReady offers a 100% free starter plan forever. You can create 1 active trip, track up to 2 bags, look up baggage limits across 42+ airlines, run TSA 3-1-1 liquids audits, and sync your data securely across all your personal devices with no credit card required.'
+      a: 'Yes! GateReady offers a 100% free starter plan forever. You can create 1 active trip, track up to 2 bags, look up baggage limits across 42 airlines, run TSA 3-1-1 liquids audits, and sync your data securely across all your personal devices with no credit card required.'
     },
     {
       q: 'What is included in the 7-day Platinum trial?',
@@ -85,15 +85,15 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
     },
     {
       q: 'Does cloud sync work on the Free plan?',
-      a: 'Yes! Cloud sync is completely un-gated and works across every tier (Free, Silver, Gold, Platinum). When you sign in on your phone, tablet, or laptop, your trips, suitcases, and packing checklists update seamlessly in real time.'
+      a: 'Yes! Cloud sync is completely un-gated and works across every tier (Free, Silver, Gold, Platinum). When you sign in on your phone, tablet, or laptop, your trips, suitcases, and packing checklists sync securely across your devices.'
     },
     {
       q: 'How does empty suitcase tare deduction save money?',
-      a: 'Most travelers weigh their packed bags on a bathroom scale and forget that empty suitcases alone weigh 5.5–7.0 lbs for carry-ons and 8.5–10.5 lbs for checked bags (1.5–3.0 lbs for personal items). On a strict 50 lb (23 kg) airline limit, a 10.5 lb hard-shell checked bag consumes 21% of your allowance before anything goes in! GateReady automatically subtracts your bag’s empty tare weight so you never face a $100–$150 airport overweight baggage fee.'
+      a: 'Weighing packed bags without deducting empty suitcase weight overlooks 5.5–7.0 lbs for carry-ons and 8.5–10.5 lbs for checked bags (1.5–3.0 lbs for personal items). On a strict 50 lb (23 kg) airline limit, a 10.5 lb hard-shell checked bag consumes 21% of your allowance before anything goes in! GateReady subtracts your bag’s empty tare weight so you see an accurate gross estimate before the airport.'
     },
     {
       q: 'How current is your airline baggage information?',
-      a: 'Our airline rule database covers 42+ major global and North American carriers (including Air Canada, WestJet, Porter, Delta, United, American, British Airways, and Lufthansa) with verified fare family allowances continuously audited against official airline tariffs.'
+      a: 'Our airline rule database covers 42 major global and North American carriers (including Air Canada, WestJet, Porter, Delta, United, American, British Airways, and Lufthansa) with verified fare family allowances audited against published airline tariffs.'
     },
     {
       q: 'Can I cancel or upgrade my subscription anytime?',
@@ -108,10 +108,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
       <section className="relative w-full pt-8 pb-12 sm:pt-14 sm:pb-18 px-4 sm:px-6 lg:px-8 xl:px-12 overflow-hidden bg-gradient-to-b from-purple-950/20 via-transparent to-transparent">
         <div className="w-full max-w-[1550px] mx-auto text-center space-y-6 sm:space-y-8">
           
-          {/* Top Corridor & 42-Airline Intelligence Radar */}
+          {/* Top Corridor & 42-Airline Directory Ticker */}
           <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap text-[11px] font-mono tracking-widest uppercase text-purple-700/90 dark:text-purple-300/90 bg-purple-100/70 dark:bg-purple-950/50 border border-purple-200/90 dark:border-purple-800/60 px-5 py-2 rounded-full w-full max-w-5xl mx-auto shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-            <span className="font-bold text-purple-900 dark:text-purple-200">GLOBAL AIRLINE RADAR:</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+            <span className="font-bold text-purple-900 dark:text-purple-200">GLOBAL AIRLINE DIRECTORY:</span>
             <span>AIR CANADA</span>
             <span className="text-purple-300 dark:text-purple-600">·</span>
             <span>WESTJET</span>
@@ -122,7 +122,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <span className="text-purple-300 dark:text-purple-600">·</span>
             <span>BRITISH AIRWAYS</span>
             <span className="text-purple-300 dark:text-purple-600">·</span>
-            <span className="font-bold text-purple-700 dark:text-purple-300">42+ CARRIERS AUDITED</span>
+            <span className="font-bold text-purple-700 dark:text-purple-300">42 CARRIERS AUDITED</span>
           </div>
 
           {/* Main Headline & Supporting Subhead */}
@@ -218,7 +218,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>42+ Airline Fee &amp; Size Tables</span>
+              <span>42 Airline Fee &amp; Size Tables</span>
             </span>
             <span className="flex items-center gap-1.5">
               <Scale className="w-4 h-4 text-purple-500" />
@@ -256,7 +256,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                 Reasons to Use GateReady for Your Trip
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                Expand to explore how GateReady helps avoid overweight bag fees, compare 42+ airlines, deduct suitcase tare, and answer common questions.
+                Expand to explore how GateReady helps avoid overweight bag fees, compare 42 airlines, deduct suitcase tare, and answer common questions.
               </p>
             </div>
             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300 shrink-0 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 shadow-2xs">
@@ -310,10 +310,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     Overweight Bag Penalties ($100–$150)
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Exceeding the 50 lb (23 kg) limit by even 1.5 lbs can trigger a punitive $100 to $150 overweight fee at the check-in desk. Most people forget to account for empty suitcase weight.
+                    Exceeding the 50 lb (23 kg) limit by even 1.5 lbs can trigger a punitive $100 to $150 overweight fee at the check-in desk. Empty suitcase weight alone can consume 8.5–10.5 lbs of your allowance before packing.
                   </p>
                   <div className="pt-2 text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
-                    <span>GateReady Solution: Auto suitcase tare deduction</span>
+                    <span>GateReady Solution: Empty suitcase tare deduction</span>
                   </div>
                 </div>
 
@@ -328,7 +328,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     United Basic Economy bans overhead roller bags entirely. WestJet charges if your bag is over 22 lbs. Ryanair and easyJet enforce strict sizer boxes with steep gate-check penalties.
                   </p>
                   <div className="pt-2 text-[11px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                    <span>GateReady Solution: 42+ airline fare family guides</span>
+                    <span>GateReady Solution: 42 airline fare family guides</span>
                   </div>
                 </div>
 
@@ -390,7 +390,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     Choose Airline &amp; Fare Class
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Select your flight from 42+ global airlines. GateReady immediately pulls published carry-on dimensions, weight caps, and baggage fees tailored to your ticket tier.
+                    Select your flight from 42 global airlines. GateReady immediately pulls published carry-on dimensions, weight caps, and baggage fees tailored to your ticket tier.
                   </p>
                 </div>
 
@@ -456,7 +456,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         <div className="flex items-center justify-center gap-2 flex-wrap border-b border-slate-200 dark:border-slate-800 pb-3">
           {[
             { id: 'dashboard', label: 'Trip Dashboard', icon: Plane },
-            { id: 'meters', label: 'Live Packing Weight Meters', icon: Scale },
+            { id: 'meters', label: 'Calibrated Packing Weight Meters', icon: Scale },
             { id: 'tare', label: 'Tare Weight Deduction', icon: Luggage },
             { id: 'checklist', label: 'Packing & TSA 3-1-1', icon: CheckCircle2 },
             { id: 'readiness', label: 'Departure Readiness', icon: ShieldCheck }
@@ -494,12 +494,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                   Your Entire Flight &amp; Luggage in One View
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  GateReady organizes your trip from the moment you book. View flight departure countdowns, operating airline rules, baggage capacity gauges, and your live readiness score all in a unified workspace.
+                  GateReady organizes your trip from the moment you book. View flight departure countdowns, operating airline rules, baggage capacity gauges, and your instant readiness score all in a unified workspace.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Real-time departure countdown and airline aircraft intel</span>
+                    <span>Departure countdown clock and airline aircraft intel</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
@@ -567,18 +567,18 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-xs font-bold">
                   <Scale className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Live Packing Weight Meters</span>
+                  <span>Calibrated Packing Weight Meters</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                   Estimate Your Luggage Weight Before Leaving Home
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  GateReady computes your luggage weight as you pack. Live Packing Weight Meters show how close you are to the airline limit and alert you before you exceed allowances or trigger unexpected fees.
+                  GateReady computes your luggage weight as you pack. Calibrated Packing Weight Meters show how close you are to the airline limit and warn you before you exceed allowances or trigger unexpected fees.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Live capacity meter showing estimated packed weight vs published airline allowance</span>
+                    <span>Interactive capacity meter showing estimated packed weight vs published airline allowance</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
@@ -586,7 +586,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Overweight fee avoidance alert calculated from published carrier tariffs</span>
+                    <span>Overweight fee avoidance warning calculated from published carrier tariffs</span>
                   </li>
                 </ul>
               </div>
@@ -633,7 +633,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                   Deduct Empty Suitcase Tare Automatically
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Most travelers weigh their packed bags on a bathroom scale and forget that empty suitcases weigh 5.5–7.0 lbs (carry-on) or 8.5–10.5 lbs (checked). On a 50 lb airline limit, a 10.5 lb hard-shell checked suitcase consumes 21% of your allowance! GateReady calibrates your bag’s shell weight so you know your true packing capacity.
+                  Empty suitcases alone weigh 5.5–7.0 lbs (carry-on) or 8.5–10.5 lbs (checked). On a 50 lb airline limit, a 10.5 lb hard-shell checked suitcase consumes 21% of your allowance before packing! GateReady calibrates your bag’s shell weight so you know your true packing capacity.
                 </p>
                 <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
@@ -844,7 +844,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               <span>Free Baggage Intelligence</span>
             </div>
             <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Compare 42+ Airlines &amp; Calculate Total Baggage Fees
+              Compare 42 Airlines &amp; Calculate Total Baggage Fees
             </h2>
           </div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
@@ -1009,7 +1009,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Instant rebalance notifications: transfer 4 lbs to Bag 2 to eliminate penalties</span>
+                    <span>Instant rebalance suggestions: transfer 4 lbs to Bag 2 to eliminate penalties</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />

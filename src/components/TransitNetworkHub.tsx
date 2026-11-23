@@ -56,8 +56,8 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
                 </span>
                 <span className="text-slate-500">·</span>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Corridor Hub
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  Multi-Modal Route Hub
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -105,7 +105,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
                 Create Your Next Trip
               </h3>
               <p className="text-xs text-purple-200/90 mt-2 mb-6 leading-relaxed">
-                Configure your baggage tare limits, liquids checklist, and packing distribution across airline, rail, or cruise networks with real-time audit tools.
+                Configure your baggage tare limits, liquids checklist, and packing distribution across airline, rail, or cruise networks with published rule calculators.
               </p>
 
               {/* Secondary Entry Button - cleanly subordinate to the primary hero CTA */}
@@ -125,7 +125,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
             <div className="pt-4 border-t border-purple-800/40 space-y-2 text-[11px] text-purple-200/80 font-medium">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Automatic suitcase tare deduction (5–12 lbs saved)</span>
+                <span>Automatic empty bag tare deduction (1.5–3.0 lbs personal, 5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked)</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -133,7 +133,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>42+ airline sizer limits & checked luggage rules</span>
+                <span>42 airline sizer limits &amp; checked luggage rules</span>
               </div>
             </div>
           </div>
@@ -171,7 +171,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
                         <span className="text-xs font-black text-slate-900 dark:text-white">Commercial Aviation</span>
                         <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-200/70 dark:bg-purple-950 text-purple-800 dark:text-purple-300">42 Airlines</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">100ml TSA liquids, 22lb carry-on, empty suitcase tare</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">100ml TSA liquids, sizer &amp; weight caps, empty bag tare</p>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" />
@@ -192,7 +192,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
                         <span className="text-xs font-black text-slate-900 dark:text-white">Passenger Rail (Amtrak / VIA)</span>
                         <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-200/70 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">Generous</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">2x 50lb carry-ons free, overhead luggage rack alerts</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">2x 50lb carry-ons free, zero liquid limits</p>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
@@ -294,7 +294,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
                 >
                   <div>
                     <span className="text-xs font-bold text-white block">New York ➔ Paris (CDG)</span>
-                    <span className="text-[10px] text-purple-300">Air France · 12kg cabin sizer</span>
+                    <span className="text-[10px] text-purple-300">Air France · 12kg cabin weight limit</span>
                   </div>
                   <Plane className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -329,7 +329,7 @@ export const TransitNetworkHub: React.FC<TransitNetworkHubProps> = ({
             <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-purple-600/20 border border-amber-400/40 text-xs">
               <div className="flex items-center gap-1.5 font-black text-amber-300 mb-1">
                 <Zap className="w-3.5 h-3.5 fill-amber-300" />
-                <span>Want to see it live?</span>
+                <span>Try a sample trip?</span>
               </div>
               <p className="text-[11px] text-slate-300 leading-relaxed mb-2.5">
                 Load a pre-configured sample trip with bags, items, and countdown timers in 1 click.

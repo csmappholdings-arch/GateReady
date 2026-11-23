@@ -150,6 +150,18 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
     trackEvent('packing_template_applied', { item_name: suggestion.name });
   };
 
+  const isFlight = !trip.travelType || trip.travelType === 'PLANE';
+  const rulesTabLabel =
+    trip.travelType === 'TRAIN'
+      ? 'Rail Rules'
+      : trip.travelType === 'BUS'
+      ? 'Bus Rules'
+      : trip.travelType === 'CRUISE'
+      ? 'Cruise Rules'
+      : trip.travelType === 'CAR'
+      ? 'Road Rules'
+      : 'Airline Rules';
+
   const getModeIcon = (type: TravelType) => {
     switch (type) {
       case 'TRAIN': return <Train className="w-4 h-4" />;
@@ -347,7 +359,7 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Airline Rules</span>
+            <span>{rulesTabLabel}</span>
           </button>
 
           <button
@@ -392,7 +404,7 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
                   Travel Readiness Score: {score.totalScore} / 100
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Real-time audit across packing progress, suitcase weights, document checklists, and flight schedules.
+                  Complete audit across packing progress, bag weights, document checklists, and {isFlight ? 'flight' : 'departure'} schedules.
                 </p>
               </div>
 
@@ -476,7 +488,9 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
                 className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 hover:border-purple-400 transition-colors cursor-pointer space-y-2"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate">5. Flight Review</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                    {isFlight ? '5. Flight Review' : '5. Trip Review'}
+                  </span>
                   <span className="font-black text-purple-700 dark:text-purple-300">{score.categories.finalReview.score}/10</span>
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">

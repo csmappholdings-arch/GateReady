@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Trip } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
@@ -97,6 +97,12 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
   const isBus = !isFlight && (trip.travelType === 'BUS' || (Boolean(trip.seatClassOrCarSize) && /bus/i.test(trip.seatClassOrCarSize || '')));
 
   const [intelSubTab, setIntelSubTab] = useState<'PREP' | 'MAPS'>(initialSubTab || 'PREP');
+
+  useEffect(() => {
+    if ((isCar || isBus) && intelSubTab === 'MAPS') {
+      setIntelSubTab('PREP');
+    }
+  }, [isCar, isBus, intelSubTab]);
   const [destinationInput, setDestinationInput] = useState(trip.destinationCity || '');
   const [isEditingDestination, setIsEditingDestination] = useState(false);
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
@@ -128,54 +134,127 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
     return getDestinationSafetyIntel(hasRealDestination ? city : undefined);
   }, [city, hasRealDestination]);
 
-  // 1. Weather Forecast Intel (Free for all users)
+  // Resolve trip departure month for seasonal climate norms (never claim a live forecast)
+  const { travelMonth, monthIdx } = useMemo(() => {
+    let parsedDate: Date | null = null;
+    if (trip.departureDate && trip.departureDate.trim()) {
+      const parts = trip.departureDate.trim().split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) parsedDate = new Date(y, m, d);
+      } else {
+        const d = new Date(trip.departureDate);
+        if (!isNaN(d.getTime())) parsedDate = d;
+      }
+    }
+    const refDate = parsedDate || new Date();
+    return {
+      travelMonth: refDate.toLocaleString('en-US', { month: 'long' }),
+      monthIdx: refDate.getMonth(),
+    };
+  }, [trip.departureDate]);
+
+  // 1. Seasonal Climate Historical Norms (Free for all users — never a live forecast)
   const forecast: WeatherForecastDay[] = useMemo(() => {
     if (!hasRealDestination) return [];
 
     const lower = city.toLowerCase();
+    const isWinter = [11, 0, 1].includes(monthIdx);
+    const isSummer = [5, 6, 7].includes(monthIdx);
+    const periods = [
+      `Early ${travelMonth}`,
+      `Mid ${travelMonth}`,
+      `Late ${travelMonth}`,
+      `Monthly Mean`,
+      `Precipitation Norm`
+    ];
 
     if (lower.includes('london') || lower.includes('uk') || lower.includes('seattle') || lower.includes('ireland')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'RAIN', tempHighF: 59, tempLowF: 48, rainChance: 75, uvIndex: 3, summary: 'Intermittent brisk rain & overcast' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'RAIN', tempHighF: 57, tempLowF: 46, rainChance: 80, uvIndex: 2, summary: 'Afternoon downpours & breeze' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'CLOUDY', tempHighF: 62, tempLowF: 50, rainChance: 35, uvIndex: 4, summary: 'Mostly cloudy with mild breaks' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'CLOUDY', tempHighF: 63, tempLowF: 51, rainChance: 25, uvIndex: 4, summary: 'Breezy & partly overcast' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'RAIN', tempHighF: 60, tempLowF: 49, rainChance: 65, uvIndex: 3, summary: 'Scattered light showers' }
+      return isWinter ? [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'RAIN', tempHighF: 48, tempLowF: 39, rainChance: 65, uvIndex: 2, summary: 'Cold drizzle & overcast skies' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 46, tempLowF: 37, rainChance: 55, uvIndex: 2, summary: 'Grey skies & damp breeze' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'RAIN', tempHighF: 45, tempLowF: 36, rainChance: 70, uvIndex: 2, summary: 'Brisk wind & cold rain' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'RAIN', tempHighF: 47, tempLowF: 38, rainChance: 65, uvIndex: 2, summary: `Average ${travelMonth}: 47°F / 38°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 46, tempLowF: 37, rainChance: 65, uvIndex: 2, summary: 'Frequent light rain & fog' }
+      ] : [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 69, tempLowF: 54, rainChance: 35, uvIndex: 5, summary: 'Partly sunny & temperate' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'RAIN', tempHighF: 66, tempLowF: 52, rainChance: 50, uvIndex: 4, summary: 'Passing showers & cool breeze' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 72, tempLowF: 55, rainChance: 25, uvIndex: 6, summary: 'Comfortable & bright' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'CLOUDY', tempHighF: 68, tempLowF: 53, rainChance: 35, uvIndex: 5, summary: `Average ${travelMonth}: 68°F / 53°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 67, tempLowF: 53, rainChance: 40, uvIndex: 5, summary: 'Scattered occasional rain' }
       ];
     } else if (lower.includes('tokyo') || lower.includes('japan') || lower.includes('seoul')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'SUNNY', tempHighF: 73, tempLowF: 59, rainChance: 15, uvIndex: 7, summary: 'Crisp sunshine & light breeze' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'SUNNY', tempHighF: 75, tempLowF: 60, rainChance: 10, uvIndex: 8, summary: 'Pleasant & ideal walking weather' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'CLOUDY', tempHighF: 70, tempLowF: 57, rainChance: 30, uvIndex: 5, summary: 'Passing high clouds' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'RAIN', tempHighF: 66, tempLowF: 55, rainChance: 70, uvIndex: 3, summary: 'Light rain in metropolitan area' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'SUNNY', tempHighF: 72, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear blue skies' }
+      return isWinter ? [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 54, tempLowF: 39, rainChance: 15, uvIndex: 4, summary: 'Crisp, sunny winter air' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 52, tempLowF: 37, rainChance: 15, uvIndex: 4, summary: 'Clear skies & cold evenings' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 50, tempLowF: 35, rainChance: 20, uvIndex: 4, summary: 'Dry winter chill with wind' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'CHILLY', tempHighF: 52, tempLowF: 37, rainChance: 15, uvIndex: 4, summary: `Average ${travelMonth}: 52°F / 37°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 53, tempLowF: 38, rainChance: 18, uvIndex: 4, summary: 'Dry season, ~4 rain days/mo' }
+      ] : isSummer ? [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'RAIN', tempHighF: 84, tempLowF: 74, rainChance: 55, uvIndex: 9, summary: 'Summer humidity with rain' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 88, tempLowF: 77, rainChance: 35, uvIndex: 10, summary: 'Hot & humid city weather' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 89, tempLowF: 78, rainChance: 60, uvIndex: 9, summary: 'Warm tropical downpours' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 87, tempLowF: 76, rainChance: 45, uvIndex: 10, summary: `Average ${travelMonth}: 87°F / 76°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 86, tempLowF: 75, rainChance: 50, uvIndex: 8, summary: 'High humidity & showers' }
+      ] : [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 68, tempLowF: 54, rainChance: 30, uvIndex: 6, summary: 'Mild transition temperatures' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 71, tempLowF: 56, rainChance: 25, uvIndex: 6, summary: 'Pleasant sightseeing climate' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 69, tempLowF: 55, rainChance: 35, uvIndex: 5, summary: 'Moderate breeze & clouds' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 70, tempLowF: 55, rainChance: 30, uvIndex: 6, summary: `Average ${travelMonth}: 70°F / 55°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'RAIN', tempHighF: 67, tempLowF: 53, rainChance: 40, uvIndex: 5, summary: 'Moderate seasonal rain' }
       ];
     } else if (lower.includes('miami') || lower.includes('cancun') || lower.includes('hawaii') || lower.includes('bali')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'SUNNY', tempHighF: 86, tempLowF: 76, rainChance: 20, uvIndex: 10, summary: 'Tropical heat & high humidity' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'THUNDERSTORM', tempHighF: 84, tempLowF: 75, rainChance: 65, uvIndex: 8, summary: 'Afternoon coastal thunderstorm' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'SUNNY', tempHighF: 87, tempLowF: 77, rainChance: 15, uvIndex: 11, summary: 'Intense sunshine & tropical warmth' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'SUNNY', tempHighF: 88, tempLowF: 78, rainChance: 10, uvIndex: 11, summary: 'Clear skies with ocean breeze' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'CLOUDY', tempHighF: 85, tempLowF: 76, rainChance: 30, uvIndex: 9, summary: 'Warm with passing sun clouds' }
+      return isWinter ? [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 78, tempLowF: 65, rainChance: 20, uvIndex: 7, summary: 'Mild warm sunshine' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 79, tempLowF: 66, rainChance: 15, uvIndex: 7, summary: 'Pleasant coastal breeze' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 77, tempLowF: 64, rainChance: 25, uvIndex: 6, summary: 'Scattered clouds & comfort' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 78, tempLowF: 65, rainChance: 20, uvIndex: 7, summary: `Average ${travelMonth}: 78°F / 65°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 79, tempLowF: 66, rainChance: 15, uvIndex: 7, summary: 'Dry winter season' }
+      ] : [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 89, tempLowF: 79, rainChance: 40, uvIndex: 11, summary: 'Intense tropical sun' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 88, tempLowF: 78, rainChance: 65, uvIndex: 10, summary: 'Afternoon coastal storm' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 90, tempLowF: 80, rainChance: 35, uvIndex: 11, summary: 'High heat & humidity' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'THUNDERSTORM', tempHighF: 89, tempLowF: 79, rainChance: 50, uvIndex: 11, summary: `Average ${travelMonth}: 89°F / 79°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 88, tempLowF: 78, rainChance: 60, uvIndex: 10, summary: 'Wet season daily showers' }
       ];
     } else if (lower.includes('denver') || lower.includes('alps') || lower.includes('calgary') || lower.includes('tromso') || lower.includes('ski')) {
-      return [
-        { dayName: 'Today', date: 'Day 1', condition: 'SNOW', tempHighF: 34, tempLowF: 22, rainChance: 85, uvIndex: 4, summary: 'Snow flurries & crisp mountain air' },
-        { dayName: 'Tomorrow', date: 'Day 2', condition: 'CHILLY', tempHighF: 38, tempLowF: 24, rainChance: 20, uvIndex: 6, summary: 'Sunny but sub-freezing mornings' },
-        { dayName: 'Day 3', date: 'Day 3', condition: 'SNOW', tempHighF: 32, tempLowF: 19, rainChance: 70, uvIndex: 3, summary: 'Steady mountain snowfall' },
-        { dayName: 'Day 4', date: 'Day 4', condition: 'CHILLY', tempHighF: 40, tempLowF: 26, rainChance: 15, uvIndex: 5, summary: 'Dry cold with crisp wind' },
-        { dayName: 'Day 5', date: 'Day 5', condition: 'SUNNY', tempHighF: 42, tempLowF: 28, rainChance: 10, uvIndex: 6, summary: 'Bright alpine sunshine' }
+      return isWinter ? [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'SNOW', tempHighF: 43, tempLowF: 19, rainChance: 45, uvIndex: 3, summary: 'Sub-freezing nights & snow' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 41, tempLowF: 17, rainChance: 35, uvIndex: 3, summary: 'Sunny dry cold & frost' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'SNOW', tempHighF: 39, tempLowF: 16, rainChance: 55, uvIndex: 3, summary: 'Mountain snow showers' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'CHILLY', tempHighF: 42, tempLowF: 18, rainChance: 45, uvIndex: 3, summary: `Average ${travelMonth}: 42°F / 18°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'SNOW', tempHighF: 40, tempLowF: 17, rainChance: 50, uvIndex: 3, summary: 'Low humidity, periodic snow' }
+      ] : [
+        { dayName: periods[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 84, tempLowF: 57, rainChance: 20, uvIndex: 8, summary: 'Warm sun & dry air' },
+        { dayName: periods[1], date: 'Historical Norm', condition: 'THUNDERSTORM', tempHighF: 82, tempLowF: 56, rainChance: 45, uvIndex: 7, summary: 'Afternoon mountain thunder' },
+        { dayName: periods[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 86, tempLowF: 58, rainChance: 15, uvIndex: 8, summary: 'Bright clear summer days' },
+        { dayName: periods[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 84, tempLowF: 57, rainChance: 25, uvIndex: 8, summary: `Average ${travelMonth}: 84°F / 57°F` },
+        { dayName: periods[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 83, tempLowF: 56, rainChance: 20, uvIndex: 8, summary: 'Low humidity & cool nights' }
       ];
     }
 
-    return [
-      { dayName: 'Today', date: 'Day 1', condition: 'SUNNY', tempHighF: 71, tempLowF: 56, rainChance: 20, uvIndex: 6, summary: 'Mild & pleasant traveling weather' },
-      { dayName: 'Tomorrow', date: 'Day 2', condition: 'CLOUDY', tempHighF: 68, tempLowF: 54, rainChance: 40, uvIndex: 4, summary: 'Overcast with brief afternoon breeze' },
-      { dayName: 'Day 3', date: 'Day 3', condition: 'RAIN', tempHighF: 64, tempLowF: 52, rainChance: 65, uvIndex: 3, summary: 'Passing showers; umbrella advised' },
-      { dayName: 'Day 4', date: 'Day 4', condition: 'SUNNY', tempHighF: 73, tempLowF: 57, rainChance: 15, uvIndex: 7, summary: 'Sunny & warm walking conditions' },
-      { dayName: 'Day 5', date: 'Day 5', condition: 'SUNNY', tempHighF: 74, tempLowF: 58, rainChance: 10, uvIndex: 7, summary: 'Clear skies through the evening' }
+    return isWinter ? [
+      { dayName: periods[0], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 49, tempLowF: 35, rainChance: 30, uvIndex: 3, summary: 'Crisp seasonal chill' },
+      { dayName: periods[1], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 47, tempLowF: 34, rainChance: 35, uvIndex: 3, summary: 'Overcast & cool breeze' },
+      { dayName: periods[2], date: 'Historical Norm', condition: 'CHILLY', tempHighF: 48, tempLowF: 33, rainChance: 25, uvIndex: 3, summary: 'Cold mornings & frost' },
+      { dayName: periods[3], date: 'Monthly Mean', condition: 'CHILLY', tempHighF: 48, tempLowF: 34, rainChance: 30, uvIndex: 3, summary: `Average ${travelMonth}: 48°F / 34°F` },
+      { dayName: periods[4], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 49, tempLowF: 35, rainChance: 30, uvIndex: 3, summary: 'Typical winter conditions' }
+    ] : isSummer ? [
+      { dayName: periods[0], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 82, tempLowF: 65, rainChance: 25, uvIndex: 8, summary: 'Warm & sunny travel days' },
+      { dayName: periods[1], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 80, tempLowF: 64, rainChance: 35, uvIndex: 7, summary: 'Pleasant summer skies' },
+      { dayName: periods[2], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 84, tempLowF: 66, rainChance: 20, uvIndex: 8, summary: 'Warm afternoon warmth' },
+      { dayName: periods[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 82, tempLowF: 65, rainChance: 25, uvIndex: 8, summary: `Average ${travelMonth}: 82°F / 65°F` },
+      { dayName: periods[4], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 81, tempLowF: 64, rainChance: 25, uvIndex: 8, summary: 'Typical summer norms' }
+    ] : [
+      { dayName: periods[0], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 66, tempLowF: 50, rainChance: 30, uvIndex: 5, summary: 'Mild seasonal temperatures' },
+      { dayName: periods[1], date: 'Historical Norm', condition: 'SUNNY', tempHighF: 69, tempLowF: 52, rainChance: 25, uvIndex: 6, summary: 'Bright & temperate days' },
+      { dayName: periods[2], date: 'Historical Norm', condition: 'RAIN', tempHighF: 64, tempLowF: 48, rainChance: 45, uvIndex: 4, summary: 'Occasional light showers' },
+      { dayName: periods[3], date: 'Monthly Mean', condition: 'SUNNY', tempHighF: 66, tempLowF: 50, rainChance: 30, uvIndex: 5, summary: `Average ${travelMonth}: 66°F / 50°F` },
+      { dayName: periods[4], date: 'Historical Norm', condition: 'CLOUDY', tempHighF: 67, tempLowF: 51, rainChance: 30, uvIndex: 5, summary: 'Typical moderate weather' }
     ];
-  }, [city]);
+  }, [city, hasRealDestination, monthIdx, travelMonth]);
 
   // Temperature unit conversion helper
   const formatTemp = (f: number) => {
@@ -376,7 +455,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Destination climate forecasts, capsule wardrobe outfit matrix, terminal & station maps, cash vs digital payment advice, and customs duty radar for {city}.
+              Destination seasonal climate previews, capsule wardrobe outfit matrix, {!(isCar || isBus) ? 'terminal & station maps, ' : ''}cash vs digital payment advice, and customs duty reference for {city}.
             </p>
           </div>
         </div>
@@ -391,17 +470,17 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              Trip Intel & Terminal Maps is Locked
+              Trip Intel {!(isCar || isBus) ? '& Terminal Maps ' : ''}is Locked
             </h2>
 
             <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed">
-              Arrive at your destination prepared with live climate forecasts, interactive terminal navigation, currency customs, and jet lag recovery schedules.
+              Arrive at your destination prepared with seasonal climate previews, {!(isCar || isBus) ? 'interactive terminal navigation, ' : ''}currency customs, and jet lag recovery schedules.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Destination climate & 5-day weather packing recommendations</span>
+                <span>Destination seasonal climate averages &amp; clothing packing tips</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
@@ -409,11 +488,11 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </div>
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Interactive terminal maps for Airports, High-Speed Rail & Cruise</span>
+                <span>Interactive terminal maps for Airports, High-Speed Rail &amp; Cruise</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Indoor gate radar, restroom & water refill station telemetry</span>
+                <span>Concourse gate wayfinding, restroom &amp; water refill station directory</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
@@ -421,7 +500,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </div>
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>International customs duty-free exemption threshold radar</span>
+                <span>International customs duty-free exemption threshold guide</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-purple-100 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
@@ -436,7 +515,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 type="button"
-                onClick={() => openPaywall(`Full Trip Intel, Terminal Maps & Weather Forecaster are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+                onClick={() => openPaywall(`Full Trip Intel, Terminal Maps & Seasonal Climate Guide are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                 className="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 transition-all"
               >
                 <Crown className="w-4 h-4 fill-purple-950" />
@@ -479,7 +558,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Destination climate forecasts, capsule wardrobe calculator, terminal maps & customs radar.
+            Destination seasonal climate previews, capsule wardrobe calculator{!(isCar || isBus) ? ', terminal maps' : ''} &amp; customs allowances.
           </p>
         </div>
 
@@ -499,21 +578,23 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               <span>Climate & Prep</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setIntelSubTab('MAPS')}
-              className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
-                intelSubTab === 'MAPS'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-              <span>Terminal & Station Maps</span>
-              <span className="text-[8px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1 py-0.2 rounded-sm ml-0.5 shrink-0">
-                SILVER+
-              </span>
-            </button>
+            {!(isCar || isBus) && (
+              <button
+                type="button"
+                onClick={() => setIntelSubTab('MAPS')}
+                className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                  intelSubTab === 'MAPS'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Terminal & Station Maps</span>
+                <span className="text-[8px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1 py-0.2 rounded-sm ml-0.5 shrink-0">
+                  SILVER+
+                </span>
+              </button>
+            )}
           </div>
 
           {/* Temperature Unit Toggle */}
@@ -548,7 +629,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
       ) : (
         <>
       {/* ============================================================== */}
-      {/* 1. DESTINATION WEATHER & CLIMATE FORECAST (FREE FOR ALL USERS) */}
+      {/* 1. DESTINATION SEASONAL CLIMATE NORMS (FREE FOR ALL USERS)     */}
       {/* ============================================================== */}
       <div className="rounded-3xl border border-purple-200/80 dark:border-purple-900/80 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-purple-50 dark:border-purple-950/60">
@@ -557,17 +638,17 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               <CloudSun className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Destination Climate & 5-Day Forecast</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                  Free Live Intel
+              <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                <span>Destination Seasonal Climate Averages</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                  Historical Norms — Not a Live Forecast
                 </span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {hasRealDestination ? (
-                  <>Weather conditions & packing recommendations for <strong className="text-purple-700 dark:text-purple-300">{city}</strong></>
+                  <>Typical {travelMonth} averages &amp; packing tips for <strong className="text-purple-700 dark:text-purple-300">{city}</strong> — not a live forecast</>
                 ) : (
-                  <>Add a destination to see weather advice</>
+                  <>Add a destination to see seasonal climate guidance</>
                 )}
               </p>
             </div>
@@ -641,15 +722,15 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
           </div>
         </div>
 
-        {/* 5-Day Forecast Grid or Clean Empty State */}
+        {/* Seasonal Climate Grid or Clean Empty State */}
         {!hasRealDestination ? (
           <div className="p-6 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-dashed border-purple-200 dark:border-purple-800 text-center space-y-2">
             <CloudSun className="w-8 h-8 text-purple-400 mx-auto" />
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
-              Add a destination to see weather advice
+              Add a destination to see seasonal climate guidance
             </h4>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Set your destination city to view 5-day climate forecasts, rain probability, and tailored clothing recommendations.
+              Set your destination city to view seasonal climate norms, rainy-day frequency, and tailored clothing recommendations.
             </p>
             <button
               type="button"
@@ -682,7 +763,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 {day.condition === 'THUNDERSTORM' && <CloudRain className="w-6 h-6 text-purple-500" />}
                 {day.condition === 'SUNNY' && <Sun className="w-6 h-6 text-amber-500" />}
                 {day.condition === 'CLOUDY' && <CloudSun className="w-6 h-6 text-slate-500" />}
-                {day.condition === 'SNOW' && <Snowflake className="w-6 h-6 text-blue-400" />}
+                {(day.condition === 'SNOW' || day.condition === 'CHILLY') && <Snowflake className="w-6 h-6 text-blue-400" />}
 
                 <div className="text-right">
                   <span className="text-sm font-black text-slate-900 dark:text-white">
@@ -696,7 +777,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
 
               <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px] space-y-0.5">
                 <div className="flex items-center justify-between text-slate-500">
-                  <span>Rain:</span>
+                  <span>Rain Freq:</span>
                   <strong className={day.rainChance > 50 ? 'text-rose-500 font-bold' : ''}>
                     {day.rainChance}%
                   </strong>
@@ -713,13 +794,13 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
         <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60">
           <h3 className="text-xs font-extrabold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Recommended Items Based on {city} Weather:</span>
+            <span>Recommended Items Based on {city} Seasonal Climate:</span>
           </h3>
           <div className="flex flex-wrap gap-2 mt-2.5">
             {[
               { name: 'Compact Travel Umbrella', icon: Umbrella },
               { name: 'Packable Rain Poncho / Jacket', icon: Wind },
-              { name: 'High-SPF Sunscreen (TSA 3-1-1)', icon: Sun },
+              { name: isFlight ? 'High-SPF Sunscreen (TSA 3-1-1)' : 'High-SPF Sunscreen', icon: Sun },
               { name: 'UV Protection Sunglasses', icon: Sun },
               { name: 'Breathable Walking Shoes', icon: Check }
             ].map((item, i) => {
@@ -946,7 +1027,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             <div className="flex items-center gap-3">
               <Crown className="w-5 h-5 text-amber-400 shrink-0" />
               <div>
-                <p className="text-xs font-black text-white">Unlock Tipping Customs & ATM FX Traps Radar</p>
+                <p className="text-xs font-black text-white">Unlock Tipping Customs &amp; ATM FX Guide</p>
                 <p className="text-[11px] text-purple-200">See exact mandatory cash locations and contactless quirks with Silver+.</p>
               </div>
             </div>
@@ -1006,7 +1087,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
       </div>
 
       {/* ============================================================== */}
-      {/* 4. DUTY-FREE & INTERNATIONAL CUSTOMS EXEMPTION RADAR (PRO)     */}
+      {/* 4. DUTY-FREE & INTERNATIONAL CUSTOMS EXEMPTION GUIDE (PRO)     */}
       {/* ============================================================== */}
       <div className="rounded-3xl border border-indigo-200/80 dark:border-indigo-900/80 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-50 dark:border-indigo-950/60">
@@ -1016,7 +1097,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
             </div>
             <div>
               <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>International Customs & Duty-Free Exemption Radar</span>
+                <span>International Customs &amp; Duty-Free Exemption Guide</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
                   Exemption Cap: {customsIntel.localLimit}
                 </span>
@@ -1044,7 +1125,7 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
               </p>
             </div>
             <button
-              onClick={() => openPaywall(`Customs Exemption Radar is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+              onClick={() => openPaywall(`Customs Exemption Guide is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
               className="h-8 px-3 rounded-xl bg-purple-600 text-white font-bold text-xs uppercase tracking-wider hover:bg-purple-700 cursor-pointer shrink-0"
             >
               Try 7 days free
@@ -1213,7 +1294,15 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
                 Pre-Departure Readiness Checklist
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Flight, document, and home security milestones before leaving for the airport.
+                {isFlight
+                  ? 'Flight, document, and home security milestones before leaving for the airport.'
+                  : isCar
+                    ? 'Vehicle, document, and home security milestones before hitting the road.'
+                    : isTrain
+                      ? 'Rail ticket, document, and home security milestones before leaving for the station.'
+                      : isCruise
+                        ? 'Embarkation, document, and home security milestones before heading to the port.'
+                        : 'Coach ticket, document, and home security milestones before leaving for the terminal.'}
               </p>
             </div>
           </div>
@@ -1225,7 +1314,13 @@ export const TripPrepChecklistScreen: React.FC<TripPrepChecklistScreenProps> = (
 
         <div className="space-y-2.5">
           {[
-            { key: 'passport', title: 'Passport Validity > 6 Months', subtitle: 'Ensure passport has at least 6 months validity from departure date.' },
+            {
+              key: 'passport',
+              title: isCar ? "Driver's License / ID & Passport Check" : 'Passport Validity > 6 Months',
+              subtitle: isCar
+                ? 'Bring your driver’s license, vehicle registration, and passport if crossing borders.'
+                : 'Ensure passport has at least 6 months validity from departure date.'
+            },
             { 
               key: 'checkin', 
               title: isFlight ? 'Airline Online Check-In (24h Before)' : isCar ? 'Vehicle Safety & Route Inspection' : isTrain ? 'Rail E-Ticket & Seat Check-In' : isCruise ? 'Cruise Terminal Online Check-In' : 'Bus Ticket & Departure Check-In', 

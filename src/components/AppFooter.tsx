@@ -33,7 +33,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
             </a>
             <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Calibrated luggage tare weight meters, TSA 3-1-1 compliance, and 42+ airline baggage allowance guides.
+              Calibrated luggage tare weight meters, TSA 3-1-1 compliance, and 42 airline baggage allowance guides.
             </p>
           </div>
 

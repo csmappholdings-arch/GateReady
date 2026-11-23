@@ -60,7 +60,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     color: 'from-purple-600 to-indigo-600',
     features: [
       'All 5 major transit modes synced: Air, Rail, Cruise, Bus, Car',
-      'Global airport & station auto-complete across 40+ international airlines',
+      'Global airport & station auto-complete across 42 international airlines',
       'Multi-traveler profiles for families, solo explorers, and group trips'
     ],
     mockupType: 'TRIP_SETUP'
@@ -69,12 +69,12 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'bags',
     title: '2. Smart Luggage Scales & TSA 3-1-1 Liquids',
     tagline: 'Eliminate surprise overweight fees & security confiscations',
-    description: 'Pack bag-by-bag with real-time digital weight meters calibrated to airline caps (50 lbs / 23 kg checked, 22 lbs carry-on). Color-coded warning bars alert you before you hit steep overweight fees, while the automated TSA 3-1-1 checker ensures every toiletry bottle is compliant.',
+    description: 'Pack bag-by-bag with calibrated digital weight meters matched to airline caps (50 lbs / 23 kg checked, 22 lbs carry-on). Color-coded warning bars warn you before you hit steep overweight fees, while the automated TSA 3-1-1 checker ensures every toiletry bottle is compliant.',
     duration: 7,
     icon: Luggage,
     color: 'from-blue-600 to-indigo-600',
     features: [
-      'Live bag weight meters with headroom alerts before steep overweight fees trigger',
+      'Calibrated bag weight meters with headroom warnings before steep overweight fees trigger',
       'TSA 3-1-1 liquids compliance verification (under 3.4 oz / 100 ml per bottle)',
       '1-tap luggage presets: Business, Beach Resort, Ski Trip, Toddler & Baby kits'
     ],
@@ -84,12 +84,12 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'intel',
     title: '3. Destination Climate & Currency Advisor',
     tagline: 'Pack for local weather and cash vs. digital payments',
-    description: 'Gate Ready pulls destination weather forecasts to recommend rain layers, warm coats, or sun protection. It also calculates your destination payment profile—specifying whether you will need local cash (e.g., Japan, Germany) or if digital tap-to-pay is accepted everywhere.',
+    description: 'Gate Ready provides destination seasonal climate norms to recommend rain layers, warm coats, or sun protection. It also calculates your destination payment profile—specifying whether you will need local cash (e.g., Japan, Germany) or if digital tap-to-pay is accepted everywhere.',
     duration: 6.5,
     icon: CloudSun,
     color: 'from-amber-500 to-rose-500',
     features: [
-      'Destination climate forecast with tailored seasonal packing warnings',
+      'Destination seasonal climate norms with tailored packing suggestions',
       'Local currency breakdown: Cash vs. Contactless card mix for 50+ countries',
       'Pre-departure home security, passport validity & medication checklists'
     ],
@@ -97,16 +97,16 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   },
   {
     id: 'terminal_maps',
-    title: '4. [Silver+] Worldwide Terminal Maps & Phone Radar',
+    title: '4. [Silver+] Worldwide Terminal Maps & Concourse Wayfinding',
     tagline: 'Post-security cold water stations, restrooms & gate wayfinding',
-    description: 'Gate Ready Silver+ unlocks dynamic terminal schematics for major global airports, high-speed rail stations, and cruise terminals. Use your phone location beacon to calculate real-time walking distance and time to the nearest cold water refill station (saving $6+ per bottle) and restrooms along your gate path.',
+    description: 'Gate Ready Silver+ unlocks dynamic terminal schematics for major global airports, high-speed rail stations, and cruise terminals. Use the interactive concourse schematic to estimate walking distance and time to the nearest cold water refill station (saving $6+ per bottle) and restrooms along your gate path.',
     duration: 7.5,
     icon: Compass,
     color: 'from-cyan-600 to-blue-600',
     isPro: true,
     features: [
       'Dynamic departure & arrival terminal hub maps (Airports, Rail & Cruise Ports)',
-      'Live Phone Location Radar: Walking distance & ETA to nearest amenities',
+      'Concourse Amenity Locator: Estimated walking distance & ETA to nearest amenities',
       'Spotlight post-security cold water refill stations and ADA-accessible restrooms'
     ],
     mockupType: 'TERMINAL_MAPS'
@@ -153,7 +153,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     color: 'from-purple-600 to-fuchsia-600',
     isPro: true,
     features: [
-      'Free ($0): 1 traveler, 1 active trip, 2 bags, live weight scales, TSA liquids checker, personal cloud sync',
+      'Free ($0): 1 traveler, 1 active trip, 2 bags, digital weight scales, TSA liquids checker, personal cloud sync',
       'Silver ($1.99/mo or $19.99/year): 1 traveler, 2 active trips, unlimited bags & all core tools',
       'Gold ($3.99/mo or $29.99/year): 2 travelers, unlimited active trips, multi-device & family member sync (Most Popular)',
       'Platinum ($4.99/mo or $39.99/year): Unlimited travelers, shared family & group device sync'
@@ -461,7 +461,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
                   <span className="ml-2 font-mono text-[10px] text-slate-500">gateready.ca</span>
                 </div>
-                <span className="text-[10px] font-bold text-purple-400">Live Feature Showcase</span>
+                <span className="text-[10px] font-bold text-purple-400">Interactive Feature Showcase</span>
               </div>
 
               {/* 1. Dynamic Mockup: TRIP_SETUP */}
@@ -555,7 +555,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                 <div className="space-y-3 animate-in fade-in duration-300">
                   <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-500/30 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">Paris Forecast Advisory</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">Paris Seasonal Climate (Spring Avg)</span>
                       <h4 className="text-sm font-black text-white">16°C / 61°F — Spring Mild Afternoon</h4>
                       <p className="text-[11px] text-slate-300 mt-0.5">Scattered light showers. Pack light trench coat & compact travel umbrella.</p>
                     </div>
@@ -594,10 +594,10 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                   <div className="relative h-28 rounded-xl bg-slate-900 border border-slate-800 p-2 overflow-hidden flex flex-col justify-between">
                     <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
                     
-                    {/* SVG vectors connecting phone to amenities */}
+                    {/* SVG vectors connecting hub gate to amenities */}
                     <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                      <line x1="45" y1="56" x2="160" y2="35" stroke="#38bdf8" strokeWidth="2" strokeDasharray="4 4" className="animate-pulse" />
-                      <line x1="45" y1="56" x2="260" y2="75" stroke="#ec4899" strokeWidth="2" strokeDasharray="4 4" className="animate-pulse" />
+                      <line x1="45" y1="56" x2="160" y2="35" stroke="#38bdf8" strokeWidth="2" strokeDasharray="4 4" />
+                      <line x1="45" y1="56" x2="260" y2="75" stroke="#ec4899" strokeWidth="2" strokeDasharray="4 4" />
                     </svg>
 
                     <div className="flex items-center justify-between text-[10px] text-slate-400 relative z-10">
@@ -606,12 +606,12 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                     </div>
 
                     <div className="relative z-10 flex items-center justify-around">
-                      {/* Phone Beacon */}
+                      {/* Gate Marker */}
                       <div className="flex flex-col items-center">
-                        <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center ring-4 ring-blue-500/30 animate-pulse shadow-md">
+                        <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center ring-4 ring-blue-500/30 shadow-md">
                           <Smartphone className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-[9px] font-black text-blue-300 mt-1">You Are Here</span>
+                        <span className="text-[9px] font-black text-blue-300 mt-1">Concourse Gate</span>
                       </div>
 
                       {/* Water Bottle Station */}
@@ -717,7 +717,7 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> 2 bags total</li>
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> Luggage scales</li>
                         <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> TSA 3-1-1 checker</li>
-                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> Climate forecast</li>
+                        <li className="flex items-center gap-1"><Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" /> Seasonal climate guide</li>
                       </ul>
                     </div>
 

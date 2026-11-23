@@ -174,6 +174,13 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
 
   // Check if user is a first-time visitor with no trips or only demo data
   const hasOnlyDemoOrNoTrips = trips.length === 0 || (trips.length === 1 && hasDemoTrip);
+  const isReturningVisit = useMemo(() => {
+    try {
+      return parseInt(localStorage.getItem('gateready_visit_count') || '1', 10) > 1;
+    } catch {
+      return false;
+    }
+  }, []);
 
   const handleClearDemo = () => {
     setClearingDemo(true);
@@ -224,13 +231,13 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
           </div>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
-            {!hasOnlyDemoOrNoTrips
+            {isReturningVisit && !hasOnlyDemoOrNoTrips
               ? `Welcome Back to GateReady${user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}!`
               : `Welcome to GateReady${user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}!`}
           </h1>
 
           <p className="text-sm sm:text-base text-purple-100/90 font-medium leading-relaxed">
-            Let&apos;s get your next trip ready. Track airline baggage limits, deduct empty suitcase tare weight, and monitor departure readiness.
+            Let&apos;s get your next trip ready. Track baggage limits, deduct empty suitcase tare weight, and monitor departure readiness.
           </p>
 
           <div className="pt-2 flex items-center gap-3 flex-wrap">
@@ -446,7 +453,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                 Baggage Fee Calculator
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Calculate carry-on and checked luggage fees across 42+ airlines by fare family (Basic Economy, Standard, Flex).
+                Calculate carry-on and checked luggage fees across 42 airlines by fare family (Basic Economy, Standard, Flex).
               </p>
             </div>
             <div className="pt-2 flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 border-t border-slate-100 dark:border-slate-800">
@@ -455,7 +462,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
             </div>
           </div>
 
-          {/* Card 2: 42+ Airline Baggage Guides */}
+          {/* Card 2: 42 Airline Baggage Guides */}
           <div 
             onClick={() => handleQuickCardClick('airline_guides', '/airlines')}
             className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
@@ -465,7 +472,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                 <Plane className="w-5 h-5" />
               </div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors">
-                42+ Airline Baggage Guides
+                42 Airline Baggage Guides
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Check published carry-on sizer box dimensions, weight caps, and baggage tariffs verified continuously.
@@ -512,7 +519,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                 Travel Wallet & PNRs
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Store airline reservation codes, frequent flyer accounts, and passport expiry alerts offline.
+                Store airline reservation codes, frequent flyer accounts, and passport expiry reminders offline.
               </p>
             </div>
             <div className="pt-2 flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 border-t border-slate-100 dark:border-slate-800">
@@ -893,7 +900,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500">
-                    {trip.companyName} · {trip.bags.length} bags · {trip.bags.flatMap((b) => b.items).length} items
+                    {trip.companyName} · {trip.bags.length} {trip.bags.length === 1 ? 'bag' : 'bags'} · {trip.bags.flatMap((b) => b.items).length} {trip.bags.flatMap((b) => b.items).length === 1 ? 'item' : 'items'}
                   </p>
                   <div className="pt-2 flex items-center justify-between">
                     <button
@@ -931,7 +938,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                   Delete &ldquo;{tripToDelete.name}&rdquo;?
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  This trip contains {tripToDelete.bags.length} bags and {tripToDelete.bags.flatMap((b) => b.items).length} packed items.
+                  This trip contains {tripToDelete.bags.length} {tripToDelete.bags.length === 1 ? 'bag' : 'bags'} and {tripToDelete.bags.flatMap((b) => b.items).length} {tripToDelete.bags.flatMap((b) => b.items).length === 1 ? 'packed item' : 'packed items'}.
                 </p>
               </div>
             </div>

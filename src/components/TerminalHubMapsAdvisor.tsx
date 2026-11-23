@@ -109,6 +109,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
   });
 
   const [phoneTrackingActive, setPhoneTrackingActive] = useState(false);
+  const [floorplanNotice, setFloorplanNotice] = useState<string | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   // Filter facilities
@@ -345,7 +346,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
                 if (!isPro) {
                   openPaywall(`Worldwide terminal floorplans & refill station locators are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
                 } else {
-                  alert(`Offline floorplan vector bundle for ${hub.name} (${hub.code}) downloaded to your device cache!`);
+                  setFloorplanNotice(`Offline floorplan vector bundle for ${hub.name} (${hub.code}) saved to your browser cache.`);
                 }
               }}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-900 dark:text-purple-200 text-xs font-bold transition-colors cursor-pointer shrink-0"
@@ -356,6 +357,19 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
             </button>
           </div>
         </div>
+
+        {floorplanNotice && (
+          <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs flex items-center justify-between gap-3">
+            <span className="font-semibold">{floorplanNotice}</span>
+            <button
+              type="button"
+              onClick={() => setFloorplanNotice(null)}
+              className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-200 cursor-pointer shrink-0"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* 3. DYNAMIC TRIP DEPARTURE VS ARRIVAL LOCATION SELECTOR */}
         <div className="p-3.5 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/80 dark:border-purple-900/60 space-y-3">
@@ -478,7 +492,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
           </div>
         </div>
 
-        {/* 4. LIVE PHONE LOCATION RADAR & PROXIMITY HUD */}
+        {/* 4. CONCOURSE PROXIMITY & WAYFINDING PREVIEW */}
         <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/90 via-indigo-950/95 to-slate-950 text-white border-2 border-blue-400/50 shadow-lg space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -491,14 +505,14 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-black text-white tracking-wide">
-                    Live Phone Location & Proximity Radar
+                    Concourse Proximity &amp; Wayfinding Preview
                   </span>
                   <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-md bg-blue-500/40 text-blue-200 border border-blue-400/30">
                     {userLocation.locationLabel}
                   </span>
                 </div>
                 <p className="text-[11px] text-blue-200/80 mt-0.5">
-                  Real-time distance & walking direction to nearest hydration point and restrooms. Tap map to calibrate.
+                  Estimated walking distance &amp; direction to nearest hydration point and restrooms. Tap map to set your position.
                 </p>
               </div>
             </div>
@@ -510,7 +524,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer self-start sm:self-auto shrink-0"
             >
               <Crosshair className={`w-4 h-4 ${userLocation.isLocating ? 'animate-spin' : ''}`} />
-              <span>{userLocation.isLocating ? 'Acquiring GPS...' : 'Locate My Phone'}</span>
+              <span>{userLocation.isLocating ? 'Locating...' : 'Pin Location'}</span>
             </button>
           </div>
 
@@ -814,7 +828,7 @@ export const TerminalHubMapsAdvisor: React.FC<TerminalHubMapsAdvisorProps> = ({ 
               )}
             </svg>
 
-            {/* LIVE USER PHONE LOCATION BEACON */}
+            {/* PINNED CONCOURSE POSITION MARKER */}
             <div 
               style={{ left: `${userLocation.xPercent}%`, top: `${userLocation.yPercent}%` }}
               className="absolute -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none transition-all duration-300"

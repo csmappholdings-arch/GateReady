@@ -131,6 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+  const [showCancelSubConfirm, setShowCancelSubConfirm] = useState(false);
 
   // Manual Pro license input state
   const [licenseInput, setLicenseInput] = useState('');
@@ -430,7 +431,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <Plane className="w-4 h-4 text-purple-600" />
                     <div>
                       <div className="text-xs font-bold text-slate-900 dark:text-white">Airline Baggage Guides</div>
-                      <div className="text-[10px] text-slate-500">42+ carriers audited tariffs</div>
+                      <div className="text-[10px] text-slate-500">42 carriers audited tariffs</div>
                     </div>
                   </a>
 
@@ -582,26 +583,22 @@ export const Header: React.FC<HeaderProps> = ({
                 <Gift className="w-3 h-3 text-amber-200 shrink-0" />
                 <span className="whitespace-nowrap">Claim 1-Mo Platinum</span>
               </button>
-            ) : ((authLoading && !hasCachedAuth) || isResolvingTier) ? (
-              <span className="w-16 h-5 bg-white/10 rounded-full animate-pulse inline-block" />
             ) : isPro ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40">
                 <Crown className="w-2.5 h-2.5 fill-white" /> {isMasterKey ? 'VIP Master' : tier === 'PLATINUM' ? 'Platinum' : tier === 'GOLD' ? 'Gold' : 'Silver'}
               </span>
-            ) : (user || (authLoading && cachedUser)) ? (
+            ) : (
               <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-purple-200/90 bg-purple-950/70 border border-purple-800/60 px-2.5 py-1 rounded-full">
                 Free Plan
               </span>
-            ) : null}
+            )}
           </div>
         </div>
 
         {/* Center / Right: Streamlined Action Buttons, Free Month Pill, Sync Account & Settings */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Pro Upgrade / Badge Button */}
-          {authLoading && !hasCachedAuth ? (
-            <div className="h-8.5 sm:h-9 w-20 rounded-xl bg-white/10 border border-white/15 animate-pulse" />
-          ) : !isPro ? (
+          {!isPro ? (
             <button
               type="button"
               onClick={() => openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`)}
@@ -643,8 +640,8 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenNotifications}
               className="relative h-8.5 sm:h-9 w-8.5 sm:w-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white flex items-center justify-center transition-colors cursor-pointer"
-              title="Departure Alerts & Reminders"
-              aria-label="Departure Alerts"
+              title="Departure Reminders"
+              aria-label="Departure Reminders"
             >
               <Bell className="w-4 h-4 text-purple-200" />
               {unreadNotificationsCount > 0 && (
@@ -693,10 +690,6 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
                 <ChevronDown className="w-3 h-3 text-emerald-400 shrink-0 ml-0.5" />
               </button>
-            ) : authLoading ? (
-              <div className="h-9 sm:h-10 px-3 rounded-xl border border-white/20 bg-white/10 text-white/70 text-xs flex items-center gap-2 animate-pulse">
-                <div className="w-5 h-5 rounded-full bg-white/20" />
-              </div>
             ) : (
               /* Single Combined Guest Action: Gold Log In / Create Account Button */
               <button
@@ -857,16 +850,35 @@ export const Header: React.FC<HeaderProps> = ({
                         >
                           Change Plan
                         </button>
-                        <button
-                          onClick={() => {
-                            if (confirm('Cancel subscription? You will return to the Free Plan (1 traveler, 1 active trip, up to 2 bags).')) {
-                              cancelSubscription();
-                            }
-                          }}
-                          className="text-[10px] text-rose-500 hover:underline cursor-pointer"
-                        >
-                          Cancel Subscription
-                        </button>
+                        {showCancelSubConfirm ? (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowCancelSubConfirm(false);
+                                cancelSubscription();
+                              }}
+                              className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-600 text-white hover:bg-rose-700 cursor-pointer"
+                            >
+                              Confirm Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setShowCancelSubConfirm(false)}
+                              className="text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:underline cursor-pointer"
+                            >
+                              Keep Plan
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setShowCancelSubConfirm(true)}
+                            className="text-[10px] text-rose-500 hover:underline cursor-pointer"
+                          >
+                            Cancel Subscription
+                          </button>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -1501,7 +1513,7 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <span className="flex items-center gap-2">
                       <Plane className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                      42+ Airline Guides
+                      42 Airline Guides
                     </span>
                     <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Browse</span>
                   </a>
@@ -1735,7 +1747,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-6 bg-rose-50/60 dark:bg-rose-950/20 p-3.5 rounded-2xl border border-rose-100 dark:border-rose-900/40">
-              Are you sure you want to delete this trip? All <strong>{tripToDeleteFromSettings.bags.length} bags</strong>, packed items, and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
+              Are you sure you want to delete this trip? All <strong>{tripToDeleteFromSettings.bags.length} {tripToDeleteFromSettings.bags.length === 1 ? 'bag' : 'bags'}</strong>, packed items, and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
             </p>
 
             <div className="flex items-center justify-end gap-2.5">
@@ -2211,7 +2223,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <Plane className="w-4 h-4 text-purple-600 shrink-0" />
                       <div>
                         <div className="text-xs font-bold text-slate-900 dark:text-white">Airline Baggage Guides</div>
-                        <div className="text-[10px] text-slate-500">42+ carriers audited tariffs</div>
+                        <div className="text-[10px] text-slate-500">42 carriers audited tariffs</div>
                       </div>
                     </a>
 
@@ -2475,8 +2487,8 @@ export const Header: React.FC<HeaderProps> = ({
                         <div className="flex items-center gap-2">
                           <Bell className="w-4 h-4 text-purple-600 shrink-0" />
                           <div>
-                            <p className="font-semibold text-slate-800 dark:text-slate-200">Departure Alerts</p>
-                            <p className="text-[10px] text-slate-400">{unreadNotificationsCount > 0 ? `${unreadNotificationsCount} unread alert${unreadNotificationsCount > 1 ? 's' : ''}` : 'No unread alerts'}</p>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Departure Reminders</p>
+                            <p className="text-[10px] text-slate-400">{unreadNotificationsCount > 0 ? `${unreadNotificationsCount} unread reminder${unreadNotificationsCount > 1 ? 's' : ''}` : 'No unread reminders'}</p>
                           </div>
                         </div>
                         <button

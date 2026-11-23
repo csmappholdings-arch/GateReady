@@ -189,6 +189,24 @@ async function prerender() {
 </html>`;
   fs.writeFileSync(path.join(feeCalcDir, 'index.html'), feeCalcRedirectHtml, 'utf-8');
 
+  // Generate static redirect for /airline-guides -> /airlines/
+  const airlineGuidesDir = path.join(distDir, 'airline-guides');
+  fs.mkdirSync(airlineGuidesDir, { recursive: true });
+  const airlineGuidesRedirectHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting to Airline Baggage Guides – GateReady</title>
+  <meta http-equiv="refresh" content="0; url=https://gateready.ca/airlines/">
+  <link rel="canonical" href="https://gateready.ca/airlines/">
+  <script>window.location.replace("https://gateready.ca/airlines/");</script>
+</head>
+<body>
+  <p>Redirecting to <a href="https://gateready.ca/airlines/">Airline Baggage Guides</a>...</p>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(airlineGuidesDir, 'index.html'), airlineGuidesRedirectHtml, 'utf-8');
+
   console.log(`[Prerender] Successfully generated ${successCount} prerendered pages and alias redirects.`);
 }
 

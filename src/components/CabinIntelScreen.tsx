@@ -113,7 +113,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
     ? 'Stateroom electrical outlet count, surge protector confiscation warnings, under-bed suitcase clearances, and sea day connectivity.'
     : isCar
     ? 'Trunk packing layout, 12V auxiliary sockets, inverter capacity, USB-C fast charging, and road trip safety gear stowage.'
-    : 'Overhead bin sizing, valet gate-check alerts, in-seat plug specs, and under-seat clearances for 20+ commercial aircraft.';
+    : 'Overhead bin sizing, valet gate-check risk notices, in-seat plug specs, and under-seat clearances for 20+ commercial aircraft.';
 
   // If user is not Pro, lock down the screen
   if (!isPro) {
@@ -493,7 +493,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Overhead bin sizing, gate-check alerts, in-seat plug specs, and under-seat clearances for your aircraft.
+            Overhead bin sizing, gate-check risk notices, in-seat plug specs, and under-seat clearances for your aircraft.
           </p>
         </div>
 

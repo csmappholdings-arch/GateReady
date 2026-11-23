@@ -98,10 +98,10 @@ export const TareWeightPage: React.FC = () => {
         <section className="p-6 sm:p-8 rounded-3xl bg-amber-50/70 border border-amber-200 space-y-4">
           <div className="flex items-center gap-2 text-amber-900 font-black text-lg">
             <AlertTriangle className="w-5 h-5 text-amber-600" />
-            <span>Why Tare Weight Causes 80% of Airport Scale Shock</span>
+            <span>Why Tare Weight Causes Airport Scale Shock</span>
           </div>
           <p className="text-xs sm:text-sm text-amber-950 leading-relaxed">
-            Most travelers weigh their packed items on bathroom scales or estimate their clothing weights in their heads, completely forgetting that modern rolling suitcases with telescoping aluminum handles, polyurethane wheels, internal frames, and TSA locks add significant dead weight.
+            Weighing packed items alone on bathroom scales or estimating clothing weights overlooks that modern rolling suitcases with telescoping aluminum handles, polyurethane wheels, internal frames, and TSA locks add significant dead weight.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
             <div className="p-4 rounded-xl bg-white border border-amber-200">
@@ -195,7 +195,7 @@ export const TareWeightPage: React.FC = () => {
               <p className="text-purple-900/80">Know your suitcase's exact empty weight? You can customize the tare weight down to 0.1 lbs and save it as your default bag preset.</p>
             </div>
             <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200 space-y-1">
-              <strong className="block text-purple-950 font-bold">3. Live Headroom Meter:</strong>
+              <strong className="block text-purple-950 font-bold">3. Headroom Weight Meter:</strong>
               <p className="text-purple-900/80">As you check off packed shoes, jackets, and toiletries, GateReady calculates remaining headroom against your airline's exact threshold.</p>
             </div>
           </div>

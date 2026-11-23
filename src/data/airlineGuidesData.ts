@@ -163,7 +163,7 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'southwest')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'southwest')!,
     title: 'Southwest Airlines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Southwest Airlines baggage policy: Choice/Basic checked bag fees ($45 1st, $55 2nd), 2 free bags on Choice Extra, free carry-on sizer dimensions (24 x 16 x 10 in), and 3rd bag fee ($125–$150).',
+    metaDescription: 'Southwest Airlines baggage policy: Choice/Basic checked bag fees ($45 1st, $55 2nd), 2 free bags on Choice Extra, active-duty military waivers, free carry-on sizer dimensions (24 x 16 x 10 in), and 3rd bag fee ($125–$150).',
     keywords: 'Southwest Airlines baggage allowance, Southwest baggage fees 2026, Southwest carry on size, Southwest checked bag fee, Southwest luggage weight limit',
     h1: 'Southwest Airlines Baggage Allowance & Fee Guide'
   },

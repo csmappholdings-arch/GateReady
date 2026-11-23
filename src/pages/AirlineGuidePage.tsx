@@ -123,7 +123,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-500">
             <span className="flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Published Carrier Rules · Confirm at booking</span>
+              <span>Verified {guide.fees.lastVerified} · Published Carrier Rules · Confirm at booking</span>
             </span>
           </div>
         </div>

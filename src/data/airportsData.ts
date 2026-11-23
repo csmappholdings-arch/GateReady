@@ -281,6 +281,8 @@ export function searchAirportsAndCities(query: string, maxResults = 8): AirportC
 
   const exactCodeMatches: AirportCity[] = [];
   const prefixCodeMatches: AirportCity[] = [];
+  const exactCityMatches: AirportCity[] = [];
+  const exactBaseCityMatches: AirportCity[] = [];
   const cityPrefixMatches: AirportCity[] = [];
   const countryMatches: AirportCity[] = [];
   const otherMatches: AirportCity[] = [];
@@ -288,6 +290,7 @@ export function searchAirportsAndCities(query: string, maxResults = 8): AirportC
   for (const item of AIRPORTS_DATABASE) {
     const codeLower = item.code.toLowerCase();
     const cityLower = item.city.toLowerCase();
+    const baseCityLower = cityLower.split('(')[0].trim();
     const countryLower = item.country.toLowerCase();
     const nameLower = item.airportName.toLowerCase();
 
@@ -295,6 +298,10 @@ export function searchAirportsAndCities(query: string, maxResults = 8): AirportC
       exactCodeMatches.push(item);
     } else if (codeLower.startsWith(rawClean)) {
       prefixCodeMatches.push(item);
+    } else if (cityLower === rawClean || cityLower === clean) {
+      exactCityMatches.push(item);
+    } else if (baseCityLower === rawClean || baseCityLower === clean) {
+      exactBaseCityMatches.push(item);
     } else if (cityLower.startsWith(rawClean) || cityLower.includes(clean)) {
       cityPrefixMatches.push(item);
     } else if (countryLower.startsWith(clean) || countryLower.includes(clean)) {
@@ -307,6 +314,8 @@ export function searchAirportsAndCities(query: string, maxResults = 8): AirportC
   const combined = [
     ...exactCodeMatches,
     ...prefixCodeMatches,
+    ...exactCityMatches,
+    ...exactBaseCityMatches,
     ...cityPrefixMatches,
     ...countryMatches,
     ...otherMatches

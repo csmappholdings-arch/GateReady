@@ -29,6 +29,7 @@ import { AirportCity } from '../data/airportsData';
 import { BagType } from '../types/travel';
 import { trackEvent } from '../utils/analytics';
 import { TRIAL_TERMS_EXACT } from '../data/planEntitlements';
+import { getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
 
 export interface TripPreviewConfig {
   originCity: string;
@@ -85,6 +86,15 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
     return getAirlineFareFamilies(airlineRecord.airlineId || airlineRecord.airlineName);
   }, [airlineRecord]);
 
+  const checkedCapLbs = useMemo(() => {
+    const m = airlineLimit.checkedWeightLimit?.match(/(\d+(?:\.\d+)?)\s*lbs/i);
+    return m ? parseFloat(m[1]) : 50;
+  }, [airlineLimit]);
+
+  const carryOnPolicy = useMemo(() => {
+    return getCarrierCarryOnPolicy(airlineLimit.company);
+  }, [airlineLimit]);
+
   // Compute fees
   const feeResult: BagFeeCalculationResult = useMemo(() => {
     const simulatedBags: Array<{
@@ -100,18 +110,19 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
         id: `prev-chk-${i + 1}`,
         label: checkedCount === 1 ? 'Checked Bag' : `Checked Bag ${i + 1}`,
         type: 'CHECKED',
-        currentWeightLbs: 44,
-        maxWeightLimitLbs: 50
+        currentWeightLbs: Math.min(44, Math.max(checkedCapLbs - 4, 20)),
+        maxWeightLimitLbs: checkedCapLbs
       });
     }
 
+    const simCarryOnCapLbs = carryOnPolicy.hasNoWeightLimit || !carryOnPolicy.limitLbs ? 22 : carryOnPolicy.limitLbs;
     for (let i = 0; i < carryOnCount; i++) {
       simulatedBags.push({
         id: `prev-co-${i + 1}`,
         label: carryOnCount === 1 ? 'Carry-On Roller' : `Carry-On ${i + 1}`,
         type: 'CARRY_ON',
-        currentWeightLbs: 18,
-        maxWeightLimitLbs: 22
+        currentWeightLbs: Math.min(18, Math.max(simCarryOnCapLbs - 2, 10)),
+        maxWeightLimitLbs: simCarryOnCapLbs
       });
     }
 
@@ -123,7 +134,10 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
       defaultFam ? defaultFam.id : undefined
     );
 
-    const totalFee = (checkedCount * airlineRecord.firstCheckedFee) + (carryOnCount * airlineRecord.carryOnFee);
+    const checkedFallbackFee = checkedCount > 0
+      ? airlineRecord.firstCheckedFee + Math.max(0, checkedCount - 1) * airlineRecord.secondCheckedFee
+      : 0;
+    const totalFee = checkedFallbackFee + (carryOnCount * airlineRecord.carryOnFee);
     const formattedFallback = airlineRecord.currencySymbol.includes(airlineRecord.currency)
       ? `${airlineRecord.currencySymbol}${totalFee.toFixed(2)}`
       : `${airlineRecord.currencySymbol}${totalFee.toFixed(2)} ${airlineRecord.currency}`;
@@ -142,7 +156,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
       officialBaggagePageUrl: airlineRecord.officialBaggagePageUrl,
       disclaimer: 'Estimate from published airline fee tables.'
     };
-  }, [airlineRecord, fareFamilies, checkedCount, carryOnCount]);
+  }, [airlineRecord, fareFamilies, checkedCount, carryOnCount, checkedCapLbs, carryOnPolicy]);
 
   const previewConfig: TripPreviewConfig = {
     originCity,
@@ -355,7 +369,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
 
           <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
             <span className="text-xs text-slate-400">
-              ⚡ Live allowance lookup using published 2026 airline tariff data
+              ⚡ Instant allowance lookup using published 2026 airline tariff data
             </span>
             <button
               type="submit"
@@ -452,7 +466,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
                   <strong>Max Linear Size:</strong> {airlineLimit.checkedLimit}
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  Overweight charge begins immediately at 51 lbs (23.1 kg).
+                  Overweight charge applies above {checkedCapLbs} lbs ({(checkedCapLbs * 0.45359237).toFixed(1)} kg) — starting at {checkedCapLbs + 1} lbs.
                 </p>
               </div>
 

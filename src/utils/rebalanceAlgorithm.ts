@@ -1,6 +1,7 @@
 import { Trip, Bag, PackingItem, BagType, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
 import { computeBagWeightStatus } from './bagWeightAnalysis';
+import { scanItemForLiquids } from './liquidScanner';
 
 export interface BagWeightSnapshot {
   bagId: string;
@@ -293,7 +294,15 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
         const currentDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: currentDestItems });
         const destLimit = destSnapshot.limitLbs;
 
-        // RULE: NEVER suggest an essential item into a CHECKED bag!
+        // RULE 1: Prohibited cabin liquids (> 100 ml / 3.4 oz, including Full-Size Toiletries) MUST NEVER move into CARRY_ON or PERSONAL bags!
+        if (destBag.type === 'CARRY_ON' || destBag.type === 'PERSONAL') {
+          const liquidCheck = scanItemForLiquids(cand.item.name, destBag.type);
+          if (liquidCheck.status === 'NON_COMPLIANT') {
+            continue; // Disqualified!
+          }
+        }
+
+        // RULE 3: NEVER suggest an essential item into a CHECKED bag!
         if (destBag.type === 'CHECKED' && cand.isEssential) {
           continue; // Disqualified!
         }
@@ -302,7 +311,7 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
         const prospectiveDestItems = [...currentDestItems, cand.item];
         const prospectiveDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: prospectiveDestItems });
 
-        // RULE: Destination bag must not exceed limit after move
+        // RULE 2: Destination bag must NEVER exceed its carrier limit after move
         if (destLimit !== null && prospectiveDestWeight > destLimit) {
           continue; // Would overload destination bag!
         }
@@ -357,7 +366,7 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
     });
 
     if (hasOnlyEssentialsLeft) {
-      noSafeMoveReason = 'No safe move found — overweight items are essential documents or medications that cannot be placed into checked luggage. Please repack by hand or carry in a personal item.';
+      noSafeMoveReason = 'No safe move found — remove an item or repack by hand. Remaining overweight items include essential documents or medications that cannot be placed into checked luggage.';
     } else {
       noSafeMoveReason = 'No safe move found — remove an item or repack by hand.';
     }

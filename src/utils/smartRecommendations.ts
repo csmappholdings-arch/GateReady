@@ -31,14 +31,16 @@ export function generateSmartPackingSuggestions(trip: Trip): {
 
   if (isLikelyInternational || isFlight) {
     result.push({
-      category: 'International & Flight Essentials',
-      reason: `Tailored for flights to ${trip.destinationCity || 'your destination'}`,
+      category: isFlight ? 'International & Flight Essentials' : 'International & Transit Essentials',
+      reason: isFlight
+        ? `Tailored for flights to ${trip.destinationCity || 'your destination'}`
+        : `Tailored for trips to ${trip.destinationCity || 'your destination'}`,
       suggestions: [
         { name: 'Universal Plug Adapter (Dual USB-C)', category: 'Electronics', defaultQty: 1, weightLbs: 0.4 },
         { name: 'AirTag / Luggage Tracker Beacon', category: 'Travel essentials', defaultQty: 2, weightLbs: 0.1 },
         { name: 'Passport & Visa Documentation Pouch', category: 'Documents', defaultQty: 1, weightLbs: 0.1 },
         { name: 'Noise-Cancelling Earbuds / Headphones', category: 'Electronics', defaultQty: 1, weightLbs: 0.5 },
-        { name: 'In-Flight Hydration Mist & Lip Balm', category: 'Toiletries', defaultQty: 1, weightLbs: 0.25 }
+        { name: isFlight ? 'In-Flight Hydration Mist & Lip Balm' : 'Travel Hydration Mist & Lip Balm', category: 'Toiletries', defaultQty: 1, weightLbs: 0.25 }
       ]
     });
   }
@@ -70,11 +72,11 @@ export function generateSmartPackingSuggestions(trip: Trip): {
       category: 'Child & Family Comfort Kit',
       reason: `${travelers.length} travelers with children on journey`,
       suggestions: [
-        { name: 'Spill-Proof Snack Cups & Airport Snacks', category: 'Baby and children\'s items', defaultQty: 3, weightLbs: 0.6 },
+        { name: 'Spill-Proof Snack Cups & Travel Snacks', category: 'Baby and children\'s items', defaultQty: 3, weightLbs: 0.6 },
         { name: 'Children Tablet with Downloaded Offline Movies', category: 'Baby and children\'s items', defaultQty: 1, weightLbs: 1.1 },
         { name: 'Kid-Safe Volume Limiting Headphones', category: 'Baby and children\'s items', defaultQty: 1, weightLbs: 0.4 },
         { name: 'Disinfectant Wipes & Travel Hand Sanitizer', category: 'Toiletries', defaultQty: 2, weightLbs: 0.5 },
-        { name: 'Backup Outfit in Carry-On (Both Child & Parent)', category: 'Clothing', defaultQty: 2, weightLbs: 1.2 }
+        { name: 'Backup Outfit in Carry-On Bag (Both Child & Parent)', category: 'Clothing', defaultQty: 2, weightLbs: 1.2 }
       ]
     });
   }

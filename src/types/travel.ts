@@ -109,6 +109,67 @@ export function getBagEmptyWeightLbs(bag: { type: BagType; material?: BagMateria
   return getUserPresetWeightLbs(bag.type, mat);
 }
 
+export function getDefaultBagLabel(type: BagType): string {
+  switch (type) {
+    case 'PERSONAL':
+      return 'Personal Backpack';
+    case 'CARRY_ON':
+      return 'Carry-On Roller';
+    case 'CHECKED':
+      return 'Checked Suitcase';
+  }
+}
+
+export function isDefaultBagLabel(label: string | undefined): boolean {
+  if (!label || !label.trim()) return true;
+  const norm = label.trim().toLowerCase();
+  const knownDefaults = [
+    'personal',
+    'personal item',
+    'personal backpack',
+    'underseat personal backpack',
+    'personal item / backpack',
+    'carry-on',
+    'carry on',
+    'carry-on roller',
+    'carry-on suitcase',
+    'carry-on bag',
+    'checked',
+    'checked bag',
+    'checked suitcase',
+    'checked luggage',
+    'checked suitcase (50 lbs)',
+    'suitcase',
+    'backpack',
+    'personal bag',
+    'main suitcase'
+  ];
+  if (knownDefaults.includes(norm)) return true;
+  if (/^(personal( item| backpack)?|carry[- ]?on( roller| suitcase| bag)?|checked( bag| suitcase| luggage)?)\s*\d*$/i.test(norm)) return true;
+  if (/^.+?'s\s+(backpack|carry[- ]?on|suitcase|checked bag|personal item)(\s*\d+)?$/i.test(norm)) return true;
+  return false;
+}
+
+export function getUpdatedBagLabelForType(currentLabel: string | undefined, nextType: BagType): string {
+  if (!currentLabel || !currentLabel.trim()) return getDefaultBagLabel(nextType);
+  const trimmed = currentLabel.trim();
+  const ownerMatch = trimmed.match(/^(.+?'s)\s+(backpack|carry[- ]?on|suitcase|checked bag|personal item)(\s*\d+)?$/i);
+  if (ownerMatch) {
+    const ownerPrefix = ownerMatch[1];
+    const suffix = ownerMatch[3] || '';
+    const nextNoun = nextType === 'PERSONAL' ? 'Backpack' : nextType === 'CARRY_ON' ? 'Carry-On' : 'Suitcase';
+    return `${ownerPrefix} ${nextNoun}${suffix}`;
+  }
+  const numMatch = trimmed.match(/^(?:personal(?: item| backpack)?|carry[- ]?on(?: roller| suitcase| bag)?|checked(?: bag| suitcase| luggage)?)\s*(\d+)$/i);
+  if (numMatch) {
+    return `${getDefaultBagLabel(nextType)} ${numMatch[1]}`;
+  }
+  if (isDefaultBagLabel(trimmed)) {
+    return getDefaultBagLabel(nextType);
+  }
+  return currentLabel;
+}
+
 export function calculateBagTotalWeightLbs(
   bag: Bag, 
   getEstimatedItemWeight: (name: string) => number

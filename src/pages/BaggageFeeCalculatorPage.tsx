@@ -69,6 +69,8 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
 
   // Build synthetic bag manifest for the fee calculation engine
   const simulatedBags = useMemo(() => {
+    const capMatch = activeGuide?.limits.checkedWeightLimit?.match(/(\d+(?:\.\d+)?)\s*lbs/i);
+    const checkedCapLbs = capMatch ? parseFloat(capMatch[1]) : 50;
     const list: Array<{
       id: string;
       label: string;
@@ -83,8 +85,8 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
         id: `fee-chk-${i + 1}`,
         label: checkedCount === 1 ? 'Checked Bag' : i === 0 ? '1st Checked Bag' : i === 1 ? '2nd Checked Bag' : `${i + 1}th Checked Bag`,
         type: 'CHECKED',
-        currentWeightLbs: 45,
-        maxWeightLimitLbs: 50
+        currentWeightLbs: Math.min(45, Math.max(checkedCapLbs - 2, 20)),
+        maxWeightLimitLbs: checkedCapLbs
       });
     }
 
@@ -100,7 +102,7 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
     }
 
     return list;
-  }, [checkedCount, carryOnCount]);
+  }, [checkedCount, carryOnCount, activeGuide]);
 
   // Run official published airline calculation with fare family
   const feeResult: BagFeeCalculationResult | null = useMemo(() => {

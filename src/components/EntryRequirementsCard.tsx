@@ -214,7 +214,7 @@ export const EntryRequirementsCard: React.FC<EntryRequirementsCardProps> = ({
           <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">
             <span className="font-extrabold uppercase tracking-wider text-[11px] text-amber-800 dark:text-amber-300 block">
-              Passport Validity Alert
+              Passport Validity Warning
             </span>
             <p className="mt-0.5 leading-snug">
               {passportValidity.message}

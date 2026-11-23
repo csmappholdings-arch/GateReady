@@ -64,7 +64,7 @@ export const AboutPage: React.FC = () => {
               <span>42-Airline Baggage Allowance Reference</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Pre-calibrated carry-on sizer dimensions (inches & cm) and checked weight caps for 42+ major global carriers, including Air Canada, WestJet, Delta, United, and British Airways.
+              Pre-calibrated carry-on sizer dimensions (inches & cm) and checked weight caps for 42 major global carriers, including Air Canada, WestJet, Delta, United, and British Airways.
             </p>
           </div>
 

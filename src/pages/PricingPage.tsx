@@ -333,7 +333,7 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">42+ Airline Baggage Rules &amp; Fees</td>
+                <td className="p-4 font-semibold">42 Airline Baggage Rules &amp; Fees</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>

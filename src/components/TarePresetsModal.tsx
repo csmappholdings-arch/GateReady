@@ -209,7 +209,7 @@ export const TarePresetsModal: React.FC<TarePresetsModalProps> = ({
           <div className="space-y-1">
             <p className="font-bold">Real-World Luggage Weight Fact:</p>
             <p className="text-[11px] text-purple-800 dark:text-purple-300 leading-relaxed">
-              Default empty bag presets range from 1.5–3.0 lbs (personal items), 5.5–7.0 lbs (carry-ons), and 8.5–10.5 lbs (checked suitcases). GateReady incorporates your empty bag weight into live airline weight meters so you never get surprised at airport check-in scales.
+              Default empty bag presets range from 1.5–3.0 lbs (personal items), 5.5–7.0 lbs (carry-ons), and 8.5–10.5 lbs (checked suitcases). GateReady incorporates your empty bag weight into airline weight meters so you never get surprised at airport check-in scales.
             </p>
           </div>
         </div>
@@ -290,7 +290,7 @@ export const TarePresetsModal: React.FC<TarePresetsModalProps> = ({
                 onChange={(e) => setApplyToExisting(e.target.checked)}
                 className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500"
               />
-              <span>Apply updated tare weights to all {trip.bags.length} bags in current trip</span>
+              <span>Apply updated tare weights to {trip.bags.length === 1 ? 'the 1 bag' : `all ${trip.bags.length} bags`} in current trip</span>
             </label>
           )}
 
