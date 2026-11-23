@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Plane, Train, Ship, Bus, MapPin, Search, Check, Globe } from 'lucide-react';
 import { AirportCity, searchAirportsAndCities, findAirportByCode } from '../data/airportsData';
-import { TransitHub, searchTransitHubs } from '../data/transitStationsData';
+import { TransitHub, searchTransitHubs, formatTransitLocationLabel } from '../data/transitStationsData';
 import { TravelType } from '../types/travel';
 
 export interface LocationSearchResult {
@@ -84,7 +84,7 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
         country: t.country,
         flag: t.flag,
         code: t.code,
-        formattedValue: `${t.name} (${t.city})`
+        formattedValue: formatTransitLocationLabel(t.name, t.city)
       }));
     }
 
@@ -96,7 +96,7 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
         country: p.country,
         flag: p.flag,
         code: p.code,
-        formattedValue: `${p.name} (${p.city})`
+        formattedValue: formatTransitLocationLabel(p.name, p.city)
       }));
     }
 
@@ -108,7 +108,7 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
         country: b.country,
         flag: b.flag,
         code: b.code,
-        formattedValue: `${b.name} (${b.city})`
+        formattedValue: formatTransitLocationLabel(b.name, b.city)
       }));
     }
 

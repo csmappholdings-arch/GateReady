@@ -4,7 +4,7 @@ import {
   Crown
 } from 'lucide-react';
 import { SocialLinks } from './SocialLinks';
-import { useSubscription } from '../context/SubscriptionContext';
+import { useSubscriptionOptional } from '../context/SubscriptionContext';
 
 interface AppFooterProps {
   onOpenPricing?: () => void;
@@ -17,7 +17,8 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   onOpenReferral,
   onOpenAirlineGuides
 }) => {
-  const { isPro } = useSubscription();
+  const subscription = useSubscriptionOptional();
+  const isPro = subscription?.isPro ?? false;
 
   return (
     <footer className="w-full mt-auto border-t border-purple-100 dark:border-purple-950/80 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md py-8 px-4 sm:px-6 lg:px-8 xl:px-10 text-xs text-slate-500 dark:text-slate-400">

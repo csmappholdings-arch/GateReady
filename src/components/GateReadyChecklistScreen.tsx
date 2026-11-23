@@ -355,7 +355,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                           {displayBagWeight}
                         </span>
                         <span className="text-[10px] text-slate-400 ml-1">
-                          / {displayLimit}
+                          / {displayLimit} cap
                         </span>
                       </>
                     )}

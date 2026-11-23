@@ -1704,7 +1704,15 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-6 bg-rose-50/60 dark:bg-rose-950/20 p-3.5 rounded-2xl border border-rose-100 dark:border-rose-900/40">
-              Are you sure you want to delete this trip? All <strong>{tripToDeleteFromSettings.bags.length} {tripToDeleteFromSettings.bags.length === 1 ? 'bag' : 'bags'}</strong>, packed items, and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
+              {(() => {
+                const allDeleteItems = tripToDeleteFromSettings.bags.flatMap((b) => b.items || []);
+                const packedDeleteCount = allDeleteItems.filter((i) => i.isPacked).length;
+                return (
+                  <>
+                    Are you sure you want to delete this trip? All <strong>{tripToDeleteFromSettings.bags.length} {tripToDeleteFromSettings.bags.length === 1 ? 'bag' : 'bags'}</strong>, <strong>{packedDeleteCount} {packedDeleteCount === 1 ? 'packed item' : 'packed items'}</strong> ({allDeleteItems.length} total), and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
+                  </>
+                );
+              })()}
             </p>
 
             <div className="flex items-center justify-end gap-2.5">

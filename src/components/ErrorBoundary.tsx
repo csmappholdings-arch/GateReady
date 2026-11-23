@@ -26,13 +26,13 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-slate-950 border border-purple-500/30 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/30">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white flex items-center justify-center p-6 transition-colors">
+          <div className="max-w-md w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-purple-500/30 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-500/30">
               <AlertCircle className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-black text-white">Something went wrong</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">Something went wrong</h2>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               Your trips and packing lists are safely saved. Reload the session to continue packing.
             </p>
             <button

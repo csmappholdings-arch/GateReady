@@ -1065,3 +1065,7 @@ export const useSubscription = () => {
   }
   return context;
 };
+
+export const useSubscriptionOptional = () => {
+  return useContext(SubscriptionContext);
+};

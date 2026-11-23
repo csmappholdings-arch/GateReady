@@ -33,6 +33,7 @@ import {
 import { UniversalLocationSearchInput } from './UniversalLocationSearchInput';
 import { CarrierSearchInput } from './CarrierSearchInput';
 import { TripCountdownBanner } from './TripCountdownBanner';
+import { cleanDuplicateCitySuffix } from '../data/transitStationsData';
 import { DatePickerInput } from './DatePickerInput';
 import { getDefaultChecklistForMode } from '../data/allowances';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
@@ -952,11 +953,17 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                 {currentTrip.name || 'Trip Route'}
               </p>
               <p className="text-[11px] text-purple-600 dark:text-purple-300 font-semibold leading-tight mt-0.5">
-                {Boolean(currentTrip.originCity?.trim() && currentTrip.originCity.trim().length > 1 && currentTrip.destinationCity?.trim() && currentTrip.destinationCity.trim().length > 1)
-                  ? `${currentTrip.originCity!.trim()} ➔ ${currentTrip.destinationCity!.trim()}`
-                  : Boolean(currentTrip.destinationCity?.trim() && currentTrip.destinationCity.trim().length > 1)
-                    ? `To ${currentTrip.destinationCity!.trim()}`
-                    : 'Direct Travel Itinerary'}
+                {(() => {
+                  const cleanOrigin = cleanDuplicateCitySuffix(currentTrip.originCity);
+                  const cleanDest = cleanDuplicateCitySuffix(currentTrip.destinationCity);
+                  if (cleanOrigin.length > 1 && cleanDest.length > 1) {
+                    return `${cleanOrigin} ➔ ${cleanDest}`;
+                  }
+                  if (cleanDest.length > 1) {
+                    return `To ${cleanDest}`;
+                  }
+                  return 'Direct Travel Itinerary';
+                })()}
               </p>
             </div>
           </div>
@@ -1146,7 +1153,15 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-6 bg-rose-50/60 dark:bg-rose-950/20 p-3.5 rounded-2xl border border-rose-100 dark:border-rose-900/40">
-              Are you sure you want to delete this trip? All <strong>{tripToDelete.bags.length} {tripToDelete.bags.length === 1 ? 'bag' : 'bags'}</strong>, packed items, and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
+              {(() => {
+                const allDeleteItems = tripToDelete.bags.flatMap((b) => b.items || []);
+                const packedDeleteCount = allDeleteItems.filter((i) => i.isPacked).length;
+                return (
+                  <>
+                    Are you sure you want to delete this trip? All <strong>{tripToDelete.bags.length} {tripToDelete.bags.length === 1 ? 'bag' : 'bags'}</strong>, <strong>{packedDeleteCount} {packedDeleteCount === 1 ? 'packed item' : 'packed items'}</strong> ({allDeleteItems.length} total), and departure schedule settings for this trip will be permanently removed. This action cannot be undone.
+                  </>
+                );
+              })()}
             </p>
 
             <div className="flex items-center justify-end gap-2.5">

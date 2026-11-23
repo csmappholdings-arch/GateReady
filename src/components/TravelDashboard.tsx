@@ -50,6 +50,7 @@ import { calculateTravelReadinessScore } from '../utils/readinessScore';
 import { computeBagWeightStatus } from '../utils/bagWeightAnalysis';
 import { computeDepartureCountdown } from '../utils/countdown';
 import { trackEvent } from '../utils/analytics';
+import { cleanDuplicateCitySuffix } from '../data/transitStationsData';
 
 interface TravelDashboardProps {
   trips: Trip[];
@@ -316,7 +317,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
             </div>
 
             <div className="text-[11px] text-purple-100 flex items-center justify-between">
-              <span className="truncate">{primaryTrip.originCity || 'Origin'} → {primaryTrip.destinationCity || primaryTrip.name}</span>
+              <span className="truncate">{cleanDuplicateCitySuffix(primaryTrip.originCity) || 'Origin'} → {cleanDuplicateCitySuffix(primaryTrip.destinationCity) || primaryTrip.name}</span>
               <button
                 type="button"
                 onClick={() => onOpenTripWorkspace(primaryTrip, 'Overview')}
@@ -670,7 +671,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <h3 className="font-black text-base text-slate-900 dark:text-white truncate">
-                              {trip.originCity || 'Origin'} → {trip.destinationCity || trip.name}
+                              {cleanDuplicateCitySuffix(trip.originCity) || 'Origin'} → {cleanDuplicateCitySuffix(trip.destinationCity) || trip.name}
                             </h3>
                             {trip.isDemo && (
                               <span className="px-1.5 py-0.2 rounded bg-amber-400 text-purple-950 font-black text-[9px] shrink-0">
@@ -933,7 +934,15 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                   Delete &ldquo;{tripToDelete.name}&rdquo;?
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  This trip contains {tripToDelete.bags.length} {tripToDelete.bags.length === 1 ? 'bag' : 'bags'} and {tripToDelete.bags.flatMap((b) => b.items).length} {tripToDelete.bags.flatMap((b) => b.items).length === 1 ? 'packed item' : 'packed items'}.
+                  {(() => {
+                    const allDeleteItems = tripToDelete.bags.flatMap((b) => b.items || []);
+                    const packedDeleteCount = allDeleteItems.filter((i) => i.isPacked).length;
+                    return (
+                      <>
+                        This trip contains {tripToDelete.bags.length} {tripToDelete.bags.length === 1 ? 'bag' : 'bags'} and {packedDeleteCount} {packedDeleteCount === 1 ? 'packed item' : 'packed items'} ({allDeleteItems.length} total).
+                      </>
+                    );
+                  })()}
                 </p>
               </div>
             </div>

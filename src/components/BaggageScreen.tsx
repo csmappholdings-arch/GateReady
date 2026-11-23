@@ -645,7 +645,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                       </span>
                     ) : (
                       <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300 block">
-                        {dispWeight.toFixed(1)} / {limit} {weightUnit}
+                        {dispWeight.toFixed(1)} {weightUnit.toLowerCase()} / {limit} {weightUnit.toLowerCase()} cap
                       </span>
                     )}
                     <span className="text-[9px] text-slate-400 font-medium">
@@ -804,9 +804,9 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                   </>
                 ) : (
                   <>
-                    {activeDisplayWeight.toFixed(1)} {weightUnit}{' '}
+                    {activeDisplayWeight.toFixed(1)} {weightUnit.toLowerCase()}{' '}
                     <span className="font-normal text-slate-400">
-                      / {activeWeightCap} {weightUnit} limit {activeBag?.type === 'CARRY_ON' ? `(${carrierCarryOnPolicy.label})` : ''}
+                      / {activeWeightCap} {weightUnit.toLowerCase()} cap {activeBag?.type === 'CARRY_ON' ? `(${carrierCarryOnPolicy.label})` : ''}
                     </span>
                   </>
                 )}

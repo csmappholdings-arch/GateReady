@@ -147,3 +147,59 @@ export function searchTransitHubs(type: 'TRAIN' | 'BUS' | 'PORT', query: string,
     })
     .slice(0, maxResults);
 }
+
+/**
+ * Formats a transit hub name and city cleanly without duplicating the city if
+ * the hub name already includes it (e.g. "Union Station (Toronto)" + "Toronto").
+ */
+export function formatTransitLocationLabel(name: string, city: string): string {
+  const trimmedName = (name || '').trim();
+  const trimmedCity = (city || '').trim();
+  if (!trimmedCity) return trimmedName;
+
+  const normalize = (s: string) =>
+    s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+  const normName = normalize(trimmedName);
+  const cityTokens = trimmedCity
+    .split('/')
+    .map((t) => normalize(t.trim()))
+    .filter(Boolean);
+
+  const alreadyIncludesCity =
+    normName.includes(normalize(trimmedCity)) ||
+    cityTokens.some((tok) => tok.length >= 3 && normName.includes(tok));
+
+  return alreadyIncludesCity ? trimmedName : `${trimmedName} (${trimmedCity})`;
+}
+
+/**
+ * Sanitizes saved origin/destination strings so duplicated city suffixes like
+ * "Union Station (Toronto) (Toronto)" or "PortMiami (Cruise Capital of the World) (Miami)"
+ * render with each city once, while keeping 3-letter airport IATA codes like "Toronto (YYZ)" untouched.
+ */
+export function cleanDuplicateCitySuffix(location?: string): string {
+  if (!location) return '';
+  const trimmed = location.trim();
+  let cleaned = trimmed.replace(/\(([^()]+)\)\s*\(\1\)\s*$/i, '($1)');
+
+  const match = cleaned.match(/^(.+?)\s+\(([^()]+)\)$/);
+  if (match) {
+    const base = match[1].trim();
+    const suffix = match[2].trim();
+    if (!/^[A-Z]{3}$/.test(suffix)) {
+      const normalize = (s: string) =>
+        s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const normBase = normalize(base);
+      const tokens = suffix
+        .split('/')
+        .map((t) => normalize(t.trim()))
+        .filter(Boolean);
+      if (tokens.some((tok) => tok.length >= 3 && normBase.includes(tok))) {
+        cleaned = base;
+      }
+    }
+  }
+
+  return cleaned;
+}

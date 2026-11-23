@@ -14,6 +14,48 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Nov 23, 2026 (Maintenance & Polish) */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 23, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Content Route Recovery, Weight Cap Parity, Route Heading &amp; Delete Count Fixes</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>/pricing, /changelog &amp; /faq Recovery + Theme-Aware Error Fallback</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Fixed a shared footer context dependency that caused /pricing, /changelog, /faq, and other standalone informational pages to trigger the error fallback outside the workspace provider, and updated the ErrorBoundary screen to follow your active light or dark theme.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Scale className="w-4 h-4 text-purple-500" />
+              <span>Carry-On Decimal Cap Parity &amp; Accurate Delete Counts</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Aligned carry-on weight limit labels across Packing Checklist, Trip Summary, Luggage view, and Print Manifests to preserve carrier decimal limits (e.g., 26.4 lbs cap on Air France instead of truncating to 26 lbs), and updated trip delete confirmations to report true packed item counts separately from total items.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+              <span>Rail &amp; Cruise Route Heading Deduplication</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Eliminated duplicate parenthetical city names on Rail, Cruise, and Bus hubs (e.g., displaying Union Station (Toronto) and PortMiami cleanly instead of repeating (Toronto) or (Miami)) while keeping airport IATA codes intact on Flight headings.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Nov 23, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">

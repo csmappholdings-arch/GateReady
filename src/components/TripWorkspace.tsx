@@ -3,6 +3,7 @@ import { Trip, BagType, BagMaterial, Bag, TravelType, LuggageProfile } from '../
 import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { calculateTravelReadinessScore } from '../utils/readinessScore';
+import { cleanDuplicateCitySuffix } from '../data/transitStationsData';
 import { 
   ArrowLeft, 
   Luggage, 
@@ -234,7 +235,7 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
           </div>
 
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight">
-            {trip.originCity || 'Departure'} → {trip.destinationCity || trip.name}
+            {cleanDuplicateCitySuffix(trip.originCity) || 'Departure'} → {cleanDuplicateCitySuffix(trip.destinationCity) || trip.name}
           </h1>
 
           <div className="flex items-center gap-3 text-xs text-purple-200 flex-wrap pt-0.5">

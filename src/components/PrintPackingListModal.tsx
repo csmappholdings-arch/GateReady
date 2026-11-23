@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Trip, Bag, PackingItem, getUserPresetWeightLbs } from '../types/travel';
 import { usePacking } from '../context/PackingContext';
 import { DefaultSuggestions } from '../data/suggestions';
+import { cleanDuplicateCitySuffix } from '../data/transitStationsData';
 import { 
   Printer, 
   X, 
@@ -629,17 +630,27 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                 
                 {/* Route & Details */}
                 <div className="flex items-center gap-3 flex-wrap mt-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                  {Boolean(trip.originCity?.trim() && trip.originCity.trim().length > 1 && trip.destinationCity?.trim() && trip.destinationCity.trim().length > 1) ? (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                      <span>{trip.originCity!.trim()} ➔ {trip.destinationCity!.trim()}</span>
-                    </span>
-                  ) : Boolean(trip.destinationCity?.trim() && trip.destinationCity.trim().length > 1) ? (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                      <span>To {trip.destinationCity!.trim()}</span>
-                    </span>
-                  ) : null}
+                  {(() => {
+                    const cleanOrigin = cleanDuplicateCitySuffix(trip.originCity);
+                    const cleanDest = cleanDuplicateCitySuffix(trip.destinationCity);
+                    if (cleanOrigin.length > 1 && cleanDest.length > 1) {
+                      return (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                          <span>{cleanOrigin} ➔ {cleanDest}</span>
+                        </span>
+                      );
+                    }
+                    if (cleanDest.length > 1) {
+                      return (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                          <span>To {cleanDest}</span>
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
                   {trip.companyName && (
                     <span className="flex items-center gap-1">
                       {trip.travelType === 'TRAIN' ? (

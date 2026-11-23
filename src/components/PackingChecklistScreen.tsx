@@ -1004,7 +1004,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                       </span>
                     ) : (
                       <span className="text-xs text-slate-400">
-                        / {typicalLimitDisplay.toFixed(0)} {unitLabel}
+                        / {bagWeightStatus?.displayLimit || `${typicalLimitDisplay} ${unitLabel}`} cap
                       </span>
                     )}
                   </div>
