@@ -1,12 +1,12 @@
 import React from 'react';
-import { Trip, TravelDocumentChecklist } from '../types/travel';
+import { Trip, TravelDocumentChecklist, TravelType } from '../types/travel';
 import { 
   FileCheck, 
   ShieldCheck, 
   CheckCircle2, 
   Circle, 
   AlertCircle, 
-  ExternalLink, 
+  ArrowRight, 
   Info,
   Calendar,
   Lock,
@@ -32,74 +32,100 @@ interface DocItemConfig {
   linkText?: string;
 }
 
-const DOCUMENT_ITEMS: DocItemConfig[] = [
-  {
-    key: 'passportChecked',
-    title: 'Passport Validity & Condition Checked',
-    subtitle: 'Verify your passport has at least 6 months validity remaining beyond your return date.',
-    tag: 'Critical',
-    recommendation: 'Many international destinations deny boarding if your passport expires within 6 months. Check for clean pages and no water damage.',
-    officialLink: '/entry-requirements/',
-    linkText: 'Check 6-Month Passport Rules'
-  },
-  {
-    key: 'visaReviewed',
-    title: 'Visa & Entry Requirements Reviewed',
-    subtitle: 'Confirm whether your destination mandates an e-Visa, tourist card, or visa upon arrival.',
-    tag: 'Required',
-    recommendation: 'Review country-specific visa rules for Canadian and US passport holders prior to departure day.',
-    officialLink: '/entry-requirements/',
-    linkText: 'Quick-Check Entry Portals'
-  },
-  {
-    key: 'boardingPassAvailable',
-    title: 'Boarding Pass & Check-In Available',
-    subtitle: 'Online check-in opens 24 hours before flight departure. Save mobile pass to Apple/Google Wallet.',
-    tag: 'Flight Day',
-    recommendation: 'Download offline screenshot or add to phone wallet in case airport terminal Wi-Fi is weak.'
-  },
-  {
-    key: 'travelAuthorizationsReviewed',
-    title: 'Electronic Travel Authorizations (ESTA / eTA / ETIAS)',
-    subtitle: 'Ensure applicable pre-travel clearance authorizations are approved and active.',
-    tag: 'Electronic Auth',
-    recommendation: 'For US transit/entry: ESTA. For Canada: eTA. For Europe: ETIAS (when in effect). Always submit at least 72 hours prior.'
-  },
-  {
-    key: 'travelInsuranceReviewed',
-    title: 'Travel Health & Trip Cancellation Insurance',
-    subtitle: 'Review coverage numbers, 24/7 emergency medical assistance hotlines, and policy certificate.',
-    tag: 'Health & Protection',
-    recommendation: 'Verify hospital coverage limits and keep emergency contact numbers saved on your phone.'
-  },
-  {
-    key: 'hotelConfirmationAvailable',
-    title: 'Hotel & Lodging Confirmations',
-    subtitle: 'Save hotel address, reservation confirmation numbers, check-in time, and local contact phone.',
-    tag: 'Lodging',
-    recommendation: 'Immigration border officers frequently request the exact street address and hotel name where you will reside.'
-  },
-  {
-    key: 'flightConfirmationAvailable',
-    title: 'Flight / Transit Return Confirmation',
-    subtitle: 'Store 6-character PNR booking code and e-ticket numbers accessible offline.',
-    tag: 'Return Proof',
-    recommendation: 'Airlines and border authorities require documented proof of onward or return travel before permitting entry.'
-  },
-  {
-    key: 'emergencyContactNoted',
-    title: 'Emergency Contacts & Embassy Location',
-    subtitle: 'Note closest consulate/embassy location and local emergency dispatch numbers (911/112/999).',
-    tag: 'Emergency',
-    recommendation: 'Know the local 3-digit emergency number for your destination before landing.'
-  }
-];
+function getDocumentItems(travelType: TravelType): DocItemConfig[] {
+  const isFlight = travelType === 'PLANE';
+  const isCar = travelType === 'CAR';
+
+  return [
+    {
+      key: 'passportChecked',
+      title: isCar ? 'Driver’s License & Passport Validity Checked' : 'Passport Validity & Condition Checked',
+      subtitle: isCar
+        ? 'Confirm your driver’s license is current, and verify passport 6-month validity if crossing an international border.'
+        : 'Verify your passport has at least 6 months validity remaining beyond your return date.',
+      tag: 'Critical',
+      recommendation: 'Many international destinations deny entry if your passport expires within 6 months. Check for clean pages and no water damage.',
+      officialLink: '/entry-requirements/',
+      linkText: 'Check 6-Month Passport Rules'
+    },
+    {
+      key: 'visaReviewed',
+      title: 'Visa & Entry Requirements Reviewed',
+      subtitle: 'Confirm whether your destination mandates an e-Visa, tourist card, or visa upon arrival.',
+      tag: 'Required',
+      recommendation: 'Review country-specific visa rules for Canadian and US passport holders prior to departure day.',
+      officialLink: '/entry-requirements/',
+      linkText: 'Quick-Check Entry Portals'
+    },
+    {
+      key: 'boardingPassAvailable',
+      title: isFlight
+        ? 'Boarding Pass & Check-In Available'
+        : isCar
+          ? 'Vehicle Registration, Insurance & Route Saved'
+          : 'Ticket & Check-In Confirmation Available',
+      subtitle: isFlight
+        ? 'Online check-in opens 24 hours before flight departure. Save mobile pass to Apple/Google Wallet.'
+        : isCar
+          ? 'Keep physical registration and auto insurance in the glovebox and save offline GPS maps for cellular dead zones.'
+          : 'Save your carrier e-ticket, QR pass, or embarkation pass offline before heading to the station or terminal.',
+      tag: isFlight ? 'Flight Day' : 'Departure Day',
+      recommendation: isCar
+        ? 'Download offline maps and store roadside assistance contact numbers before driving.'
+        : 'Download an offline screenshot or wallet pass in case station or terminal Wi-Fi is weak.'
+    },
+    {
+      key: 'travelAuthorizationsReviewed',
+      title: 'Electronic Travel Authorizations (ESTA / eTA / ETIAS)',
+      subtitle: 'Ensure applicable pre-travel clearance authorizations are approved and active.',
+      tag: 'Electronic Auth',
+      recommendation: 'For US transit/entry: ESTA. For Canada: eTA. For Europe: ETIAS (when in effect). Always submit at least 72 hours prior.'
+    },
+    {
+      key: 'travelInsuranceReviewed',
+      title: 'Travel Health & Trip Cancellation Insurance',
+      subtitle: 'Review coverage numbers, 24/7 emergency medical assistance hotlines, and policy certificate.',
+      tag: 'Health & Protection',
+      recommendation: 'Verify hospital coverage limits and keep emergency contact numbers saved on your phone.'
+    },
+    {
+      key: 'hotelConfirmationAvailable',
+      title: 'Hotel & Lodging Confirmations',
+      subtitle: 'Save hotel address, reservation confirmation numbers, check-in time, and local contact phone.',
+      tag: 'Lodging',
+      recommendation: 'Immigration border officers frequently request the exact street address and hotel name where you will reside.'
+    },
+    {
+      key: 'flightConfirmationAvailable',
+      title: isFlight
+        ? 'Flight / Transit Return Confirmation'
+        : isCar
+          ? 'Ferry, Toll Pass & Border Return Docs'
+          : 'Return / Onward Travel Confirmation',
+      subtitle: isCar
+        ? 'Keep any ferry reservations, toll transponders, and lodging return dates accessible offline.'
+        : 'Store booking codes and return reservation details accessible offline.',
+      tag: 'Return Proof',
+      recommendation: isCar
+        ? 'Border authorities may ask for proof of lodging and planned return dates on cross-border drives.'
+        : 'Carriers and border authorities often require documented proof of onward or return travel before permitting entry.'
+    },
+    {
+      key: 'emergencyContactNoted',
+      title: 'Emergency Contacts & Embassy Location',
+      subtitle: 'Note closest consulate/embassy location and local emergency dispatch numbers (911/112/999).',
+      tag: 'Emergency',
+      recommendation: 'Know the local 3-digit emergency number for your destination before arriving.'
+    }
+  ];
+}
 
 export const TravelDocumentsChecklistScreen: React.FC<TravelDocumentsChecklistProps> = ({
   trip,
   onUpdateTripDetails
 }) => {
   const currentDocs: TravelDocumentChecklist = trip.travelDocuments || {};
+  const documentItems = React.useMemo(() => getDocumentItems(trip.travelType), [trip.travelType]);
 
   const handleToggle = (key: keyof TravelDocumentChecklist) => {
     const updatedDocs: TravelDocumentChecklist = {
@@ -114,8 +140,8 @@ export const TravelDocumentsChecklistScreen: React.FC<TravelDocumentsChecklistPr
     });
   };
 
-  const completedCount = DOCUMENT_ITEMS.filter((item) => !!currentDocs[item.key]).length;
-  const progressPercent = Math.round((completedCount / DOCUMENT_ITEMS.length) * 100);
+  const completedCount = documentItems.filter((item) => !!currentDocs[item.key]).length;
+  const progressPercent = Math.round((completedCount / documentItems.length) * 100);
 
   return (
     <div className="space-y-6">
@@ -146,7 +172,7 @@ export const TravelDocumentsChecklistScreen: React.FC<TravelDocumentsChecklistPr
                 Documents Ready
               </p>
               <p className="text-2xl font-black text-white">
-                {completedCount} <span className="text-xs font-normal text-indigo-200">/ {DOCUMENT_ITEMS.length}</span>
+                {completedCount} <span className="text-xs font-normal text-indigo-200">/ {documentItems.length}</span>
               </p>
             </div>
             <div className="w-12 h-12 rounded-full border-4 border-indigo-400/30 border-t-emerald-400 flex items-center justify-center font-black text-xs text-white">
@@ -166,7 +192,7 @@ export const TravelDocumentsChecklistScreen: React.FC<TravelDocumentsChecklistPr
 
       {/* Checklist Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-        {DOCUMENT_ITEMS.map((item) => {
+        {documentItems.map((item) => {
           const isDone = !!currentDocs[item.key];
           return (
             <div
@@ -215,13 +241,11 @@ export const TravelDocumentsChecklistScreen: React.FC<TravelDocumentsChecklistPr
                 {item.officialLink && (
                   <a
                     href={item.officialLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="text-purple-600 dark:text-purple-400 hover:underline font-bold inline-flex items-center gap-1 shrink-0 ml-auto"
                   >
                     <span>{item.linkText}</span>
-                    <ExternalLink className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3" />
                   </a>
                 )}
               </div>

@@ -237,6 +237,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       setReturnTripDate(initialReturnTripDate || '');
       setReturnTripTime(initialReturnTripTime || '');
       setAircraftType(initialAircraftType || '');
+      setFareFamily(initialFareFamily || '');
       setPassportExpiryDate(initialPassportExpiryDate || '');
       const defaultUser = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
       if (initialTravelers && initialTravelers.length > 0) {
@@ -274,7 +275,26 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         ]);
       }
     }
-  }, [isOpen, user, initialTravelType, initialDestinationCity, initialCarrier, initialSeatClass, initialBags]);
+  }, [
+    isOpen,
+    user,
+    isPro,
+    initialTripTitle,
+    initialTravelType,
+    initialOriginCity,
+    initialDestinationCity,
+    initialCarrier,
+    initialSeatClass,
+    initialFareFamily,
+    initialDepartureDate,
+    initialDepartureTime,
+    initialReturnTripDate,
+    initialReturnTripTime,
+    initialAircraftType,
+    initialPassportExpiryDate,
+    initialTravelers,
+    initialBags
+  ]);
 
   // Keyboard Escape handler
   useEffect(() => {

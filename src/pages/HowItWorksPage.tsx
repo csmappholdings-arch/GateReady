@@ -73,7 +73,7 @@ export const HowItWorksPage: React.FC = () => {
                 Select Travel Mode &amp; Operating Airline
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Choose your travel mode (Flight, Road Trip, Train, Cruise). For flights, select from 42+ verified global airlines and your booked fare family (e.g. Basic Economy vs Standard). GateReady automatically loads published carry-on dimensions and checked baggage weight limits.
+                Choose your travel mode (Flight, Road Trip, Train, Cruise). For flights, select from 42+ global airlines and your booked fare family (e.g. Basic Economy vs Standard). GateReady automatically loads published carry-on dimensions and checked baggage weight limits.
               </p>
             </div>
           </div>
@@ -83,7 +83,7 @@ export const HowItWorksPage: React.FC = () => {
             <div className="flex items-center justify-between text-xs pb-1.5 border-b border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-slate-900 dark:text-white">Air Canada AC849</span>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Verified Tariff</span>
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published Tariff</span>
               </div>
               <span className="text-[10px] text-slate-400 font-mono">Boeing 787-9</span>
             </div>

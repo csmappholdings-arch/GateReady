@@ -119,17 +119,21 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
     const computed = calculateTripBaggageFees(
       airlineRecord.airlineName,
       simulatedBags,
+      undefined,
       defaultFam ? defaultFam.id : undefined
     );
 
     const totalFee = (checkedCount * airlineRecord.firstCheckedFee) + (carryOnCount * airlineRecord.carryOnFee);
+    const formattedFallback = airlineRecord.currencySymbol.includes(airlineRecord.currency)
+      ? `${airlineRecord.currencySymbol}${totalFee.toFixed(2)}`
+      : `${airlineRecord.currencySymbol}${totalFee.toFixed(2)} ${airlineRecord.currency}`;
     return computed || {
       hasFeeData: true,
       airlineName: airlineRecord.airlineName,
       currency: airlineRecord.currency,
       currencySymbol: airlineRecord.currencySymbol,
       totalEstimatedFee: totalFee,
-      totalEstimatedFeeFormatted: `${airlineRecord.currencySymbol}${totalFee.toFixed(2)} ${airlineRecord.currency}`,
+      totalEstimatedFeeFormatted: formattedFallback,
       breakdown: [],
       overweightBagCount: 0,
       totalOverweightFee: 0,
@@ -166,11 +170,13 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
   return (
     <section 
       id="interactive-trip-preview"
-      className="relative w-full py-10 sm:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 bg-slate-900 text-white rounded-3xl my-6 shadow-2xl border border-purple-500/30 overflow-hidden"
+      className="relative w-full py-10 sm:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 bg-slate-900 text-white rounded-3xl my-6 shadow-2xl border border-purple-500/30"
     >
       {/* Decorative Aviation Glows */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none" aria-hidden="true">
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl" />
+      </div>
 
       <div className="relative z-10 max-w-6xl mx-auto space-y-8">
         
@@ -191,7 +197,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
         {/* Input Form Card */}
         <form 
           onSubmit={handleCalculate}
-          className="p-5 sm:p-7 rounded-3xl bg-slate-800/90 border border-purple-400/30 shadow-xl backdrop-blur-md space-y-5"
+          className="relative z-20 p-5 sm:p-7 rounded-3xl bg-slate-800/90 border border-purple-400/30 shadow-xl backdrop-blur-md space-y-5"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
@@ -363,7 +369,7 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
 
         {/* Dynamic Preview Results Card */}
         {hasCalculated && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="relative z-10 space-y-6 animate-in fade-in duration-300">
             
             {/* Top Summary Bar */}
             <div className="p-5 rounded-2xl bg-gradient-to-r from-purple-900/60 via-slate-800 to-indigo-900/60 border border-purple-400/40 flex items-center justify-between flex-wrap gap-4 shadow-lg">
@@ -395,7 +401,9 @@ export const InteractiveTripPreview: React.FC<InteractiveTripPreviewProps> = ({
                   Estimated Baggage Fees
                 </div>
                 <div className="text-2xl font-black text-white">
-                  {feeResult.currencySymbol}{feeResult.totalEstimatedFee.toFixed(2)} {feeResult.currency}
+                  {feeResult.currencySymbol.includes(feeResult.currency)
+                    ? `${feeResult.currencySymbol}${feeResult.totalEstimatedFee.toFixed(2)}`
+                    : `${feeResult.currencySymbol}${feeResult.totalEstimatedFee.toFixed(2)} ${feeResult.currency}`}
                 </div>
                 <div className="text-[11px] text-slate-400">
                   {feeResult.totalEstimatedFee === 0 ? '✓ Free allowances cover selection' : 'Based on standard published fees'}

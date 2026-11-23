@@ -258,10 +258,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 dark:from-purple-700 dark:via-purple-600 dark:to-indigo-800 text-white backdrop-blur-md border-b border-purple-300/60 dark:border-purple-400/50 shadow-lg shadow-purple-600/20 transition-colors">
-      {/* Top luminous accent edge */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-fuchsia-300 via-white/80 to-purple-200 opacity-90" />
-
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 dark:from-purple-700 dark:via-purple-600 dark:to-indigo-800 text-white border-b border-white/10 shadow-lg shadow-purple-600/20 transition-colors">
       {/* Background blueprint circuit lines accent from branding */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div 
@@ -272,7 +269,7 @@ export const Header: React.FC<HeaderProps> = ({
         />
       </div>
 
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6 relative z-10">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6 relative z-30">
         {/* Left: GateReady.ca Stadium Neon Badge matching uploaded branding */}
         <div className="flex items-center gap-3 min-w-0">
           <div 
@@ -339,6 +336,8 @@ export const Header: React.FC<HeaderProps> = ({
                   setPlanMenuOpen(!planMenuOpen);
                   setToolsMenuOpen(false);
                   setWhyMenuOpen(false);
+                  setUserMenuOpen(false);
+                  setSettingsOpen(false);
                 }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
                   planMenuOpen ? 'bg-white/20 text-white' : 'text-purple-100 hover:text-white hover:bg-white/10'
@@ -349,7 +348,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {planMenuOpen && (
-                <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-150">
                   <button
                     type="button"
                     onClick={() => {
@@ -410,6 +409,8 @@ export const Header: React.FC<HeaderProps> = ({
                   setToolsMenuOpen(!toolsMenuOpen);
                   setPlanMenuOpen(false);
                   setWhyMenuOpen(false);
+                  setUserMenuOpen(false);
+                  setSettingsOpen(false);
                 }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
                   toolsMenuOpen ? 'bg-white/20 text-white' : 'text-purple-100 hover:text-white hover:bg-white/10'
@@ -420,7 +421,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {toolsMenuOpen && (
-                <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-150">
                   <a
                     href="/airlines"
                     onClick={() => setToolsMenuOpen(false)}
@@ -480,6 +481,8 @@ export const Header: React.FC<HeaderProps> = ({
                   setWhyMenuOpen(!whyMenuOpen);
                   setPlanMenuOpen(false);
                   setToolsMenuOpen(false);
+                  setUserMenuOpen(false);
+                  setSettingsOpen(false);
                 }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
                   whyMenuOpen ? 'bg-white/20 text-white' : 'text-purple-100 hover:text-white hover:bg-white/10'
@@ -490,7 +493,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {whyMenuOpen && (
-                <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-150">
                   <a
                     href="/"
                     onClick={() => setWhyMenuOpen(false)}
@@ -660,6 +663,9 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => {
                   setUserMenuOpen(!userMenuOpen);
                   setSettingsOpen(false);
+                  setPlanMenuOpen(false);
+                  setToolsMenuOpen(false);
+                  setWhyMenuOpen(false);
                 }}
                 className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-emerald-500/40 bg-emerald-950/50 text-emerald-200 flex items-center gap-2 hover:bg-emerald-900/60 transition-colors cursor-pointer"
                 title="Google Account & Cloud Sync"
@@ -692,46 +698,28 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="w-5 h-5 rounded-full bg-white/20" />
               </div>
             ) : (
-              /* High-Intent Guest Actions: Clearly Visible Log In and Sign Up Free */
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccountSyncModalMode('signin');
-                    if (onOpenAccountSync) {
-                      onOpenAccountSync('signin');
-                    } else {
-                      setAccountSyncModalOpen(true);
-                    }
-                  }}
-                  className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                  title="Log into existing GateReady account"
-                >
-                  <span>Log In</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccountSyncModalMode('signup');
-                    if (onOpenAccountSync) {
-                      onOpenAccountSync('signup');
-                    } else {
-                      setAccountSyncModalOpen(true);
-                    }
-                  }}
-                  className="h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:brightness-105 active:scale-95 text-purple-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-400/25 transition-all cursor-pointer"
-                  title="Create your free account (includes 7-day Platinum trial)"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-900" />
-                  <span className="whitespace-nowrap">Sign Up Free</span>
-                </button>
-              </div>
+              /* Single Combined Guest Action: Gold Log In / Create Account Button */
+              <button
+                type="button"
+                onClick={() => {
+                  setAccountSyncModalMode('signup');
+                  if (onOpenAccountSync) {
+                    onOpenAccountSync('signup');
+                  } else {
+                    setAccountSyncModalOpen(true);
+                  }
+                }}
+                className="h-8.5 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:brightness-105 active:scale-95 text-purple-950 font-black text-[11px] sm:text-xs flex items-center gap-1.5 shadow-md shadow-amber-400/25 transition-all cursor-pointer shrink-0"
+                title="Log in or create your free account (includes 7-day Platinum trial)"
+              >
+                <Sparkles className="hidden sm:block w-3.5 h-3.5 text-purple-900 shrink-0" />
+                <span className="whitespace-nowrap">Log In / Create Account</span>
+              </button>
             )}
 
             {/* User Account Popover */}
             {userMenuOpen && user && (
-              <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-[calc(100vw-1.5rem)] sm:w-80 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-3.5 z-[70] animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                   {user.photoURL ? (
                     <img
@@ -966,6 +954,9 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => {
                 setSettingsOpen(!settingsOpen);
                 setUserMenuOpen(false);
+                setPlanMenuOpen(false);
+                setToolsMenuOpen(false);
+                setWhyMenuOpen(false);
               }}
               className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer"
               aria-label="Settings"
@@ -975,7 +966,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {settingsOpen && (
-              <div className="absolute right-0 mt-2 w-80 max-h-[85vh] sm:max-h-[88vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 py-2 pb-8 z-50 animate-in fade-in slide-in-from-top-2 duration-150 overscroll-contain">
+              <div className="absolute right-0 mt-2 w-[calc(100vw-1.5rem)] sm:w-80 max-h-[85vh] sm:max-h-[88vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 py-2 pb-8 z-[70] animate-in fade-in slide-in-from-top-2 duration-150 overscroll-contain">
                 <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10">
                   <div>
                     <p className="text-xs font-bold text-slate-900 dark:text-white">
@@ -2053,19 +2044,7 @@ export const Header: React.FC<HeaderProps> = ({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setAccountSyncModalMode('signin');
-                          if (onOpenAccountSync) onOpenAccountSync('signin');
-                          else setAccountSyncModalOpen(true);
-                        }}
-                        className="h-8.5 px-3 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-purple-900 dark:text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-                      >
-                        <span>Log In</span>
-                      </button>
+                    <div className="pt-1">
                       <button
                         type="button"
                         onClick={() => {
@@ -2074,10 +2053,11 @@ export const Header: React.FC<HeaderProps> = ({
                           if (onOpenAccountSync) onOpenAccountSync('signup');
                           else setAccountSyncModalOpen(true);
                         }}
-                        className="h-8.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 active:scale-98 text-purple-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                        className="w-full h-9 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:brightness-105 active:scale-98 text-purple-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm shadow-amber-400/25 transition-all cursor-pointer"
+                        title="Log in or create your free account (includes 7-day Platinum trial)"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-purple-950" />
-                        <span>Sign Up Free</span>
+                        <Sparkles className="w-3.5 h-3.5 text-purple-900 shrink-0" />
+                        <span>Log In / Create Account</span>
                       </button>
                     </div>
 
@@ -2583,8 +2563,6 @@ export const Header: React.FC<HeaderProps> = ({
         document.body
       )}
 
-      {/* Bottom glowing neon transit rail line from branding */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-purple-600 via-fuchsia-400 to-indigo-500 shadow-[0_1px_10px_rgba(217,70,239,0.7)] relative z-20" />
     </header>
   );
 };

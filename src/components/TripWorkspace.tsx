@@ -271,7 +271,7 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
       </div>
 
       {/* Clean 7-Tab Navigation Bar (Section 2) */}
-      <div className="sticky top-16 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md py-2 border-b border-purple-100 dark:border-purple-950 shadow-xs">
+      <div className="sm:sticky sm:top-16 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md py-2 border-b border-purple-100 dark:border-purple-950 shadow-xs">
         <nav
           aria-label="Trip workspace navigation tabs"
           className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1 overflow-x-auto no-scrollbar"

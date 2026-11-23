@@ -43,7 +43,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         description: guide.metaDescription,
         keywords: guide.keywords,
         heading: guide.h1,
-        subheading: `Verified carry-on dimensions, weight limits, and baggage fees for ${guide.name} travelers.`,
+        subheading: `Published carry-on dimensions, weight limits, and baggage fees for ${guide.name} travelers.`,
         schemaType: 'WebPage'
       };
 
@@ -58,10 +58,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     const meta: StaticPageMeta = {
       path: '/airlines',
       title: 'Airline Baggage Allowance Guides (42 Airlines) – GateReady',
-      description: 'Verified carry-on dimensions, weight limits, and checked luggage fee tables for all 42 major airlines across Canada, the US, Europe, and Asia.',
+      description: 'Published carry-on dimensions, weight limits, and checked luggage fee tables for all 42 major airlines across Canada, the US, Europe, and Asia.',
       keywords: 'airline baggage allowance, carry on dimensions by airline, checked baggage fees by airline, airline baggage limits 2026, luggage scale',
       heading: 'Airline Baggage Allowance & Fee Directory',
-      subheading: 'Verified carry-on sizers, weight caps, and baggage fees for 42 global airlines.',
+      subheading: 'Published carry-on sizers, weight caps, and baggage fees for 42 global airlines.',
       schemaType: 'CollectionPage'
     };
 

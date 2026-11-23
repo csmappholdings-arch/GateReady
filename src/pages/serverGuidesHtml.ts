@@ -180,12 +180,12 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
                     <td class="py-3.5 px-4">
                       ${fam.includedCheckedBags >= 1 
                         ? '<span class="font-bold text-emerald-700">Included Free (1st)</span>' 
-                        : `<span class="font-semibold text-slate-700">${fam.firstCheckedFee === 0 ? 'Included' : `${guide.fees.currencySymbol}${fam.firstCheckedFee} ${guide.fees.currency}`}</span>`}
+                        : `<span class="font-semibold text-slate-700">${fam.firstCheckedFee === 0 ? 'Included' : (guide.fees.currencySymbol.includes(guide.fees.currency) ? `${guide.fees.currencySymbol}${fam.firstCheckedFee}` : `${guide.fees.currencySymbol}${fam.firstCheckedFee} ${guide.fees.currency}`)}</span>`}
                     </td>
                     <td class="py-3.5 px-4">
                       ${fam.includedCheckedBags >= 2 
                         ? '<span class="font-bold text-emerald-700">Included Free (2nd)</span>' 
-                        : `<span class="font-semibold text-slate-700">${fam.secondCheckedFee === 0 ? 'Included' : `${guide.fees.currencySymbol}${fam.secondCheckedFee} ${guide.fees.currency}`}</span>`}
+                        : `<span class="font-semibold text-slate-700">${fam.secondCheckedFee === 0 ? 'Included' : (guide.fees.currencySymbol.includes(guide.fees.currency) ? `${guide.fees.currencySymbol}${fam.secondCheckedFee}` : `${guide.fees.currencySymbol}${fam.secondCheckedFee} ${guide.fees.currency}`)}</span>`}
                     </td>
                     <td class="py-3.5 px-4 text-slate-500 text-[11px] max-w-xs leading-relaxed">
                       ${fam.fareNote}
@@ -360,16 +360,16 @@ export function getBaggageFeeCalculatorHtml(): string {
             <tbody class="divide-y divide-slate-100 text-slate-700">
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/air-canada-baggage" class="underline">Air Canada</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)</td>
-                <td class="py-3 px-4 font-bold">CAD $35</td>
-                <td class="py-3 px-4">CAD $50</td>
+                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)*</td>
+                <td class="py-3 px-4 font-bold">CAD $45</td>
+                <td class="py-3 px-4">CAD $60</td>
                 <td class="py-3 px-4 text-rose-600 font-bold">+CAD $100</td>
               </tr>
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/westjet-baggage" class="underline">WestJet</a></td>
                 <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)*</td>
-                <td class="py-3 px-4 font-bold">CAD $35</td>
-                <td class="py-3 px-4">CAD $50</td>
+                <td class="py-3 px-4 font-bold">CAD $40 (prepaid)</td>
+                <td class="py-3 px-4">CAD $60 (prepaid)</td>
                 <td class="py-3 px-4 text-rose-600 font-bold">+CAD $100</td>
               </tr>
               <tr>
@@ -389,8 +389,8 @@ export function getBaggageFeeCalculatorHtml(): string {
               <tr>
                 <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/southwest-airlines-baggage" class="underline">Southwest Airlines</a></td>
                 <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)</td>
-                <td class="py-3 px-4 text-emerald-700 font-black">2 BAGS FREE</td>
-                <td class="py-3 px-4 text-emerald-700 font-black">FREE ($0)</td>
+                <td class="py-3 px-4 font-bold">$45 USD (Choice Extra free)</td>
+                <td class="py-3 px-4">$55 USD (Choice Extra free)</td>
                 <td class="py-3 px-4 text-rose-600 font-bold">+$100 USD</td>
               </tr>
               <tr>
@@ -403,7 +403,7 @@ export function getBaggageFeeCalculatorHtml(): string {
             </tbody>
           </table>
         </div>
-        <p class="text-[11px] text-slate-500">*UltraBasic fares on WestJet exclude carry-on bags. Estimate from published airline fee tables. Airlines change fees — confirm at booking.</p>
+        <p class="text-[11px] text-slate-500">*Air Canada Basic (NA/Sun routes) and WestJet UltraBasic (Canada/US routes) exclude overhead carry-on bags. Estimate from published airline fee tables. Airlines change fees — confirm at booking.</p>
       </section>
 
       <section class="p-5 rounded-2xl bg-purple-600 text-white space-y-3">

@@ -383,7 +383,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       {/* ============================================================== */}
       {/* TOP BAR: TRAVELER DROPDOWN WITH % PACKED BESIDE DYNAMIC BAGS   */}
       {/* ============================================================== */}
-      <div className="border-b border-purple-100 dark:border-purple-950/60 bg-white dark:bg-slate-900 sticky top-16 z-20 transition-colors shadow-2xs">
+      <div className="border-b border-purple-100 dark:border-purple-950/60 bg-white dark:bg-slate-900 relative z-20 transition-colors shadow-2xs rounded-t-2xl">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
           <div className="flex items-center gap-3 py-2.5">
             {/* Person / Traveler Dropdown */}

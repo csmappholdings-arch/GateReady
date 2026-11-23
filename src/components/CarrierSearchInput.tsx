@@ -201,75 +201,77 @@ export const CarrierSearchInput: React.FC<CarrierSearchInputProps> = ({
 
       {/* Autocomplete Dropdown List */}
       {isOpen && (
-        <div className="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 shadow-xl overflow-hidden py-1 animate-in fade-in duration-100">
+        <div className="absolute z-50 left-0 right-0 mt-1 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 shadow-xl overflow-hidden animate-in fade-in duration-100">
           <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950/60 border-b border-purple-100 dark:border-purple-900/40 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             <span>{dropdownHeaderLabel}</span>
             <span className="text-purple-600 dark:text-purple-400 font-semibold">{suggestions.length} choices</span>
           </div>
 
-          {suggestions.length === 0 ? (
-            <div className="p-3 text-center text-xs text-slate-500 dark:text-slate-400">
-              No matching suggestions found. You can keep typing "{value}" as a custom name.
-            </div>
-          ) : (
-            suggestions.map((item, idx) => {
-              const isSelected = idx === selectedIndex;
-              const isCurrent = value.toLowerCase() === item.name.toLowerCase();
+          <div className="max-h-60 overflow-y-auto py-1">
+            {suggestions.length === 0 ? (
+              <div className="p-3 text-center text-xs text-slate-500 dark:text-slate-400">
+                No matching suggestions found. You can keep typing "{value}" as a custom name.
+              </div>
+            ) : (
+              suggestions.map((item, idx) => {
+                const isSelected = idx === selectedIndex;
+                const isCurrent = value.toLowerCase() === item.name.toLowerCase();
 
-              return (
-                <button
-                  key={`${item.name}-${idx}`}
-                  type="button"
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectItem(item.name);
-                  }}
-                  className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2 transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-950 dark:text-white'
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-200'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    {item.flag ? (
-                      <span className="text-base select-none shrink-0" role="img" aria-label="flag">
-                        {item.flag}
-                      </span>
-                    ) : (
-                      <div className="w-5 h-5 rounded-md bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0">
-                        {getIcon()}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold truncate flex items-center gap-1.5">
-                        <span>{item.name}</span>
-                        {item.isRegional && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 font-semibold">
-                            Regional
-                          </span>
-                        )}
-                      </p>
-                      {item.country && (
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                          {item.country}
-                        </p>
+                return (
+                  <button
+                    key={`${item.name}-${idx}`}
+                    type="button"
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectItem(item.name);
+                    }}
+                    className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-950 dark:text-white'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {item.flag ? (
+                        <span className="text-base select-none shrink-0" role="img" aria-label="flag">
+                          {item.flag}
+                        </span>
+                      ) : (
+                        <div className="w-5 h-5 rounded-md bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0">
+                          {getIcon()}
+                        </div>
                       )}
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold truncate flex items-center gap-1.5">
+                          <span>{item.name}</span>
+                          {item.isRegional && (
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 font-semibold">
+                              Regional
+                            </span>
+                          )}
+                        </p>
+                        {item.country && (
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                            {item.country}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    {item.code && (
-                      <span className="px-1.5 py-0.5 rounded font-mono font-bold text-[10px] bg-purple-100 dark:bg-purple-900/80 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
-                        {item.code}
-                      </span>
-                    )}
-                    {isCurrent && <Check className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />}
-                  </div>
-                </button>
-              );
-            })
-          )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {item.code && (
+                        <span className="px-1.5 py-0.5 rounded font-mono font-bold text-[10px] bg-purple-100 dark:bg-purple-900/80 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
+                          {item.code}
+                        </span>
+                      )}
+                      {isCurrent && <Check className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />}
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
         </div>
       )}
     </div>

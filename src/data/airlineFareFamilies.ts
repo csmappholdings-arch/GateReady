@@ -21,24 +21,35 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
   aircanada: [
     {
       id: 'standard',
-      name: 'Standard / Flex Economy',
+      name: 'Standard Economy',
       isDefault: true,
-      includedCheckedBags: 1,
-      firstCheckedFee: 0,
-      secondCheckedFee: 50,
+      includedCheckedBags: 0,
+      firstCheckedFee: 45,
+      secondCheckedFee: 60,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Standard Economy includes 1 free checked bag (up to 50 lbs / 23 kg) + free overhead carry-on (no weight limit). 2nd checked bag is $50 CAD.'
+      fareNote: 'North America & Sun flights: 1st checked bag is $45 CAD, 2nd bag is $60 CAD. Includes 1 free overhead carry-on roller + personal item.'
     },
     {
       id: 'basic',
       name: 'Basic Economy',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 50,
+      firstCheckedFee: 45,
+      secondCheckedFee: 60,
+      carryOnAllowed: false,
+      carryOnFee: 65,
+      carryOnRestrictionNotice: 'No overhead carry-on on North America/Sun flights (personal item only). $65 CAD gate-check fee.',
+      fareNote: 'Basic Economy on North America & Sun routes includes personal item only (no overhead carry-on). 1st checked bag $45 CAD, 2nd $60 CAD.'
+    },
+    {
+      id: 'flex',
+      name: 'Economy Flex',
+      includedCheckedBags: 1,
+      firstCheckedFee: 0,
+      secondCheckedFee: 60,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Basic Economy: unbundled non-refundable fare. 1st checked bag $35 CAD, 2nd $50 CAD. Free carry-on roller included.'
+      fareNote: 'Economy Flex includes 1 free checked bag (up to 50 lbs / 23 kg) + free overhead carry-on. 2nd checked bag is $60 CAD.'
     },
     {
       id: 'latitude',
@@ -65,25 +76,35 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
   westjet: [
     {
       id: 'standard',
-      name: 'Econo / EconoFlex',
+      name: 'Econo',
       isDefault: true,
-      includedCheckedBags: 1,
-      firstCheckedFee: 0,
-      secondCheckedFee: 50,
+      includedCheckedBags: 0,
+      firstCheckedFee: 40,
+      secondCheckedFee: 60,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Standard Econo includes 1 free checked bag (up to 50 lbs / 23 kg) + free overhead carry-on. 2nd checked bag is $50 CAD.'
+      fareNote: 'Econo includes free overhead carry-on + personal item. 1st checked bag starts around $40 CAD prepaid ($35–$45 prepaid / $50–$59 check-in), 2nd bag ~$60 CAD prepaid.'
+    },
+    {
+      id: 'econoflex',
+      name: 'EconoFlex',
+      includedCheckedBags: 1,
+      firstCheckedFee: 0,
+      secondCheckedFee: 60,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: 'EconoFlex includes 1 free checked bag (up to 50 lbs / 23 kg) + free overhead carry-on. 2nd checked bag is ~$60 CAD prepaid.'
     },
     {
       id: 'ultrabasic',
       name: 'UltraBasic',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 50,
+      firstCheckedFee: 50,
+      secondCheckedFee: 75,
       carryOnAllowed: false,
-      carryOnFee: 0,
+      carryOnFee: 65,
       carryOnRestrictionNotice: 'No overhead carry-on allowed on Canada/US flights (under-seat personal item only).',
-      fareNote: 'UltraBasic fares do NOT include an overhead carry-on on Canada/US flights. Under-seat personal item only. 1st checked bag $35 CAD, 2nd $50 CAD.'
+      fareNote: 'UltraBasic fares do NOT include an overhead carry-on on Canada/US flights. Under-seat personal item only. Checked bags $45–$55+ prepaid 1st, $70–$83 2nd.'
     },
     {
       id: 'premium',
@@ -128,7 +149,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 0,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'PorterReserve all-inclusive fare includes 2 checked bags ($0) + free carry-on.'
+      fareNote: 'PorterReserve all-inclusive fare includes 2 checked bags (Included) + free carry-on.'
     }
   ],
 
@@ -162,22 +183,22 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Bare Fare (Unbundled)',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 59,
-      secondCheckedFee: 79,
+      firstCheckedFee: 49,
+      secondCheckedFee: 69,
       carryOnAllowed: false,
       carryOnFee: 39,
-      carryOnRestrictionNotice: 'ULCC unbundled: Carry-on roller costs $39 CAD. Only a small personal item (15 x 13 x 6 in) is free.',
-      fareNote: 'Flair Bare Fare: Unbundled ultra-low-cost. Carry-on bag is $39 CAD online; 1st checked bag $59 CAD, 2nd $79 CAD.'
+      carryOnRestrictionNotice: 'ULCC unbundled: Carry-on roller costs ~$39 CAD. Only a small personal item (17 x 13 x 6 in) is free.',
+      fareNote: 'Flair Bare Fare: Unbundled ultra-low-cost. Carry-on bag starts at $39 CAD online; 1st checked bag ~$49 CAD, 2nd ~$69 CAD.'
     },
     {
       id: 'bundle',
       name: 'Bundle / Big Forward Seat',
       includedCheckedBags: 1,
       firstCheckedFee: 0,
-      secondCheckedFee: 79,
+      secondCheckedFee: 69,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Flair Bundle packages include 1 carry-on roller + 1 checked bag ($0).'
+      fareNote: 'Flair Bundle packages include 1 carry-on roller + 1 checked bag (Included).'
     }
   ],
 
@@ -288,14 +309,24 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
   southwest: [
     {
       id: 'standard',
-      name: 'Wanna Get Away / Any Fare',
+      name: 'Choice / Basic / Choice Preferred',
       isDefault: true,
+      includedCheckedBags: 0,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: '1st checked bag is $45 USD, 2nd bag is $55 USD (Rapid Rewards cardholders & A-List receive 1st bag free). Free overhead carry-on + personal item included.'
+    },
+    {
+      id: 'choice_extra',
+      name: 'Choice Extra',
       includedCheckedBags: 2,
       firstCheckedFee: 0,
       secondCheckedFee: 0,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Bags Fly Free: 2 checked bags included ($0) up to 50 lbs each on all fares. Free carry-on + personal item.'
+      fareNote: 'Choice Extra (and A-List Preferred) include 2 free checked bags (Included) up to 50 lbs each + free carry-on + personal item.'
     }
   ],
 
@@ -397,19 +428,19 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Standard (Unbundled)',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 40,
-      secondCheckedFee: 50,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: false,
       carryOnFee: 45,
       carryOnRestrictionNotice: 'ULCC unbundled: Carry-on roller requires a fee (~$45 USD). Only a personal item (18 x 14 x 8 in) is free.',
-      fareNote: 'Spirit Standard: Unbundled model. Personal item is free; carry-on bag is ~$45 USD, 1st checked bag is ~$40 USD online.'
+      fareNote: 'Historical Spirit Standard (operations ceased May 2026): Personal item free; carry-on ~$45 USD, 1st checked bag ~$45 USD, 2nd ~$55 USD.'
     },
     {
       id: 'gobig',
       name: 'Go Big / Go Comfy',
       includedCheckedBags: 1,
       firstCheckedFee: 0,
-      secondCheckedFee: 50,
+      secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'Go Big and Go Comfy bundles include 1 carry-on roller and 1 checked bag ($0).'
@@ -422,19 +453,19 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Basic (Unbundled)',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 55,
-      secondCheckedFee: 70,
+      firstCheckedFee: 49,
+      secondCheckedFee: 69,
       carryOnAllowed: false,
-      carryOnFee: 55,
-      carryOnRestrictionNotice: 'ULCC unbundled: Carry-on roller costs ~$55 USD. Only personal item (14 x 18 x 8 in) is free.',
-      fareNote: 'Frontier Basic: Unbundled pricing. Carry-on roller ~$55 USD online; 1st checked bag ~$55 USD, 2nd $70 USD.'
+      carryOnFee: 49,
+      carryOnRestrictionNotice: 'ULCC unbundled: Carry-on roller costs ~$49 USD. Only personal item (18 x 14 x 8 in) is free.',
+      fareNote: 'Frontier Basic: Unbundled pricing. Carry-on roller ~$49 USD online; 1st checked bag ~$49 USD, 2nd ~$69 USD.'
     },
     {
       id: 'bundle',
       name: 'Economy / Business Bundle',
       includedCheckedBags: 1,
       firstCheckedFee: 0,
-      secondCheckedFee: 70,
+      secondCheckedFee: 69,
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'Frontier bundle packages include 1 carry-on roller + 1 checked bag ($0).'
@@ -508,11 +539,11 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       id: 'basic',
       name: 'Economy Basic',
       includedCheckedBags: 0,
-      firstCheckedFee: 45,
+      firstCheckedFee: 35,
       secondCheckedFee: 65,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Economy Basic: unbundled hand-baggage-only fare. 1st checked bag is ~£35–£50 ($45 USD). Free carry-on included.'
+      fareNote: 'Economy Basic: unbundled hand-baggage-only fare. 1st checked bag starts around £35 online (£65 2nd bag). Free carry-on included.'
     },
     {
       id: 'premium',
@@ -542,7 +573,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       id: 'light',
       name: 'Light (Hand Baggage Only)',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
+      firstCheckedFee: 30,
       secondCheckedFee: 75,
       carryOnAllowed: true,
       carryOnFee: 0,
@@ -576,7 +607,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       id: 'light',
       name: 'Economy Light',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
+      firstCheckedFee: 30,
       secondCheckedFee: 80,
       carryOnAllowed: true,
       carryOnFee: 0,
@@ -590,7 +621,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 0,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Business Class includes 2 checked bags (32 kg each); First Class includes 3 checked bags ($0).'
+      fareNote: 'Business Class includes 2 checked bags (32 kg each); First Class includes 3 checked bags (Included).'
     }
   ],
 
@@ -613,9 +644,9 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       firstCheckedFee: 25,
       secondCheckedFee: 40,
       carryOnAllowed: false,
-      carryOnFee: 18,
-      carryOnRestrictionNotice: 'Small personal bag ONLY (40 x 20 x 25 cm). Overhead wheelie bag requires Priority fee (€12–€25).',
-      fareNote: 'Ryanair Basic: 1 small personal item under seat only. Overhead carry-on wheelie bag costs €12–€25; 20 kg checked bag €25.'
+      carryOnFee: 15,
+      carryOnRestrictionNotice: 'Small personal bag ONLY (40 x 30 x 20 cm). Overhead wheelie bag requires Priority fee (€12–€36).',
+      fareNote: 'Ryanair Basic: 1 small personal item under seat only. Overhead carry-on wheelie bag costs €12–€36; 20 kg checked bag €25.'
     },
     {
       id: 'plus',
@@ -625,7 +656,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 40,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Plus fare includes 1 small bag, 1 10 kg check-in bag ($0), and 1 20 kg checked bag ($0).'
+      fareNote: 'Plus fare includes 1 small bag, 1 10 kg check-in bag (Included), and 1 20 kg checked bag (Included).'
     }
   ],
 
@@ -635,12 +666,12 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Standard Fare',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
+      firstCheckedFee: 30,
       secondCheckedFee: 45,
       carryOnAllowed: false,
-      carryOnFee: 20,
-      carryOnRestrictionNotice: 'Small under-seat bag only (45 x 36 x 20 cm). Large overhead cabin bag requires a fee (€15–€30).',
-      fareNote: 'easyJet Standard: 1 small under-seat bag free. Large overhead cabin bag costs €15–€30; 1st checked bag (23 kg) €35 online.'
+      carryOnFee: 15,
+      carryOnRestrictionNotice: 'Small under-seat bag only (45 x 36 x 20 cm). Large overhead cabin bag requires a fee (£15–£30).',
+      fareNote: 'easyJet Standard: 1 small under-seat bag free. Large overhead cabin bag starts around £15–£30; 1st checked bag (23 kg) ~£30 online.'
     },
     {
       id: 'plus',
@@ -650,14 +681,14 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 45,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'easyJet Plus & Flexi include 1 large overhead cabin bag + 1 23 kg checked bag ($0).'
+      fareNote: 'easyJet Plus & Flexi include 1 large overhead cabin bag + 1 23 kg checked bag (Included).'
     }
   ],
 
   turkish: [
     {
       id: 'standard',
-      name: 'EcoFly / Standard',
+      name: 'Standard / Americas Economy',
       isDefault: true,
       includedCheckedBags: 2,
       firstCheckedFee: 0,
@@ -665,6 +696,16 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'International Americas routes include 2 free checked bags (up to 23 kg each) + 8 kg carry-on.'
+    },
+    {
+      id: 'ecofly',
+      name: 'EcoFly (Regional / Domestic)',
+      includedCheckedBags: 0,
+      firstCheckedFee: 30,
+      secondCheckedFee: 50,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: 'EcoFly on select European/regional routes is cabin-baggage-only (8 kg carry-on free; checked bag requires paid upgrade).'
     },
     {
       id: 'business',
@@ -776,7 +817,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 0,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Premium includes 2 checked bags (23 kg); Upper Class includes 2 bags up to 32 kg ($0).'
+      fareNote: 'Premium includes 2 checked bags (23 kg); Upper Class includes 2 bags up to 32 kg (Included).'
     }
   ],
 
@@ -924,7 +965,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 40,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Smart bundles include 1 trolley carry-on + 1 20 kg checked bag ($0).'
+      fareNote: 'Smart bundles include 1 trolley carry-on + 1 20 kg checked bag (Included).'
     }
   ],
 
@@ -1127,7 +1168,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 70,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'International Americas routes include 1-2 free checked bags (23 kg each) ($0).'
+      fareNote: 'International Americas routes include 1-2 free checked bags (23 kg each) (Included).'
     },
     {
       id: 'business',
@@ -1137,7 +1178,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 0,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Premium Economy and Business include 2-3 free checked bags (up to 32 kg each) ($0).'
+      fareNote: 'Premium Economy and Business include 2-3 free checked bags (up to 32 kg each) (Included).'
     }
   ],
 
@@ -1176,6 +1217,16 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'US and Canada routes include 2 free checked bags (23 kg each) ($0) + 7 kg carry-on.'
+    },
+    {
+      id: 'basic',
+      name: 'Economy Basic (Hand Baggage Only)',
+      includedCheckedBags: 0,
+      firstCheckedFee: 60,
+      secondCheckedFee: 90,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: 'Economy Basic on select regional/European routes includes 7 kg carry-on only; checked baggage costs extra.'
     },
     {
       id: 'business',
@@ -1248,6 +1299,16 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       carryOnAllowed: true,
       carryOnFee: 0,
       fareNote: 'Long-haul routes include 2 free checked bags (23 kg each) ($0) + 12 kg carry-on.'
+    },
+    {
+      id: 'lite',
+      name: 'Economy Lite (Domestic / Short-Haul)',
+      includedCheckedBags: 0,
+      firstCheckedFee: 25,
+      secondCheckedFee: 50,
+      carryOnAllowed: true,
+      carryOnFee: 0,
+      fareNote: 'Economy Lite on select domestic/regional routes excludes free checked luggage (12 kg carry-on included).'
     },
     {
       id: 'business',

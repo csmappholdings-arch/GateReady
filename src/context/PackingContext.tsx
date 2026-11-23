@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { Trip, Bag, BagType, BagMaterial, WeightUnit, DepartureReminder, getBagEmptyWeightLbs, TravelType } from '../types/travel';
 import { initialTrips } from '../data/seedTrips';
 import { getDefaultDepartureReminders } from '../data/defaultReminders';
+import { getDefaultChecklistForMode } from '../data/allowances';
 import { useAuth } from './AuthContext';
 import { 
   subscribeToUserTrips, 
@@ -516,14 +517,6 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       };
     });
 
-    const defaultGateChecks = [
-      { id: `gc-${Date.now()}-1`, text: 'Valid Government Photo ID or Passport ready for all travelers', completed: false, required: true },
-      { id: `gc-${Date.now()}-2`, text: 'Boarding pass / reservation ticket saved offline', completed: false, required: true },
-      { id: `gc-${Date.now()}-3`, text: 'Power banks & spare lithium batteries in Carry-On', completed: false, required: true },
-      { id: `gc-${Date.now()}-4`, text: 'Luggage liquids under 3.4oz (100ml) in 1 quart bag', completed: false, required: true },
-      { id: `gc-${Date.now()}-5`, text: 'Kids / Family formula and medications declared at security', completed: false, required: false }
-    ];
-
     const deducedType: TravelType = (type && ['PLANE', 'TRAIN', 'CAR', 'CRUISE', 'BUS'].includes(type))
       ? type
       : /car|suv|sedan|truck|van|overland/i.test(seatOrSize || '')
@@ -535,6 +528,8 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             : /bus/i.test(seatOrSize || '')
               ? 'BUS'
               : 'PLANE';
+
+    const defaultGateChecks = getDefaultChecklistForMode(deducedType);
 
     const newTrip: Trip = {
       id: newTripId,

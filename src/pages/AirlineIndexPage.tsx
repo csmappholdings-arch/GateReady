@@ -82,7 +82,7 @@ export const AirlineIndexPage: React.FC = () => {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Verified carry-on dimensions, weight limits, and checked baggage fee tables across North America, Europe, Asia, and the Middle East.
+            Published carry-on dimensions, weight limits, and checked baggage fee tables across North America, Europe, Asia, and the Middle East.
           </p>
 
           {/* Search and Filter Controls */}

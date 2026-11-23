@@ -99,7 +99,7 @@ export const AddBagDialog: React.FC<AddBagDialogProps> = ({
       }}
     >
       <div
-        className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-hidden flex flex-col relative z-[100000] cursor-default max-h-[92vh] overflow-y-auto"
+        className="w-full max-w-md my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-100 dark:border-purple-900/60 overflow-x-hidden flex flex-col relative z-[100000] cursor-default max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-purple-50 dark:border-purple-950/60 flex items-center justify-between">

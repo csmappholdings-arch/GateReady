@@ -44,11 +44,11 @@ export const airlineLimits: BaggageLimitInfo[] = [
     type: 'PLANE',
     region: 'USA',
     personalLimit: '16.25 x 13.5 x 8 in (41 x 34 x 20 cm)',
-    carryOnLimit: '24 x 16 x 10 in (61 x 41 x 25 cm) - Generous size allowance!',
+    carryOnLimit: '24 x 16 x 10 in (61 x 41 x 25 cm) - Free on all fares',
     checkedLimit: '62 linear in (158 cm), 50 lbs (23 kg)',
     carryOnWeightLimit: 'No strict weight limit',
-    checkedWeightLimit: '2 FREE checked bags up to 50 lbs each!',
-    notes: 'Famous for "Bags Fly Free": Your first 2 checked bags are completely free within 50 lbs / 62 in.'
+    checkedWeightLimit: '50 lbs (23 kg) Choice/Basic ($45 1st / $55 2nd); Choice Extra includes 2 FREE bags',
+    notes: 'Overhead carry-on stays free on all fares. Standard Choice/Basic fares charge $45 1st bag and $55 2nd bag (Choice Extra, A-List Preferred & Rapid Rewards cardholders get fee waivers).'
   },
   {
     id: 'jetblue',
@@ -145,8 +145,8 @@ export const airlineLimits: BaggageLimitInfo[] = [
     carryOnLimit: '21.5 x 15.5 x 9 in (55 x 40 x 23 cm) including wheels and handles',
     checkedLimit: '62 linear in (158 cm), max 50 lbs (23 kg)',
     carryOnWeightLimit: 'No weight limit (must be light enough to store in overhead without assistance)',
-    checkedWeightLimit: '50 lbs (23 kg) Economy (1st bag included on Standard); 70 lbs (32 kg) Signature / Business',
-    notes: 'One standard carry-on plus one personal item allowed free on all flights worldwide. Standard Economy fares include 1 free checked bag up to 50 lbs (23 kg).'
+    checkedWeightLimit: '50 lbs (23 kg) Economy ($45 CAD 1st bag on Basic/Standard; Flex includes 1st); 70 lbs (32 kg) Signature / Business',
+    notes: 'Standard & Flex fares include 1 free overhead carry-on; North America/Sun Basic fares allow a personal item only. Within North America/Sun, 1st checked bag is $45 CAD (2nd $60 CAD) on Basic/Standard; Economy Flex includes 1st checked bag.'
   },
   {
     id: 'westjet',
@@ -157,8 +157,8 @@ export const airlineLimits: BaggageLimitInfo[] = [
     carryOnLimit: '21 x 15 x 9 in (53 x 38 x 23 cm) including wheels/handles',
     checkedLimit: '62 linear in (157 cm), max 50 lbs (23 kg)',
     carryOnWeightLimit: 'No maximum weight limit',
-    checkedWeightLimit: '50 lbs (23 kg) Standard (1st bag included on Econo); 70 lbs for Business/Premium',
-    notes: 'Standard Econo fares include 1 free checked bag up to 50 lbs (23 kg) and free overhead carry-on. UltraBasic fares do NOT include an overhead carry-on for flights within Canada/US.'
+    checkedWeightLimit: '50 lbs (23 kg) Economy ($40–$55 CAD prepaid 1st bag on Econo/UltraBasic; EconoFlex includes 1st); 70 lbs Business/Premium',
+    notes: 'Standard Econo fares include a free overhead carry-on; 1st checked bag starts around $40 CAD prepaid ($35–$45 prepaid, $50–$59 check-in), included on EconoFlex. UltraBasic fares exclude overhead carry-ons on Canada/US flights.'
   },
   {
     id: 'porter',
@@ -239,7 +239,7 @@ export const airlineLimits: BaggageLimitInfo[] = [
     company: 'Ryanair',
     type: 'PLANE',
     region: 'Europe',
-    personalLimit: '15.7 x 9.8 x 7.8 in (40 x 25 x 20 cm) - Must fit sizer box',
+    personalLimit: '15.7 x 11.8 x 7.8 in (40 x 30 x 20 cm) - Must fit sizer box',
     carryOnLimit: '21.6 x 15.7 x 7.8 in (55 x 40 x 20 cm), 22 lbs (10 kg) - Priority only',
     checkedLimit: '10 kg or 20 kg booking tier, max 31.8 x 47 x 47 in',
     carryOnWeightLimit: '22 lbs (10 kg) with Priority Boarding booking',

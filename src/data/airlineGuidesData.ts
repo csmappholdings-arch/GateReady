@@ -33,7 +33,7 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'aircanada')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'aircanada')!,
     title: 'Air Canada Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Complete Air Canada baggage allowance rules: carry-on sizer dimensions (21.5 x 15.5 x 9 in), no carry-on weight limit, 1st checked bag included on Standard ($35 CAD on Basic), and overweight fees.',
+    metaDescription: 'Complete Air Canada baggage allowance rules: carry-on sizer dimensions (21.5 x 15.5 x 9 in), no carry-on weight limit, $45 CAD 1st bag / $60 CAD 2nd bag on Basic/Standard NA/Sun (Flex includes 1st free), and Basic overhead rules.',
     keywords: 'Air Canada baggage allowance, Air Canada carry on dimensions, Air Canada baggage fees, Air Canada carry on weight limit, Air Canada checked luggage size',
     h1: 'Air Canada Baggage Allowance & Fee Guide'
   },
@@ -49,7 +49,7 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'westjet')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'westjet')!,
     title: 'WestJet Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Verified WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no carry-on weight limit (must lift unassisted), 1st checked bag included on Standard Econo ($35 CAD on UltraBasic).',
+    metaDescription: 'Published WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no carry-on weight limit (must lift unassisted), $40–$55 CAD prepaid 1st bag on Econo/UltraBasic (EconoFlex includes 1st free).',
     keywords: 'WestJet baggage allowance, WestJet carry on size, WestJet baggage fees, WestJet carry on weight limit, WestJet checked bag cost, UltraBasic baggage',
     h1: 'WestJet Baggage Allowance & Fee Guide'
   },
@@ -163,8 +163,8 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'southwest')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'southwest')!,
     title: 'Southwest Airlines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Southwest Airlines baggage policy: 2 FREE checked bags up to 50 lbs (Bags Fly Free), generous carry-on sizer dimensions (24 x 16 x 10 in), and 3rd bag fee ($125).',
-    keywords: 'Southwest Airlines baggage allowance, Southwest 2 bags free, Southwest carry on size, Southwest baggage fees, Southwest luggage weight limit',
+    metaDescription: 'Southwest Airlines baggage policy: Choice/Basic checked bag fees ($45 1st, $55 2nd), 2 free bags on Choice Extra, free carry-on sizer dimensions (24 x 16 x 10 in), and 3rd bag fee ($125–$150).',
+    keywords: 'Southwest Airlines baggage allowance, Southwest baggage fees 2026, Southwest carry on size, Southwest checked bag fee, Southwest luggage weight limit',
     h1: 'Southwest Airlines Baggage Allowance & Fee Guide'
   },
   {
@@ -341,7 +341,7 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'ryanair')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'ryanair')!,
     title: 'Ryanair Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Ryanair baggage policy: free small personal underseat bag (40 x 25 x 20 cm), Priority & 2 Cabin Bags (10 kg overhead), checked bag fees (10kg & 20kg), and sizer fees.',
+    metaDescription: 'Ryanair baggage policy: free small personal underseat bag (40 x 30 x 20 cm), Priority & 2 Cabin Bags (10 kg overhead), checked bag fees (10kg & 20kg), and sizer fees.',
     keywords: 'Ryanair baggage allowance, Ryanair carry on dimensions, Ryanair priority boarding, Ryanair baggage fees, Ryanair 10kg checked bag, Ryanair sizer box',
     h1: 'Ryanair Baggage Allowance & Fee Guide'
   },

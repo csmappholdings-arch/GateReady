@@ -409,7 +409,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                           <span className="font-semibold text-slate-700">
                             {fam.firstCheckedFee === 0 
                               ? 'Included' 
-                              : `${guide.fees.currencySymbol}${fam.firstCheckedFee} ${guide.fees.currency}`}
+                              : guide.fees.currencySymbol.includes(guide.fees.currency)
+                                ? `${guide.fees.currencySymbol}${fam.firstCheckedFee}`
+                                : `${guide.fees.currencySymbol}${fam.firstCheckedFee} ${guide.fees.currency}`}
                           </span>
                         )}
                       </td>
@@ -420,7 +422,9 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                           <span className="font-semibold text-slate-700">
                             {fam.secondCheckedFee === 0 
                               ? 'Included' 
-                              : `${guide.fees.currencySymbol}${fam.secondCheckedFee} ${guide.fees.currency}`}
+                              : guide.fees.currencySymbol.includes(guide.fees.currency)
+                                ? `${guide.fees.currencySymbol}${fam.secondCheckedFee}`
+                                : `${guide.fees.currencySymbol}${fam.secondCheckedFee} ${guide.fees.currency}`}
                           </span>
                         )}
                       </td>

@@ -48,6 +48,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<'dashboard' | 'meters' | 'tare' | 'checklist' | 'readiness'>('dashboard');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [isReasonsSectionOpen, setIsReasonsSectionOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (key: string) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handlePrimaryClick = () => {
     trackEvent('primary_cta_click', { location: 'hero_primary' });
@@ -130,6 +136,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
               Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home.
             </p>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
+              Ready for a stress-free flight? Start free with your first trip and check airline limits, suitcase tare weight, and TSA 3-1-1 rules before leaving home.
+            </p>
             <p className="text-xs sm:text-sm font-semibold tracking-wide text-purple-600 dark:text-purple-400 uppercase">
               One simple travel companion. From packing to departure.
             </p>
@@ -137,26 +146,41 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
           {/* Primary and Secondary Call to Action Buttons */}
           <div className="space-y-3 pt-2">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 flex-wrap max-w-4xl mx-auto">
               
-              {/* Primary CTA */}
+              {/* Primary CTA: Create Your Trip */}
               <button
                 type="button"
                 onClick={handlePrimaryClick}
                 className="w-full sm:w-auto h-13 px-8 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 active:scale-98 text-white font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/40"
               >
-                <span>GET READY FOR YOUR NEXT TRIP</span>
+                <span>Create Your Trip</span>
                 <ArrowRight className="w-4.5 h-4.5" />
               </button>
 
-              {/* Secondary CTA */}
+              {/* Secondary CTA: Create Free Account */}
+              {onOpenAccountSync && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent('registration_started', { origin: 'hero_cta' });
+                    onOpenAccountSync('signup');
+                  }}
+                  className="w-full sm:w-auto h-13 px-7 rounded-2xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 border-2 border-purple-400 dark:border-purple-500 text-purple-900 dark:text-purple-100 font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                >
+                  <Cloud className="w-4.5 h-4.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <span>Create Free Account</span>
+                </button>
+              )}
+
+              {/* Tertiary CTA: Explore Travel Tools */}
               <button
                 type="button"
                 onClick={handleSecondaryClick}
                 className="w-full sm:w-auto h-13 px-7 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-100 font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
                 <Calculator className="w-4.5 h-4.5 text-purple-600 dark:text-purple-400" />
-                <span>EXPLORE TRAVEL TOOLS</span>
+                <span>Explore Travel Tools</span>
               </button>
             </div>
 
@@ -183,7 +207,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     className="text-slate-600 dark:text-slate-300 hover:text-purple-600 font-semibold cursor-pointer underline decoration-dotted"
                     title={TRIAL_TERMS_EXACT}
                   >
-                    7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7
+                    {TRIAL_TERMS_EXACT}
                   </button>
                 </>
               )}
@@ -194,7 +218,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>42+ Verified Airline Tables</span>
+              <span>42+ Airline Fee &amp; Size Tables</span>
             </span>
             <span className="flex items-center gap-1.5">
               <Scale className="w-4 h-4 text-purple-500" />
@@ -213,137 +237,220 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         </div>
       </section>
 
-      {/* ================= SECTION 2: WHY GATEREADY? (THE REAL TRAVEL PROBLEM) ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 text-xs font-black uppercase tracking-wider">
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-            <span>The Real Airport Stress</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-            Why Do So Many Travelers Get Surprised at the Airport?
-          </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            Airlines generated over $33 billion in ancillary baggage fees last year. Rules change between carriers, fare classes hide restrictions, and bathroom scales mislead travelers.
-          </p>
-        </div>
+      {/* ================= REASONS TO USE GATEREADY (COLLAPSED BY DEFAULT) ================= */}
+      <div className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 border-t border-slate-200 dark:border-slate-800">
+        <section className="rounded-3xl bg-purple-50/50 dark:bg-slate-900/80 border border-purple-200/80 dark:border-purple-900/60 shadow-sm overflow-hidden transition-all">
+          <button
+            type="button"
+            onClick={() => setIsReasonsSectionOpen((prev) => !prev)}
+            aria-expanded={isReasonsSectionOpen}
+            aria-controls="reasons-to-use-gateready-content"
+            className="w-full p-5 sm:p-7 text-left flex items-center justify-between gap-4 hover:bg-purple-50/90 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
+          >
+            <div className="space-y-1.5 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <span>Traveler Guides &amp; Feature Breakdown</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                Reasons to Use GateReady for Your Trip
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                Expand to explore how GateReady helps avoid overweight bag fees, compare 42+ airlines, deduct suitcase tare, and answer common questions.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300 shrink-0 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 shadow-2xs">
+              <span>{isReasonsSectionOpen ? 'Hide' : 'Open Guides'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isReasonsSectionOpen ? 'rotate-180' : ''}`} />
+            </span>
+          </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 flex items-center justify-center font-bold text-lg">
-              💸
-            </div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Overweight Bag Penalties ($100–$150)
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Exceeding the 50 lb (23 kg) limit by even 1.5 lbs can trigger a punitive $100 to $150 overweight fee at the check-in desk. Most people forget to account for empty suitcase weight.
-            </p>
-            <div className="pt-2 text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
-              <span>GateReady Solution: Auto suitcase tare deduction</span>
-            </div>
-          </div>
+          {isReasonsSectionOpen && (
+            <div
+              id="reasons-to-use-gateready-content"
+              className="px-4 sm:px-6 pb-6 pt-4 border-t border-purple-200/60 dark:border-slate-800 space-y-4 animate-in fade-in duration-200"
+            >
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 flex items-center justify-center font-bold text-lg">
-              📐
+        {/* ================= SECTION 2: WHY GATEREADY? (THE REAL TRAVEL PROBLEM) ================= */}
+        <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+          <button
+            type="button"
+            onClick={() => toggleSection('why-gateready')}
+            aria-expanded={!!openSections['why-gateready']}
+            aria-controls="section-why-gateready"
+            className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+          >
+            <div className="space-y-2 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 text-[11px] font-black uppercase tracking-wider">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                <span>The Real Airport Stress</span>
+              </div>
+              <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                Why Do So Many Travelers Get Surprised at the Airport?
+              </h2>
             </div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Hidden Sizer & Fare Restrictions
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              United Basic Economy bans overhead roller bags entirely. WestJet charges if your bag is over 22 lbs. Ryanair and easyJet enforce strict sizer boxes with steep gate-check penalties.
-            </p>
-            <div className="pt-2 text-[11px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-              <span>GateReady Solution: 42+ verified fare family guides</span>
-            </div>
-          </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+              <span>{openSections['why-gateready'] ? 'Hide' : 'Read more'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['why-gateready'] ? 'rotate-180' : ''}`} />
+            </span>
+          </button>
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 flex items-center justify-center font-bold text-lg">
-              🧳
-            </div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Frantic Floor Repacking at Check-In
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Nothing is more stressful than opening your personal luggage on the airport terminal floor in front of a long queue to transfer shoes and clothes into another bag.
-            </p>
-            <div className="pt-2 text-[11px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
-              <span>GateReady Solution: Smart companion bag rebalancing</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          {openSections['why-gateready'] && (
+            <div id="section-why-gateready" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+                Airlines generated over $33 billion in ancillary baggage fees last year. Rules change between carriers, fare classes hide restrictions, and bathroom scales mislead travelers.
+              </p>
 
-      {/* ================= SECTION 3: HOW GATEREADY WORKS IN 3 STEPS ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
-            <Zap className="w-3.5 h-3.5 text-purple-600" />
-            <span>Effortless Workflow</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            How GateReady Works in 3 Simple Steps
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-            From packing in your bedroom to boarding at the gate, we guide your travel prep.
-          </p>
-        </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 flex items-center justify-center font-bold text-lg">
+                    💸
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Overweight Bag Penalties ($100–$150)
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Exceeding the 50 lb (23 kg) limit by even 1.5 lbs can trigger a punitive $100 to $150 overweight fee at the check-in desk. Most people forget to account for empty suitcase weight.
+                  </p>
+                  <div className="pt-2 text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                    <span>GateReady Solution: Auto suitcase tare deduction</span>
+                  </div>
+                </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200/80 dark:border-purple-900/60 shadow-md space-y-3 relative overflow-hidden">
-            <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-purple-600/30">
-              1
+                <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 flex items-center justify-center font-bold text-lg">
+                    📐
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Hidden Sizer &amp; Fare Restrictions
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    United Basic Economy bans overhead roller bags entirely. WestJet charges if your bag is over 22 lbs. Ryanair and easyJet enforce strict sizer boxes with steep gate-check penalties.
+                  </p>
+                  <div className="pt-2 text-[11px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <span>GateReady Solution: 42+ airline fare family guides</span>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 flex items-center justify-center font-bold text-lg">
+                    🧳
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Frantic Floor Repacking at Check-In
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Nothing is more stressful than opening your personal luggage on the airport terminal floor in front of a long queue to transfer shoes and clothes into another bag.
+                  </p>
+                  <div className="pt-2 text-[11px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                    <span>GateReady Solution: Smart companion bag rebalancing</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-white">
-              Choose Airline & Fare Class
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Select your flight from 42+ verified airlines. GateReady immediately pulls published carry-on dimensions, weight caps, and baggage fees tailored to your ticket tier.
-            </p>
-          </div>
+          )}
+        </section>
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200/80 dark:border-purple-900/60 shadow-md space-y-3 relative overflow-hidden">
-            <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-purple-600/30">
-              2
+        {/* ================= SECTION 3: HOW GATEREADY WORKS IN 3 STEPS ================= */}
+        <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+          <button
+            type="button"
+            onClick={() => toggleSection('how-it-works')}
+            aria-expanded={!!openSections['how-it-works']}
+            aria-controls="section-how-it-works"
+            className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+          >
+            <div className="space-y-2 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
+                <Zap className="w-3.5 h-3.5 text-purple-600" />
+                <span>Effortless Workflow</span>
+              </div>
+              <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                How GateReady Works in 3 Simple Steps
+              </h2>
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-white">
-              Pack & Deduct Suitcase Tare
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Add your bags and items. GateReady subtracts empty suitcase tare (5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked), validates TSA 3-1-1 liquids, and warns you before you ever get close to airline weight limits.
-            </p>
-          </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+              <span>{openSections['how-it-works'] ? 'Hide' : 'Read more'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['how-it-works'] ? 'rotate-180' : ''}`} />
+            </span>
+          </button>
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200/80 dark:border-purple-900/60 shadow-md space-y-3 relative overflow-hidden">
-            <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-purple-600/30">
-              3
+          {openSections['how-it-works'] && (
+            <div id="section-how-it-works" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                From packing in your bedroom to boarding at the gate, we guide your travel prep.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-purple-200/80 dark:border-purple-900/60 shadow-xs space-y-3 relative overflow-hidden">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-purple-600/30">
+                    1
+                  </div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Choose Airline &amp; Fare Class
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Select your flight from 42+ global airlines. GateReady immediately pulls published carry-on dimensions, weight caps, and baggage fees tailored to your ticket tier.
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-purple-200/80 dark:border-purple-900/60 shadow-xs space-y-3 relative overflow-hidden">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-purple-600/30">
+                    2
+                  </div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Pack &amp; Deduct Suitcase Tare
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Add your bags and items. GateReady subtracts empty suitcase tare (5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked), validates TSA 3-1-1 liquids, and warns you before you ever get close to airline weight limits.
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-purple-200/80 dark:border-purple-900/60 shadow-xs space-y-3 relative overflow-hidden">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-purple-600/30">
+                    3
+                  </div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Arrive at the Gate Confidently
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Walk up to check-in with your baggage estimates within limits, your liquids audited for security, and your documents organized. Travel prepared with zero surprises.
+                  </p>
+                </div>
+              </div>
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-white">
-              Arrive at the Gate Confidently
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Walk up to check-in with your baggage estimates within limits, your liquids audited for security, and your documents organized. Travel prepared with zero surprises.
-            </p>
-          </div>
-        </div>
-      </section>
+          )}
+        </section>
 
-      {/* ================= SECTION 4: INTERACTIVE FEATURE SHOWCASE ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 space-y-8 border-t border-slate-200 dark:border-slate-800">
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-            <span>Interactive Travel Platform</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-            See How GateReady Makes Travel Easier
-          </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            Click through our core tools below to see how GateReady equips you with everything required for a seamless travel experience.
-          </p>
-        </div>
+        {/* ================= SECTION 4: INTERACTIVE FEATURE SHOWCASE ================= */}
+        <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+          <button
+            type="button"
+            onClick={() => toggleSection('feature-showcase')}
+            aria-expanded={!!openSections['feature-showcase']}
+            aria-controls="section-feature-showcase"
+            className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+          >
+            <div className="space-y-2 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>Interactive Travel Platform</span>
+              </div>
+              <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                See How GateReady Makes Travel Easier
+              </h2>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+              <span>{openSections['feature-showcase'] ? 'Hide' : 'Read more'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['feature-showcase'] ? 'rotate-180' : ''}`} />
+            </span>
+          </button>
+
+          {openSections['feature-showcase'] && (
+            <div id="section-feature-showcase" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+                Click through our core tools below to see how GateReady equips you with everything required for a seamless travel experience.
+              </p>
 
         {/* Feature Demo Tabs */}
         <div className="flex items-center justify-center gap-2 flex-wrap border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -718,344 +825,397 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             </div>
           )}
         </div>
+            </div>
+          )}
       </section>
 
       {/* ================= SECTION 5: AIRLINE BAGGAGE & FEE CALCULATOR SPOTLIGHT ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
+      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+        <button
+          type="button"
+          onClick={() => toggleSection('fee-spotlight')}
+          aria-expanded={!!openSections['fee-spotlight']}
+          aria-controls="section-fee-spotlight"
+          className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+        >
+          <div className="space-y-2 min-w-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
               <Calculator className="w-3.5 h-3.5 text-purple-600" />
               <span>Free Baggage Intelligence</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-              Compare 42+ Airlines & Calculate Total Baggage Fees
+            <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Compare 42+ Airlines &amp; Calculate Total Baggage Fees
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              Don’t wait until the check-in desk to find out what 2 checked bags will cost on your specific route. Our Baggage Fee Calculator accounts for domestic vs international routes, elite status, and fare classes.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <a
-                href="/baggage-fee-calculator"
-                className="h-11 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all"
-              >
-                <Calculator className="w-4 h-4" />
-                <span>Open Baggage Fee Calculator</span>
-              </a>
-              <a
-                href="/airlines"
-                className="h-11 px-6 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-2 border border-slate-200 dark:border-slate-700 transition-all"
-              >
-                <Plane className="w-4 h-4 text-purple-600" />
-                <span>Browse All 42 Airline Guides</span>
-              </a>
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+            <span>{openSections['fee-spotlight'] ? 'Hide' : 'Read more'}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['fee-spotlight'] ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
+
+        {openSections['fee-spotlight'] && (
+          <div id="section-fee-spotlight" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in fade-in duration-200">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="space-y-4">
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Don’t wait until the check-in desk to find out what 2 checked bags will cost on your specific route. Our Baggage Fee Calculator accounts for domestic vs international routes, elite status, and fare classes.
+                </p>
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <a
+                    href="/baggage-fee-calculator"
+                    className="h-11 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all"
+                  >
+                    <Calculator className="w-4 h-4" />
+                    <span>Open Baggage Fee Calculator</span>
+                  </a>
+                  <a
+                    href="/airlines"
+                    className="h-11 px-6 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-2 border border-slate-200 dark:border-slate-700 transition-all"
+                  >
+                    <Plane className="w-4 h-4 text-purple-600" />
+                    <span>Browse All 42 Airline Guides</span>
+                  </a>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-xs text-slate-900 dark:text-white">Air Canada</span>
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Carry-on: Free (Standard+) / Basic NA personal only</div>
+                  <div className="text-[11px] font-semibold text-purple-600">Checked: $45 CAD 1st bag · $60 CAD 2nd bag</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-xs text-slate-900 dark:text-white">WestJet</span>
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Carry-on: Free (Econo+) / UltraBasic excluded</div>
+                  <div className="text-[11px] font-semibold text-purple-600">Checked: ~$40 CAD prepaid 1st bag (EconoFlex 1st free)</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-xs text-slate-900 dark:text-white">United Airlines</span>
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Basic Economy: No overhead roller</div>
+                  <div className="text-[11px] font-semibold text-purple-600">Gate-check fee: $25 service fee + $35–$40 bag fee</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-xs text-slate-900 dark:text-white">Delta Air Lines</span>
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Carry-on: Free (22 x 14 x 9 in, no weight limit)</div>
+                  <div className="text-[11px] font-semibold text-purple-600">Checked: $35 1st bag · $45 2nd bag</div>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-black text-xs text-slate-900 dark:text-white">Air Canada</span>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Verified</span>
-              </div>
-              <div className="text-[11px] text-slate-500">Carry-on: Free (21.5 x 15.5 x 9 in)</div>
-              <div className="text-[11px] font-semibold text-purple-600">Checked: $35 1st bag · $50 2nd bag</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-black text-xs text-slate-900 dark:text-white">WestJet</span>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Verified</span>
-              </div>
-              <div className="text-[11px] text-slate-500">Carry-on: Free (Max 22 lbs)</div>
-              <div className="text-[11px] font-semibold text-purple-600">Checked: $35–$42 1st bag (UltraBasic rules apply)</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-black text-xs text-slate-900 dark:text-white">United Airlines</span>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Verified</span>
-              </div>
-              <div className="text-[11px] text-slate-500">Basic Economy: No overhead roller</div>
-              <div className="text-[11px] font-semibold text-purple-600">Gate-check fee: $25 service fee + $35 bag fee</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-black text-xs text-slate-900 dark:text-white">Delta Air Lines</span>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Verified</span>
-              </div>
-              <div className="text-[11px] text-slate-500">Carry-on: Free (22 x 14 x 9 in, no weight limit)</div>
-              <div className="text-[11px] font-semibold text-purple-600">Checked: $35 1st bag · $45 2nd bag</div>
-            </div>
-          </div>
-        </div>
+        )}
       </section>
 
       {/* ================= SECTION 6: SMART PACKING & LUGGAGE TARE WEIGHT ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-950 text-white border border-purple-400/30 shadow-2xl space-y-8">
-          <div className="max-w-3xl space-y-3">
+      <section className="rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-950 text-white border border-purple-400/30 shadow-xl overflow-hidden transition-all">
+        <button
+          type="button"
+          onClick={() => toggleSection('smart-tare')}
+          aria-expanded={!!openSections['smart-tare']}
+          aria-controls="section-smart-tare"
+          className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-white/5 transition-colors cursor-pointer"
+        >
+          <div className="space-y-2 min-w-0">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-800/80 border border-purple-400/40 text-[11px] font-black uppercase tracking-wider text-purple-200">
               <Scale className="w-3.5 h-3.5 text-purple-300" />
               <span>Smart Tare Technology</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight">
               Empty Suitcases Aren’t Weightless: Deduct 5.5–10.5 lbs Automatically
             </h2>
-            <p className="text-sm sm:text-base text-purple-200 leading-relaxed">
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-200 shrink-0 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20">
+            <span>{openSections['smart-tare'] ? 'Hide' : 'Read more'}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['smart-tare'] ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
+
+        {openSections['smart-tare'] && (
+          <div id="section-smart-tare" className="px-5 sm:px-6 pb-6 sm:pb-8 pt-4 border-t border-white/15 space-y-6 animate-in fade-in duration-200">
+            <p className="text-sm sm:text-base text-purple-200 leading-relaxed max-w-3xl">
               When an airline says your bag limit is 50 lbs (23 kg), that includes the weight of your suitcase itself. Standard rolling suitcase tare presets are 5.5–7.0 lbs for carry-ons and 8.5–10.5 lbs for checked suitcases (1.5–3.0 lbs for personal items). GateReady factors in your bag's empty tare weight so you never get caught over the limit.
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
-              <div className="text-amber-300 font-black text-2xl">10.5 lbs</div>
-              <div className="text-xs font-bold text-white">Hard-Shell Checked Suitcase</div>
-              <p className="text-[11px] text-purple-200">Consumes 21% of a 50 lb checked allowance (8.5 lbs for fabric checked bags).</p>
-            </div>
-            <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
-              <div className="text-emerald-300 font-black text-2xl">7.0 lbs</div>
-              <div className="text-xs font-bold text-white">Hard-Shell Carry-On Roller</div>
-              <p className="text-[11px] text-purple-200">Consumes 32% of a 22 lb carry-on limit on capped airlines (5.5 lbs for fabric).</p>
-            </div>
-            <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
-              <div className="text-fuchsia-300 font-black text-2xl">0 Surprise Fees</div>
-              <div className="text-xs font-bold text-white">With GateReady Tare Tracking</div>
-              <p className="text-[11px] text-purple-200">Automatic tare deduction gives you the exact net capacity left for clothes.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
+                <div className="text-amber-300 font-black text-2xl">10.5 lbs</div>
+                <div className="text-xs font-bold text-white">Hard-Shell Checked Suitcase</div>
+                <p className="text-[11px] text-purple-200">Consumes 21% of a 50 lb checked allowance (8.5 lbs for fabric checked bags).</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
+                <div className="text-emerald-300 font-black text-2xl">7.0 lbs</div>
+                <div className="text-xs font-bold text-white">Hard-Shell Carry-On Roller</div>
+                <p className="text-[11px] text-purple-200">Consumes 32% of a 22 lb carry-on limit on capped airlines (5.5 lbs for fabric).</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
+                <div className="text-fuchsia-300 font-black text-2xl">0 Surprise Fees</div>
+                <div className="text-xs font-bold text-white">With GateReady Tare Tracking</div>
+                <p className="text-[11px] text-purple-200">Automatic tare deduction gives you the exact net capacity left for clothes.</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* ================= SECTION 7: FAMILY & MULTI-TRAVELLER BENEFITS ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
+      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+        <button
+          type="button"
+          onClick={() => toggleSection('family-balance')}
+          aria-expanded={!!openSections['family-balance']}
+          aria-controls="section-family-balance"
+          className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+        >
+          <div className="space-y-2 min-w-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
               <Users className="w-3.5 h-3.5 text-purple-600" />
               <span>Multi-Traveler Coordination</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Traveling with Family or Companions? Balance Weight Across Bags.
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              Family trips often result in one parent’s bag weighing 54 lbs (overweight) while a child’s suitcase weighs only 28 lbs. GateReady lets you manage all bags in one master view and suggests intelligent rebalancing before leaving for the airport.
-            </p>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Assign suitcases and personal items to specific family members</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Instant rebalance notifications: transfer 4 lbs to Bag 2 to eliminate penalties</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                <span>Real-time companion cloud sync on Gold and Platinum tiers</span>
-              </li>
-            </ul>
           </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+            <span>{openSections['family-balance'] ? 'Hide' : 'Read more'}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['family-balance'] ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
 
-          <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
-            <div className="text-xs font-black uppercase text-slate-500 tracking-wider">
-              Smart Family Bag Balancing
-            </div>
-            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-rose-900 dark:text-rose-200">Bag 1 (Dad's Spinner)</div>
-                <div className="text-[11px] text-rose-700 dark:text-rose-300">54.2 lbs · 4.2 lbs over 50 lb limit</div>
+        {openSections['family-balance'] && (
+          <div id="section-family-balance" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in fade-in duration-200">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="space-y-4">
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Family trips often result in one parent’s bag weighing 54 lbs (overweight) while a child’s suitcase weighs only 28 lbs. GateReady lets you manage all bags in one master view and suggests intelligent rebalancing before leaving for the airport.
+                </p>
+                <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Assign suitcases and personal items to specific family members</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Instant rebalance notifications: transfer 4 lbs to Bag 2 to eliminate penalties</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span>Real-time companion cloud sync on Gold and Platinum tiers</span>
+                  </li>
+                </ul>
               </div>
-              <span className="text-[10px] font-black bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 px-2 py-1 rounded-md">
-                ⚠ Overweight
-              </span>
-            </div>
 
-            <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200">Bag 2 (Kids' Spinner)</div>
-                <div className="text-[11px] text-emerald-700 dark:text-emerald-300">32.0 lbs · 18.0 lbs available capacity</div>
+              <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+                <div className="text-xs font-black uppercase text-slate-500 tracking-wider">
+                  Smart Family Bag Balancing
+                </div>
+                <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-rose-900 dark:text-rose-200">Bag 1 (Dad's Spinner)</div>
+                    <div className="text-[11px] text-rose-700 dark:text-rose-300">54.2 lbs · 4.2 lbs over 50 lb limit</div>
+                  </div>
+                  <span className="text-[10px] font-black bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 px-2 py-1 rounded-md">
+                    ⚠ Overweight
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200">Bag 2 (Kids' Spinner)</div>
+                    <div className="text-[11px] text-emerald-700 dark:text-emerald-300">32.0 lbs · 18.0 lbs available capacity</div>
+                  </div>
+                  <span className="text-[10px] font-black bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 px-2 py-1 rounded-md">
+                    ✓ 18 lbs Free
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-xs text-purple-900 dark:text-purple-200 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
+                  <span><strong>GateReady Recommendation:</strong> Move heavy winter boots (4.5 lbs) from Bag 1 to Bag 2 to save $100 in excess fees!</span>
+                </div>
               </div>
-              <span className="text-[10px] font-black bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 px-2 py-1 rounded-md">
-                ✓ 18 lbs Free
-              </span>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-xs text-purple-900 dark:text-purple-200 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
-              <span><strong>GateReady Recommendation:</strong> Move heavy winter boots (4.5 lbs) from Bag 1 to Bag 2 to save $100 in excess fees!</span>
             </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* ================= SECTION 8: SUBSCRIPTION COMPARISON PREVIEW ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
-            <Lock className="w-3.5 h-3.5 text-purple-600" />
-            <span>Honest & Transparent</span>
+      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+        <button
+          type="button"
+          onClick={() => toggleSection('plans-preview')}
+          aria-expanded={!!openSections['plans-preview']}
+          aria-controls="section-plans-preview"
+          className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+        >
+          <div className="space-y-2 min-w-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
+              <Lock className="w-3.5 h-3.5 text-purple-600" />
+              <span>Honest &amp; Transparent</span>
+            </div>
+            <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Simple Plans for Every Type of Traveler
+            </h2>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Simple Plans for Every Type of Traveler
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-            Start 100% free with no credit card required. Upgrade whenever you need more travelers or active trips.
-          </p>
-        </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+            <span>{openSections['plans-preview'] ? 'Hide' : 'Read more'}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['plans-preview'] ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-            <div className="text-xs font-black uppercase text-slate-500">{PLAN_DEFINITIONS.FREE.name}</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.FREE.formattedMonthly}</div>
-            <div className="text-xs text-slate-500">Forever · No Card Needed</div>
-            <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              {PLAN_DEFINITIONS.FREE.features.map((feat) => (
-                <li key={feat}>✓ {feat}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-900 shadow-md space-y-3">
-            <div className="text-xs font-black uppercase text-purple-600">{PLAN_DEFINITIONS.SILVER.name}</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.SILVER.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
-            <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.SILVER.formattedYearly} /year</div>
-            <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              {PLAN_DEFINITIONS.SILVER.features.map((feat, idx) => (
-                <li key={feat} className={idx === 2 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
-                  ✓ {feat}
-                </li>
-              ))}
-            </ul>
-            <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl p-2">
-              {FEE_MATH_STATEMENT}
+        {openSections['plans-preview'] && (
+          <div id="section-plans-preview" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Start 100% free with no credit card required. Upgrade whenever you need more travelers or active trips.
             </p>
-          </div>
 
-          <div className="p-6 rounded-3xl bg-amber-500/10 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xl space-y-3 relative">
-            <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase">
-              Popular
-            </span>
-            <div className="text-xs font-black uppercase text-amber-600">{PLAN_DEFINITIONS.GOLD.name}</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.GOLD.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
-            <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.GOLD.formattedYearly} /year</div>
-            <ul className="text-xs space-y-1.5 pt-2 border-t border-amber-200 dark:border-amber-900/60 text-slate-700 dark:text-slate-300">
-              {PLAN_DEFINITIONS.GOLD.features.map((feat, idx) => (
-                <li key={feat} className={idx < 2 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
-                  ✓ {feat}
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+                <div className="text-xs font-black uppercase text-slate-500">{PLAN_DEFINITIONS.FREE.name}</div>
+                <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.FREE.formattedMonthly}</div>
+                <div className="text-xs text-slate-500">Forever · No Card Needed</div>
+                <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+                  {PLAN_DEFINITIONS.FREE.features.map((feat) => (
+                    <li key={feat}>✓ {feat}</li>
+                  ))}
+                </ul>
+              </div>
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-900 shadow-md space-y-3">
-            <div className="text-xs font-black uppercase text-indigo-600">Platinum</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.PLATINUM.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
-            <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.PLATINUM.formattedYearly} /year</div>
-            <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-              {PLAN_DEFINITIONS.PLATINUM.features.map((feat, idx) => (
-                <li key={feat} className={idx === 0 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
-                  ✓ {feat}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-900 shadow-md space-y-3">
+                <div className="text-xs font-black uppercase text-purple-600">{PLAN_DEFINITIONS.SILVER.name}</div>
+                <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.SILVER.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
+                <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.SILVER.formattedYearly} /year</div>
+                <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+                  {PLAN_DEFINITIONS.SILVER.features.map((feat, idx) => (
+                    <li key={feat} className={idx === 2 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
+                      ✓ {feat}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl p-2">
+                  {FEE_MATH_STATEMENT}
+                </p>
+              </div>
 
-        <div className="text-center pt-2">
-          <button
-            type="button"
-            onClick={onOpenPricing}
-            className="text-xs sm:text-sm font-bold text-purple-600 hover:text-purple-700 underline cursor-pointer"
-          >
-            <span>View full plan comparison table and 14-day guarantee details →</span>
-          </button>
-        </div>
+              <div className="p-6 rounded-3xl bg-amber-500/10 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xl space-y-3 relative">
+                <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase">
+                  Popular
+                </span>
+                <div className="text-xs font-black uppercase text-amber-600">{PLAN_DEFINITIONS.GOLD.name}</div>
+                <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.GOLD.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
+                <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.GOLD.formattedYearly} /year</div>
+                <ul className="text-xs space-y-1.5 pt-2 border-t border-amber-200 dark:border-amber-900/60 text-slate-700 dark:text-slate-300">
+                  {PLAN_DEFINITIONS.GOLD.features.map((feat, idx) => (
+                    <li key={feat} className={idx < 2 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
+                      ✓ {feat}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-900 shadow-md space-y-3">
+                <div className="text-xs font-black uppercase text-indigo-600">Platinum</div>
+                <div className="text-3xl font-black text-slate-900 dark:text-white">{PLAN_DEFINITIONS.PLATINUM.formattedMonthly} <span className="text-xs text-slate-500">/mo</span></div>
+                <div className="text-xs text-slate-500">or {PLAN_DEFINITIONS.PLATINUM.formattedYearly} /year</div>
+                <ul className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+                  {PLAN_DEFINITIONS.PLATINUM.features.map((feat, idx) => (
+                    <li key={feat} className={idx === 0 ? 'font-bold text-slate-900 dark:text-white' : undefined}>
+                      ✓ {feat}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="text-xs sm:text-sm font-bold text-purple-600 hover:text-purple-700 underline cursor-pointer"
+              >
+                <span>View full plan comparison table and 14-day guarantee details →</span>
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ================= SECTION 10: FREQUENTLY ASKED QUESTIONS ================= */}
-      <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 border-t border-slate-200 dark:border-slate-800">
-        <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-black uppercase tracking-wider">
-            <HelpCircle className="w-3.5 h-3.5 text-purple-600" />
-            <span>Got Questions?</span>
+      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+        <button
+          type="button"
+          onClick={() => toggleSection('faqs')}
+          aria-expanded={!!openSections['faqs']}
+          aria-controls="section-faqs"
+          className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+        >
+          <div className="space-y-2 min-w-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-[11px] font-black uppercase tracking-wider">
+              <HelpCircle className="w-3.5 h-3.5 text-purple-600" />
+              <span>Got Questions?</span>
+            </div>
+            <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Frequently Asked Questions
+            </h2>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-            Everything you need to know about GateReady, our free tools, and plan tiers.
-          </p>
-        </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/60">
+            <span>{openSections['faqs'] ? 'Hide' : 'Read more'}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSections['faqs'] ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
 
-        <div className="max-w-3xl mx-auto space-y-3">
-          {faqs.map((faq, index) => {
-            const isOpen = openFaqIndex === index;
-            return (
-              <div 
-                key={faq.q}
-                className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs transition-colors"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                  className="w-full p-4.5 text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center justify-between gap-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850"
-                >
-                  <span>{faq.q}</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-purple-600' : ''}`} />
-                </button>
-                {isOpen && (
-                  <div className="px-4.5 pb-4.5 pt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800">
-                    {faq.a}
+        {openSections['faqs'] && (
+          <div id="section-faqs" className="px-5 sm:px-6 pb-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Everything you need to know about GateReady, our free tools, and plan tiers.
+            </p>
+
+            <div className="max-w-3xl mx-auto space-y-3">
+              {faqs.map((faq, index) => {
+                const isOpen = openFaqIndex === index;
+                return (
+                  <div 
+                    key={faq.q}
+                    className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 overflow-hidden shadow-xs transition-colors"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                      className="w-full p-4.5 text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center justify-between gap-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850"
+                    >
+                      <span>{faq.q}</span>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-purple-600' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <div className="px-4.5 pb-4.5 pt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800">
+                        {faq.a}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* ================= SECTION 11: PROMINENT FINAL SIGNUP SECTION ================= */}
-      <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center space-y-6">
-        <div className="space-y-3">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-            Ready for a Stress-Free Flight?
-          </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Start free with your first trip and check airline limits, suitcase tare weight, and TSA 3-1-1 rules before leaving home.
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto pt-2">
-          <button
-            type="button"
-            onClick={handlePrimaryClick}
-            className="w-full sm:w-auto h-13 px-8 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 active:scale-98 text-white font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2.5 shadow-xl shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/40"
-          >
-            <span>GET READY FOR YOUR NEXT TRIP</span>
-            <ArrowRight className="w-4.5 h-4.5" />
-          </button>
-
-          {onOpenAccountSync && (
-            <button
-              type="button"
-              onClick={() => {
-                trackEvent('registration_started', { origin: 'footer_cta' });
-                onOpenAccountSync('signup');
-              }}
-              className="w-full sm:w-auto h-13 px-7 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-2 border-purple-300 dark:border-purple-600 text-purple-900 dark:text-purple-100 font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-            >
-              <Cloud className="w-4 h-4 text-purple-600 shrink-0" />
-              <span>Create Free Account</span>
-            </button>
+            </div>
           )}
-        </div>
-
-        <div className="text-xs text-slate-400 pt-2 flex items-center justify-center gap-4 flex-wrap">
-          <span>{TRIAL_TERMS_EXACT}</span>
-        </div>
-      </section>
+        </section>
+      </div>
 
     </div>
   );
