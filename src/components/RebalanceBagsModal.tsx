@@ -30,6 +30,8 @@ interface RebalanceBagsModalProps {
 interface AppliedMoveRecord {
   moveId: string;
   itemId: string;
+  mergeBackIntoItemId?: string;
+  quantityMoved: number;
   itemName: string;
   sourceBagId: string;
   destBagId: string;
@@ -72,50 +74,79 @@ export const RebalanceBagsModal: React.FC<RebalanceBagsModalProps> = ({
     }
   };
 
-  // Handle applying a single suggested move
-  const handleApplyMove = (move: SuggestedMove) => {
-    moveItemBetweenBags(trip.id, move.sourceBagId, move.destBagId, move.itemId);
-    setAppliedMoves((prev) => [
-      ...prev,
-      {
+  const executeSuggestedMove = (move: SuggestedMove, idxSuffix = 0): AppliedMoveRecord => {
+    const sourceBag = trip.bags.find((b) => b.id === move.sourceBagId);
+    const origItem = sourceBag?.items.find((i) => i.id === move.itemId);
+    const origQty = origItem && typeof origItem.quantity === 'number' && origItem.quantity > 0 ? origItem.quantity : 1;
+    const isPartialSplit = origQty > move.quantity;
+
+    if (isPartialSplit) {
+      const splitId = `split-${move.itemId}-${Date.now()}-${idxSuffix}-${Math.random().toString(36).slice(2, 6)}`;
+      moveItemBetweenBags(trip.id, move.sourceBagId, move.destBagId, move.itemId, move.quantity, splitId);
+      return {
         moveId: move.id,
-        itemId: move.itemId,
+        itemId: splitId,
+        mergeBackIntoItemId: move.itemId,
+        quantityMoved: move.quantity,
         itemName: move.itemName,
         sourceBagId: move.sourceBagId,
         destBagId: move.destBagId
-      }
-    ]);
+      };
+    }
+
+    moveItemBetweenBags(trip.id, move.sourceBagId, move.destBagId, move.itemId);
+    return {
+      moveId: move.id,
+      itemId: move.itemId,
+      quantityMoved: move.quantity,
+      itemName: move.itemName,
+      sourceBagId: move.sourceBagId,
+      destBagId: move.destBagId
+    };
+  };
+
+  // Handle applying a single suggested move
+  const handleApplyMove = (move: SuggestedMove) => {
+    const rec = executeSuggestedMove(move);
+    setAppliedMoves((prev) => [...prev, rec]);
   };
 
   // Handle undoing a specific applied move
   const handleUndoMove = (applied: AppliedMoveRecord) => {
-    // Revert by moving from destBag back to sourceBag
-    moveItemBetweenBags(trip.id, applied.destBagId, applied.sourceBagId, applied.itemId);
+    // Revert by moving from destBag back to sourceBag (merging back if split)
+    moveItemBetweenBags(
+      trip.id,
+      applied.destBagId,
+      applied.sourceBagId,
+      applied.itemId,
+      applied.quantityMoved,
+      undefined,
+      applied.mergeBackIntoItemId
+    );
     setAppliedMoves((prev) => prev.filter((m) => m.moveId !== applied.moveId));
   };
 
   // Handle applying all remaining suggestions
   const handleApplyAll = () => {
-    analysis.suggestedMoves.forEach((move) => {
-      moveItemBetweenBags(trip.id, move.sourceBagId, move.destBagId, move.itemId);
-      setAppliedMoves((prev) => [
-        ...prev,
-        {
-          moveId: move.id,
-          itemId: move.itemId,
-          itemName: move.itemName,
-          sourceBagId: move.sourceBagId,
-          destBagId: move.destBagId
-        }
-      ]);
-    });
+    const newRecords: AppliedMoveRecord[] = analysis.suggestedMoves.map((move, idx) =>
+      executeSuggestedMove(move, idx)
+    );
+    setAppliedMoves((prev) => [...prev, ...newRecords]);
   };
 
   // Handle undoing all moves applied in this modal session
   const handleUndoAll = () => {
     // Revert in reverse order
     [...appliedMoves].reverse().forEach((record) => {
-      moveItemBetweenBags(trip.id, record.destBagId, record.sourceBagId, record.itemId);
+      moveItemBetweenBags(
+        trip.id,
+        record.destBagId,
+        record.sourceBagId,
+        record.itemId,
+        record.quantityMoved,
+        undefined,
+        record.mergeBackIntoItemId
+      );
     });
     setAppliedMoves([]);
   };

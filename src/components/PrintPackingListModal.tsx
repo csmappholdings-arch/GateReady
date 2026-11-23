@@ -39,6 +39,7 @@ import { recordCapturedEmail } from '../lib/firebase';
 import { airlineLimits } from '../data/allowances';
 import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 import { scanItemForLiquids } from '../utils/liquidScanner';
+import { computeBagWeightStatus } from '../utils/bagWeightAnalysis';
 
 interface PrintPackingListModalProps {
   isOpen: boolean;
@@ -702,25 +703,11 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
             </div>
 
             {filteredBags.map((bag, bagIdx) => {
-              const emptyLbs = bag.emptyBagWeightLbs ?? getUserPresetWeightLbs(bag.type, bag.material || 'HARD_SHELL');
-              const bagItemsLbs = bag.items.reduce((sum, item) => {
-                const w = item.customWeightLbs ?? DefaultSuggestions.getEstimatedWeightLbs(item.name);
-                return sum + w * item.quantity;
-              }, 0);
-              const totalBagLbs = emptyLbs + bagItemsLbs;
-              const limitLbs = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? 50 : bag.type === 'CARRY_ON' ? 22 : 15);
+              const weightStatus = computeBagWeightStatus(bag, weightUnit, trip.companyName, trip.travelType);
               const bagPackedCount = bag.items.filter(i => i.isPacked).length;
-
-              const displayBagWeight = weightUnit === 'KG'
-                ? `${DefaultSuggestions.convertLbsToKg(totalBagLbs).toFixed(1)} kg`
-                : `${totalBagLbs.toFixed(1)} lbs`;
-
-              const displayLimit = weightUnit === 'KG'
-                ? `${DefaultSuggestions.convertLbsToKg(limitLbs).toFixed(0)} kg`
-                : `${limitLbs} lbs`;
-
-              const carrierLimit = airlineLimits.find(a => a.company.toLowerCase() === (trip.companyName || '').toLowerCase());
-              const bagHasNoWeightLimit = bag.type === 'CARRY_ON' && Boolean(carrierLimit && /no weight limit/i.test(carrierLimit.carryOnWeightLimit || ''));
+              const displayBagWeight = weightStatus.displayTotalWeight;
+              const displayLimit = weightStatus.displayLimit;
+              const bagHasNoWeightLimit = weightStatus.hasNoWeightLimit;
 
               return (
                 <div 
@@ -750,7 +737,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                       <span className="flex items-center gap-1">
                         <Scale className="w-3.5 h-3.5 text-purple-600" />
                         {bagHasNoWeightLimit ? (
-                          <span>{displayBagWeight} (No {isFlight ? 'airline' : 'weight'} limit · {trip.companyName || 'Carrier'})</span>
+                          <span>{displayBagWeight} ({displayLimit} · {trip.companyName || 'Carrier'})</span>
                         ) : (
                           <span>{displayBagWeight} / {displayLimit} cap</span>
                         )}
@@ -893,7 +880,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
           <div className="pt-4 border-t border-slate-200 dark:border-slate-800 print-card-break-avoid">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Gate-Ready Departure Security Checklist</span>
+              <span>{isFlight ? 'Gate-Ready Departure Security Checklist' : 'Departure Readiness & Packing Checklist'}</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300">
               <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">

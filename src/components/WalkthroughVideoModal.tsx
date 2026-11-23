@@ -777,16 +777,18 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                     <span>All paid plans include instant access</span>
                   </div>
 
-                  <div className="pt-1 flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openPaywall('tour_footer')}
-                      className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-fuchsia-500 hover:from-amber-300 hover:to-fuchsia-400 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
-                    >
-                      <Crown className="w-3.5 h-3.5 fill-purple-950" />
-                      <span>Compare Plans & Upgrade</span>
-                    </button>
-                  </div>
+                  {!isPro && (
+                    <div className="pt-1 flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openPaywall('tour_footer')}
+                        className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-fuchsia-500 hover:from-amber-300 hover:to-fuchsia-400 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Crown className="w-3.5 h-3.5 fill-purple-950" />
+                        <span>Compare Plans & Upgrade</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

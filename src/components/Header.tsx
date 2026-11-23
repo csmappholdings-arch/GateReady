@@ -550,25 +550,21 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Pro / Referral / Trial / Free Plan Badge (Desktop row) */}
           <div className="hidden sm:flex items-center">
             {isReferralPlatinumActive ? (
-              <button
-                type="button"
-                onClick={() => openPaywall("You have an active 1-Month Free Platinum Referral access! All Platinum features are unlocked.")}
-                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-fuchsia-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
-                title={`Referral 1-Month Free Platinum · ${referralTimeLeftText} · Click to view plans`}
+              <span
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-fuchsia-300/40"
+                title={`Referral 1-Month Free Platinum · ${referralTimeLeftText}`}
               >
-                <Gift className="w-3 h-3 text-amber-300 shrink-0 animate-bounce" />
+                <Gift className="w-3 h-3 text-amber-300 shrink-0" />
                 <span className="whitespace-nowrap">Referral Platinum · {referralTimeLeftText}</span>
-              </button>
+              </span>
             ) : isTrialActive ? (
-              <button
-                type="button"
-                onClick={() => openPaywall("You are on a 7-day Platinum trial with full access. Choose a plan to lock in uninterrupted access.")}
-                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-amber-300/40 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
-                title={`Platinum 7-Day Trial Active · ${trialTimeLeftText} · Click to view plans`}
+              <span
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 sm:px-3 py-1 rounded-full shadow-md border border-amber-300/40"
+                title={`Platinum 7-Day Trial Active · ${trialTimeLeftText}`}
               >
-                <Crown className="w-3 h-3 fill-amber-200 text-amber-200 shrink-0 animate-pulse" />
+                <Crown className="w-3 h-3 fill-amber-200 text-amber-200 shrink-0" />
                 <span className="whitespace-nowrap">Platinum trial · {trialTimeLeftText}</span>
-              </button>
+              </span>
             ) : hasPendingReferralCode ? (
               <button
                 type="button"
@@ -597,8 +593,8 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Center / Right: Streamlined Action Buttons, Free Month Pill, Sync Account & Settings */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Pro Upgrade / Badge Button */}
-          {!isPro ? (
+          {/* Pro Upgrade Button (only shown for Free / guest users) */}
+          {!isPro && (
             <button
               type="button"
               onClick={() => openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`)}
@@ -608,16 +604,6 @@ export const Header: React.FC<HeaderProps> = ({
               <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
               <span className="hidden sm:inline">Upgrade</span>
               <span className="text-[10px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded-md">PLANS</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => openPaywall()}
-              className="h-8.5 sm:h-9 px-2 sm:px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-1 hover:bg-amber-900/60 transition-colors cursor-pointer shadow-xs"
-              title={`${tier} Plan Active`}
-            >
-              <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="hidden md:inline text-[11px] font-bold">{tier} Active</span>
             </button>
           )}
 
@@ -789,7 +775,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {isTrialActive ? (
-                    <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs space-y-1.5">
+                    <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs space-y-1">
                       <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-200 text-[11px]">
                         <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
                         <span>Platinum trial · {trialTimeLeftText}</span>
@@ -797,19 +783,9 @@ export const Header: React.FC<HeaderProps> = ({
                       <p className="text-[10px] text-amber-800/90 dark:text-amber-300/90 leading-snug">
                         Returns to Free automatically on day 7. No card, no charge.
                       </p>
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          openPaywall("Choose a plan to keep uninterrupted Platinum features after day 7.");
-                        }}
-                        className="w-full h-7 mt-1 rounded-lg bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-600 hover:to-purple-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer"
-                      >
-                        <Crown className="w-3 h-3 fill-amber-200 text-amber-200" />
-                        <span>Upgrade to Keep Platinum</span>
-                      </button>
                     </div>
                   ) : isReferralPlatinumActive ? (
-                    <div className="p-2.5 rounded-xl bg-fuchsia-50/70 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800/80 text-xs space-y-1.5">
+                    <div className="p-2.5 rounded-xl bg-fuchsia-50/70 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800/80 text-xs space-y-1">
                       <div className="flex items-center gap-1.5 font-bold text-fuchsia-900 dark:text-fuchsia-200 text-[11px]">
                         <Gift className="w-3.5 h-3.5 text-fuchsia-500" />
                         <span>Referral Platinum · {referralTimeLeftText}</span>
@@ -817,15 +793,6 @@ export const Header: React.FC<HeaderProps> = ({
                       <p className="text-[10px] text-fuchsia-800/90 dark:text-fuchsia-300/90 leading-snug">
                         1 Month Free Platinum unlocked via referral. No card, no charge.
                       </p>
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          openPaywall();
-                        }}
-                        className="w-full h-7 mt-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer"
-                      >
-                        <span>View Plans</span>
-                      </button>
                     </div>
                   ) : isPro ? (
                     <div className="p-2 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs">
@@ -843,13 +810,7 @@ export const Header: React.FC<HeaderProps> = ({
                             ? (billingCycle === 'yearly' ? '$29.99/year' : '$3.99/month')
                             : (billingCycle === 'yearly' ? '$39.99/year' : '$4.99/month')} · Renews automatically
                       </p>
-                      <div className="mt-2 flex items-center justify-between">
-                        <button
-                          onClick={() => openPaywall()}
-                          className="text-[10px] font-bold text-purple-700 dark:text-purple-300 hover:underline cursor-pointer"
-                        >
-                          Change Plan
-                        </button>
+                      <div className="mt-2 flex items-center justify-end">
                         {showCancelSubConfirm ? (
                           <div className="flex items-center gap-1.5">
                             <button
@@ -1196,19 +1157,17 @@ export const Header: React.FC<HeaderProps> = ({
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      setSettingsOpen(false);
-                      openPaywall();
-                    }}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      isPro
-                        ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 hover:bg-amber-200'
-                        : 'bg-purple-600 hover:bg-purple-700 text-white'
-                    }`}
-                  >
-                    {isPro ? 'Manage' : 'Upgrade'}
-                  </button>
+                  {!isPro && (
+                    <button
+                      onClick={() => {
+                        setSettingsOpen(false);
+                        openPaywall();
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      Upgrade
+                    </button>
+                  )}
                 </div>
 
                 {/* Manual Pro License Key Entry (Backup / Testing) */}
@@ -1467,17 +1426,19 @@ export const Header: React.FC<HeaderProps> = ({
                       <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Home Base</span>
                     </button>
                   )}
-                  <a
-                    href="/pricing"
-                    onClick={() => setSettingsOpen(false)}
-                    className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
-                  >
-                    <span className="flex items-center gap-2">
-                      <CreditCard className="w-3.5 h-3.5 text-emerald-500" />
-                      Pricing & Plans
-                    </span>
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">from $1.99</span>
-                  </a>
+                  {!isPro && (
+                    <a
+                      href="/pricing"
+                      onClick={() => setSettingsOpen(false)}
+                      className="w-full px-3.5 py-1.5 text-left text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center justify-between transition-colors"
+                    >
+                      <span className="flex items-center gap-2">
+                        <CreditCard className="w-3.5 h-3.5 text-emerald-500" />
+                        Pricing & Plans
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">from $1.99</span>
+                    </a>
+                  )}
                   <a
                     href="/how-it-works"
                     onClick={() => setSettingsOpen(false)}
@@ -1657,23 +1618,19 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="sm:hidden w-full bg-purple-950/95 border-t border-purple-800/40 px-3 py-1.5 flex items-center justify-between gap-2 z-10 relative">
           <div className="flex items-center gap-1.5 min-w-0">
             {isReferralPlatinumActive ? (
-              <button
-                type="button"
-                onClick={() => openPaywall("You have an active 1-Month Free Platinum Referral access! All Platinum features are unlocked.")}
-                className="inline-flex items-center gap-1 text-[11px] font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-fuchsia-300/40 cursor-pointer min-h-[32px]"
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-fuchsia-300/40 min-h-[32px]"
               >
                 <Gift className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                 <span className="truncate">Referral Platinum · {referralTimeLeftText}</span>
-              </button>
+              </span>
             ) : isTrialActive ? (
-              <button
-                type="button"
-                onClick={() => openPaywall("You are on a 7-day Platinum trial with full access. Choose a plan to lock in uninterrupted access.")}
-                className="inline-flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40 cursor-pointer min-h-[32px]"
+              <span
+                className="inline-flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-amber-500 via-amber-600 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-xs border border-amber-300/40 min-h-[32px]"
               >
                 <Crown className="w-3.5 h-3.5 fill-amber-200 text-amber-200 shrink-0" />
                 <span className="truncate">Platinum Trial · {trialTimeLeftText}</span>
-              </button>
+              </span>
             ) : hasPendingReferralCode ? (
               <button
                 type="button"
@@ -2012,7 +1969,7 @@ export const Header: React.FC<HeaderProps> = ({
                       </button>
                     </div>
 
-                    {!isPro ? (
+                    {!isPro && (
                       <button
                         type="button"
                         onClick={() => {
@@ -2023,18 +1980,6 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <Crown className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
                         <span>Upgrade Plan (from $1.99/mo)</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          openPaywall();
-                        }}
-                        className="w-full h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <Crown className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                        <span>Manage Subscription ({tier})</span>
                       </button>
                     )}
                   </>

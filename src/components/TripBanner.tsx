@@ -320,6 +320,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
         returnTripDate: editReturnDate.trim() || currentTrip.returnTripDate || '',
         returnTripTime: editReturnTime.trim() || currentTrip.returnTripTime || '',
         aircraftType: resolvedAircraft,
+        ...(editTravelType !== 'PLANE' ? { flightNumber: '' } : {}),
         passportExpiryDate: editPassportExpiry.trim() || '',
         modeProfiles: finalModeProfiles,
         ...(modeChanged ? { gateChecklist: updatedGateChecklist, bags: updatedBags } : {})
@@ -985,7 +986,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                 )}
               </p>
               <p className="text-[11px] text-indigo-600 dark:text-indigo-300 font-semibold leading-tight mt-0.5">
-                {currentTrip.flightNumber
+                {isFlight && currentTrip.flightNumber
                   ? `Flight / Route #${currentTrip.flightNumber}`
                   : isFlight
                     ? 'Standard Carrier Allowances'
@@ -1030,7 +1031,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
                 )}
               </div>
               <p className="text-[11px] text-fuchsia-600 dark:text-fuchsia-300 font-semibold leading-tight mt-0.5">
-                {currentTrip.aircraftType
+                {isFlight && currentTrip.aircraftType
                   ? `Aircraft: ${currentTrip.aircraftType}`
                   : isFlight
                     ? 'Overhead Bin & In-Seat Specs'
@@ -1102,7 +1103,7 @@ export const TripBanner: React.FC<TripBannerProps> = ({
             </span>
           )}
 
-          {currentTrip.aircraftType && (
+          {isFlight && currentTrip.aircraftType && (
             <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
               <Zap className="w-3.5 h-3.5 text-amber-500" />
               <span>Aircraft: <strong>{currentTrip.aircraftType}</strong></span>

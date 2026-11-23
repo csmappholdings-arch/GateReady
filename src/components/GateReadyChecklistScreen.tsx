@@ -104,7 +104,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
     summary += `Carrier: ${trip.companyName || trip.travelType} (${trip.seatClassOrCarSize || 'Standard'})\n`;
     summary += `Travelers: ${familyMembers.join(', ')}\n`;
     summary += `Total Weight: ${displayTotalWeight}\n`;
-    summary += `Packed: ${packedItemsCount}/${totalItemsCount} items (${packingPct}%)\n\n`;
+    summary += `Packed: ${packedItemsCount}/${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'} (${packingPct}%)\n\n`;
 
     trip.bags.forEach((bag) => {
       const emptyLbs = getBagEmptyWeightLbs(bag);
@@ -307,6 +307,10 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
             const pct = weightStatus.pct;
             const isBagOverweight = weightStatus.isOverweight;
 
+            const nonCompliantCount = isFlight && bag.type !== 'CHECKED'
+              ? bag.items.filter((it) => scanItemForLiquids(it.name, bag.type).status === 'NON_COMPLIANT').length
+              : 0;
+
             return (
               <div
                 key={bag.id}
@@ -324,6 +328,12 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                     {bag.assignedTo && (
                       <span className="text-[10px] font-semibold bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">
                         Assigned to: {bag.assignedTo}
+                      </span>
+                    )}
+                    {nonCompliantCount > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span>{nonCompliantCount} {nonCompliantCount === 1 ? 'liquid' : 'liquids'} &gt;100 ml</span>
                       </span>
                     )}
                   </div>

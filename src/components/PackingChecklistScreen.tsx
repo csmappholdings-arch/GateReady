@@ -296,10 +296,12 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
     const trimmed = newTravelerInput.trim();
     if (!trimmed) return;
 
-    // Enforce 1-traveler Free limit
+    // Enforce traveler limit
     const travelerCheck = canAddTraveler(familyMembers.length);
     if (!travelerCheck.allowed) {
-      openPaywall(travelerCheck.reason);
+      if (!isPro) {
+        openPaywall(travelerCheck.reason);
+      }
       setShowAddTravelerInline(false);
       return;
     }
@@ -610,7 +612,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                           Cancel
                         </button>
                       </form>
-                    ) : (
+                    ) : !isPro || canAddTraveler(familyMembers.length).allowed ? (
                       <button
                         onClick={() => {
                           const check = canAddTraveler(familyMembers.length);
@@ -639,6 +641,10 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                           </>
                         )}
                       </button>
+                    ) : (
+                      <p className="w-full py-1.5 px-2 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                        Traveler limit reached for your {tier} plan
+                      </p>
                     )}
                   </div>
                 </div>

@@ -172,15 +172,12 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
     };
   }, [primaryTrip, weightUnit]);
 
-  // Check if user is a first-time visitor with no trips or only demo data
-  const hasOnlyDemoOrNoTrips = trips.length === 0 || (trips.length === 1 && hasDemoTrip);
-  const isReturningVisit = useMemo(() => {
-    try {
-      return parseInt(localStorage.getItem('gateready_visit_count') || '1', 10) > 1;
-    } catch {
-      return false;
-    }
-  }, []);
+  // Smart greeting rule: decided strictly by created (non-demo) trips, never by visit count or sign-in state
+  const hasCreatedTrips = useMemo(() => {
+    return trips.some(
+      (t) => !t.isDemo && !t.id.startsWith('trip-demo-') && !t.name.includes('Paris & London')
+    );
+  }, [trips]);
 
   const handleClearDemo = () => {
     setClearingDemo(true);
@@ -231,7 +228,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
           </div>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
-            {isReturningVisit && !hasOnlyDemoOrNoTrips
+            {hasCreatedTrips
               ? `Welcome Back to GateReady${user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}!`
               : `Welcome to GateReady${user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}!`}
           </h1>
@@ -392,36 +389,34 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {planLimits.nextUpgrade ? (
-              <button
-                type="button"
-                onClick={() => {
-                  trackEvent('premium_feature_clicked', { feature: 'plan_card_upgrade', target_tier: planLimits.nextUpgrade });
-                  trackEvent('upgrade_button_clicked', { source: 'dashboard_plan_card' });
-                  openPaywall(
-                    tier === 'FREE'
-                      ? `Free plan includes 1 active trip and 2 bags. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`
-                      : `Upgrade to ${planLimits.nextUpgrade} for more active trips and companion luggage sharing.`
-                  );
-                }}
-                className="h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/20 active:scale-95 transition-all cursor-pointer"
+          {!isPro && (
+            <div className="flex items-center gap-2 shrink-0">
+              {planLimits.nextUpgrade && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent('premium_feature_clicked', { feature: 'plan_card_upgrade', target_tier: planLimits.nextUpgrade });
+                    trackEvent('upgrade_button_clicked', { source: 'dashboard_plan_card' });
+                    openPaywall(
+                      tier === 'FREE'
+                        ? `Free plan includes 1 active trip and 2 bags. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`
+                        : `Upgrade to ${planLimits.nextUpgrade} for more active trips and companion luggage sharing.`
+                    );
+                  }}
+                  className="h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-300" />
+                  <span>{tier === 'FREE' ? 'Try 7 days free' : `Upgrade: ${planLimits.nextUpgrade}`}</span>
+                </button>
+              )}
+              <a
+                href="/pricing"
+                className="h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center transition-colors cursor-pointer"
               >
-                <Crown className="w-3.5 h-3.5 text-amber-300" />
-                <span>{tier === 'FREE' ? 'Try 7 days free' : `Upgrade: ${planLimits.nextUpgrade}`}</span>
-              </button>
-            ) : (
-              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-3 py-1.5 rounded-xl border border-indigo-200">
-                VIP Platinum Active
-              </span>
-            )}
-            <a
-              href="/pricing"
-              className="h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center transition-colors cursor-pointer"
-            >
-              View All Plans
-            </a>
-          </div>
+                View All Plans
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -685,8 +680,8 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                           </div>
                           <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
                             <span className="font-semibold text-purple-700 dark:text-purple-400">{trip.companyName}</span>
-                            {trip.flightNumber && <span>· {trip.flightNumber}</span>}
-                            {trip.fareFamily && <span>· {trip.fareFamily}</span>}
+                            {(!trip.travelType || trip.travelType === 'PLANE') && trip.flightNumber && <span>· {trip.flightNumber}</span>}
+                            {(!trip.travelType || trip.travelType === 'PLANE') && trip.fareFamily && <span>· {trip.fareFamily}</span>}
                           </div>
                         </div>
                       </div>
@@ -720,7 +715,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
-                          <span>Packing Progress: {totalItems > 0 ? `${packedItems} of ${totalItems} items (${packingPercent}%)` : 'No items added yet'}</span>
+                          <span>Packing Progress: {totalItems > 0 ? `${packedItems} of ${totalItems} ${totalItems === 1 ? 'item' : 'items'} (${packingPercent}%)` : 'No items added yet'}</span>
                         </span>
                         <span className="font-black text-slate-900 dark:text-white">
                           Score: {score.totalScore}/100

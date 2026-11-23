@@ -224,7 +224,7 @@ export const TripWorkspace: React.FC<TripWorkspaceProps> = ({
               {getModeIcon(trip.travelType)}
             </span>
             <span className="text-xs font-black uppercase tracking-wider text-purple-300">
-              {trip.companyName} {trip.flightNumber ? `· ${trip.flightNumber}` : ''} {trip.fareFamily ? `· ${trip.fareFamily}` : ''}
+              {trip.companyName} {isFlight && trip.flightNumber ? `· ${trip.flightNumber}` : ''} {isFlight && trip.fareFamily ? `· ${trip.fareFamily}` : ''}
             </span>
             {trip.seatClassOrCarSize && (
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-purple-200">

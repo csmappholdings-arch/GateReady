@@ -4,6 +4,7 @@ import {
   Crown
 } from 'lucide-react';
 import { SocialLinks } from './SocialLinks';
+import { useSubscription } from '../context/SubscriptionContext';
 
 interface AppFooterProps {
   onOpenPricing?: () => void;
@@ -16,6 +17,8 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   onOpenReferral,
   onOpenAirlineGuides
 }) => {
+  const { isPro } = useSubscription();
+
   return (
     <footer className="w-full mt-auto border-t border-purple-100 dark:border-purple-950/80 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md py-8 px-4 sm:px-6 lg:px-8 xl:px-10 text-xs text-slate-500 dark:text-slate-400">
       <div className="w-full max-w-[1600px] mx-auto space-y-6">
@@ -49,7 +52,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
               </button>
             )}
 
-            {onOpenPricing ? (
+            {!isPro && (onOpenPricing ? (
               <button
                 type="button"
                 onClick={onOpenPricing}
@@ -66,7 +69,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 <span>Plans from $1.99/mo</span>
               </a>
-            )}
+            ))}
           </div>
         </div>
 
@@ -123,11 +126,13 @@ export const AppFooter: React.FC<AppFooterProps> = ({
               Product
             </h3>
             <ul className="space-y-1.5 font-medium text-slate-600 dark:text-slate-300 text-[11px] sm:text-xs">
-              <li>
-                <a href="/pricing" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                  Pricing & Plans
-                </a>
-              </li>
+              {!isPro && (
+                <li>
+                  <a href="/pricing" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                    Pricing & Plans
+                  </a>
+                </li>
+              )}
               <li>
                 <a href="/how-it-works" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                   How It Works

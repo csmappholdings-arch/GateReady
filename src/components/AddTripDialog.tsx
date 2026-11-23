@@ -136,6 +136,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   const [aircraftType, setAircraftType] = useState('');
   const [fareFamily, setFareFamily] = useState<string>(initialFareFamily || '');
   const [passportExpiryDate, setPassportExpiryDate] = useState('');
+  const [originSelected, setOriginSelected] = useState(false);
+  const [step1Error, setStep1Error] = useState('');
 
   const passportWarning = React.useMemo(() => {
     if (!passportExpiryDate) return null;
@@ -219,8 +221,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       }
 
       setOriginCity(initialOriginCity || '');
+      setOriginSelected(Boolean(initialOriginCity && initialOriginCity.trim()));
       const safeDest = initialDestinationCity || '';
       setDestinationCity(safeDest);
+      setStep1Error('');
 
       if (initialTripTitle) {
         setName(initialTripTitle);
@@ -356,6 +360,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
 
     const travelerCheck = canAddTraveler(familyMembers.length);
     if (!travelerCheck.allowed) {
+      if (isPro) {
+        setTravelerError(travelerCheck.reason || 'Traveler limit reached for your current plan.');
+        return;
+      }
       openPaywall(travelerCheck.reason);
       return;
     }
@@ -518,15 +526,52 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     setBags(bags.map((b, i) => (i === index ? { ...b, assignedTo: newAssignee } : b)));
   };
 
+  const handleSelectTravelType = (newType: TravelType) => {
+    if (newType === travelType) return;
+    setTravelType(newType);
+    setCompanyName('');
+    setOriginCity('');
+    setDestinationCity('');
+    setOriginSelected(false);
+    setStep1Error('');
+    if (newType !== 'PLANE') {
+      setAircraftType('');
+      setFareFamily('');
+    }
+  };
+
+  const validateStep1 = (): boolean => {
+    if (!originCity.trim() || !originSelected) {
+      setStep1Error(
+        `Please select a ${travelType === 'PLANE' ? 'departing airport' : 'starting location'} from the search dropdown.`
+      );
+      setActiveTab('destination');
+      return false;
+    }
+    if (!destinationCity.trim()) {
+      setStep1Error(
+        `Please enter or select a ${travelType === 'PLANE' ? 'destination airport or city' : 'destination'}.`
+      );
+      setActiveTab('destination');
+      return false;
+    }
+    setStep1Error('');
+    return true;
+  };
+
   // Final submission
   const handleFinalSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+
+    if (!validateStep1()) return;
 
     const tripTitle = name.trim() || destinationCity.trim() || 'My Upcoming Trip';
     const finalFamily = familyMembers.length > 0 ? familyMembers : [defaultTraveler];
     const finalBags = bags.length > 0 
       ? bags 
       : [{ type: 'CARRY_ON' as BagType, label: 'Carry-On Roller', assignedTo: finalFamily[0] }];
+    const cleanAircraft = travelType === 'PLANE' ? aircraftType : '';
+    const cleanFare = travelType === 'PLANE' ? fareFamily : '';
 
     // Hard limit enforcement: Free plan cannot hold > 2 bags or > 1 checked bag
     if (!isPro) {
@@ -553,8 +598,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         departureTime,
         returnTripDate,
         returnTripTime,
-        aircraftType,
-        fareFamily,
+        aircraftType: cleanAircraft,
+        fareFamily: cleanFare,
+        ...(travelType !== 'PLANE' ? { flightNumber: '' } : {}),
         passportExpiryDate: passportExpiryDate.trim() || undefined,
         familyMembers: finalFamily
       });
@@ -584,8 +630,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         departureTime,
         returnTripDate,
         returnTripTime,
-        aircraftType,
-        fareFamily,
+        aircraftType: cleanAircraft,
+        fareFamily: cleanFare,
         passportExpiryDate: passportExpiryDate.trim() || undefined
       }
     );
@@ -758,7 +804,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
 
             <button
               type="button"
-              onClick={() => setActiveTab('carrier')}
+              onClick={() => {
+                if (activeTab === 'destination' && !validateStep1()) return;
+                setActiveTab('carrier');
+              }}
               className={`py-2 px-2 sm:px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 isExpanded ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'
               } ${
@@ -776,7 +825,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
 
             <button
               type="button"
-              onClick={() => setActiveTab('baggage')}
+              onClick={() => {
+                if (activeTab === 'destination' && !validateStep1()) return;
+                setActiveTab('baggage');
+              }}
               className={`py-2 px-2 sm:px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 isExpanded ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'
               } ${
@@ -882,7 +934,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     <button
                       key={type}
                       type="button"
-                      onClick={() => setTravelType(type)}
+                      onClick={() => handleSelectTravelType(type)}
                       className={`rounded-2xl flex flex-col items-center gap-1 border transition-all cursor-pointer ${
                         isExpanded ? 'py-3 px-2' : 'py-2 px-1'
                       } ${
@@ -928,20 +980,30 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <UniversalLocationSearchInput
                     label={getOriginLabel()}
+                    required
                     iconType="origin"
                     travelType={travelType}
                     value={originCity}
-                    onChange={(formatted) => setOriginCity(formatted)}
+                    onSelectionChange={(sel) => {
+                      setOriginSelected(sel);
+                      if (step1Error) setStep1Error('');
+                    }}
+                    onChange={(formatted) => {
+                      setOriginCity(formatted);
+                      if (step1Error) setStep1Error('');
+                    }}
                     inputClassName={isExpanded ? 'h-11 text-sm' : 'h-10 text-xs'}
                   />
 
                   <UniversalLocationSearchInput
                     label={getDestinationLabel()}
+                    required
                     iconType="destination"
                     travelType={travelType}
                     value={destinationCity}
                     onChange={(formatted) => {
                       setDestinationCity(formatted);
+                      if (step1Error) setStep1Error('');
                       if (!name || name === 'My Trip') {
                         setName(`${formatted.split(' ')[0]} Trip`);
                       }
@@ -949,6 +1011,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     inputClassName={isExpanded ? 'h-11 text-sm' : 'h-10 text-xs'}
                   />
                 </div>
+
+                {step1Error && (
+                  <p role="alert" className="text-xs text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5 pt-1">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{step1Error}</span>
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -1304,18 +1373,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       <span>Free: 1 Traveler</span>
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (tier === 'SILVER' || tier === 'GOLD') {
-                          openPaywall(tier === 'SILVER' ? 'Silver includes 1 traveler. Upgrade to Gold (2 travelers) or Platinum (unlimited).' : 'Gold includes 2 travelers. Upgrade to Platinum for unlimited travelers.');
-                        }
-                      }}
-                      className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full flex items-center gap-1 cursor-pointer"
-                    >
+                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Crown className="w-3 h-3 fill-purple-600 text-purple-600" />
                       <span>{tier === 'PLATINUM' ? 'Platinum: Unlimited' : tier === 'GOLD' ? 'Gold: 2 Travelers' : 'Silver: 1 Traveler'}</span>
-                    </button>
+                    </span>
                   )}
                 </div>
 
@@ -1434,9 +1495,15 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     <p className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
                       <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
                       <span>Checked + Carry</span>
-                      <span className="text-[9px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded flex items-center gap-0.5 ml-auto">
-                        <Lock className="w-2.5 h-2.5" /> Silver+ (3 bags)
-                      </span>
+                      {isPro ? (
+                        <span className="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.2 rounded ml-auto">
+                          Included (3 bags)
+                        </span>
+                      ) : (
+                        <span className="text-[9px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded flex items-center gap-0.5 ml-auto">
+                          <Lock className="w-2.5 h-2.5" /> Silver+ (3 bags)
+                        </span>
+                      )}
                     </p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
                       1 Checked Suitcase (50lb) + 1 Carry + Backpack
@@ -1476,7 +1543,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       </span>
                     ) : (
                       <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
-                        Silver+: Unlimited Bags
+                        {tier === 'PLATINUM' ? 'Platinum: Unlimited Bags' : tier === 'GOLD' ? 'Gold: Unlimited Bags' : 'Silver: Unlimited Bags'}
                       </span>
                     )}
                   </div>
@@ -1616,7 +1683,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('carrier')}
+                  onClick={() => {
+                    if (!validateStep1()) return;
+                    setActiveTab('carrier');
+                  }}
                   className={`rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer ${
                     isExpanded ? 'h-11 px-6 text-sm' : 'h-10 px-5 text-xs'
                   }`}

@@ -115,12 +115,25 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
     const carrierWord = trip.travelType === 'PLANE' || !trip.travelType ? 'airline' : 'carrier';
     const terminalWord = trip.travelType === 'PLANE' || !trip.travelType ? 'airport' : trip.travelType === 'TRAIN' ? 'train station' : trip.travelType === 'CRUISE' ? 'cruise terminal' : trip.travelType === 'BUS' ? 'bus terminal' : 'road';
 
+    const dayLabel = daysRemaining === 1 ? 'day' : 'days';
+    const dayTitleLabel = daysRemaining === 1 ? 'Day' : 'Days';
+    const departurePassText =
+      !trip.travelType || trip.travelType === 'PLANE'
+        ? 'Have your boarding pass, photo ID, and essentials ready.'
+        : trip.travelType === 'CRUISE'
+          ? 'Have your cruise embarkation docs, passport, and essentials ready.'
+          : trip.travelType === 'TRAIN'
+            ? 'Have your rail ticket, photo ID, and essentials ready.'
+            : trip.travelType === 'BUS'
+              ? 'Have your bus ticket, photo ID, and essentials ready.'
+              : 'Have your driver’s license, registration, and road essentials ready.';
+
     // 14 Days Check (triggers when strictly 8 to 14 days out)
     if (prefs.fourteenDaysNotice && daysRemaining <= 14 && daysRemaining >= 8) {
       addNotice(
         '14_DAYS',
-        `${daysRemaining} Days Until Departure: ${trip.destinationCity || trip.name}`,
-        `Your departure is ${daysRemaining} days away. Now is a great time to review your ${carrierWord} baggage allowance and begin preparing your packing list.`,
+        `${daysRemaining} ${dayTitleLabel} Until Departure: ${trip.destinationCity || trip.name}`,
+        `Your departure is ${daysRemaining} ${dayLabel} away. Now is a great time to review your ${carrierWord} baggage allowance and begin preparing your packing list.`,
         'Review My Trip',
         'Overview'
       );
@@ -130,8 +143,8 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
     if (prefs.sevenDaysNotice && daysRemaining <= 7 && daysRemaining >= 4) {
       addNotice(
         '7_DAYS',
-        `${daysRemaining} Days Until Departure: One Week to Travel!`,
-        `Your departure is ${daysRemaining} days away. Check your luggage weights, dimensions, and ${carrierWord} baggage restrictions.`,
+        `${daysRemaining} ${dayTitleLabel} Until Departure: One Week to Travel!`,
+        `Your departure is ${daysRemaining} ${dayLabel} away. Check your luggage weights, dimensions, and ${carrierWord} baggage restrictions.`,
         'Check My Luggage',
         'Luggage'
       );
@@ -141,8 +154,8 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
     if (prefs.threeDaysNotice && daysRemaining <= 3 && daysRemaining >= 2) {
       addNotice(
         '3_DAYS',
-        `${daysRemaining} Days Until Departure: Finalize Packing!`,
-        `Your trip is only ${daysRemaining} days away. Complete your packing checklist and make sure your luggage is within your ${carrierWord}'s limits.`,
+        `${daysRemaining} ${dayTitleLabel} Until Departure: Finalize Packing!`,
+        `Your trip is only ${daysRemaining} ${dayLabel} away. Complete your packing checklist and make sure your luggage is within your ${carrierWord}'s limits.`,
         'Complete My Packing',
         'Checklist'
       );
@@ -154,7 +167,7 @@ export function generateTripNotifications(trips: Trip[]): InAppNotification[] {
         '24_HOURS',
         daysRemaining === 0 ? 'Today is Departure Day!' : '1 Day Until Departure: Final Check',
         daysRemaining === 0
-          ? `Safe travels to ${trip.destinationCity || trip.name}! Have your boarding pass, photo ID, and essentials ready.`
+          ? `Safe travels to ${trip.destinationCity || trip.name}! ${departurePassText}`
           : trip.travelType === 'CAR'
             ? `Your road trip starts tomorrow! Review your packing checklist, cargo space, and travel documents before heading out.`
             : `Your trip is tomorrow! Review your packing checklist, luggage restrictions, and travel documents before heading to the ${terminalWord}.`,

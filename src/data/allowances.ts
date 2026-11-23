@@ -757,7 +757,7 @@ export function getDefaultChecklistForMode(travelType: TravelType): GateCheckIte
       ];
     case 'CRUISE':
       return [
-        { id: `gc-${ts}-1`, text: 'Valid Passport, cruise boarding pass & embarkation docs ready', completed: false, required: true },
+        { id: `gc-${ts}-1`, text: 'Valid Passport, cruise embarkation pass & embarkation docs ready', completed: false, required: true },
         { id: `gc-${ts}-2`, text: 'Ship luggage tags printed and stapled to checked bags', completed: false, required: true },
         { id: `gc-${ts}-3`, text: 'Carry-on bag packed with Day 1 swimsuits & change of clothes', completed: false, required: true },
         { id: `gc-${ts}-4`, text: 'All prescriptions, jewelry, and travel insurance docs in carry-on', completed: false, required: true },

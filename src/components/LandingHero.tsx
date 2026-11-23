@@ -36,6 +36,8 @@ interface LandingHeroProps {
   onOpenAirlineGuides?: () => void;
   onOpenAccountSync?: (mode?: 'signin' | 'signup') => void;
   onExploreTools?: () => void;
+  hasCreatedTrips?: boolean;
+  isPro?: boolean;
 }
 
 export const LandingHero: React.FC<LandingHeroProps> = ({
@@ -44,7 +46,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
   onOpenPricing,
   onOpenAirlineGuides,
   onOpenAccountSync,
-  onExploreTools
+  onExploreTools,
+  hasCreatedTrips = false,
+  isPro = false
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<'dashboard' | 'meters' | 'tare' | 'checklist' | 'readiness'>('dashboard');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -127,6 +131,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
 
           {/* Main Headline & Supporting Subhead */}
           <div className="space-y-4 w-full max-w-5xl mx-auto">
+            <p className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100/80 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/70 text-xs sm:text-sm font-black uppercase tracking-wider text-purple-800 dark:text-purple-200">
+              {hasCreatedTrips ? 'Welcome Back to GateReady' : 'Welcome to GateReady'}
+            </p>
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08]">
               Travel Smarter. Pack Better.
               <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-800">
@@ -159,7 +166,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               </button>
 
               {/* Secondary CTA: Create Free Account */}
-              {onOpenAccountSync && (
+              {onOpenAccountSync && !isPro && (
                 <button
                   type="button"
                   onClick={() => {
@@ -195,7 +202,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               >
                 <span>or view sample trip →</span>
               </button>
-              {onOpenAccountSync && (
+              {onOpenAccountSync && !isPro && (
                 <>
                   <span className="text-slate-300 dark:text-slate-700">·</span>
                   <button
@@ -1053,6 +1060,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
       </section>
 
       {/* ================= SECTION 8: SUBSCRIPTION COMPARISON PREVIEW ================= */}
+      {!isPro && (
       <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
         <button
           type="button"
@@ -1152,6 +1160,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           </div>
         )}
       </section>
+      )}
 
       {/* ================= SECTION 10: FREQUENTLY ASKED QUESTIONS ================= */}
       <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">

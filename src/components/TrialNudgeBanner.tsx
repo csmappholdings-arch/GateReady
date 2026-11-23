@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSubscription } from '../context/SubscriptionContext';
-import { usePacking } from '../context/PackingContext';
-import { Crown, Sparkles, X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Crown, X } from 'lucide-react';
 
 export const TrialNudgeBanner: React.FC = () => {
   const { 
@@ -10,10 +9,8 @@ export const TrialNudgeBanner: React.FC = () => {
     trialTimeLeftText, 
     isReferralPlatinumActive,
     isReferralExpiringSoon,
-    referralTimeLeftText,
-    openPaywall 
+    referralTimeLeftText
   } = useSubscription();
-  const { currentTrip } = usePacking();
   const [dismissed, setDismissed] = useState(false);
 
   const showReferralNudge = isReferralPlatinumActive && isReferralExpiringSoon;
@@ -23,10 +20,6 @@ export const TrialNudgeBanner: React.FC = () => {
     return null;
   }
 
-  const travelerCount = currentTrip?.familyMembers?.length || 1;
-  const recommendedTier = travelerCount > 1 ? 'GOLD' : 'SILVER';
-  const tierCost = recommendedTier === 'GOLD' ? '$3.99/mo' : '$1.99/mo';
-
   const countdownText = showReferralNudge ? referralTimeLeftText : trialTimeLeftText;
   const bannerTitle = showReferralNudge ? '⏳ 1-Month Referral Platinum Ends Soon:' : '⏳ 7-Day Platinum Trial Ends Soon:';
 
@@ -35,7 +28,7 @@ export const TrialNudgeBanner: React.FC = () => {
       <div className="w-full max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-black/20 flex items-center justify-center shrink-0 text-amber-200">
-            <Crown className="w-4 h-4 fill-amber-300 text-amber-300 animate-bounce" />
+            <Crown className="w-4 h-4 fill-amber-300 text-amber-300" />
           </div>
           <div className="min-w-0">
             <p className="font-black text-white flex items-center gap-1.5 flex-wrap">
@@ -45,23 +38,14 @@ export const TrialNudgeBanner: React.FC = () => {
               </span>
             </p>
             <p className="text-[11px] text-white/90 leading-tight">
-              {recommendedTier === 'GOLD'
-                ? `You have multiple travelers saved. Keep multi-traveler sync & unlimited trips with Gold (${tierCost}).`
-                : `Solo traveler? Lock in Silver for just ${tierCost} to keep unlimited bags & baggage scale tools.`}
+              {showReferralNudge
+                ? '1-Month Referral Platinum active — returns to Free automatically upon expiry. No card, no charge.'
+                : 'Returns to Free automatically on day 7. No card, no charge.'}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-          <button
-            type="button"
-            onClick={() => openPaywall(`Your Platinum trial ends soon. Lock in ${recommendedTier === 'GOLD' ? 'Gold ($3.99/mo)' : 'Silver ($1.99/mo)'} to keep full access.`)}
-            className="h-8 px-3.5 rounded-xl bg-white hover:bg-amber-50 text-purple-950 font-black text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
-          >
-            <span>Lock In {recommendedTier === 'GOLD' ? 'Gold' : 'Silver'} ({tierCost})</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-
           <button
             type="button"
             onClick={() => setDismissed(true)}

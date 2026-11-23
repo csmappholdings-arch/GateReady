@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem('gateready_dark_mode') === 'true') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <title>GateReady.ca – Travel Smarter. Pack Better. Avoid Airport Surprises.</title>
     <meta name="description" content="Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home." />
     <meta name="keywords" content="airline baggage allowance, carry-on baggage restrictions, airline baggage fees, luggage weight calculator, carry-on size checker, travel packing checklist, checked baggage allowance, avoid overweight baggage fees, TSA 3-1-1 liquids checker, luggage tare weight" />

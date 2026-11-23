@@ -65,33 +65,18 @@ export function scanItemForLiquids(itemName: string, bagType: BagType = 'CARRY_O
   const lower = itemName.toLowerCase();
   const matchedKeyword = LIQUID_KEYWORDS.find((kw) => lower.includes(kw));
 
-  if (!matchedKeyword) {
-    return { isLiquid: false, status: 'NOT_LIQUID' };
-  }
-
-  // Liquid / full-size toiletries are permitted in checked luggage (within typical airline max)
-  if (bagType === 'CHECKED') {
-    return {
-      isLiquid: true,
-      status: 'CHECKED_PERMITTED',
-      detectedKeyword: matchedKeyword,
-      badgeLabel: 'Checked Luggage Liquid (Permitted)',
-      alertMessage: undefined
-    };
-  }
-
-  // Parse bottle size (oz / fl oz / ml)
+  // Parse bottle size (oz / fl oz / ml) regardless of keyword match so custom items like "Aftershave 150ml" or "5 oz" are detected
   let capacityOz: number | undefined;
   let capacityMl: number | undefined;
 
   // Pattern 1: e.g. "6oz", "6 oz", "3.4 oz", "8 fl oz"
-  const ozMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:fl\s*oz|oz|ounce|ounces)/);
+  const ozMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:fl\s*oz|oz|ounces?)/);
   if (ozMatch) {
     capacityOz = parseFloat(ozMatch[1]);
   }
 
-  // Pattern 2: e.g. "100ml", "150 ml", "200ml"
-  const mlMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:ml|milliliter|millilitres)/);
+  // Pattern 2: e.g. "100ml", "150 ml", "200 milliliter(s)"
+  const mlMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:ml|milliliters?|millilitres?)/);
   if (mlMatch) {
     capacityMl = parseFloat(mlMatch[1]);
     if (capacityOz === undefined) {
@@ -101,9 +86,26 @@ export function scanItemForLiquids(itemName: string, bagType: BagType = 'CARRY_O
 
   const isExplicitFullSize = /\b(full[- ]?size|jumbo|family[- ]?size|value[- ]?size|oversized)\b/i.test(lower);
   const isExplicitTravelSize = /\b(3-1-1|3\.1\.1|travel[- ]?size|tsa[- ]?approved|mini)\b/i.test(lower);
+  const hasExplicitNumericSize = capacityOz !== undefined || capacityMl !== undefined;
+
+  if (!matchedKeyword && !hasExplicitNumericSize && !isExplicitFullSize && !isExplicitTravelSize) {
+    return { isLiquid: false, status: 'NOT_LIQUID' };
+  }
+
+  // Liquid / full-size toiletries are permitted in checked luggage (within typical airline max)
+  if (bagType === 'CHECKED') {
+    return {
+      isLiquid: true,
+      status: 'CHECKED_PERMITTED',
+      detectedKeyword: matchedKeyword,
+      capacityOz,
+      capacityMl,
+      badgeLabel: 'Checked Luggage Liquid (Permitted)',
+      alertMessage: undefined
+    };
+  }
 
   // TSA 3-1-1 limits: 3.4 oz (100 ml) — explicit over-limit volume OR full-size descriptor without <=100ml override
-  const hasExplicitNumericSize = capacityOz !== undefined || capacityMl !== undefined;
   const isOverNumericLimit = (capacityOz !== undefined && capacityOz > 3.4) || (capacityMl !== undefined && capacityMl > 100);
   const isOverLimit = isOverNumericLimit || (isExplicitFullSize && !hasExplicitNumericSize && !isExplicitTravelSize);
 

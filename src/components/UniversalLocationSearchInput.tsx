@@ -27,6 +27,7 @@ interface UniversalLocationSearchInputProps {
   className?: string;
   inputClassName?: string;
   hideLabel?: boolean;
+  onSelectionChange?: (isSelected: boolean) => void;
 }
 
 export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInputProps> = ({
@@ -42,7 +43,8 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
   travelType = 'PLANE',
   className = '',
   inputClassName = '',
-  hideLabel = false
+  hideLabel = false,
+  onSelectionChange
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState(value);
@@ -187,6 +189,7 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
     setQuery(newVal);
     setIsOpen(true);
     setSelectedIndex(-1);
+    onSelectionChange?.(false);
 
     // If user types exactly a 3-letter uppercase airport code while in PLANE mode
     if (travelType === 'PLANE') {
@@ -206,6 +209,7 @@ export const UniversalLocationSearchInput: React.FC<UniversalLocationSearchInput
   const handleSelect = (item: LocationSearchResult) => {
     setQuery(item.formattedValue);
     setIsOpen(false);
+    onSelectionChange?.(true);
     onChange(item.formattedValue, item.country);
   };
 

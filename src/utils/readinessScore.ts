@@ -41,7 +41,7 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
   } else {
     packingPercentage = Math.round((packedItemsCount / totalItemsCount) * 100);
     packingScore = Math.round((packedItemsCount / totalItemsCount) * 30);
-    packingDetail = `${packedItemsCount} of ${totalItemsCount} items packed (${packingPercentage}%)`;
+    packingDetail = `${packedItemsCount} of ${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'} packed (${packingPercentage}%)`;
     packingComplete = packedItemsCount === totalItemsCount && totalItemsCount > 0;
 
     if (!packingComplete) {
@@ -172,7 +172,7 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
 
     const ratio = preparedCount / rawTravelers.length;
     travelerScore = Math.round(ratio * 15);
-    travelerDetail = `${preparedCount} of ${rawTravelers.length} travelers have items assigned`;
+    travelerDetail = `${preparedCount} of ${rawTravelers.length} ${rawTravelers.length === 1 ? 'traveler has' : 'travelers have'} items assigned`;
     travelerComplete = preparedCount === rawTravelers.length;
 
     if (!travelerComplete) {
@@ -212,10 +212,20 @@ export function calculateTravelReadinessScore(trip: Trip): TravelReadinessScore 
   let documentsComplete = completedDocsCount === totalDocsCount;
 
   if (completedDocsCount < totalDocsCount) {
+    const docPassLabel =
+      trip.travelType === 'CRUISE'
+        ? 'embarkation pass'
+        : trip.travelType === 'TRAIN'
+          ? 'rail tickets'
+          : trip.travelType === 'BUS'
+            ? 'bus tickets'
+            : trip.travelType === 'CAR'
+              ? 'driver ID & insurance'
+              : 'boarding pass';
     recommendations.push({
       id: 'docs_incomplete',
       title: 'Review Travel Document Checklist',
-      description: 'Check off passport validity, visas, boarding pass, and hotel confirmations.',
+      description: `Check off photo ID, ${docPassLabel}, and booking confirmations.`,
       actionLabel: 'Check Documents',
       targetTab: 'Documents',
       priority: completedDocsCount <= 2 ? 'HIGH' : 'MEDIUM'

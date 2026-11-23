@@ -65,13 +65,21 @@ interface PackingContextType {
   ) => void;
   toggleItemPacked: (tripId: string, bagId: string, itemId: string) => void;
   removeItem: (tripId: string, bagId: string, itemId: string) => void;
-  moveItemBetweenBags: (tripId: string, sourceBagId: string, destBagId: string, itemId: string) => void;
+  moveItemBetweenBags: (
+    tripId: string,
+    sourceBagId: string,
+    destBagId: string,
+    itemId: string,
+    quantityToMove?: number,
+    targetMovedItemId?: string,
+    mergeIntoItemId?: string
+  ) => void;
   updateItemCustomWeight: (tripId: string, bagId: string, itemId: string, customWeightLbs: number | undefined) => void;
   updateItemQuantity: (tripId: string, bagId: string, itemId: string, quantity: number) => void;
   updateItemPacker: (tripId: string, bagId: string, itemId: string, packedFor: string) => void;
   updateTripDetails: (
     tripId: string,
-    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles' | 'familyMembers' | 'travelerMembers' | 'travelDocuments' | 'isArchived' | 'sharedWith'>>
+    details: Partial<Pick<Trip, 'name' | 'companyName' | 'seatClassOrCarSize' | 'fareFamily' | 'flightNumber' | 'travelType' | 'departureDate' | 'departureTime' | 'aircraftType' | 'isReturnRepackMode' | 'returnTripDate' | 'returnTripTime' | 'souvenirBufferEnabled' | 'souvenirBufferLbs' | 'originCity' | 'destinationCity' | 'destinationCountry' | 'luggageTags' | 'gateChecklist' | 'bags' | 'passportExpiryDate' | 'modeProfiles' | 'familyMembers' | 'travelerMembers' | 'travelDocuments' | 'isArchived' | 'sharedWith'>>
   ) => Promise<Trip>;
   refreshActiveTrip: () => void;
   updateLuggageTag: (
@@ -467,6 +475,13 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setDarkMode = (isDark: boolean) => {
     setIsDarkMode(isDark);
+    try {
+      localStorage.setItem(THEME_KEY, String(isDark));
+    } catch {}
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('dark', isDark);
+      document.body.classList.toggle('dark', isDark);
+    }
   };
 
   const addTrip = (
@@ -846,7 +861,10 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     tripId: string,
     sourceBagId: string,
     destBagId: string,
-    itemId: string
+    itemId: string,
+    quantityToMove?: number,
+    targetMovedItemId?: string,
+    mergeIntoItemId?: string
   ) => {
     let updatedTripToSave: Trip | null = null;
 
@@ -858,16 +876,57 @@ export const PackingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const itemToMove = sourceBag.items.find((item) => item.id === itemId);
         if (!itemToMove) return trip;
 
+        const currentQty = typeof itemToMove.quantity === 'number' && itemToMove.quantity > 0 ? itemToMove.quantity : 1;
+        const moveQty = typeof quantityToMove === 'number' && quantityToMove > 0
+          ? Math.min(quantityToMove, currentQty)
+          : currentQty;
+        const remainingInSource = currentQty - moveQty;
+
         const updated = {
           ...trip,
           bags: trip.bags.map((bag) => {
             if (bag.id === sourceBagId) {
               return {
                 ...bag,
-                items: bag.items.filter((item) => item.id !== itemId)
+                items: remainingInSource <= 0
+                  ? bag.items.filter((item) => item.id !== itemId)
+                  : bag.items.map((item) =>
+                      item.id === itemId ? { ...item, quantity: remainingInSource } : item
+                    )
               };
             }
             if (bag.id === destBagId) {
+              if (mergeIntoItemId) {
+                const existingTarget = bag.items.find((item) => item.id === mergeIntoItemId);
+                if (existingTarget) {
+                  const existingQty = typeof existingTarget.quantity === 'number' && existingTarget.quantity > 0 ? existingTarget.quantity : 1;
+                  return {
+                    ...bag,
+                    items: bag.items.map((item) =>
+                      item.id === mergeIntoItemId
+                        ? { ...item, quantity: existingQty + moveQty }
+                        : item
+                    )
+                  };
+                }
+                return {
+                  ...bag,
+                  items: [...bag.items, { ...itemToMove, id: mergeIntoItemId, quantity: moveQty }]
+                };
+              }
+              if (targetMovedItemId) {
+                return {
+                  ...bag,
+                  items: [...bag.items, { ...itemToMove, id: targetMovedItemId, quantity: moveQty }]
+                };
+              }
+              if (remainingInSource > 0) {
+                const splitId = `item-split-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                return {
+                  ...bag,
+                  items: [...bag.items, { ...itemToMove, id: splitId, quantity: moveQty }]
+                };
+              }
               return {
                 ...bag,
                 items: [...bag.items, itemToMove]

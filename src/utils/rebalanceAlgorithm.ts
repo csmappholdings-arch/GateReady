@@ -259,7 +259,7 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
     const candidateDestBags = snapshots.filter((d) => d.bagId !== sourceSnapshot.bagId);
 
     // Collect candidate items from source bag with valid weights
-    const candidateItems: Array<{ item: PackingItem; weightLbs: number; unitWeightLbs: number; quantity: number; isEssential: boolean }> = [];
+    const candidateItems: Array<{ item: PackingItem; weightLbs: number; unitWeightLbs: number; quantity: number; originalQuantity: number; isEssential: boolean }> = [];
 
     for (const item of currentSourceItems) {
       const w = getItemWeightLbs(item);
@@ -274,11 +274,12 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
         weightLbs: w,
         unitWeightLbs: unit,
         quantity,
+        originalQuantity: quantity,
         isEssential: isEssentialItem(item)
       });
     }
 
-    // Sort candidate items: largest weight first to find fewest moves
+    // Sort candidate items: largest total weight first to find fewest moves
     candidateItems.sort((a, b) => b.weightLbs - a.weightLbs);
 
     // Find moves
@@ -287,6 +288,8 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
 
       // Try each candidate destination bag
       for (const destSnapshot of candidateDestBags) {
+        if (currentSourceWeight <= sourceLimit || cand.quantity <= 0) break;
+
         const destBag = bags.find((b) => b.id === destSnapshot.bagId);
         if (!destBag) continue;
 
@@ -307,31 +310,61 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
           continue; // Disqualified!
         }
 
-        // Test prospective destination bag items & weight
-        const prospectiveDestItems = [...currentDestItems, cand.item];
-        const prospectiveDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: prospectiveDestItems });
+        // Compute how many units of this item stack should move
+        const excessLbs = Math.max(0, Number((currentSourceWeight - sourceLimit).toFixed(2)));
+        const unitsNeeded = cand.quantity > 1
+          ? Math.max(1, Math.ceil(excessLbs / cand.unitWeightLbs))
+          : 1;
+        const maxDestUnits = destLimit === null
+          ? cand.quantity
+          : Math.floor((destLimit - currentDestWeight + 1e-6) / cand.unitWeightLbs);
+
+        if (maxDestUnits < 1) {
+          continue; // Would overload destination bag!
+        }
+
+        let moveQty = Math.min(cand.quantity, unitsNeeded, maxDestUnits);
+        let movedItem: PackingItem = moveQty === cand.originalQuantity && cand.quantity === cand.originalQuantity
+          ? cand.item
+          : { ...cand.item, quantity: moveQty };
+
+        let prospectiveDestItems = [...currentDestItems, movedItem];
+        let prospectiveDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: prospectiveDestItems });
+
+        while (destLimit !== null && prospectiveDestWeight > destLimit && moveQty > 1) {
+          moveQty -= 1;
+          movedItem = { ...cand.item, quantity: moveQty };
+          prospectiveDestItems = [...currentDestItems, movedItem];
+          prospectiveDestWeight = calculateBagTotalWeightLbs({ ...destBag, items: prospectiveDestItems });
+        }
 
         // RULE 2: Destination bag must NEVER exceed its carrier limit after move
         if (destLimit !== null && prospectiveDestWeight > destLimit) {
           continue; // Would overload destination bag!
         }
 
-        // Test prospective source bag items & weight
-        const prospectiveSourceItems = currentSourceItems.filter((i) => i.id !== cand.item.id);
+        const remainingQty = cand.quantity - moveQty;
+        const prospectiveSourceItems = remainingQty <= 0
+          ? currentSourceItems.filter((i) => i.id !== cand.item.id)
+          : currentSourceItems.map((i) => (i.id === cand.item.id ? { ...i, quantity: remainingQty } : i));
         const prospectiveSourceWeight = calculateBagTotalWeightLbs({ ...sourceBag, items: prospectiveSourceItems });
 
-        // This move is valid!
+        const movedWeightLbs = Number((moveQty * cand.unitWeightLbs).toFixed(1));
         const sourceAfter = prospectiveSourceWeight;
         const destAfter = prospectiveDestWeight;
-        const displayName = cand.quantity > 1 ? `${cand.quantity}x ${cand.item.name}` : cand.item.name;
+        const displayName = moveQty < cand.originalQuantity
+          ? `${moveQty} of ${cand.originalQuantity} ${cand.item.name}`
+          : cand.originalQuantity > 1
+            ? `${moveQty}x ${cand.item.name}`
+            : cand.item.name;
 
         suggestedMoves.push({
-          id: `move-${sourceBag.id}-${destBag.id}-${cand.item.id}`,
+          id: `move-${sourceBag.id}-${destBag.id}-${cand.item.id}-${moveQty}`,
           itemId: cand.item.id,
           itemName: displayName,
-          quantity: cand.quantity,
+          quantity: moveQty,
           unitWeightLbs: cand.unitWeightLbs,
-          itemWeightLbs: cand.weightLbs,
+          itemWeightLbs: movedWeightLbs,
           sourceBagId: sourceBag.id,
           sourceBagLabel: sourceBag.label,
           sourceBagType: sourceBag.type,
@@ -348,11 +381,16 @@ export function computeRebalanceSuggestions(trip: Trip): RebalanceComputationRes
         });
 
         // Update simulation states
+        cand.quantity = remainingQty;
+        cand.weightLbs = Number((remainingQty * cand.unitWeightLbs).toFixed(1));
         currentSourceItems = prospectiveSourceItems;
         currentSourceWeight = prospectiveSourceWeight;
         simulatedBagItems.set(sourceBag.id, prospectiveSourceItems);
         simulatedBagItems.set(destBag.id, prospectiveDestItems);
-        break; // Item moved, go to next item
+
+        if (currentSourceWeight <= sourceLimit || cand.quantity <= 0) {
+          break;
+        }
       }
     }
   }

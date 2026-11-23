@@ -639,8 +639,8 @@ function PackingAppContent() {
         onOpenOnboarding={() => setShowOnboardingModal(true)}
       />
 
-      {/* Free Plan Bag Limit Trip Notice (strictly scoped to currentTrip; never on landing or other trips) */}
-      {tripNotice && currentTrip && tripNotice.tripId === currentTrip.id && !dismissedNoticeTripIds.has(tripNotice.tripId) && (
+      {/* Free Plan Bag Limit Trip Notice (strictly scoped to currentTrip and Free/guest tier; never on landing or other trips) */}
+      {!isPro && tripNotice && currentTrip && tripNotice.tripId === currentTrip.id && !dismissedNoticeTripIds.has(tripNotice.tripId) && (
         <div className="bg-purple-950 text-white px-4 py-3 shadow-lg flex items-center justify-between gap-3 text-xs border-b border-purple-800 relative z-30 animate-in fade-in duration-200">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-6 h-6 rounded-lg bg-amber-400 text-purple-950 flex items-center justify-center shrink-0 font-bold shadow-xs">
@@ -809,6 +809,8 @@ function PackingAppContent() {
           <div className="flex flex-col">
             {/* Conversion Marketing Hero (Above the trip creator) */}
             <LandingHero
+              hasCreatedTrips={trips.some((t) => !t.isDemo && !t.id.startsWith('trip-demo-') && !t.name.includes('Paris & London'))}
+              isPro={isPro}
               onOpenAddTrip={() => handleOpenAddTrip()}
               onLoadDemo={handleLoadDemo}
               onOpenPricing={() => openPaywall()}

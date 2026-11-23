@@ -396,7 +396,7 @@ export const CabinIntelScreen: React.FC<CabinIntelScreenProps> = ({ trip }) => {
               <span>Embarkation Day Luggage Essentials</span>
             </h4>
             <ul className="space-y-1.5 text-xs text-purple-950 dark:text-purple-200 list-disc list-inside">
-              <li>Always carry your passport, cruise boarding pass, credit cards, and essential medications in your personal day bag.</li>
+              <li>Always carry your passport, cruise embarkation ticket, credit cards, and essential medications in your personal day bag.</li>
               <li>Pack swimsuits, sunscreen, and evening dinner clothes in your carry-on because checked bags may arrive hours after ship departure.</li>
               <li>Most cruise lines permit guests to bring 1 unopened 750ml bottle of wine or champagne per adult in carry-on baggage.</li>
             </ul>

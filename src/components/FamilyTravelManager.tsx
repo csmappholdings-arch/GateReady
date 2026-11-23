@@ -45,6 +45,7 @@ export const FamilyTravelManager: React.FC<FamilyTravelManagerProps> = ({
   const [inviteRole, setInviteRole] = useState<'VIEWER' | 'EDITOR'>('EDITOR');
   const [copiedLink, setCopiedLink] = useState(false);
   const [invitedNotice, setInvitedNotice] = useState(false);
+  const [travelerLimitError, setTravelerLimitError] = useState<string | null>(null);
 
   const travelers = trip.familyMembers && trip.familyMembers.length > 0
     ? trip.familyMembers
@@ -85,12 +86,17 @@ export const FamilyTravelManager: React.FC<FamilyTravelManagerProps> = ({
     // Check plan limits
     const check = canAddTraveler(travelers.length);
     if (!check.allowed) {
+      if (isPro) {
+        setTravelerLimitError(check.reason || 'Traveler limit reached for your current plan.');
+        return;
+      }
       if (openPaywall) {
         openPaywall(check.reason || 'Upgrade to Gold (2 travelers) or Platinum (unlimited) to pack for family members.');
       }
       return;
     }
 
+    setTravelerLimitError(null);
     const tag = selectedCategory === 'CHILD' ? ' (Child)' : selectedCategory === 'INFANT' ? ' (Infant)' : '';
     const formattedName = `${newTravelerName.trim()}${tag}`;
     onAddFamilyMember(trip.id, formattedName);
@@ -240,6 +246,11 @@ export const FamilyTravelManager: React.FC<FamilyTravelManagerProps> = ({
               <span>Add Traveler</span>
             </button>
           </div>
+          {travelerLimitError && (
+            <p role="alert" className="text-xs text-rose-600 dark:text-rose-400 font-semibold">
+              {travelerLimitError}
+            </p>
+          )}
         </form>
       </div>
 
@@ -305,7 +316,7 @@ export const FamilyTravelManager: React.FC<FamilyTravelManagerProps> = ({
                 <p className="text-[11px] text-slate-500">
                   {stat.itemsCount === 0 
                     ? 'No packing items assigned yet' 
-                    : `${stat.packedCount} of ${stat.itemsCount} items packed`}
+                    : `${stat.packedCount} of ${stat.itemsCount} ${stat.itemsCount === 1 ? 'item' : 'items'} packed`}
                 </p>
               </div>
 

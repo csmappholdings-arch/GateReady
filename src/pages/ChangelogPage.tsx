@@ -14,6 +14,48 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Nov 23, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 23, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Partial Rebalance, Smart Greetings, Paid Chrome Cleanup, Liquid &amp; Validation Fixes</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Scale className="w-4 h-4 text-purple-500" />
+              <span>Partial-Quantity Rebalance Bags &amp; Lossless Undo</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Updated the Rebalance Bags optimizer to split multi-quantity item stacks cleanly (e.g., moving only 2 of 6 items needed to resolve an overweight bag) instead of relocating entire stacks, while preserving TSA 3-1-1 liquid rules, essential-item guardrails, and exact 1-click Undo merge-back.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Droplets className="w-4 h-4 text-sky-500" />
+              <span>Custom-Item Liquid Volume Detection &amp; Print Cap Parity</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Enhanced TSA 3-1-1 scanning to catch explicit volumes (oz, fl oz, ml, milliliters, full-size) on custom-named items even without standard toiletry keywords, surfaced liquid alerts on Gate Readiness bag cards, and synced Print &amp; PDF manifests directly with carrier weight policies.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Smart Content Greetings, Trip Validation &amp; Mode-Switch Isolation</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Keyed "Welcome Back to GateReady" strictly on created trips across the hero and dashboard, required picking a verified origin and entering a destination before creating or advancing trips, cleared stale flight fields when switching travel modes, removed upsell prompts for active paid and trial accounts, persisted dark/light theme across reloads and sign-outs, and fixed singular/plural count grammar.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Nov 22, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">

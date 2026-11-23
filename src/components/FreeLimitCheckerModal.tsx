@@ -157,7 +157,7 @@ export const FreeLimitCheckerModal: React.FC<FreeLimitCheckerModalProps> = ({
         <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-2 mb-6 text-xs text-amber-950 dark:text-amber-200">
           <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-300">
             <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600" />
-            <span>Configured: {totalRequested} bags ({config.checkedCount} checked, {config.carryOnCount} carry-on) on {config.carrier}</span>
+            <span>Configured: {totalRequested} {totalRequested === 1 ? 'bag' : 'bags'} ({config.checkedCount} checked, {config.carryOnCount} carry-on) on {config.carrier}</span>
           </div>
           <p className="text-[11px] leading-relaxed text-amber-900/90 dark:text-amber-300/90">
             If you continue with the <strong>Free Plan</strong>, <strong className="text-rose-600 dark:text-rose-400">{excludedText}</strong> will not be included.
