@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AIRLINE_GUIDES, AirlineGuideItem, getAirlineGuideBySlug, getAirlineGuideByAnySlug } from '../data/airlineGuidesData';
+import { AIRLINE_GUIDES, AirlineGuideItem, getAirlineGuideBySlug, getAirlineGuideByAnySlug, buildAirlineDirectSummary } from '../data/airlineGuidesData';
 import { getSplitBagUsdNotes } from '../data/baggageFeeData';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { 
@@ -18,6 +18,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { applySeoHead } from './PageLayout';
 
 interface AirlineGuidePageProps {
   guide?: AirlineGuideItem;
@@ -42,13 +43,16 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
   const guide = propGuide || (slugMatch ? slugMatch.guide : getAirlineGuideBySlug(currentSlug)) || AIRLINE_GUIDES[0];
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = guide.title;
-      const canonicalTag = document.querySelector('link[rel="canonical"]');
-      if (canonicalTag) {
-        canonicalTag.setAttribute('href', `https://gateready.ca${guide.canonicalPath}`);
-      }
-      // Scroll to top
+    applySeoHead({
+      path: guide.canonicalPath,
+      title: guide.title,
+      description: guide.metaDescription,
+      keywords: guide.keywords,
+      heading: guide.h1,
+      subheading: `Published carry-on dimensions, weight limits, and baggage fees for ${guide.name} travelers.`,
+      schemaType: 'WebPage'
+    });
+    if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
   }, [guide]);
@@ -75,20 +79,25 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
         <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <a 
-              href="/airlines" 
+              href="/airlines/" 
               className="text-xs font-bold text-slate-600 hover:text-purple-600 flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>All 42 Airlines</span>
             </a>
             <span className="text-slate-300">|</span>
-            <a href="/" className="font-black text-base tracking-tight text-slate-900">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              title="GateReady – Return to homepage"
+              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               Gate<span className="text-purple-600">Ready</span>
             </a>
           </div>
           <div className="flex items-center gap-2">
             <a 
-              href="/baggage-fee-calculator" 
+              href="/baggage-fee-calculator/" 
               className="hidden md:inline-flex text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
               Fee Calculator
@@ -131,6 +140,16 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
 
       {/* Main Content Area */}
       <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
+        {/* Direct-Answer Summary */}
+        <section className="p-5 sm:p-6 rounded-3xl bg-white border border-purple-200 shadow-xs space-y-2">
+          <div className="text-[11px] font-black uppercase tracking-wider text-purple-700">
+            {guide.name} Baggage Policy Quick Answer
+          </div>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            {buildAirlineDirectSummary(guide)}
+          </p>
+        </section>
+
         {/* Quick Action Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-5 rounded-3xl bg-white border border-purple-100 shadow-xs hover:border-purple-300 transition-all flex flex-col justify-between">
@@ -521,18 +540,20 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
         {/* 5. Bottom Navigation / Directory link */}
         <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
           <a 
-            href="/airlines" 
+            href="/airlines/" 
             className="text-purple-700 hover:text-purple-900 underline flex items-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Browse All 42 Airline Baggage Guides</span>
           </a>
-          <div className="flex items-center gap-4 text-slate-500">
-            <a href="/baggage-fee-calculator" className="hover:text-purple-700">Fee Calculator</a>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-slate-500">
+            <a href="/baggage-fee-calculator/" className="hover:text-purple-700">Fee Calculator</a>
             <span>·</span>
-            <a href="/tare-weight" className="hover:text-purple-700">Tare Weight Guide</a>
+            <a href="/carry-on-checker" className="hover:text-purple-700">Carry-On Checker</a>
             <span>·</span>
-            <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements</a>
+            <a href="/tsa-liquids-checker" className="hover:text-purple-700">TSA Liquids Checker</a>
+            <span>·</span>
+            <a href="/packing-list-7-day" className="hover:text-purple-700">7-Day Packing List</a>
           </div>
         </div>
       </main>
@@ -547,8 +568,11 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
               <span className="text-slate-400">Smart Trip Packing & Baggage Limits</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-              <a href="/airlines" className="hover:text-purple-300">Airline Guides</a>
-              <a href="/baggage-fee-calculator" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/airlines/" className="hover:text-purple-300">Airline Guides</a>
+              <a href="/baggage-fee-calculator/" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/tsa-liquids-checker" className="hover:text-purple-300">TSA Liquids</a>
+              <a href="/carry-on-checker" className="hover:text-purple-300">Carry-On Checker</a>
+              <a href="/packing-list-7-day" className="hover:text-purple-300">7-Day Packing</a>
               <a href="/tare-weight" className="hover:text-purple-300">Tare Weight</a>
               <a href="/entry-requirements" className="hover:text-purple-300">Entry Rules</a>
               <a href="/pricing" className="hover:text-purple-300">Pricing</a>

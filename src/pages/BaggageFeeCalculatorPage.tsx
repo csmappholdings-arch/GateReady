@@ -5,8 +5,9 @@ import {
   BagFeeCalculationResult 
 } from '../data/baggageFeeData';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
-import { AIRLINE_GUIDES } from '../data/airlineGuidesData';
+import { AIRLINE_GUIDES, formatAirlineFee } from '../data/airlineGuidesData';
 import { SocialLinks } from '../components/SocialLinks';
+import { applySeoHead } from './PageLayout';
 import { 
   Receipt, 
   Calculator, 
@@ -132,8 +133,16 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
   }, [feeBearingBags]);
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = 'Baggage Fee Calculator — GateReady';
+    applySeoHead({
+      path: '/baggage-fee-calculator/',
+      title: 'Baggage Fee Calculator — GateReady',
+      description: "Estimate checked bag fees, carry-on charges, and fare-family luggage inclusions across 42 airlines with GateReady's standalone fee calculator.",
+      keywords: 'baggage fee calculator, airline luggage fees, calculate baggage fees by airline, overweight baggage cost, carry on fee calculator, fare families luggage',
+      heading: 'Airline Baggage Fee Calculator',
+      subheading: 'Instant baggage fee calculations across 42 airlines before heading to the airport.',
+      schemaType: 'WebApplication'
+    });
+    if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
   }, []);
@@ -160,13 +169,18 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
               ← Back to App
             </a>
             <span className="text-slate-300">|</span>
-            <a href="/" className="font-black text-base tracking-tight text-slate-900">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              title="GateReady – Return to homepage"
+              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               Gate<span className="text-purple-600">Ready</span>
             </a>
           </div>
           <div className="flex items-center gap-2">
             <a 
-              href="/airlines" 
+              href="/airlines/" 
               className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
               Airline Guides
@@ -215,7 +229,16 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
 
       {/* Main Interactive Baggage Fee Checker Tool */}
       <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
-        
+        {/* Direct-Answer Summary */}
+        <section className="p-5 sm:p-6 rounded-3xl bg-white border border-purple-200 shadow-xs space-y-2">
+          <div className="text-[11px] font-black uppercase tracking-wider text-purple-700">
+            Published Airline Fee Summary · Verified November 4, 2026
+          </div>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            Most legacy North American airlines charge $35–$45 for a 1st checked bag (prepaid savings of $5–$15 online vs. airport counter), enforce a 50 lb (23 kg) weight threshold on Economy tickets with $100–$150 flat overweight surcharges for 51–70 lbs, and require ultra-low-cost carriers (such as Spirit, Frontier, and Allegiant) or 40 lb ULCC tiers to pay extra for overhead carry-on bags. Figures below come from static published airline fee tables verified November 4, 2026—always confirm exact itinerary fees with your carrier at booking.
+          </p>
+        </section>
+
         {/* The Complete Standalone Baggage Fee Checker Card */}
         <div className="rounded-3xl bg-white border border-purple-200/90 shadow-lg overflow-hidden flex flex-col justify-between">
           <div>
@@ -507,15 +530,71 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
           </div>
         </section>
 
+        {/* Full 42-Airline Published Fee Table */}
+        <section className="bg-white rounded-3xl border border-purple-100 shadow-xs p-6 sm:p-8 space-y-4">
+          <div className="space-y-1 pb-2 border-b border-slate-100">
+            <h2 className="text-lg font-black text-slate-900">
+              All 42 Airlines Published Baggage Fee Reference Table
+            </h2>
+            <p className="text-xs text-slate-600">
+              Estimates from published airline tables verified November 4, 2026. Basic Economy, UltraBasic, and regional exceptions may change fees—confirm at booking.
+            </p>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
+                <tr>
+                  <th className="py-3 px-4">Airline</th>
+                  <th className="py-3 px-4">Carry-On Fee</th>
+                  <th className="py-3 px-4">1st Checked Bag</th>
+                  <th className="py-3 px-4">2nd Checked Bag</th>
+                  <th className="py-3 px-4">Overweight Surcharge (51–70 lbs)</th>
+                  <th className="py-3 px-4">Verified</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {AIRLINE_GUIDES.map((g) => (
+                  <tr key={g.id} className="hover:bg-purple-50/40 transition-colors">
+                    <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
+                      <a href={g.canonicalPath} className="hover:text-purple-700 underline">
+                        {g.name}
+                      </a>
+                    </td>
+                    <td className={`py-3 px-4 font-bold whitespace-nowrap ${g.fees.carryOnFee === 0 ? 'text-emerald-700' : 'text-amber-800'}`}>
+                      {g.fees.carryOnFee === 0 ? 'Free ($0)' : formatAirlineFee(g.fees.carryOnFee, g.fees.currencySymbol, g.fees.currency)}
+                    </td>
+                    <td className="py-3 px-4 font-bold whitespace-nowrap">
+                      {formatAirlineFee(g.fees.firstCheckedFee, g.fees.currencySymbol, g.fees.currency)}
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      {formatAirlineFee(g.fees.secondCheckedFee, g.fees.currencySymbol, g.fees.currency)}
+                    </td>
+                    <td className="py-3 px-4 text-rose-600 font-bold whitespace-nowrap">
+                      +{formatAirlineFee(g.fees.overweightFee51to70lbs, g.fees.currencySymbol, g.fees.currency)}
+                    </td>
+                    <td className="py-3 px-4 text-emerald-700 font-semibold whitespace-nowrap">
+                      {g.fees.lastVerified}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         {/* Cross-Link Directory Footer */}
         <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
-          <a href="/airlines" className="text-purple-700 hover:text-purple-900 underline flex items-center gap-1.5">
+          <a href="/airlines/" className="text-purple-700 hover:text-purple-900 underline flex items-center gap-1.5">
             <span>← Directory of all 42 Airline Allowance Guides</span>
           </a>
-          <div className="flex items-center gap-4 text-slate-500">
-            <a href="/tare-weight" className="hover:text-purple-700">What is Tare Weight?</a>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-slate-500">
+            <a href="/carry-on-checker" className="hover:text-purple-700">Carry-On Checker</a>
             <span>·</span>
-            <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements Quick-Check</a>
+            <a href="/tsa-liquids-checker" className="hover:text-purple-700">TSA Liquids Checker</a>
+            <span>·</span>
+            <a href="/packing-list-7-day" className="hover:text-purple-700">7-Day Packing List</a>
+            <span>·</span>
+            <a href="/tare-weight" className="hover:text-purple-700">Tare Weight Guide</a>
           </div>
         </div>
       </main>
@@ -530,8 +609,11 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
               <span className="text-slate-400">Smart Trip Packing & Baggage Limits</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-              <a href="/airlines" className="hover:text-purple-300">Airline Guides</a>
-              <a href="/baggage-fee-calculator" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/airlines/" className="hover:text-purple-300">Airline Guides</a>
+              <a href="/baggage-fee-calculator/" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/tsa-liquids-checker" className="hover:text-purple-300">TSA Liquids</a>
+              <a href="/carry-on-checker" className="hover:text-purple-300">Carry-On Checker</a>
+              <a href="/packing-list-7-day" className="hover:text-purple-300">7-Day Packing</a>
               <a href="/tare-weight" className="hover:text-purple-300">Tare Weight</a>
               <a href="/entry-requirements" className="hover:text-purple-300">Entry Rules</a>
               <a href="/pricing" className="hover:text-purple-300">Pricing</a>

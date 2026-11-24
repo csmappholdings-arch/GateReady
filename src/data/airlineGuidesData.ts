@@ -19,7 +19,40 @@ export interface AirlineGuideItem {
   h1: string;
 }
 
-export const AIRLINE_GUIDES: AirlineGuideItem[] = [
+export function formatAirlineFee(amount: number, currencySymbol: string, currency: string): string {
+  if (amount === 0) return 'Free ($0)';
+  if (currencySymbol.includes(currency)) return `${currencySymbol}${amount}`;
+  return `${currencySymbol}${amount} ${currency}`;
+}
+
+function extractCarryOnDimSnippet(carryOnLimit: string): string {
+  const dimMatch = carryOnLimit.match(/\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*(?:in|cm)/i);
+  if (dimMatch) return dimMatch[0].replace(/\s+/g, ' ').trim();
+  const linearMatch = carryOnLimit.match(/\d+(?:\.\d+)?\s*(?:linear\s*)?in(?:\s*\(\d+\s*cm\))?/i);
+  if (linearMatch) return `${linearMatch[0].trim()}`;
+  return carryOnLimit.split(',')[0].split('(')[0].trim();
+}
+
+export function buildAirlineDirectSummary(guide: AirlineGuideItem): string {
+  const { name, limits, fees } = guide;
+  const weightText = limits.carryOnWeightLimit
+    ? (limits.carryOnWeightLimit.toLowerCase().includes('no ')
+        ? 'has no fixed carry-on weight limit (bag must be lifted into the overhead bin unassisted)'
+        : `caps carry-on weight at ${limits.carryOnWeightLimit.split(';')[0].trim()}`)
+    : 'requires bags to fit gate sizers unassisted';
+  const personalText = limits.personalLimit.split(' - ')[0].trim();
+  const firstChecked = formatAirlineFee(fees.firstCheckedFee, fees.currencySymbol, fees.currency);
+  const overweightText = fees.currencySymbol.includes(fees.currency)
+    ? `${fees.currencySymbol}${fees.overweightFee51to70lbs}`
+    : `${fees.currencySymbol}${fees.overweightFee51to70lbs} ${fees.currency}`;
+  const carryOnFeeNote = fees.carryOnFee > 0
+    ? ` Standard overhead carry-on bags incur a ${formatAirlineFee(fees.carryOnFee, fees.currencySymbol, fees.currency)} fee on unbundled tickets.`
+    : '';
+
+  return `${name} permits carry-on bags up to ${limits.carryOnLimit} and ${weightText}.${carryOnFeeNote} Each passenger may also bring a free under-seat personal item (${personalText}). The standard 1st checked bag fee is ${firstChecked}, and checked bags weighing 51–70 lbs (24–32 kg) incur a ${overweightText} overweight surcharge. Verified ${fees.lastVerified}.`;
+}
+
+const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
   // ================= CANADA (5) =================
   {
     id: 'aircanada',
@@ -700,6 +733,19 @@ export const AIRLINE_GUIDES: AirlineGuideItem[] = [
     h1: 'Vietnam Airlines Baggage Allowance & Fee Guide'
   }
 ];
+
+export const AIRLINE_GUIDES: AirlineGuideItem[] = RAW_AIRLINE_GUIDES.map((guide) => {
+  const shortDim = extractCarryOnDimSnippet(guide.limits.carryOnLimit);
+  const firstBag = formatAirlineFee(
+    guide.fees.firstCheckedFee,
+    guide.fees.currencySymbol,
+    guide.fees.currency
+  );
+  return {
+    ...guide,
+    metaDescription: `${guide.name} baggage allowance and fees — carry-on ${shortDim}, first checked bag ${firstBag}. Verified ${guide.fees.lastVerified}.`
+  };
+});
 
 export function getAirlineGuideBySlug(slug: string): AirlineGuideItem | undefined {
   const cleanSlug = slug.toLowerCase().trim().replace(/^\/airlines\//, '').replace(/\/$/, '');

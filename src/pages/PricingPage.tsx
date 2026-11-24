@@ -44,9 +44,9 @@ export const PricingPage: React.FC = () => {
           <Sparkles className="w-3.5 h-3.5 text-purple-600" />
           <span>Simple, Honest Pricing · No Hidden Fees</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
           Transparent Plans for Every Type of Traveler
-        </h1>
+        </h2>
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
           Start 100% free with no credit card required. {TRIAL_TERMS_EXACT}
         </p>
@@ -144,9 +144,6 @@ export const PricingPage: React.FC = () => {
                   <span>{feat}</span>
                 </div>
               ))}
-            </div>
-            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold text-emerald-900 dark:text-emerald-200 leading-snug">
-              {FEE_MATH_STATEMENT}
             </div>
           </div>
           <button

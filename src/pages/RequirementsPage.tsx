@@ -6,11 +6,20 @@ import {
   Plane
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { applySeoHead } from './PageLayout';
 
 export const RequirementsPage: React.FC = () => {
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = 'Travel Requirements Hub — GateReady';
+    applySeoHead({
+      path: '/requirements',
+      title: 'Travel Requirements Hub — GateReady',
+      description: 'Look up published airline checked luggage fees and passport validity rules right now before creating a trip.',
+      keywords: 'travel requirements hub, baggage fee calculator, entry requirements quick-check, passport validity rules, 42 airlines baggage',
+      heading: 'Baggage Fees by Airline, Luggage Allowances & Entry Requirements',
+      subheading: 'Look up published airline checked luggage fees and passport validity rules right now before creating a trip.',
+      schemaType: 'CollectionPage'
+    });
+    if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
   }, []);
@@ -25,19 +34,24 @@ export const RequirementsPage: React.FC = () => {
               ← Back to App
             </a>
             <span className="text-slate-300">|</span>
-            <a href="/" className="font-black text-base tracking-tight text-slate-900">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              title="GateReady – Return to homepage"
+              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               Gate<span className="text-purple-600">Ready</span>
             </a>
           </div>
           <div className="flex items-center gap-2">
             <a 
-              href="/airlines" 
+              href="/airlines/" 
               className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
               Airline Guides
             </a>
             <a 
-              href="/baggage-fee-calculator" 
+              href="/baggage-fee-calculator/" 
               className="text-xs font-bold text-slate-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 transition-colors"
             >
               Fee Calculator
@@ -99,7 +113,7 @@ export const RequirementsPage: React.FC = () => {
 
             <div className="pt-6 mt-6 border-t border-purple-100">
               <a
-                href="/baggage-fee-calculator"
+                href="/baggage-fee-calculator/"
                 className="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm shadow-purple-600/20 transition-all cursor-pointer"
               >
                 <span>Open Baggage Fee Calculator</span>
@@ -158,8 +172,11 @@ export const RequirementsPage: React.FC = () => {
               <span className="text-slate-400">Smart Trip Packing & Baggage Limits</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-              <a href="/airlines" className="hover:text-purple-300">Airline Guides</a>
-              <a href="/baggage-fee-calculator" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/airlines/" className="hover:text-purple-300">Airline Guides</a>
+              <a href="/baggage-fee-calculator/" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/tsa-liquids-checker" className="hover:text-purple-300">TSA Liquids</a>
+              <a href="/carry-on-checker" className="hover:text-purple-300">Carry-On Checker</a>
+              <a href="/packing-list-7-day" className="hover:text-purple-300">7-Day Packing</a>
               <a href="/tare-weight" className="hover:text-purple-300">Tare Weight</a>
               <a href="/entry-requirements" className="hover:text-purple-300">Entry Rules</a>
               <a href="/pricing" className="hover:text-purple-300">Pricing</a>

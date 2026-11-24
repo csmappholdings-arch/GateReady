@@ -21,6 +21,7 @@ import { WalkthroughVideoModal } from './components/WalkthroughVideoModal';
 import { AccountSyncModal } from './components/AccountSyncModal';
 import { TransitNetworkHub } from './components/TransitNetworkHub';
 import { LandingHero } from './components/LandingHero';
+import { ProductShowcase } from './components/ProductShowcase';
 import { InteractiveTripPreview, TripPreviewConfig } from './components/InteractiveTripPreview';
 import { TravelDashboard } from './components/TravelDashboard';
 import { TripWorkspace, WorkspaceTab } from './components/TripWorkspace';
@@ -56,6 +57,10 @@ import { BaggageFeeCalculatorPage } from './pages/BaggageFeeCalculatorPage';
 import { TareWeightPage } from './pages/TareWeightPage';
 import { EntryRequirementsPage } from './pages/EntryRequirementsPage';
 import { RequirementsPage } from './pages/RequirementsPage';
+import { DemoPage } from './pages/DemoPage';
+import { TsaLiquidsCheckerPage } from './pages/TsaLiquidsCheckerPage';
+import { CarryOnCheckerPage } from './pages/CarryOnCheckerPage';
+import { PackingList7DayPage } from './pages/PackingList7DayPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -150,13 +155,49 @@ function PackingAppContent() {
   const [showSaveGateModal, setShowSaveGateModal] = useState(false);
 
   // Phase 2: Personalized Travel Dashboard & Workspace State
+  // Root path (/) MUST always render the public homepage, even for authenticated or returning users.
   const [appView, setAppView] = useState<'dashboard' | 'workspace' | 'home'>(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/\/+$/, '') || '/';
       if (p === '/dashboard') return 'dashboard';
     }
-    return trips.length > 0 ? 'dashboard' : 'home';
+    return 'home';
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncViewFromLocation = () => {
+      const p = window.location.pathname.replace(/\/+$/, '') || '/';
+      if (p === '/dashboard') {
+        setAppView('dashboard');
+      } else if (p === '/') {
+        setAppView('home');
+      }
+    };
+    window.addEventListener('popstate', syncViewFromLocation);
+    return () => window.removeEventListener('popstate', syncViewFromLocation);
+  }, []);
+
+  const handleGoHome = () => {
+    setAppView('home');
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname !== '/') {
+        try {
+          window.history.pushState({}, '', '/');
+        } catch {}
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleOpenDashboard = () => {
+    setAppView('dashboard');
+    if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
+      try {
+        window.history.pushState({}, '', '/dashboard');
+      } catch {}
+    }
+  };
   const [workspaceInitialTab, setWorkspaceInitialTab] = useState<WorkspaceTab>('Overview');
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showLuggageLibraryModal, setShowLuggageLibraryModal] = useState(false);
@@ -558,6 +599,7 @@ function PackingAppContent() {
       [defaultUser],
       {}
     );
+    handleOpenDashboard();
   };
 
   const handleContinueWithTwoBagsFree = (
@@ -587,6 +629,7 @@ function PackingAppContent() {
       setTripNotice({ tripId: createdTrip.id, message: leftOutNote });
     }
     setPendingCheckerConfig(null);
+    handleOpenDashboard();
   };
 
   const handlePlanTripFromChecker = (destinationCity: string) => {
@@ -625,14 +668,8 @@ function PackingAppContent() {
           setShowAccountModal(true);
         }}
         onOpenReferral={() => setShowReferralModal(true)}
-        onOpenDashboard={() => {
-          setAppView('dashboard');
-          if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
-            try {
-              window.history.pushState({}, '', '/dashboard');
-            } catch {}
-          }
-        }}
+        onOpenDashboard={handleOpenDashboard}
+        onGoHome={handleGoHome}
         onOpenNotifications={() => setShowNotificationsModal(true)}
         unreadNotificationsCount={notifications.filter((n) => !n.isRead).length}
         currentView={appView}
@@ -756,7 +793,7 @@ function PackingAppContent() {
           <TripWorkspace
             trip={currentTrip}
             initialTab={workspaceInitialTab}
-            onBackToDashboard={() => setAppView('dashboard')}
+            onBackToDashboard={handleOpenDashboard}
             onOpenAddBag={() => setShowAddBagModal(true)}
             onOpenAddItem={(bagId) => {
               setTargetBagId(bagId);
@@ -785,7 +822,7 @@ function PackingAppContent() {
             }}
             onOpenReferral={() => setShowReferralModal(true)}
           />
-        ) : appView === 'dashboard' || trips.length > 0 ? (
+        ) : appView === 'dashboard' ? (
           <TravelDashboard
             trips={trips}
             onOpenTripWorkspace={(trip, initialTab) => {
@@ -807,7 +844,7 @@ function PackingAppContent() {
           />
         ) : (
           <div className="flex flex-col">
-            {/* Conversion Marketing Hero (Above the trip creator) */}
+            {/* Conversion Marketing Hero (Above interactive product showcase) */}
             <LandingHero
               hasCreatedTrips={trips.some((t) => !t.isDemo && !t.id.startsWith('trip-demo-') && !t.name.includes('Paris & London'))}
               isPro={isPro}
@@ -824,6 +861,18 @@ function PackingAppContent() {
                 const el = document.getElementById('interactive-trip-preview');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
+            />
+
+            {/* Visual Product Demonstration Showcase (Visible immediately on public homepage) */}
+            <ProductShowcase
+              onStartTrip={() => handleOpenAddTrip()}
+              onExploreBaggage={() => {
+                const el = document.getElementById('interactive-trip-preview');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                else window.location.href = '/baggage-fee-calculator';
+              }}
+              onExplorePacking={handleLoadDemo}
+              onOpenPricing={() => openPaywall()}
             />
 
             {/* Interactive Trip Preview Tool (Prominent on homepage) */}
@@ -850,6 +899,7 @@ function PackingAppContent() {
           setShowAddTripModal(false);
           setEditingTripId(undefined);
         }}
+        onTripCreated={handleOpenDashboard}
         editingTripId={editingTripId}
         initialTripTitle={editingTripId && currentTrip ? currentTrip.name : undefined}
         initialTravelType={selectedTravelTypeForAdd}
@@ -1057,6 +1107,7 @@ export default function App() {
     );
   }
   if (pathname === '/how-it-works') return <HowItWorksPage />;
+  if (pathname === '/demo') return <DemoPage />;
   if (pathname === '/cookies') return <CookiesPage />;
   if (pathname === '/refunds') return <RefundsPage />;
   if (pathname === '/changelog') return <ChangelogPage />;
@@ -1073,13 +1124,16 @@ export default function App() {
   if (pathname === '/baggage-fee-calculator') return <BaggageFeeCalculatorPage />;
   if (pathname === '/fee-calculator' || pathname === '/fee-calculator/') {
     if (typeof window !== 'undefined') {
-      window.history.replaceState({}, '', '/baggage-fee-calculator');
+      window.history.replaceState({}, '', '/baggage-fee-calculator/');
     }
     return <BaggageFeeCalculatorPage />;
   }
   if (pathname === '/tare-weight') return <TareWeightPage />;
   if (pathname === '/entry-requirements') return <EntryRequirementsPage />;
   if (pathname === '/requirements') return <RequirementsPage />;
+  if (pathname === '/tsa-liquids-checker') return <TsaLiquidsCheckerPage />;
+  if (pathname === '/carry-on-checker') return <CarryOnCheckerPage />;
+  if (pathname === '/packing-list-7-day') return <PackingList7DayPage />;
   if (pathname === '/feedback' || pathname === '/feedback/') {
     if (typeof window !== 'undefined') {
       window.location.replace('/contact');

@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import { getPageHtmlContent } from './src/pages/serverPagesHtml';
 import { getAirlineGuideByAnySlug } from './src/data/airlineGuidesData';
-import { OFFICIAL_SAME_AS } from './src/data/socialLinks';
+import { buildStructuredDataGraph, getCanonicalUrl } from './src/pages/structuredData';
 
 dotenv.config();
 
@@ -195,9 +195,9 @@ app.get(['/feedback', '/feedback/'], (_req: Request, res: Response) => {
   return res.redirect(301, '/contact');
 });
 
-// 301 Permanent Redirect: /fee-calculator -> /baggage-fee-calculator
+// 301 Permanent Redirect: /fee-calculator -> /baggage-fee-calculator/
 app.get(['/fee-calculator', '/fee-calculator/'], (_req: Request, res: Response) => {
-  return res.redirect(301, '/baggage-fee-calculator');
+  return res.redirect(301, '/baggage-fee-calculator/');
 });
 
 // 301 Permanent Redirect: /airline-guides -> /airlines/
@@ -217,22 +217,40 @@ async function startServer() {
     });
   }
 
+  // Explicit route for llms.txt (plain text/markdown, never SPA fallback)
+  app.get('/llms.txt', (_req: Request, res: Response) => {
+    const publicLlmsPath = path.resolve(__dirname, 'public', 'llms.txt');
+    const distLlmsPath = path.resolve(__dirname, 'dist', 'llms.txt');
+    const llmsPath = fs.existsSync(publicLlmsPath) ? publicLlmsPath : distLlmsPath;
+    if (fs.existsSync(llmsPath)) {
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.sendFile(llmsPath);
+    }
+    res.status(404).type('text/plain').send('Not Found');
+  });
+
   // Explicit route for robots.txt
   app.get('/robots.txt', (_req: Request, res: Response) => {
-    const robotsPath = path.resolve(__dirname, 'public', 'robots.txt');
+    const publicRobotsPath = path.resolve(__dirname, 'public', 'robots.txt');
+    const distRobotsPath = path.resolve(__dirname, 'dist', 'robots.txt');
+    const robotsPath = fs.existsSync(publicRobotsPath) ? publicRobotsPath : distRobotsPath;
     if (fs.existsSync(robotsPath)) {
-      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
       return res.sendFile(robotsPath);
     }
-    res.setHeader('Content-Type', 'text/plain');
-    res.send("User-agent: *\nAllow: /\nSitemap: https://gateready.ca/sitemap.xml\n");
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.send(
+      'User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: ChatGPT-User\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: Claude-User\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: Perplexity-User\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nUser-agent: CCBot\nAllow: /\n\nUser-agent: Applebot-Extended\nAllow: /\n\nSitemap: https://gateready.ca/sitemap.xml\n'
+    );
   });
 
   // Explicit route for sitemap.xml
   app.get('/sitemap.xml', (_req: Request, res: Response) => {
-    const sitemapPath = path.resolve(__dirname, 'public', 'sitemap.xml');
+    const publicSitemapPath = path.resolve(__dirname, 'public', 'sitemap.xml');
+    const distSitemapPath = path.resolve(__dirname, 'dist', 'sitemap.xml');
+    const sitemapPath = fs.existsSync(publicSitemapPath) ? publicSitemapPath : distSitemapPath;
     if (fs.existsSync(sitemapPath)) {
-      res.setHeader('Content-Type', 'application/xml');
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
       return res.sendFile(sitemapPath);
     }
     res.status(404).send('Not Found');
@@ -295,9 +313,10 @@ async function startServer() {
         /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
         `<meta property="og:description" content="${meta.description}" />`
       );
+      const canonicalUrl = getCanonicalUrl(meta.path);
       template = template.replace(
         /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/,
-        `<meta property="og:url" content="https://gateready.ca${meta.path}" />`
+        `<meta property="og:url" content="${canonicalUrl}" />`
       );
       template = template.replace(
         /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/,
@@ -317,96 +336,33 @@ async function startServer() {
       );
       template = template.replace(
         /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
-        `<link rel="canonical" href="https://gateready.ca${meta.path}" />`
+        `<link rel="canonical" href="${canonicalUrl}" />`
       );
 
-      const isAirlineGuide = meta.path.startsWith('/airlines/');
+      const jsonLdScript = `<script id="gateready-jsonld" type="application/ld+json">${JSON.stringify(
+        buildStructuredDataGraph(meta)
+      )}</script>`;
+      if (/<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/.test(template)) {
+        template = template.replace(
+          /<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/,
+          `<!-- JSONLD_START -->\n    ${jsonLdScript}\n    <!-- JSONLD_END -->`
+        );
+      } else {
+        template = template.replace('</head>', `${jsonLdScript}\n  </head>`);
+      }
 
-      const breadcrumbItems = isAirlineGuide
-        ? [
-            {
-              '@type': 'ListItem',
-              'position': 1,
-              'name': 'Home',
-              'item': 'https://gateready.ca/'
-            },
-            {
-              '@type': 'ListItem',
-              'position': 2,
-              'name': 'Airline Baggage Guides',
-              'item': 'https://gateready.ca/airlines'
-            },
-            {
-              '@type': 'ListItem',
-              'position': 3,
-              'name': meta.heading,
-              'item': `https://gateready.ca${meta.path}`
-            }
-          ]
-        : [
-            {
-              '@type': 'ListItem',
-              'position': 1,
-              'name': 'Home',
-              'item': 'https://gateready.ca/'
-            },
-            {
-              '@type': 'ListItem',
-              'position': 2,
-              'name': meta.heading,
-              'item': `https://gateready.ca${meta.path}`
-            }
-          ];
-
-      // Inject page-specific JSON-LD structured data for rich snippets
-      const isHomepage = meta.path === '/';
-      const pageStructuredData = {
-        '@context': 'https://schema.org',
-        '@type': isHomepage ? 'SoftwareApplication' : (meta.schemaType || 'WebPage'),
-        'name': meta.title,
-        'headline': meta.heading,
-        'description': meta.description,
-        'keywords': meta.keywords,
-        'url': `https://gateready.ca${meta.path}`,
-        ...(isHomepage
-          ? {
-              'applicationCategory': 'TravelApplication',
-              'operatingSystem': 'All',
-              'sameAs': OFFICIAL_SAME_AS,
-              'offers': {
-                '@type': 'Offer',
-                'price': '0',
-                'priceCurrency': 'USD'
-              }
-            }
-          : {}),
-        'publisher': {
-          '@type': 'Organization',
-          'name': 'CSM App Holdings',
-          'url': 'https://gateready.ca',
-          'sameAs': OFFICIAL_SAME_AS,
-          'contactPoint': {
-            '@type': 'ContactPoint',
-            'email': 'csmappholdings@gmail.com',
-            'contactType': 'customer support'
-          }
-        },
-        'breadcrumb': {
-          '@type': 'BreadcrumbList',
-          'itemListElement': breadcrumbItems
-        }
-      };
-
-      template = template.replace(
-        '</head>',
-        `<script type="application/ld+json">${JSON.stringify(pageStructuredData)}</script>\n  </head>`
-      );
-
-      // Inject pre-rendered semantic HTML inside #root
-      template = template.replace(
-        /<div id="root">[\s\S]*?<\/div>/,
-        `<div id="root">${bodyHtml}</div>`
-      );
+      // Inject pre-rendered semantic HTML inside #root while preserving markers
+      if (/<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/.test(template)) {
+        template = template.replace(
+          /<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/,
+          `<!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END -->`
+        );
+      } else {
+        template = template.replace(
+          /<div id="root">[\s\S]*?<\/div>/,
+          `<div id="root"><!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END --></div>`
+        );
+      }
 
       if (!isProduction && viteDevServer) {
         template = await viteDevServer.transformIndexHtml(req.originalUrl, template);

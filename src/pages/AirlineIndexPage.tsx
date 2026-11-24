@@ -12,14 +12,23 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { applySeoHead } from './PageLayout';
 
 export const AirlineIndexPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState<'ALL' | 'Canada' | 'USA' | 'Europe' | 'Asia'>('ALL');
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = 'Airline Baggage Allowance Guides (42 Airlines) – GateReady';
+    applySeoHead({
+      path: '/airlines/',
+      title: 'Airline Baggage Allowance Guides (42 Airlines) – GateReady',
+      description: 'Published carry-on dimensions, weight limits, and checked luggage fee tables for all 42 major airlines across Canada, the US, Europe, and Asia.',
+      keywords: 'airline baggage allowance, carry on dimensions by airline, checked baggage fees by airline, airline baggage limits 2026, luggage scale',
+      heading: 'Airline Baggage Allowance & Fee Directory',
+      subheading: 'Published carry-on sizers, weight caps, and baggage fees for 42 global airlines.',
+      schemaType: 'CollectionPage'
+    });
+    if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
   }, []);
@@ -47,13 +56,18 @@ export const AirlineIndexPage: React.FC = () => {
               ← Back to App
             </a>
             <span className="text-slate-300">|</span>
-            <a href="/" className="font-black text-base tracking-tight text-slate-900">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              title="GateReady – Return to homepage"
+              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               Gate<span className="text-purple-600">Ready</span>
             </a>
           </div>
           <div className="flex items-center gap-2">
             <a 
-              href="/baggage-fee-calculator" 
+              href="/baggage-fee-calculator/" 
               className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
               Fee Calculator
@@ -120,6 +134,16 @@ export const AirlineIndexPage: React.FC = () => {
 
       {/* Directory Grid */}
       <main className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+        {/* Direct-Answer Summary */}
+        <section className="p-5 sm:p-6 rounded-3xl bg-white border border-purple-200 shadow-xs mb-8 space-y-2">
+          <div className="text-[11px] font-black uppercase tracking-wider text-purple-700">
+            42-Airline Allowance Overview · Verified November 4, 2026
+          </div>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            GateReady indexes published carry-on sizer dimensions, weight limits, and checked bag fees for 42 airlines across Canada (5 carriers), the United States (11 carriers), Europe (13 carriers), and Asia-Pacific &amp; the Middle East (13 carriers). Most US and Canadian legacy airlines allow carry-on bags with no strict weight limit as long as you can lift them overhead unassisted, whereas European and Asia-Pacific carriers enforce 15.4 to 22 lb (7–10 kg) cabin caps and Basic or UltraBasic fares restrict travelers to a free personal item only. All published figures were verified November 4, 2026—confirm fare-specific exceptions with your carrier at booking.
+          </p>
+        </section>
+
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-700">
             Showing {filteredAirlines.length} of 42 Airlines
@@ -225,8 +249,17 @@ export const AirlineIndexPage: React.FC = () => {
             Airlines enforce different sizer dimensions and weight allowances at every departure gate. GateReady actively tracks published limits across North America, Europe, Asia, and Oceania. All figures are verified directly from published airline fee schedules.
           </p>
           <div className="flex flex-wrap gap-4 pt-2 text-xs font-bold">
-            <a href="/baggage-fee-calculator" className="text-purple-600 hover:underline">
+            <a href="/baggage-fee-calculator/" className="text-purple-600 hover:underline">
               → Interactive Baggage Fee Calculator
+            </a>
+            <a href="/carry-on-checker" className="text-purple-600 hover:underline">
+              → Carry-On Size &amp; Weight Checker
+            </a>
+            <a href="/tsa-liquids-checker" className="text-purple-600 hover:underline">
+              → TSA 3-1-1 Liquids Checker
+            </a>
+            <a href="/packing-list-7-day" className="text-purple-600 hover:underline">
+              → 7-Day Carry-On Packing List
             </a>
             <a href="/tare-weight" className="text-purple-600 hover:underline">
               → Suitcase Tare Weight Explainer
@@ -248,8 +281,11 @@ export const AirlineIndexPage: React.FC = () => {
               <span className="text-slate-400">Smart Trip Packing & Baggage Limits</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-              <a href="/airlines" className="hover:text-purple-300">Airline Guides</a>
-              <a href="/baggage-fee-calculator" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/airlines/" className="hover:text-purple-300">Airline Guides</a>
+              <a href="/baggage-fee-calculator/" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/tsa-liquids-checker" className="hover:text-purple-300">TSA Liquids</a>
+              <a href="/carry-on-checker" className="hover:text-purple-300">Carry-On Checker</a>
+              <a href="/packing-list-7-day" className="hover:text-purple-300">7-Day Packing</a>
               <a href="/tare-weight" className="hover:text-purple-300">Tare Weight</a>
               <a href="/entry-requirements" className="hover:text-purple-300">Entry Rules</a>
               <a href="/pricing" className="hover:text-purple-300">Pricing</a>

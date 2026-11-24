@@ -14,6 +14,48 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Nov 24, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 24, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">AI Search Discoverability, Structured Data, Answer-Ready Carrier Summaries &amp; Intent Guides</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <FileText className="w-4 h-4 text-purple-600" />
+              <span>Machine-Readable /llms.txt, AI Crawler Allowance &amp; Unified JSON-LD</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Published a plain markdown index at /llms.txt, opened /robots.txt explicitly to major AI search crawlers, standardized unified Organization/WebSite/SoftwareApplication/FAQPage/BreadcrumbList JSON-LD graphs, synchronized trailing-slash canonical URLs with sitemap.xml, and deduplicated the /pricing Silver callout.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-600" />
+              <span>Direct-Answer Airline Summaries &amp; Full 42-Airline Calculator Table</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Added concise plain-text direct-answer summaries directly beneath H1 headings on all 42 airline baggage guides, /airlines/, and /baggage-fee-calculator/, expanded the pre-rendered calculator fee table to include all 42 airlines verified November 4, 2026, and standardized airline meta descriptions.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Three Dedicated Intent Guides (/tsa-liquids-checker, /carry-on-checker, /packing-list-7-day)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Launched pre-rendered, FAQPage-annotated guides for TSA 3-1-1 &amp; Canadian CATSA liquid rules, airline carry-on gate sizer &amp; weight cap comparisons, and a 7-day 5-4-3-2-1 carry-on capsule packing weight matrix.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Nov 23, 2026 (Maintenance & Polish) */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">

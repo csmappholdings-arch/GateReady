@@ -13,11 +13,20 @@ import {
   Plane
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { applySeoHead } from './PageLayout';
 
 export const TareWeightPage: React.FC = () => {
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = 'What is Tare Weight? Empty Suitcase Weight Guide – GateReady';
+    applySeoHead({
+      path: '/tare-weight',
+      title: 'What is Tare Weight? Empty Suitcase Weight Guide – GateReady',
+      description: 'Learn what luggage tare weight is, why empty suitcases consume up to 21% of checked baggage allowances (or 32% of carry-on caps), and how GateReady stops overweight fees.',
+      keywords: 'what is tare weight, luggage tare weight, empty suitcase weight, baggage weight scale, overweight luggage fee prevention',
+      heading: 'What is Tare Weight in Luggage & Travel?',
+      subheading: 'Why your empty suitcase consumes up to 21% of checked allowances (or 32% of carry-on caps).',
+      schemaType: 'Article'
+    });
+    if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
   }, []);
@@ -32,13 +41,18 @@ export const TareWeightPage: React.FC = () => {
               ← Back to App
             </a>
             <span className="text-slate-300">|</span>
-            <a href="/" className="font-black text-base tracking-tight text-slate-900">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              title="GateReady – Return to homepage"
+              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               Gate<span className="text-purple-600">Ready</span>
             </a>
           </div>
           <div className="flex items-center gap-2">
             <a 
-              href="/baggage-fee-calculator" 
+              href="/baggage-fee-calculator/" 
               className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
               Fee Calculator
@@ -209,7 +223,7 @@ export const TareWeightPage: React.FC = () => {
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
             <a
-              href="/baggage-fee-calculator"
+              href="/baggage-fee-calculator/"
               className="w-full sm:w-auto h-11 px-6 rounded-2xl bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-xs flex items-center justify-center gap-2 border border-purple-200"
             >
               <Calculator className="w-3.5 h-3.5" />
@@ -259,11 +273,15 @@ export const TareWeightPage: React.FC = () => {
 
         {/* Cross links */}
         <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
-          <a href="/airlines" className="text-purple-700 hover:text-purple-900 underline flex items-center gap-1.5">
+          <a href="/airlines/" className="text-purple-700 hover:text-purple-900 underline flex items-center gap-1.5">
             <span>← Directory of all 42 Airline Allowance Guides</span>
           </a>
-          <div className="flex items-center gap-4 text-slate-500">
-            <a href="/baggage-fee-calculator" className="hover:text-purple-700">Fee Calculator</a>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-slate-500">
+            <a href="/baggage-fee-calculator/" className="hover:text-purple-700">Fee Calculator</a>
+            <span>·</span>
+            <a href="/carry-on-checker" className="hover:text-purple-700">Carry-On Checker</a>
+            <span>·</span>
+            <a href="/packing-list-7-day" className="hover:text-purple-700">7-Day Packing List</a>
             <span>·</span>
             <a href="/entry-requirements" className="hover:text-purple-700">Entry Requirements</a>
           </div>
@@ -280,8 +298,11 @@ export const TareWeightPage: React.FC = () => {
               <span className="text-slate-400">Smart Trip Packing & Baggage Limits</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
-              <a href="/airlines" className="hover:text-purple-300">Airline Guides</a>
-              <a href="/baggage-fee-calculator" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/airlines/" className="hover:text-purple-300">Airline Guides</a>
+              <a href="/baggage-fee-calculator/" className="hover:text-purple-300">Fee Calculator</a>
+              <a href="/tsa-liquids-checker" className="hover:text-purple-300">TSA Liquids</a>
+              <a href="/carry-on-checker" className="hover:text-purple-300">Carry-On Checker</a>
+              <a href="/packing-list-7-day" className="hover:text-purple-300">7-Day Packing</a>
               <a href="/tare-weight" className="hover:text-purple-300">Tare Weight</a>
               <a href="/entry-requirements" className="hover:text-purple-300">Entry Rules</a>
               <a href="/pricing" className="hover:text-purple-300">Pricing</a>

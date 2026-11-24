@@ -27,7 +27,11 @@ export const AppFooter: React.FC<AppFooterProps> = ({
         {/* Top: Brand info & Mission */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4 border-b border-purple-100/70 dark:border-slate-800/80">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
-            <a href="/" className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               <span className="font-black text-sm text-slate-900 dark:text-white">
                 Gate<span className="text-purple-600 dark:text-purple-400">Ready</span>.ca
               </span>
@@ -83,13 +87,28 @@ export const AppFooter: React.FC<AppFooterProps> = ({
             </h3>
             <ul className="space-y-1.5 font-medium text-slate-600 dark:text-slate-300 text-[11px] sm:text-xs">
               <li>
-                <a href="/airlines" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                <a href="/airlines/" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                   Airline Baggage Guides
                 </a>
               </li>
               <li>
-                <a href="/baggage-fee-calculator" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                <a href="/baggage-fee-calculator/" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                   Baggage Fee Calculator
+                </a>
+              </li>
+              <li>
+                <a href="/tsa-liquids-checker" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  TSA 3-1-1 Liquids Checker
+                </a>
+              </li>
+              <li>
+                <a href="/carry-on-checker" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Carry-On Size Checker
+                </a>
+              </li>
+              <li>
+                <a href="/packing-list-7-day" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  7-Day Packing List
                 </a>
               </li>
               <li>
@@ -137,6 +156,11 @@ export const AppFooter: React.FC<AppFooterProps> = ({
               <li>
                 <a href="/how-it-works" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                   How It Works
+                </a>
+              </li>
+              <li>
+                <a href="/demo" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  Interactive Demo
                 </a>
               </li>
               <li>

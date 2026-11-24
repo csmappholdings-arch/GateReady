@@ -23,6 +23,15 @@ export const HowItWorksPage: React.FC = () => {
         <p className="text-base text-slate-600 dark:text-slate-300">
           GateReady bridges the gap between packing at home and the airport ticket counter. Here is how our step-by-step workflow eliminates overweight luggage fees and security delays.
         </p>
+        <div>
+          <a
+            href="/demo"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 px-4 py-2 rounded-xl transition-colors"
+          >
+            <span>Explore the Interactive Product Walkthrough</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </section>
 
       {/* 5 Steps */}
@@ -215,6 +224,30 @@ export const HowItWorksPage: React.FC = () => {
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
           GateReady is a modeling and packing checklist tool. Luggage weights are calculated from tare baselines and item benchmarks. Always verify weight on a calibrated home scale if packing dense or unusual goods, and check with your carrier for seat-tier specific allowances.
         </p>
+      </section>
+
+      {/* Related Guides */}
+      <section className="p-5 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/60 space-y-3">
+        <div className="font-black text-slate-900 dark:text-white text-xs uppercase tracking-wider">
+          Explore GateReady Planning Guides &amp; Checkers
+        </div>
+        <div className="flex flex-wrap gap-2.5 text-xs font-bold">
+          <a href="/airlines/" className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100">
+            42 Airline Baggage Guides →
+          </a>
+          <a href="/baggage-fee-calculator/" className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100">
+            Baggage Fee Calculator →
+          </a>
+          <a href="/tsa-liquids-checker" className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100">
+            TSA 3-1-1 Liquids Checker →
+          </a>
+          <a href="/carry-on-checker" className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100">
+            Carry-On Size &amp; Weight Checker →
+          </a>
+          <a href="/packing-list-7-day" className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100">
+            7-Day 5-4-3-2-1 Packing List →
+          </a>
+        </div>
       </section>
 
       {/* CTA */}

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { STATIC_PAGES } from '../src/pages/pageMetadata';
 import { AIRLINE_GUIDES } from '../src/data/airlineGuidesData';
 import { getPageHtmlContent } from '../src/pages/serverPagesHtml';
-import { OFFICIAL_SAME_AS } from '../src/data/socialLinks';
+import { buildStructuredDataGraph, getCanonicalUrl } from '../src/pages/structuredData';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,16 +19,16 @@ async function prerender() {
 
   const baseHtml = fs.readFileSync(baseIndexPath, 'utf-8');
 
-  // Collect all static routes
+  // Collect all static routes (matches sitemap.xml canonical paths)
   const routes: string[] = [
     // Homepage
     '/',
-    // 12 Informational pages
+    // Static content & intent pages (includes /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day)
     ...Object.keys(STATIC_PAGES),
     // Directory index
-    '/airlines',
-    // 4 Intent hubs
-    '/baggage-fee-calculator',
+    '/airlines/',
+    // Additional intent hubs
+    '/baggage-fee-calculator/',
     '/tare-weight',
     '/entry-requirements',
     '/requirements',
@@ -56,76 +56,42 @@ async function prerender() {
     html = html.replace(/<meta\s+name="keywords"\s+content=".*?"\s*\/?>/, `<meta name="keywords" content="${meta.keywords}" />`);
     html = html.replace(/<meta\s+property="og:title"\s+content=".*?"\s*\/?>/, `<meta property="og:title" content="${meta.title}" />`);
     html = html.replace(/<meta\s+property="og:description"\s+content=".*?"\s*\/?>/, `<meta property="og:description" content="${meta.description}" />`);
-    html = html.replace(/<meta\s+property="og:url"\s+content=".*?"\s*\/?>/, `<meta property="og:url" content="https://gateready.ca${meta.path}" />`);
+    const canonicalUrl = getCanonicalUrl(meta.path);
+    html = html.replace(/<meta\s+property="og:url"\s+content=".*?"\s*\/?>/, `<meta property="og:url" content="${canonicalUrl}" />`);
     html = html.replace(/<meta\s+property="og:image"\s+content=".*?"\s*\/?>/, `<meta property="og:image" content="https://gateready.ca/thumbnail.jpg" />`);
     html = html.replace(/<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/, `<meta name="twitter:title" content="${meta.title}" />`);
     html = html.replace(/<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/, `<meta name="twitter:description" content="${meta.description}" />`);
     html = html.replace(/<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/, `<meta name="twitter:image" content="https://gateready.ca/thumbnail.jpg" />`);
-    html = html.replace(/<link\s+rel="canonical"\s+href=".*?"\s*\/?>/, `<link rel="canonical" href="https://gateready.ca${meta.path}" />`);
+    html = html.replace(/<link\s+rel="canonical"\s+href=".*?"\s*\/?>/, `<link rel="canonical" href="${canonicalUrl}" />`);
 
-    const isAirlineGuide = meta.path.startsWith('/airlines/');
-    const breadcrumbItems = isAirlineGuide
-      ? [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://gateready.ca/' },
-          { '@type': 'ListItem', position: 2, name: 'Airline Baggage Guides', item: 'https://gateready.ca/airlines' },
-          { '@type': 'ListItem', position: 3, name: meta.heading, item: `https://gateready.ca${meta.path}` }
-        ]
-      : [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://gateready.ca/' },
-          { '@type': 'ListItem', position: 2, name: meta.heading, item: `https://gateready.ca${meta.path}` }
-        ];
+    const jsonLdScript = `<script id="gateready-jsonld" type="application/ld+json">${JSON.stringify(
+      buildStructuredDataGraph(meta)
+    )}</script>`;
+    if (/<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/.test(html)) {
+      html = html.replace(
+        /<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/,
+        `<!-- JSONLD_START -->\n    ${jsonLdScript}\n    <!-- JSONLD_END -->`
+      );
+    } else {
+      html = html.replace('</head>', `${jsonLdScript}\n  </head>`);
+    }
 
-    const isHomepage = meta.path === '/';
-    const structuredData = {
-      '@context': 'https://schema.org',
-      '@type': isHomepage ? 'SoftwareApplication' : (meta.schemaType || 'WebPage'),
-      name: meta.title,
-      headline: meta.heading,
-      description: meta.description,
-      keywords: meta.keywords,
-      url: `https://gateready.ca${meta.path}`,
-      ...(isHomepage
-        ? {
-            applicationCategory: 'TravelApplication',
-            operatingSystem: 'All',
-            sameAs: OFFICIAL_SAME_AS,
-            offers: {
-              '@type': 'Offer',
-              price: '0',
-              priceCurrency: 'USD'
-            }
-          }
-        : {}),
-      publisher: {
-        '@type': 'Organization',
-        name: 'CSM App Holdings',
-        url: 'https://gateready.ca',
-        sameAs: OFFICIAL_SAME_AS,
-        contactPoint: {
-          '@type': 'ContactPoint',
-          email: 'csmappholdings@gmail.com',
-          contactType: 'customer support'
-        }
-      },
-      breadcrumb: {
-        '@type': 'BreadcrumbList',
-        itemListElement: breadcrumbItems
-      }
-    };
-
-    html = html.replace(
-      '</head>',
-      `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>\n  </head>`
-    );
-
-    // Inject semantic body content into #root
-    html = html.replace(
-      /<div id="root">[\s\S]*?<\/div>/,
-      `<div id="root">${bodyHtml}</div>`
-    );
+    // Inject semantic body content into #root while keeping markers intact
+    if (/<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/.test(html)) {
+      html = html.replace(
+        /<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/,
+        `<!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END -->`
+      );
+    } else {
+      html = html.replace(
+        /<div id="root">[\s\S]*?<\/div>/,
+        `<div id="root"><!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END --></div>`
+      );
+    }
 
     // Determine target directory and write index.html
-    const targetDir = path.join(distDir, route.replace(/^\//, ''));
+    const cleanRouteDir = route.replace(/^\/|\/$/g, '');
+    const targetDir = cleanRouteDir ? path.join(distDir, cleanRouteDir) : distDir;
     fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(path.join(targetDir, 'index.html'), html, 'utf-8');
     successCount++;
@@ -171,7 +137,7 @@ async function prerender() {
 </html>`;
   fs.writeFileSync(path.join(feedbackDir, 'index.html'), feedbackRedirectHtml, 'utf-8');
 
-  // Generate static redirect for /fee-calculator -> /baggage-fee-calculator
+  // Generate static redirect for /fee-calculator -> /baggage-fee-calculator/
   const feeCalcDir = path.join(distDir, 'fee-calculator');
   fs.mkdirSync(feeCalcDir, { recursive: true });
   const feeCalcRedirectHtml = `<!DOCTYPE html>
@@ -179,12 +145,12 @@ async function prerender() {
 <head>
   <meta charset="UTF-8">
   <title>Redirecting to Baggage Fee Calculator – GateReady</title>
-  <meta http-equiv="refresh" content="0; url=https://gateready.ca/baggage-fee-calculator">
-  <link rel="canonical" href="https://gateready.ca/baggage-fee-calculator">
-  <script>window.location.replace("https://gateready.ca/baggage-fee-calculator");</script>
+  <meta http-equiv="refresh" content="0; url=https://gateready.ca/baggage-fee-calculator/">
+  <link rel="canonical" href="https://gateready.ca/baggage-fee-calculator/">
+  <script>window.location.replace("https://gateready.ca/baggage-fee-calculator/");</script>
 </head>
 <body>
-  <p>Redirecting to <a href="https://gateready.ca/baggage-fee-calculator">Baggage Fee Calculator</a>...</p>
+  <p>Redirecting to <a href="https://gateready.ca/baggage-fee-calculator/">Baggage Fee Calculator</a>...</p>
 </body>
 </html>`;
   fs.writeFileSync(path.join(feeCalcDir, 'index.html'), feeCalcRedirectHtml, 'utf-8');

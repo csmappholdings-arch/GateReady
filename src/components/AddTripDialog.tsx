@@ -48,6 +48,7 @@ import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
 interface AddTripDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  onTripCreated?: () => void;
   editingTripId?: string;
   initialTripTitle?: string;
   initialTravelType?: TravelType;
@@ -76,6 +77,7 @@ interface AddTripDialogProps {
 export const AddTripDialog: React.FC<AddTripDialogProps> = ({ 
   isOpen, 
   onClose, 
+  onTripCreated,
   editingTripId,
   initialTripTitle,
   initialTravelType, 
@@ -643,6 +645,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     });
 
     onClose();
+    if (onTripCreated) {
+      onTripCreated();
+    }
   };
 
   // Dynamic wording depending on selected travel mode

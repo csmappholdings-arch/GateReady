@@ -1,107 +1,88 @@
 import React, { useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Plane, Luggage } from 'lucide-react';
 import { AppFooter } from '../components/AppFooter';
-import { STATIC_PAGES } from './pageMetadata';
-import { OFFICIAL_SAME_AS } from '../data/socialLinks';
+import { STATIC_PAGES, StaticPageMeta } from './pageMetadata';
+import { buildStructuredDataGraph, getCanonicalUrl } from './structuredData';
+
+export function applySeoHead(meta: Pick<StaticPageMeta, 'path' | 'title' | 'description' | 'keywords' | 'heading' | 'subheading' | 'schemaType'>) {
+  if (typeof document === 'undefined') return;
+  const canonicalUrl = getCanonicalUrl(meta.path);
+
+  document.title = meta.title;
+
+  const setMetaTag = (attrName: string, attrVal: string, content: string) => {
+    let el = document.querySelector(`meta[${attrName}="${attrVal}"]`);
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute(attrName, attrVal);
+      document.head.appendChild(el);
+    }
+    el.setAttribute('content', content);
+  };
+
+  setMetaTag('name', 'description', meta.description);
+  setMetaTag('name', 'keywords', meta.keywords || 'GateReady, baggage fees, travel packing');
+  setMetaTag('property', 'og:title', meta.title);
+  setMetaTag('property', 'og:description', meta.description);
+  setMetaTag('property', 'og:url', canonicalUrl);
+  setMetaTag('name', 'twitter:title', meta.title);
+  setMetaTag('name', 'twitter:description', meta.description);
+
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonical);
+  }
+  canonical.setAttribute('href', canonicalUrl);
+
+  let jsonLdScript = document.getElementById('gateready-jsonld') as HTMLScriptElement | null;
+  if (!jsonLdScript) {
+    jsonLdScript = document.querySelector('script[type="application/ld+json"]') as HTMLScriptElement | null;
+    if (jsonLdScript) {
+      jsonLdScript.id = 'gateready-jsonld';
+    } else {
+      jsonLdScript = document.createElement('script');
+      jsonLdScript.id = 'gateready-jsonld';
+      jsonLdScript.type = 'application/ld+json';
+      document.head.appendChild(jsonLdScript);
+    }
+  }
+  jsonLdScript.textContent = JSON.stringify(
+    buildStructuredDataGraph({
+      path: meta.path,
+      title: meta.title,
+      description: meta.description,
+      keywords: meta.keywords,
+      heading: meta.heading,
+      subheading: meta.subheading,
+      schemaType: meta.schemaType
+    })
+  );
+}
 
 interface PageLayoutProps {
   pathname: string;
   children: React.ReactNode;
+  fullWidthContent?: boolean;
 }
 
-export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children }) => {
+export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children, fullWidthContent = false }) => {
   const meta = STATIC_PAGES[pathname] || {
+    path: pathname,
     title: 'GateReady – Smart Trip Packing & Luggage Limit App',
     description: 'Smart trip packing checklist, calibrated luggage weight scale, and airline baggage allowance guide.',
+    keywords: 'GateReady, baggage fees, travel packing',
     heading: 'GateReady Information',
     subheading: 'Travel smart with verified baggage limits and tare-deducted packing.'
   };
 
   useEffect(() => {
-    document.title = meta.title;
-
-    // Helper to safely set or create meta tags
-    const setMetaTag = (attrName: string, attrVal: string, content: string) => {
-      let el = document.querySelector(`meta[${attrName}="${attrVal}"]`);
-      if (!el) {
-        el = document.createElement('meta');
-        el.setAttribute(attrName, attrVal);
-        document.head.appendChild(el);
-      }
-      el.setAttribute('content', content);
-    };
-
-    setMetaTag('name', 'description', meta.description);
-    setMetaTag('name', 'keywords', meta.keywords || 'GateReady, baggage fees, travel packing');
-    setMetaTag('property', 'og:title', meta.title);
-    setMetaTag('property', 'og:description', meta.description);
-    setMetaTag('property', 'og:url', `https://gateready.ca${meta.path || pathname}`);
-    setMetaTag('name', 'twitter:title', meta.title);
-    setMetaTag('name', 'twitter:description', meta.description);
-
-    // Canonical link
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', `https://gateready.ca${meta.path || pathname}`);
-
-    // Dynamic JSON-LD structured data
-    let jsonLdScript = document.getElementById('page-jsonld') as HTMLScriptElement | null;
-    if (!jsonLdScript) {
-      jsonLdScript = document.createElement('script');
-      jsonLdScript.id = 'page-jsonld';
-      jsonLdScript.type = 'application/ld+json';
-      document.head.appendChild(jsonLdScript);
-    }
-
-    const structuredData = {
-      '@context': 'https://schema.org',
-      '@type': meta.schemaType || 'WebPage',
-      'name': meta.title,
-      'headline': meta.heading,
-      'description': meta.description,
-      'url': `https://gateready.ca${meta.path || pathname}`,
-      'publisher': {
-        '@type': 'Organization',
-        'name': 'CSM App Holdings',
-        'url': 'https://gateready.ca',
-        'sameAs': OFFICIAL_SAME_AS,
-        'contactPoint': {
-          '@type': 'ContactPoint',
-          'email': 'csmappholdings@gmail.com',
-          'contactType': 'customer support'
-        }
-      },
-      'breadcrumb': {
-        '@type': 'BreadcrumbList',
-        'itemListElement': [
-          {
-            '@type': 'ListItem',
-            'position': 1,
-            'name': 'Home',
-            'item': 'https://gateready.ca/'
-          },
-          {
-            '@type': 'ListItem',
-            'position': 2,
-            'name': meta.heading,
-            'item': `https://gateready.ca${meta.path || pathname}`
-          }
-        ]
-      }
-    };
-    jsonLdScript.textContent = JSON.stringify(structuredData);
-
+    applySeoHead({
+      ...meta,
+      path: meta.path || pathname
+    });
     window.scrollTo(0, 0);
-
-    return () => {
-      // Cleanup page-specific JSON-LD when unmounting
-      const el = document.getElementById('page-jsonld');
-      if (el) el.remove();
-    };
   }, [meta, pathname]);
 
   return (
@@ -118,7 +99,12 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children }) =>
               <span>Back to App</span>
             </a>
             <span className="text-slate-300 dark:text-slate-700">|</span>
-            <a href="/" className="flex items-center gap-2">
+            <a
+              href="/"
+              aria-label="GateReady – Return to homepage"
+              title="GateReady – Return to homepage"
+              className="flex items-center gap-2 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-700 via-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
                 <Luggage className="w-4 h-4" />
               </div>
@@ -163,10 +149,14 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children }) =>
       </section>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <article className="bg-white dark:bg-slate-900 rounded-3xl border border-purple-100 dark:border-slate-800 shadow-sm p-6 sm:p-10 space-y-8 text-slate-700 dark:text-slate-300 leading-relaxed text-sm">
-          {children}
-        </article>
+      <main className={`flex-1 w-full mx-auto ${fullWidthContent ? 'max-w-[1600px] py-4 sm:py-6' : 'max-w-4xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12'}`}>
+        {fullWidthContent ? (
+          children
+        ) : (
+          <article className="bg-white dark:bg-slate-900 rounded-3xl border border-purple-100 dark:border-slate-800 shadow-sm p-6 sm:p-10 space-y-8 text-slate-700 dark:text-slate-300 leading-relaxed text-sm">
+            {children}
+          </article>
+        )}
       </main>
 
       {/* Global Footer */}

@@ -241,6 +241,19 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             </span>
           </div>
 
+          {/* Direct Guide & Checker Links */}
+          <nav aria-label="Travel checkers and guides" className="pt-1 flex items-center justify-center gap-x-4 gap-y-2 flex-wrap text-xs font-semibold text-purple-700 dark:text-purple-300">
+            <a href="/airlines/" className="hover:underline">42 Airline Baggage Guides</a>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <a href="/baggage-fee-calculator/" className="hover:underline">Baggage Fee Calculator</a>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <a href="/tsa-liquids-checker" className="hover:underline">TSA 3-1-1 Liquids Checker</a>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <a href="/carry-on-checker" className="hover:underline">Carry-On Size Checker</a>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <a href="/packing-list-7-day" className="hover:underline">7-Day Packing List</a>
+          </nav>
+
         </div>
       </section>
 

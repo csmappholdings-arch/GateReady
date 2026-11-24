@@ -38,7 +38,12 @@ export type AnalyticsEventType =
   | 'premium_feature_clicked'
   | 'upgrade_page_viewed'
   | 'upgrade_button_clicked'
-  | 'subscription_started';
+  | 'subscription_started'
+  // Interactive Product Showcase Events
+  | 'product_showcase_tab_selected'
+  | 'product_showcase_cta_click'
+  | 'showcase_global_cta_start_trip'
+  | 'showcase_global_cta_pricing';
 
 export interface AnalyticsEventParams {
   [key: string]: string | number | boolean | undefined;

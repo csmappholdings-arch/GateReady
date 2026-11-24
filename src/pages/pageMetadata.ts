@@ -51,6 +51,15 @@ export const STATIC_PAGES: Record<string, StaticPageMeta> = {
     subheading: 'Your step-by-step packing companion from list creation to the boarding gate.',
     schemaType: 'HowTo'
   },
+  '/demo': {
+    path: '/demo',
+    title: 'Interactive Product Demo – GateReady',
+    description: 'Explore GateReady inside before signing up: live travel dashboard, bag weight meters, suitcase tare deduction, TSA 3-1-1 checklist audit, and privacy-safe QR bag tags.',
+    keywords: 'GateReady demo, product walkthrough, luggage weight meter demo, tare weight deduction, TSA 3-1-1 checklist, emergency QR luggage tag',
+    heading: 'See GateReady Inside Before You Sign Up',
+    subheading: 'Explore the travel dashboard, bag weight meters, smart packing checklist, emergency QR tags, and departure readiness tools.',
+    schemaType: 'WebPage'
+  },
   '/faq': {
     path: '/faq',
     title: 'Frequently Asked Questions – GateReady',
@@ -131,5 +140,32 @@ export const STATIC_PAGES: Record<string, StaticPageMeta> = {
     heading: 'Security & Data Protection',
     subheading: 'Factual information on our security practices and account safeguards.',
     schemaType: 'WebPage'
+  },
+  '/tsa-liquids-checker': {
+    path: '/tsa-liquids-checker',
+    title: 'TSA 3-1-1 Liquids Checker & CATSA Carry-On Rules – GateReady',
+    description: 'Rule-based TSA 3-1-1 and Canadian CATSA carry-on liquids guide: 3.4 oz (100 mL) bottle limit, 1 quart or 1 liter bag rule, item table, and medical exemptions.',
+    keywords: 'TSA 3-1-1 liquids checker, TSA 3-1-1 rule, CATSA 100ml liquids rule, carry on liquids size limit, 3.4 oz toiletries rule, airport security liquid exemptions',
+    heading: 'TSA 3-1-1 Liquids Checker & Carry-On Guide',
+    subheading: 'Verify 3.4 oz (100 mL) bottle rules, Canadian CATSA 1-liter bag rules, and security exemptions before you pack.',
+    schemaType: 'FAQPage'
+  },
+  '/carry-on-checker': {
+    path: '/carry-on-checker',
+    title: 'Carry-On Size & Weight Checker (42 Airlines) – GateReady',
+    description: 'Check airline carry-on sizer dimensions, cabin weight caps, Basic/UltraBasic restrictions, and tare weight across US, Canadian, and international airlines.',
+    keywords: 'carry on size checker, carry on weight limit by airline, airline carry on sizer dimensions, personal item vs carry on, Air Canada WestJet Delta carry on limit',
+    heading: 'Carry-On Size & Weight Checker',
+    subheading: 'How airport gate sizers, weight caps, fare restrictions, and empty bag tare determine cabin pass or fail.',
+    schemaType: 'FAQPage'
+  },
+  '/packing-list-7-day': {
+    path: '/packing-list-7-day',
+    title: '7-Day Carry-On Packing List (5-4-3-2-1 Capsule) – GateReady',
+    description: 'Practical 7-day carry-on capsule packing list using the 5-4-3-2-1 method with item weights and suitcase tare math under 20–22 lb airline limits.',
+    keywords: '7 day carry on packing list, 5-4-3-2-1 capsule wardrobe, one bag travel packing list, 7 day packing weight breakdown, carry on luggage weight math',
+    heading: '7-Day Carry-On Packing List & Capsule Matrix',
+    subheading: 'Pack 40 outfits into one carry-on bag using GateReady’s 5-4-3-2-1 capsule matrix and tare weight math.',
+    schemaType: 'FAQPage'
   }
 };

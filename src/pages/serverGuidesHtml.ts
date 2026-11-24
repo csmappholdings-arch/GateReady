@@ -1,10 +1,16 @@
-import { AIRLINE_GUIDES, AirlineGuideItem } from '../data/airlineGuidesData';
+import { AIRLINE_GUIDES, AirlineGuideItem, buildAirlineDirectSummary, formatAirlineFee } from '../data/airlineGuidesData';
 import { getSplitBagUsdNotes } from '../data/baggageFeeData';
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT } from '../data/planEntitlements';
+import {
+  TSA_LIQUIDS_TABLE,
+  TSA_LIQUIDS_FAQS,
+  CARRY_ON_FAQS,
+  PACKING_7_DAY_CAPSULE,
+  PACKING_LIST_7_DAY_FAQS
+} from '../data/faqData';
 
 export function getAirlinePageHtml(guide: AirlineGuideItem): string {
-  const isNoLimit = (guide.limits.carryOnWeightLimit || '').toLowerCase().includes('no');
   const { firstBagNote, secondBagNote } = getSplitBagUsdNotes(guide.fees);
   const fareFamilies = getAirlineFareFamilies(guide.id);
 
@@ -20,7 +26,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <a href="/baggage-fee-calculator?airline=${encodeURIComponent(guide.name)}" class="h-8 px-3 rounded-xl bg-white border border-purple-200 text-purple-900 text-xs font-bold inline-flex items-center gap-1 hover:bg-purple-100">
+          <a href="/baggage-fee-calculator/?airline=${encodeURIComponent(guide.name)}" class="h-8 px-3 rounded-xl bg-white border border-purple-200 text-purple-900 text-xs font-bold inline-flex items-center gap-1 hover:bg-purple-100">
             Calculate ${guide.name} Fees →
           </a>
           <a href="/?action=new_trip&mode=PLANE&carrier=${encodeURIComponent(guide.name)}" class="h-8 px-3 rounded-xl bg-purple-600 text-white text-xs font-bold inline-flex items-center gap-1 hover:bg-purple-700">
@@ -28,6 +34,12 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
           </a>
         </div>
       </div>
+
+      <!-- Direct Answer Summary -->
+      <section class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-purple-200 space-y-1.5">
+        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">${guide.name} Baggage Policy Quick Answer</div>
+        <p class="text-sm text-slate-700 leading-relaxed">${buildAirlineDirectSummary(guide)}</p>
+      </section>
 
       <!-- Section 1: Carry-On Allowance -->
       <section class="space-y-3">
@@ -227,10 +239,16 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
           <a href="/?action=new_trip&mode=PLANE&carrier=${encodeURIComponent(guide.name)}" class="h-9 px-4 rounded-xl bg-white text-purple-950 font-black text-xs inline-flex items-center justify-center hover:bg-purple-50">
             Create Trip with ${guide.name}
           </a>
-          <a href="/baggage-fee-calculator?airline=${encodeURIComponent(guide.name)}" class="h-9 px-4 rounded-xl bg-purple-800 text-white font-bold text-xs inline-flex items-center justify-center hover:bg-purple-900">
+          <a href="/baggage-fee-calculator/?airline=${encodeURIComponent(guide.name)}" class="h-9 px-4 rounded-xl bg-purple-800 text-white font-bold text-xs inline-flex items-center justify-center hover:bg-purple-900">
             Calculate Baggage Fees
           </a>
-          <a href="/airlines" class="h-9 px-4 rounded-xl bg-purple-700/60 text-white font-semibold text-xs inline-flex items-center justify-center hover:bg-purple-700">
+          <a href="/carry-on-checker" class="h-9 px-4 rounded-xl bg-purple-700/80 text-white font-semibold text-xs inline-flex items-center justify-center hover:bg-purple-700">
+            Carry-On Checker
+          </a>
+          <a href="/tsa-liquids-checker" class="h-9 px-4 rounded-xl bg-purple-700/80 text-white font-semibold text-xs inline-flex items-center justify-center hover:bg-purple-700">
+            TSA 3-1-1 Checker
+          </a>
+          <a href="/airlines/" class="h-9 px-4 rounded-xl bg-purple-700/60 text-white font-semibold text-xs inline-flex items-center justify-center hover:bg-purple-700">
             Browse All 42 Airlines
           </a>
         </div>
@@ -300,14 +318,18 @@ export function getAirlineIndexPageHtml(): string {
 
   return `
     <div class="space-y-6">
-      <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs text-purple-950 leading-relaxed">
-        GateReady provides pre-calibrated baggage limits and fee schedules for <strong>42 global airlines</strong>. Select any carrier below to review official carry-on dimensions, checked luggage allowances, overweight penalties, and packing tips.
+      <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs sm:text-sm text-purple-950 leading-relaxed space-y-1">
+        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">42-Airline Allowance Overview · Verified November 4, 2026</div>
+        <p>GateReady indexes published carry-on sizer dimensions, weight limits, and checked bag fees for <strong>42 global airlines</strong> across Canada (5 carriers), the United States (11 carriers), Europe (13 carriers), and Asia-Pacific &amp; the Middle East (13 carriers). Most US and Canadian legacy carriers allow carry-on bags with no fixed weight cap (provided you can lift them overhead unassisted), whereas European and Asia-Pacific carriers enforce 15.4 to 22 lb (7–10 kg) limits and Basic or UltraBasic fares permit an under-seat personal item only. Verified November 4, 2026 — always confirm fare rules at booking.</p>
       </div>
 
       ${sectionsHtml}
 
       <div class="pt-6 border-t border-slate-200 flex flex-wrap gap-4 text-xs font-bold">
-        <a href="/baggage-fee-calculator" class="text-purple-600 hover:underline">→ Interactive Baggage Fee Calculator</a>
+        <a href="/baggage-fee-calculator/" class="text-purple-600 hover:underline">→ Interactive Baggage Fee Calculator</a>
+        <a href="/carry-on-checker" class="text-purple-600 hover:underline">→ Carry-On Size &amp; Weight Checker</a>
+        <a href="/tsa-liquids-checker" class="text-purple-600 hover:underline">→ TSA 3-1-1 Liquids Checker</a>
+        <a href="/packing-list-7-day" class="text-purple-600 hover:underline">→ 7-Day Carry-On Packing List</a>
         <a href="/tare-weight" class="text-purple-600 hover:underline">→ What is Luggage Tare Weight?</a>
         <a href="/entry-requirements" class="text-purple-600 hover:underline">→ International Travel Entry Rules</a>
       </div>
@@ -316,16 +338,28 @@ export function getAirlineIndexPageHtml(): string {
 }
 
 export function getBaggageFeeCalculatorHtml(): string {
+  const all42Rows = AIRLINE_GUIDES.map((g) => `
+    <tr>
+      <td class="py-3 px-4 font-bold text-slate-900 whitespace-nowrap"><a href="${g.canonicalPath}" class="underline hover:text-purple-700">${g.name}</a></td>
+      <td class="py-3 px-4 ${g.fees.carryOnFee === 0 ? 'text-emerald-700' : 'text-amber-800'} font-bold whitespace-nowrap">${g.fees.carryOnFee === 0 ? 'Free ($0)' : formatAirlineFee(g.fees.carryOnFee, g.fees.currencySymbol, g.fees.currency)}</td>
+      <td class="py-3 px-4 font-bold whitespace-nowrap">${formatAirlineFee(g.fees.firstCheckedFee, g.fees.currencySymbol, g.fees.currency)}</td>
+      <td class="py-3 px-4 whitespace-nowrap">${formatAirlineFee(g.fees.secondCheckedFee, g.fees.currencySymbol, g.fees.currency)}</td>
+      <td class="py-3 px-4 text-rose-600 font-bold whitespace-nowrap">+${formatAirlineFee(g.fees.overweightFee51to70lbs, g.fees.currencySymbol, g.fees.currency)}</td>
+      <td class="py-3 px-4 text-emerald-700 font-semibold whitespace-nowrap">${g.fees.lastVerified}</td>
+    </tr>
+  `).join('');
+
   return `
     <div class="space-y-6">
-      <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs text-purple-950 leading-relaxed">
-        <strong>Standalone Baggage Fee Calculator:</strong> Calculate your luggage costs before heading to the airport. Our fee engine evaluates checked bag rates, carry-on fees, and overweight surcharges across 42 airlines without needing an account.
+      <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs sm:text-sm text-purple-950 leading-relaxed space-y-1">
+        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">Published Airline Fee Summary · Verified November 4, 2026</div>
+        <p><strong>Standalone Baggage Fee Calculator:</strong> Most legacy North American airlines charge $35–$45 for a 1st checked bag (with $5–$15 online prepaid discounts vs. airport counters), cap standard Economy bags at 50 lbs (23 kg) with $100–$150 overweight surcharges for 51–70 lbs, and apply extra overhead carry-on fees on ultra-low-cost carriers or 40 lb ULCC tiers. All figures below reflect static published carrier fee tables verified November 4, 2026—confirm at booking.</p>
       </div>
 
       <section class="space-y-3">
         <h2 class="text-xl font-black text-slate-900 tracking-tight">How Airline Baggage Fees Work</h2>
         <p class="text-xs text-slate-600 leading-relaxed">
-          Most commercial airlines charge for checked bags on a tiered scale: 1st checked bag ($35–$40), 2nd checked bag ($45–$55), and 3rd+ bag ($100–$150). Ultra-low-cost carriers also charge for overhead carry-on bags.
+          Most commercial airlines charge for checked bags on a tiered scale: 1st checked bag ($35–$45), 2nd checked bag ($45–$60), and 3rd+ bag ($100–$150). Ultra-low-cost carriers also charge for overhead carry-on bags, and Basic or UltraBasic fares limit you to an under-seat personal item.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-2">
@@ -334,19 +368,19 @@ export function getBaggageFeeCalculatorHtml(): string {
             <p class="text-slate-600">Prepaying bags during online check-in saves $5 to $15 per bag compared to paying at the airport counter.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-            <strong class="block text-slate-900 font-bold">Overweight Risk (50 lbs):</strong>
-            <p class="text-slate-600">Standard Economy checked bags are capped at 50 lbs (23 kg). Bags from 51 to 70 lbs incur a flat $100–$150 surcharge.</p>
+            <strong class="block text-slate-900 font-bold">Overweight Risk (50 lbs / 40 lbs ULCC):</strong>
+            <p class="text-slate-600">Standard Economy checked bags are capped at 50 lbs (23 kg), or 40 lbs (18 kg) on US ultra-low-cost carriers. Bags from 51 to 70 lbs incur a flat $100–$150 surcharge.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <strong class="block text-slate-900 font-bold">Basic Economy Limits:</strong>
-            <p class="text-slate-600">United and unbundled carriers exclude overhead carry-ons on Basic Economy tickets, permitting an underseat bag only.</p>
+            <p class="text-slate-600">United Basic Economy, Air Canada Basic (NA/Sun), and WestJet UltraBasic exclude overhead carry-ons, permitting an under-seat bag only.</p>
           </div>
         </div>
       </section>
 
       <section class="space-y-3 pt-4 border-t border-slate-100">
-        <h2 class="text-xl font-black text-slate-900 tracking-tight">Standard Airline Baggage Fee Reference (42 Airlines)</h2>
-        <p class="text-xs text-slate-600">Sample published domestic/transatlantic standard economy rates:</p>
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">All 42 Airlines Published Baggage Fee Reference Table</h2>
+        <p class="text-xs text-slate-600">Complete static published standard economy fee table across all 42 carriers tracked by GateReady (verified November 4, 2026):</p>
 
         <div class="overflow-x-auto rounded-2xl border border-slate-200">
           <table class="w-full text-left text-xs">
@@ -356,52 +390,12 @@ export function getBaggageFeeCalculatorHtml(): string {
                 <th class="py-3 px-4">Carry-On Fee</th>
                 <th class="py-3 px-4">1st Checked Bag</th>
                 <th class="py-3 px-4">2nd Checked Bag</th>
-                <th class="py-3 px-4">Overweight Surcharge (51-70 lbs)</th>
+                <th class="py-3 px-4">Overweight Surcharge (51–70 lbs)</th>
+                <th class="py-3 px-4">Verified</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-700">
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/air-canada-baggage" class="underline">Air Canada</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)*</td>
-                <td class="py-3 px-4 font-bold">CAD $45</td>
-                <td class="py-3 px-4">CAD $60</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">+CAD $100</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/westjet-baggage" class="underline">WestJet</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)*</td>
-                <td class="py-3 px-4 font-bold">CAD $40 (prepaid)</td>
-                <td class="py-3 px-4">CAD $60 (prepaid)</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">+CAD $100</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/delta-air-lines-baggage" class="underline">Delta Air Lines</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)</td>
-                <td class="py-3 px-4 font-bold">$35 USD</td>
-                <td class="py-3 px-4">$45 USD</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">+$100 USD</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/american-airlines-baggage" class="underline">American Airlines</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)</td>
-                <td class="py-3 px-4 font-bold">$35 USD</td>
-                <td class="py-3 px-4">$45 USD</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">+$100 USD</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/southwest-airlines-baggage" class="underline">Southwest Airlines</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)</td>
-                <td class="py-3 px-4 font-bold">$45 USD (Choice Extra free)</td>
-                <td class="py-3 px-4">$55 USD (Choice Extra free)</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">+$100 USD</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-bold text-slate-900"><a href="/airlines/british-airways-baggage" class="underline">British Airways</a></td>
-                <td class="py-3 px-4 text-emerald-700 font-bold">Free ($0)</td>
-                <td class="py-3 px-4 font-bold">£35 (Basic) / Free</td>
-                <td class="py-3 px-4">£65</td>
-                <td class="py-3 px-4 text-rose-600 font-bold">+£65</td>
-              </tr>
+              ${all42Rows}
             </tbody>
           </table>
         </div>
@@ -417,8 +411,14 @@ export function getBaggageFeeCalculatorHtml(): string {
           <a href="/" class="h-9 px-4 rounded-xl bg-white text-purple-950 font-black text-xs inline-flex items-center justify-center hover:bg-purple-50">
             Create Free Trip
           </a>
-          <a href="/airlines" class="h-9 px-4 rounded-xl bg-purple-800 text-white font-bold text-xs inline-flex items-center justify-center hover:bg-purple-900">
+          <a href="/airlines/" class="h-9 px-4 rounded-xl bg-purple-800 text-white font-bold text-xs inline-flex items-center justify-center hover:bg-purple-900">
             Explore All 42 Airline Guides
+          </a>
+          <a href="/carry-on-checker" class="h-9 px-4 rounded-xl bg-purple-700/80 text-white font-semibold text-xs inline-flex items-center justify-center hover:bg-purple-700">
+            Carry-On Size Checker
+          </a>
+          <a href="/tsa-liquids-checker" class="h-9 px-4 rounded-xl bg-purple-700/80 text-white font-semibold text-xs inline-flex items-center justify-center hover:bg-purple-700">
+            TSA 3-1-1 Checker
           </a>
         </div>
       </section>
@@ -589,11 +589,20 @@ export function getHomepageHtml(): string {
           Understand your baggage allowances, estimate luggage weight and check potential airline fees before you leave home. GateReady calculates real empty-luggage tare weight, audits every liquid against TSA 3-1-1 rules, and validates carry-on sizer compliance across 42 worldwide airlines.
         </p>
         <div class="flex flex-wrap gap-3 pt-2">
-          <a href="/baggage-fee-calculator" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">
+          <a href="/baggage-fee-calculator/" class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">
             Calculate Baggage Fees →
           </a>
-          <a href="/airlines" class="h-10 px-4 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+          <a href="/airlines/" class="h-10 px-4 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 font-bold text-xs inline-flex items-center gap-2 transition-colors">
             Browse 42 Airline Guides
+          </a>
+          <a href="/tsa-liquids-checker" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+            TSA 3-1-1 Liquids Checker
+          </a>
+          <a href="/carry-on-checker" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+            Carry-On Size Checker
+          </a>
+          <a href="/packing-list-7-day" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
+            7-Day Packing List
           </a>
           <a href="/tare-weight" class="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs inline-flex items-center gap-2 transition-colors">
             Tare Weight Guide
@@ -608,7 +617,7 @@ export function getHomepageHtml(): string {
       <section class="space-y-4 pt-6 border-t border-slate-200">
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-black text-slate-900 tracking-tight">42 Major Airlines Baggage Policy Directory</h2>
-          <a href="/airlines" class="text-xs font-bold text-purple-600 hover:text-purple-800">View Full Directory →</a>
+          <a href="/airlines/" class="text-xs font-bold text-purple-600 hover:text-purple-800">View Full Directory →</a>
         </div>
         <p class="text-xs text-slate-600">Select any airline below to view exact carry-on dimensions, overhead sizer limits, checked baggage rates, and fare families:</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -729,7 +738,7 @@ export function getRequirementsHubHtml(): string {
             <p class="text-[11px] text-slate-400">Published Carrier Fare Tables · Confirm at booking</p>
           </div>
           <div class="pt-4 border-t border-purple-100">
-            <a href="/baggage-fee-calculator" class="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">
+            <a href="/baggage-fee-calculator/" class="w-full h-11 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-xs transition-colors">
               Open Baggage Fee Calculator →
             </a>
           </div>
@@ -739,7 +748,7 @@ export function getRequirementsHubHtml(): string {
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-purple-700 uppercase tracking-wider bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">Cross-Border Rules</span>
-              <span class="text-[11px] font-bold text-slate-400">CA & US Passports</span>
+              <span class="text-[11px] font-bold text-slate-400">CA &amp; US Passports</span>
             </div>
             <h3 class="text-xl font-black text-slate-900">Entry Requirements Quick-Check</h3>
             <p class="text-xs text-slate-600 leading-relaxed">
@@ -754,6 +763,261 @@ export function getRequirementsHubHtml(): string {
           </div>
         </div>
       </div>
+    </div>
+  `;
+}
+
+export function getTsaLiquidsCheckerHtml(): string {
+  const tableRows = TSA_LIQUIDS_TABLE.map((row) => `
+    <tr>
+      <td class="py-3 px-4 font-bold text-slate-900">${row.item}</td>
+      <td class="py-3 px-4 font-mono text-[11px]">${row.size}</td>
+      <td class="py-3 px-4 font-bold">
+        <span class="inline-block px-2 py-0.5 rounded-md text-[11px] ${
+          row.carryOnAllowed === 'Yes'
+            ? 'bg-emerald-100 text-emerald-800'
+            : row.carryOnAllowed === 'No (Checked Only)'
+              ? 'bg-rose-100 text-rose-800'
+              : 'bg-amber-100 text-amber-800'
+        }">${row.carryOnAllowed}</span>
+      </td>
+      <td class="py-3 px-4 text-slate-600 text-[11px] leading-relaxed">${row.notes}</td>
+    </tr>
+  `).join('');
+
+  const faqCards = TSA_LIQUIDS_FAQS.map((faq) => `
+    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+      <h3 class="font-bold text-slate-900">${faq.question}</h3>
+      <p class="text-slate-600 leading-relaxed">${faq.answer}</p>
+    </div>
+  `).join('');
+
+  return `
+    <div class="space-y-6">
+      <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
+        <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — TSA 3-1-1 &amp; Canadian CATSA Liquids Rule</div>
+        <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">
+          Under the <strong>TSA 3-1-1 liquids rule</strong>, every liquid, gel, aerosol, cream, or paste packed inside carry-on luggage must be in a container of <strong>3.4 fl oz (100 mL) or less</strong>, fit inside <strong>1 clear quart-sized zip-top bag</strong> (or <strong>1 clear 1-liter resealable plastic bag</strong> on Canadian CATSA flights), with <strong>1 bag permitted per passenger</strong>. GateReady performs a rule- and list-based catalog audit against this 3.4 oz threshold before departure — it is not a camera or barcode scanner.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Common Carry-On Liquid, Gel &amp; Aerosol Rules Table</h2>
+        <p class="text-xs text-slate-600">Side-by-side container size audit across TSA (US) and CATSA (Canada) airport security rules.</p>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3 px-4">Item</th>
+                <th class="py-3 px-4">Printed Size</th>
+                <th class="py-3 px-4">Carry-On Status</th>
+                <th class="py-3 px-4">Screening Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              ${tableRows}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="p-5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2 text-xs">
+        <div class="font-bold text-amber-900">Medical &amp; Infant Liquid Exemptions</div>
+        <p class="text-amber-950 leading-relaxed">
+          Prescription liquid medications, insulin/ice packs, saline contact solution, and baby formula, breast milk, or toddler purées over 3.4 oz (100 mL) are permitted in carry-on luggage in reasonable trip quantities. Separate them from your 1-quart/1-liter bag and declare them to the screening officer at the belt.
+        </p>
+      </section>
+
+      <section class="space-y-4 pt-4 border-t border-slate-100">
+        <h2 class="text-lg font-black text-slate-900 tracking-tight">TSA 3-1-1 &amp; CATSA Liquids FAQs</h2>
+        <div class="space-y-3 text-xs">
+          ${faqCards}
+        </div>
+      </section>
+
+      <section class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap gap-3 text-xs font-bold text-purple-600">
+          <a href="/carry-on-checker" class="hover:underline">Carry-On Size Checker →</a>
+          <a href="/packing-list-7-day" class="hover:underline">7-Day Carry-On List →</a>
+          <a href="/baggage-fee-calculator/" class="hover:underline">Baggage Fee Calculator →</a>
+          <a href="/airlines/" class="hover:underline">42 Airline Guides →</a>
+        </div>
+        <a href="/?action=new_trip&mode=PLANE" class="h-10 px-5 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center">
+          Audit My Packing List Free →
+        </a>
+      </section>
+    </div>
+  `;
+}
+
+export function getCarryOnCheckerHtml(): string {
+  const featuredIds = [
+    'aircanada',
+    'westjet',
+    'porter',
+    'airtransat',
+    'flair',
+    'delta',
+    'american',
+    'united',
+    'southwest',
+    'jetblue',
+    'alaska',
+    'frontier',
+    'britishairways',
+    'lufthansa',
+    'ryanair',
+    'singapore'
+  ];
+  const map = new Map(AIRLINE_GUIDES.map((g) => [g.id, g]));
+  const rows = featuredIds
+    .map((id) => map.get(id))
+    .filter((g): g is AirlineGuideItem => Boolean(g))
+    .map((g) => `
+      <tr>
+        <td class="py-3 px-4 font-bold text-slate-900"><a href="${g.canonicalPath}" class="underline hover:text-purple-600">${g.name}</a></td>
+        <td class="py-3 px-4">${g.limits.carryOnLimit.split('(')[0].trim()}</td>
+        <td class="py-3 px-4 font-semibold">${g.limits.carryOnWeightLimit ? g.limits.carryOnWeightLimit.split(';')[0].trim() : 'No limit'}</td>
+        <td class="py-3 px-4 text-slate-600">${g.limits.personalLimit.split('(')[0].trim()}</td>
+        <td class="py-3 px-4 font-bold">${g.fees.carryOnFee === 0 ? 'Free ($0)*' : `${g.fees.currencySymbol}${g.fees.carryOnFee} ${g.fees.currency}`}</td>
+      </tr>
+    `)
+    .join('');
+
+  const faqCards = CARRY_ON_FAQS.map((faq) => `
+    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+      <h3 class="font-bold text-slate-900">${faq.question}</h3>
+      <p class="text-slate-600 leading-relaxed">${faq.answer}</p>
+    </div>
+  `).join('');
+
+  return `
+    <div class="space-y-6">
+      <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
+        <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — Carry-On Gate Sizers, Weight Caps &amp; Tare</div>
+        <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">
+          Airline carry-on size limits always include <strong>wheels, handles, and exterior pockets</strong> and must drop smoothly inside the departure gate metal sizer box. Major US and Canadian carriers (Air Canada, WestJet, Delta, United, American) set <strong>no fixed carry-on weight cap</strong> as long as you can lift the bag unassisted, whereas carriers such as Porter (20 lbs), Air Transat (22 lbs), Lufthansa (17.6 lbs), and Qantas/Singapore (15.4 lbs / 7 kg) enforce strict weight caps where an empty <strong>5.5 to 7.0 lb roller</strong> already uses 25%–45% of your weight limit.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Carry-On Size &amp; Weight Limit Comparison (Major US, Canadian &amp; Global Airlines)</h2>
+        <p class="text-xs text-slate-600">Published carry-on dimensions, cabin weight caps, and personal-item limits verified November 4, 2026.</p>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3 px-4">Airline</th>
+                <th class="py-3 px-4">Carry-On Max Size</th>
+                <th class="py-3 px-4">Weight Cap</th>
+                <th class="py-3 px-4">Personal Item</th>
+                <th class="py-3 px-4">Carry-On Fee</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-[11px] text-slate-500">
+          *Air Canada Basic (NA/Sun), WestJet UltraBasic (Canada/US), and United Basic Economy (most domestic) allow an under-seat personal item only and exclude overhead carry-on bins. Static published estimates verified November 4, 2026; confirm with your operating carrier before departure.
+        </p>
+      </section>
+
+      <section class="space-y-4 pt-4 border-t border-slate-100">
+        <h2 class="text-lg font-black text-slate-900 tracking-tight">Carry-On Sizer &amp; Weight Limit FAQs</h2>
+        <div class="space-y-3 text-xs">
+          ${faqCards}
+        </div>
+      </section>
+
+      <section class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap gap-3 text-xs font-bold text-purple-600">
+          <a href="/airlines/" class="hover:underline">All 42 Airline Guides →</a>
+          <a href="/tare-weight" class="hover:underline">Tare Weight Guide →</a>
+          <a href="/tsa-liquids-checker" class="hover:underline">TSA 3-1-1 Liquids Checker →</a>
+          <a href="/baggage-fee-calculator/" class="hover:underline">Baggage Fee Calculator →</a>
+        </div>
+        <a href="/?action=new_trip&mode=PLANE" class="h-10 px-5 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center">
+          Model My Carry-On Free →
+        </a>
+      </section>
+    </div>
+  `;
+}
+
+export function getPackingList7DayHtml(): string {
+  const itemsTotalLbs = Math.round(
+    PACKING_7_DAY_CAPSULE.reduce((acc, row) => acc + row.quantity * row.unitWeightLbs, 0) * 10
+  ) / 10;
+
+  const rows = PACKING_7_DAY_CAPSULE.map((row) => `
+    <tr>
+      <td class="py-3 px-4 font-bold text-purple-700 whitespace-nowrap">${row.category}</td>
+      <td class="py-3 px-4 font-semibold text-slate-900">${row.item}</td>
+      <td class="py-3 px-4 font-mono">${row.quantity}</td>
+      <td class="py-3 px-4 font-mono">${row.unitWeightLbs.toFixed(2)} lb</td>
+      <td class="py-3 px-4 font-bold">${(row.quantity * row.unitWeightLbs).toFixed(1)} lbs</td>
+      <td class="py-3 px-4 text-slate-500 text-[11px]">${row.notes}</td>
+    </tr>
+  `).join('');
+
+  const faqCards = PACKING_LIST_7_DAY_FAQS.map((faq) => `
+    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+      <h3 class="font-bold text-slate-900">${faq.question}</h3>
+      <p class="text-slate-600 leading-relaxed">${faq.answer}</p>
+    </div>
+  `).join('');
+
+  return `
+    <div class="space-y-6">
+      <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
+        <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — The 5-4-3-2-1 7-Day Carry-On Formula</div>
+        <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">
+          To pack 7 days cleanly inside one carry-on suitcase, GateReady recommends the <strong>5-4-3-2-1 capsule matrix</strong>: <strong>5 tops, 4 bottoms, 3 layers, 2 pairs of shoes, 1 swimwear/dressy set</strong> (plus 7 pairs of underwear and socks, a compliant 3-1-1 quart liquids bag, and carry-on tech). The packed contents total roughly <strong>${itemsTotalLbs.toFixed(1)} lbs</strong> — leaving you at <strong>17.7 lbs gross</strong> in a 5.5 lb fabric carry-on or <strong>19.2 lbs gross</strong> in a 7.0 lb hard-shell spinner, safely under 20–22 lb airline carry-on limits.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">7-Day 5-4-3-2-1 Capsule Packing Table</h2>
+        <p class="text-xs text-slate-600">Every line includes catalog unit weight and total contribution before travel-day worn items (wearing your heaviest sneakers, jeans, and outerwear onto the plane shaves another ~3.5 lbs off bag weight).</p>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3 px-4">Slot</th>
+                <th class="py-3 px-4">Item</th>
+                <th class="py-3 px-4">Qty</th>
+                <th class="py-3 px-4">Unit Est.</th>
+                <th class="py-3 px-4">Line Weight</th>
+                <th class="py-3 px-4">Packing Note</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="space-y-4 pt-4 border-t border-slate-100">
+        <h2 class="text-lg font-black text-slate-900 tracking-tight">7-Day Carry-On Packing FAQs</h2>
+        <div class="space-y-3 text-xs">
+          ${faqCards}
+        </div>
+      </section>
+
+      <section class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap gap-3 text-xs font-bold text-purple-600">
+          <a href="/carry-on-checker" class="hover:underline">Carry-On Checker →</a>
+          <a href="/tsa-liquids-checker" class="hover:underline">TSA 3-1-1 Liquids Checker →</a>
+          <a href="/tare-weight" class="hover:underline">Tare Weight Guide →</a>
+          <a href="/airlines/" class="hover:underline">42 Airline Guides →</a>
+        </div>
+        <a href="/?action=new_trip" class="h-10 px-5 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center">
+          Build My 7-Day Capsule Trip →
+        </a>
+      </section>
     </div>
   `;
 }

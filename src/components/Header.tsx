@@ -62,6 +62,7 @@ interface HeaderProps {
   onOpenAccountSync?: (mode?: 'signin' | 'signup') => void;
   onOpenReferral?: () => void;
   onOpenDashboard?: () => void;
+  onGoHome?: () => void;
   onOpenNotifications?: () => void;
   unreadNotificationsCount?: number;
   currentView?: 'dashboard' | 'workspace' | 'home';
@@ -74,6 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAccountSync,
   onOpenReferral,
   onOpenDashboard,
+  onGoHome,
   onOpenNotifications,
   unreadNotificationsCount = 0,
   currentView = 'dashboard',
@@ -271,12 +273,19 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6 relative z-30">
-        {/* Left: GateReady.ca Stadium Neon Badge matching uploaded branding */}
+        {/* Left: GateReady.ca Stadium Neon Badge — Always returns to public homepage (/) */}
         <div className="flex items-center gap-3 min-w-0">
-          <div 
-            onClick={onOpenDashboard}
-            className={`relative group select-none ${onOpenDashboard ? 'cursor-pointer active:scale-98 transition-transform' : 'cursor-default'}`}
-            title="GateReady Travel Dashboard"
+          <a
+            href="/"
+            aria-label="GateReady – Return to homepage"
+            title="GateReady – Return to homepage"
+            onClick={(e) => {
+              if (onGoHome && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) {
+                e.preventDefault();
+                onGoHome();
+              }
+            }}
+            className="relative group select-none cursor-pointer active:scale-98 transition-transform rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-purple-900 block"
           >
             {/* Outer neon magenta/violet glow blur aura */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 rounded-2xl blur-[3px] opacity-75 group-hover:opacity-100 transition duration-300" />
@@ -310,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
             </div>
-          </div>
+          </a>
 
           {/* Desktop Navigation: 3 Structured Dropdown Groups + Dashboard */}
           <nav className="hidden xl:flex items-center gap-1.5 ml-2" aria-label="Main travel navigation">
@@ -1862,7 +1871,18 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative w-full max-w-[340px] sm:max-w-sm h-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col z-10 overflow-hidden animate-in slide-in-from-right duration-250 border-l border-purple-100 dark:border-purple-900/60">
             {/* Drawer Header */}
             <div className="p-4 border-b border-purple-100 dark:border-purple-900/60 bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-700 text-white flex items-center justify-between gap-3 shrink-0 shadow-xs">
-              <div className="flex items-center gap-2.5 min-w-0">
+              <a
+                href="/"
+                aria-label="GateReady – Return to homepage"
+                onClick={(e) => {
+                  setMobileMenuOpen(false);
+                  if (onGoHome && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) {
+                    e.preventDefault();
+                    onGoHome();
+                  }
+                }}
+                className="flex items-center gap-2.5 min-w-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              >
                 <div className="w-8 h-8 rounded-xl bg-purple-950/80 border border-purple-300/40 flex items-center justify-center text-white shrink-0 shadow-xs">
                   <Luggage className="w-4 h-4 text-purple-200" />
                 </div>
@@ -1874,7 +1894,7 @@ export const Header: React.FC<HeaderProps> = ({
                     Travel Navigation &amp; Settings
                   </span>
                 </div>
-              </div>
+              </a>
 
               <button
                 type="button"

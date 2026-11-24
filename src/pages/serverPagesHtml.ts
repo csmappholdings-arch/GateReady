@@ -1,5 +1,5 @@
 import { STATIC_PAGES, StaticPageMeta } from './pageMetadata';
-import { AIRLINE_GUIDES, getAirlineGuideBySlug } from '../data/airlineGuidesData';
+import { getAirlineGuideBySlug } from '../data/airlineGuidesData';
 import { 
   getAirlinePageHtml, 
   getAirlineIndexPageHtml, 
@@ -7,10 +7,14 @@ import {
   getTareWeightHtml, 
   getEntryRequirementsHtml,
   getHomepageHtml,
-  getRequirementsHubHtml
+  getRequirementsHubHtml,
+  getTsaLiquidsCheckerHtml,
+  getCarryOnCheckerHtml,
+  getPackingList7DayHtml
 } from './serverGuidesHtml';
 import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT, FEE_MATH_YEARLY_FRAME } from '../data/planEntitlements';
 import { OFFICIAL_SOCIAL_LINKS, FACEBOOK_SVG_ICON, INSTAGRAM_SVG_ICON } from '../data/socialLinks';
+import { MAIN_FAQS } from '../data/faqData';
 
 export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bodyHtml: string } | null {
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
@@ -53,10 +57,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     }
   }
 
-  // 2. Check if path is the Airline Directory Index (/airlines)
+  // 2. Check if path is the Airline Directory Index (/airlines/)
   if (normalizedPath === '/airlines') {
     const meta: StaticPageMeta = {
-      path: '/airlines',
+      path: '/airlines/',
       title: 'Airline Baggage Allowance Guides (42 Airlines) – GateReady',
       description: 'Published carry-on dimensions, weight limits, and checked luggage fee tables for all 42 major airlines across Canada, the US, Europe, and Asia.',
       keywords: 'airline baggage allowance, carry on dimensions by airline, checked baggage fees by airline, airline baggage limits 2026, luggage scale',
@@ -70,10 +74,10 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     return { meta, bodyHtml };
   }
 
-  // 3. Intent Page: Baggage Fee Calculator (/baggage-fee-calculator)
+  // 3. Intent Page: Baggage Fee Calculator (/baggage-fee-calculator/)
   if (normalizedPath === '/baggage-fee-calculator') {
     const meta: StaticPageMeta = {
-      path: '/baggage-fee-calculator',
+      path: '/baggage-fee-calculator/',
       title: 'Baggage Fee Calculator — GateReady',
       description: "Estimate checked bag fees, carry-on charges, and fare-family luggage inclusions across 42 airlines with GateReady's standalone fee calculator.",
       keywords: 'baggage fee calculator, airline luggage fees, calculate baggage fees by airline, overweight baggage cost, carry on fee calculator, fare families luggage',
@@ -211,7 +215,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
-  } else if (pathname === '/privacy') {
+  } else if (normalizedPath === '/privacy') {
     innerContentHtml = `
       <div class="text-xs text-slate-500 font-medium">Last updated: November 1, 2026</div>
       <section class="space-y-3 mt-3">
@@ -239,7 +243,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <p class="text-xs text-slate-600">GateReady is not directed at children under the age of 13. For any privacy questions, contact <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a>.</p>
       </section>
     `;
-  } else if (pathname === '/terms') {
+  } else if (normalizedPath === '/terms') {
     innerContentHtml = `
       <div class="text-xs text-slate-500 font-medium">Last updated: October 24, 2026</div>
       <section class="space-y-3 mt-3">
@@ -261,7 +265,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <p class="text-xs text-slate-600">Contact CSM App Holdings at <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a>.</p>
       </section>
     `;
-  } else if (pathname === '/contact') {
+  } else if (normalizedPath === '/contact') {
     innerContentHtml = `
       <section class="space-y-3">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">Contact GateReady Support</h2>
@@ -277,43 +281,22 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <div>CSM App Holdings · gateready.ca</div>
       </section>
     `;
-  } else if (pathname === '/faq') {
+  } else if (normalizedPath === '/faq') {
+    const faqCards = MAIN_FAQS.map((item) => `
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+        <h3 class="font-bold text-slate-900">${item.question}</h3>
+        <p class="text-xs text-slate-600 mt-1 leading-relaxed">${item.answer}</p>
+      </div>
+    `).join('');
     innerContentHtml = `
       <section class="space-y-3">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">Frequently Asked Questions</h2>
         <div class="space-y-4 pt-3">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">How do the free account and 7-day Platinum trial work?</h3>
-            <p class="text-xs text-slate-600 mt-1">${TRIAL_TERMS_EXACT} You get immediate access to unlimited trips, bags, tare weight calibration, and terminal maps.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">What happens at day 7?</h3>
-            <p class="text-xs text-slate-600 mt-1">${TRIAL_TERMS_EXACT} All your packing lists stay saved in your account. You will never be billed automatically without explicit checkout.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">Are baggage fees exact or estimates?</h3>
-            <p class="text-xs text-slate-600 mt-1">Estimates derived from published airline baggage tables for 42 carriers. Because airlines vary rates by fare class, route, and prepayment, always confirm with your airline at booking.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">What happens to a guest list if you do not sign up?</h3>
-            <p class="text-xs text-slate-600 mt-1">It lives only in that specific browser's localStorage. If you clear your browser data or switch devices, it is lost unless you create a free account to sync.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">How does the TSA 3-1-1 checker work?</h3>
-            <p class="text-xs text-slate-600 mt-1">It is an item list rule check against the TSA 3.4 oz (100ml) limit, not a hardware scanner. It flags toiletries in carry-on bags that should be moved to checked luggage.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">How do referrals work?</h3>
-            <p class="text-xs text-slate-600 mt-1">Your friend gets 1 free month of Platinum on signup ($4.99 value); you get 1 free month of Platinum credited to your account automatically upon their signup. No card or purchase required.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <h3 class="font-bold text-slate-900">How do I cancel and how does the 14-day guarantee work?</h3>
-            <p class="text-xs text-slate-600 mt-1">Cancel anytime via your account settings. If within 14 days of subscribing to a paid plan, email csmappholdings@gmail.com for a 100% refund processed via Lemon Squeezy.</p>
-          </div>
+          ${faqCards}
         </div>
       </section>
     `;
-  } else if (pathname === '/pricing') {
+  } else if (normalizedPath === '/pricing') {
     innerContentHtml = `
       <section class="space-y-6">
         <div class="space-y-2">
@@ -330,7 +313,6 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
             <h3 class="font-bold text-purple-900">Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo · ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr)</h3>
             <p class="text-[11px] font-semibold text-purple-700">${PLAN_DEFINITIONS.SILVER.tagline}</p>
             <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.SILVER.features.join(', ')}.</p>
-            <p class="text-[11px] font-bold text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-xl p-2 mt-2">${FEE_MATH_STATEMENT}</p>
           </div>
           <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2">
             <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
@@ -355,7 +337,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
-  } else if (pathname === '/how-it-works') {
+  } else if (normalizedPath === '/how-it-works') {
     innerContentHtml = `
       <section class="space-y-4">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">How GateReady Works in 5 Steps</h2>
@@ -383,7 +365,36 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
-  } else if (pathname === '/cookies') {
+  } else if (normalizedPath === '/demo') {
+    innerContentHtml = `
+      <section class="space-y-4">
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Interactive Product Walkthrough</h2>
+        <p class="text-slate-700 leading-relaxed">Explore the GateReady workflow without creating an account or subscribing: Travel Dashboard, Packing Weight Meters &amp; Empty Bag Tare Deduction (1.5–3.0 lbs personal, 5.5–7.0 lbs carry-on, 8.5–10.5 lbs checked), rule-based TSA 3-1-1 Checklist, privacy-safe Emergency QR Luggage Tags, and Departure Readiness reviews.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+            <h3 class="font-bold text-slate-900">Your Entire Trip. One Clear Dashboard.</h3>
+            <p class="text-xs text-slate-600 mt-1">Active trip cards, departure countdowns, bag weight compliance gauges, and instant access to Luggage Library and Travel Wallet.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+            <h3 class="font-bold text-slate-900">Know Your Bag Weight Before You Fly.</h3>
+            <p class="text-xs text-slate-600 mt-1">Safe, Caution, and Overweight headroom bars calibrated across 42 airline tables with empty suitcase tare deduction.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+            <h3 class="font-bold text-slate-900">Pack With Confidence. Forget Less.</h3>
+            <p class="text-xs text-slate-600 mt-1">Categorized per-bag checklists with rule-based TSA 3-1-1 carry-on liquids compliance checks (≤ 3.4 oz / 100 ml).</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+            <h3 class="font-bold text-slate-900">Give Lost Luggage a Better Chance of Getting Home.</h3>
+            <p class="text-xs text-slate-600 mt-1">Privacy-safe QR contact tags omitting your home street address (watermarked preview on Free; full unwatermarked tags on Silver+).</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3 pt-4">
+          <a href="/" class="h-10 px-5 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center">Start Your Free Trip</a>
+          <a href="/pricing" class="h-10 px-5 rounded-xl border border-slate-300 text-slate-800 font-bold text-xs inline-flex items-center">View Plans &amp; Pricing</a>
+        </div>
+      </section>
+    `;
+  } else if (normalizedPath === '/cookies') {
     innerContentHtml = `
       <div class="text-xs text-slate-500 font-medium">Last updated: October 24, 2026</div>
       <section class="space-y-3 mt-3">
@@ -392,7 +403,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <p class="text-xs text-slate-600">Questions? Contact <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a>.</p>
       </section>
     `;
-  } else if (pathname === '/refunds') {
+  } else if (normalizedPath === '/refunds') {
     innerContentHtml = `
       <div class="text-xs text-slate-500 font-medium">Last updated: October 24, 2026</div>
       <section class="space-y-3 mt-3">
@@ -401,13 +412,29 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <p class="text-xs text-slate-600">Cancel renewals anytime via account settings. ${TRIAL_TERMS_EXACT} It will never bill automatically.</p>
       </section>
     `;
-  } else if (pathname === '/changelog') {
+  } else if (normalizedPath === '/changelog') {
     innerContentHtml = `
       <section class="space-y-3">
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">November 22, 2026 — Mode-Aware Workspaces, Guest Save-Gate Timing, Carrier Verification &amp; UI Clarity</div>
+            <div class="font-bold text-purple-900 text-sm">November 24, 2026 — AI Search Discoverability, Structured Data, Answer-Ready Carrier Summaries &amp; Intent Guides</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li><strong>Machine-Readable /llms.txt, AI Crawler Allowance &amp; Unified JSON-LD:</strong> Published a plain markdown index at /llms.txt, opened /robots.txt explicitly to major AI search crawlers, standardized unified Organization/WebSite/SoftwareApplication/FAQPage/BreadcrumbList JSON-LD graphs, synchronized trailing-slash canonical URLs with sitemap.xml, and deduplicated the /pricing Silver callout.</li>
+              <li><strong>Direct-Answer Airline Summaries &amp; Full 42-Airline Calculator Table:</strong> Added concise plain-text direct-answer summaries directly beneath H1 headings on all 42 airline baggage guides, /airlines/, and /baggage-fee-calculator/, expanded the pre-rendered calculator fee table to include all 42 airlines verified November 4, 2026, and standardized airline meta descriptions.</li>
+              <li><strong>Three Dedicated Intent Guides (/tsa-liquids-checker, /carry-on-checker, /packing-list-7-day):</strong> Launched pre-rendered, FAQPage-annotated guides for TSA 3-1-1 &amp; Canadian CATSA liquid rules, airline carry-on gate sizer &amp; weight cap comparisons, and a 7-day 5-4-3-2-1 carry-on capsule packing weight matrix.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">November 23, 2026 — Content Route Recovery, Weight Cap Parity, Route Heading &amp; Delete Count Fixes</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li><strong>/pricing, /changelog &amp; /faq Recovery + Theme-Aware Error Fallback:</strong> Fixed a shared footer context dependency that caused /pricing, /changelog, /faq, and other standalone informational pages to trigger the error fallback outside the workspace provider, and updated the ErrorBoundary screen to follow your active light or dark theme.</li>
+              <li><strong>Carry-On Decimal Cap Parity &amp; Accurate Delete Counts:</strong> Aligned carry-on weight limit labels across Packing Checklist, Trip Summary, Luggage view, and Print Manifests to preserve carrier decimal limits (e.g., 26.4 lbs cap on Air France instead of truncating to 26 lbs), and updated trip delete confirmations to report true packed item counts separately from total items.</li>
+              <li><strong>Rail &amp; Cruise Route Heading Deduplication:</strong> Eliminated duplicate parenthetical city names on Rail, Cruise, and Bus hubs while keeping airport IATA codes intact on Flight headings.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">November 22, 2026 — Mode-Aware Workspaces, Guest Save-Gate Timing, Carrier Verification &amp; UI Clarity</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li><strong>Save-Gate Timing &amp; Last-Trip Navigation:</strong> Fired the guest save prompt only after packing items are added, kept dismissals durable across reloads until saved or signed in, renamed secondary button to "Maybe Later", and returned guests to the homepage after deleting their final trip.</li>
               <li><strong>Mode-Aware Non-Flight Workspaces:</strong> Eliminated flight/airport/TSA terminology from Cruise, Train, Bus, and Road Trip workspaces, scoped baggage directories by mode, and hid Terminal Maps on Car and Bus trips.</li>
@@ -554,7 +581,7 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
-  } else if (pathname === '/security') {
+  } else if (normalizedPath === '/security') {
     innerContentHtml = `
       <div class="text-xs text-slate-500 font-medium">Last updated: October 24, 2026</div>
       <section class="space-y-3 mt-3">
@@ -587,6 +614,12 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         </div>
       </section>
     `;
+  } else if (normalizedPath === '/tsa-liquids-checker') {
+    innerContentHtml = getTsaLiquidsCheckerHtml();
+  } else if (normalizedPath === '/carry-on-checker') {
+    innerContentHtml = getCarryOnCheckerHtml();
+  } else if (normalizedPath === '/packing-list-7-day') {
+    innerContentHtml = getPackingList7DayHtml();
   }
 
   const bodyHtml = renderPageShell(meta, innerContentHtml);
@@ -609,8 +642,11 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
           <div class="space-y-2.5">
             <h3 class="font-bold text-[11px] uppercase tracking-wider text-purple-400">Tools</h3>
             <ul class="space-y-2 text-slate-400">
-              <li><a href="/airlines" class="hover:text-purple-300 transition-colors">Airline Baggage Guides</a></li>
-              <li><a href="/baggage-fee-calculator" class="hover:text-purple-300 transition-colors">Baggage Fee Calculator</a></li>
+              <li><a href="/airlines/" class="hover:text-purple-300 transition-colors">Airline Baggage Guides</a></li>
+              <li><a href="/baggage-fee-calculator/" class="hover:text-purple-300 transition-colors">Baggage Fee Calculator</a></li>
+              <li><a href="/tsa-liquids-checker" class="hover:text-purple-300 transition-colors">TSA 3-1-1 Liquids Checker</a></li>
+              <li><a href="/carry-on-checker" class="hover:text-purple-300 transition-colors">Carry-On Size Checker</a></li>
+              <li><a href="/packing-list-7-day" class="hover:text-purple-300 transition-colors">7-Day Packing List</a></li>
               <li><a href="/tare-weight" class="hover:text-purple-300 transition-colors">Tare Weight Guide</a></li>
               <li><a href="/entry-requirements" class="hover:text-purple-300 transition-colors">Entry Requirements</a></li>
             </ul>
@@ -621,6 +657,7 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
             <ul class="space-y-2 text-slate-400">
               <li><a href="/pricing" class="hover:text-purple-300 transition-colors">Pricing & Plans</a></li>
               <li><a href="/how-it-works" class="hover:text-purple-300 transition-colors">How It Works</a></li>
+              <li><a href="/demo" class="hover:text-purple-300 transition-colors">Interactive Demo</a></li>
               <li><a href="/about" class="hover:text-purple-300 transition-colors">About</a></li>
               <li><a href="/faq" class="hover:text-purple-300 transition-colors">FAQ</a></li>
               <li><a href="/changelog" class="hover:text-purple-300 transition-colors">Changelog</a></li>
@@ -662,8 +699,8 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
           <a href="/" class="font-black text-base tracking-tight text-slate-900">Gate<span class="text-purple-600">Ready</span></a>
         </div>
         <div class="flex items-center gap-2">
-          <a href="/airlines" class="hidden md:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">42 Airline Guides</a>
-          <a href="/baggage-fee-calculator" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Fee Calculator</a>
+          <a href="/airlines/" class="hidden md:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">42 Airline Guides</a>
+          <a href="/baggage-fee-calculator/" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Fee Calculator</a>
           <a href="/pricing" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Plans from $1.99</a>
           <a href="/" class="h-9 px-4 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center justify-center">Create Your Trip (Free)</a>
         </div>
