@@ -30,7 +30,7 @@ export const ChangelogPage: React.FC = () => {
               <span>Interactive Real-UI Product Demo &amp; Live Guide Embedded Panels</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Added a live interactive product demonstration on the homepage backed by real bag weight math, suggest-first Rebalance Bags with Apply/Undo, and TSA 3-1-1 checks — plus embedded real-UI panels across /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.
+              Added a live interactive product demonstration on the homepage backed by real bag weight math, suggest-first Rebalance Bags with exact partial-quantity Apply/Undo, and TSA 3-1-1 checks — plus embedded real-UI panels across /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.
             </p>
           </div>
 
@@ -50,7 +50,7 @@ export const ChangelogPage: React.FC = () => {
               <span>All 6 Lemon Squeezy Checkout Variants, Direct Signup Flow &amp; Value-Moment Gating</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Wired dedicated monthly and annual checkout triggers for Silver, Gold, and Platinum with 14-day money-back guarantee notes beside every checkout button, added a factual trial/refund/cancellation block below /pricing comparison tables, routed post-signup straight to trip creation with a sample trip option, and gated upsell popups behind first packing or readiness value.
+              Wired dedicated monthly and annual checkout variants for Silver ($1.99/mo, $19.99/yr), Gold ($3.99/mo, $29.99/yr), and Platinum ($4.99/mo, $39.99/yr) with 14-day money-back guarantee notes, added a factual trial/refund/cancellation block on /pricing, routed post-signup straight to trip creation with a sample trip option, and gated upsell popups and locks behind first packing or readiness value.
             </p>
           </div>
         </div>

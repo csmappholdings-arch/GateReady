@@ -44,6 +44,7 @@ import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { checkPassportValidity } from '../utils/passportValidity';
 import { trackEvent } from '../utils/analytics';
 import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
+import { hasReachedValueMoment, VALUE_MOMENT_EVENT } from '../utils/valueMoment';
 
 interface AddTripDialogProps {
   isOpen: boolean;
@@ -165,11 +166,25 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     }
   }, [airlineFareFamilies, fareFamily]);
 
+  const [valueMomentReached, setValueMomentReached] = useState<boolean>(() => hasReachedValueMoment());
+  const showLockedUpsells = !isPro && valueMomentReached;
+  const showPreValueFlow = !isPro && !valueMomentReached;
+
+  useEffect(() => {
+    if (isOpen) {
+      setValueMomentReached(hasReachedValueMoment());
+    }
+    const handleValueMoment = () => setValueMomentReached(true);
+    window.addEventListener(VALUE_MOMENT_EVENT, handleValueMoment);
+    return () => window.removeEventListener(VALUE_MOMENT_EVENT, handleValueMoment);
+  }, [isOpen]);
+
   // Tab 2: Traveler & Baggage State
   const defaultTraveler = user?.displayName ? user.displayName.split(' ')[0] : 'Me';
   const [familyMembers, setFamilyMembers] = useState<string[]>([defaultTraveler]);
   const [newMemberInput, setNewMemberInput] = useState('');
   const [travelerError, setTravelerError] = useState('');
+  const [bagError, setBagError] = useState('');
 
   // Default initial bag preset: 1 Carry-on Roller + 1 Personal Backpack (2 bags max for free)
   const [bags, setBags] = useState<Array<{ 
@@ -255,6 +270,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
       }
       setNewMemberInput('');
       setTravelerError('');
+      setBagError('');
 
       if (initialBags && initialBags.length > 0) {
         if (!isPro) {
@@ -285,8 +301,6 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     }
   }, [
     isOpen,
-    user,
-    isPro,
     initialTripTitle,
     initialTravelType,
     initialOriginCity,
@@ -364,8 +378,12 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
 
     const travelerCheck = canAddTraveler(familyMembers.length);
     if (!travelerCheck.allowed) {
-      if (isPro) {
-        setTravelerError(travelerCheck.reason || 'Traveler limit reached for your current plan.');
+      if (isPro || showPreValueFlow) {
+        setTravelerError(
+          isPro
+            ? travelerCheck.reason || 'Traveler limit reached for your current plan.'
+            : 'Free Starter supports 1 traveler per trip.'
+        );
         return;
       }
       openPaywall(travelerCheck.reason);
@@ -397,6 +415,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
 
   // 1-Click Luggage Bundles
   const applyLuggageBundle = (bundle: 'CARRY_ON_ONLY' | 'CHECKED_PLUS_CARRY' | 'MINIMALIST') => {
+    setBagError('');
     const primary = familyMembers[0] || 'Traveler';
     if (bundle === 'CARRY_ON_ONLY') {
       setBags([
@@ -418,6 +437,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     } else if (bundle === 'CHECKED_PLUS_CARRY') {
       // 3 Bags Bundle: Requires Silver+
       if (!isPro) {
+        if (showPreValueFlow) {
+          setBagError('Free Starter supports up to 2 bags per trip (max 1 checked bag).');
+          return;
+        }
         openPaywall(`Packing 3 or more bags (Checked + Carry-On + Personal Item) requires unlocking beyond the 2-bag Free limit. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
@@ -458,8 +481,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   };
 
   const handleAddBag = (type: BagType = 'CHECKED') => {
+    setBagError('');
     const bagCheck = canAddBag(bags as any, type);
     if (!bagCheck.allowed) {
+      if (showPreValueFlow) {
+        setBagError('Free Starter supports up to 2 bags per trip (max 1 checked bag).');
+        return;
+      }
       openPaywall(bagCheck.reason);
       return;
     }
@@ -487,13 +515,19 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   };
 
   const handleRemoveBag = (index: number) => {
+    setBagError('');
     setBags(bags.filter((_, i) => i !== index));
   };
 
   const handleUpdateBagType = (index: number, newType: BagType) => {
+    setBagError('');
     const otherBags = bags.filter((_, i) => i !== index);
     const bagCheck = canAddBag(otherBags as any, newType);
     if (!bagCheck.allowed) {
+      if (showPreValueFlow) {
+        setBagError('Free Starter supports up to 2 bags per trip (max 1 checked bag).');
+        return;
+      }
       openPaywall(bagCheck.reason);
       return;
     }
@@ -581,10 +615,20 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
     if (!isPro) {
       const checkedCount = finalBags.filter((b) => b.type === 'CHECKED').length;
       if (checkedCount > 1) {
+        if (showPreValueFlow) {
+          setBagError('Free Starter allows 1 Checked Bag per trip (up to 2 bags total).');
+          setActiveTab('baggage');
+          return;
+        }
         openPaywall(`Free plan allows 1 Checked Bag per trip (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
       if (finalBags.length > 2) {
+        if (showPreValueFlow) {
+          setBagError('Free Starter supports up to 2 bags per trip.');
+          setActiveTab('baggage');
+          return;
+        }
         openPaywall(`Free plan is limited to 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
         return;
       }
@@ -1225,22 +1269,31 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 </div>
               </div>
 
-              {/* Return Trip Schedule (Round-Trip Tracking) - Pro Feature */}
+              {/* Return Trip Schedule (Round-Trip Tracking) */}
               <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-indigo-50/70 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 border border-indigo-200/90 dark:border-indigo-800/60 shadow-2xs space-y-3">
-                {/* Pro Locked Header Banner with Short Feature Summary for Non-Pro Users */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-indigo-100 dark:border-indigo-900/60">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-300/40">
-                      <Crown className="w-4 h-4 fill-amber-500 text-amber-500" />
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
+                      showPreValueFlow
+                        ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                        : 'bg-amber-400/20 text-amber-600 dark:text-amber-400 border-amber-300/40'
+                    }`}>
+                      {showPreValueFlow ? (
+                        <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-300" />
+                      ) : (
+                        <Crown className="w-4 h-4 fill-amber-500 text-amber-500" />
+                      )}
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-black text-indigo-950 dark:text-indigo-200">
                           Round-Trip & Return Tracking
                         </span>
-                        <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                          {!isPro && <Lock className="w-2.5 h-2.5" />} SILVER+
-                        </span>
+                        {!showPreValueFlow && (
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
+                            {showLockedUpsells && <Lock className="w-2.5 h-2.5" />} SILVER+
+                          </span>
+                        )}
                       </div>
                       <p className="text-[10px] text-indigo-700/80 dark:text-indigo-300/80">
                         {travelType === 'PLANE'
@@ -1250,7 +1303,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     </div>
                   </div>
 
-                  {!isPro ? (
+                  {showLockedUpsells ? (
                     <button
                       type="button"
                       onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
@@ -1259,15 +1312,15 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       <Lock className="w-3 h-3" />
                       <span>Try 7 days free</span>
                     </button>
-                  ) : (
+                  ) : isPro ? (
                     <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Unlocked
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
-                {/* Short Summary of Pro Features Banner (shown when locked) */}
-                {!isPro && (
+                {/* Short Summary of Pro Features Banner (only shown post-value-moment when locked) */}
+                {showLockedUpsells && (
                   <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-indigo-100 dark:border-indigo-900/50 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
                     <p className="font-bold text-indigo-900 dark:text-indigo-300 flex items-center gap-1 text-[10.5px]">
                       <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
@@ -1284,9 +1337,9 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   </div>
                 )}
 
-                {/* Return Date & Time Inputs (Interactive for Pro, Locked Overlay for Free) */}
+                {/* Return Date & Time Inputs */}
                 <div className="relative">
-                  {!isPro && (
+                  {showLockedUpsells && (
                     <div 
                       onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                       className="absolute inset-0 z-10 bg-slate-900/5 dark:bg-slate-950/20 backdrop-blur-[1px] rounded-xl flex items-center justify-center cursor-pointer group"
@@ -1299,15 +1352,15 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     </div>
                   )}
 
-                  <div className={`grid grid-cols-2 gap-3 ${!isPro ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                  <div className={`grid grid-cols-2 gap-3 ${showLockedUpsells ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                     <div>
                       <label className="block text-[11px] font-bold text-indigo-950 dark:text-indigo-300 uppercase tracking-wider mb-1 flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Return Date</span>
                       </label>
                       <DatePickerInput
-                        value={isPro ? returnTripDate : ''}
-                        onChange={(val) => isPro && setReturnTripDate(val)}
+                        value={showLockedUpsells ? '' : returnTripDate}
+                        onChange={(val) => !showLockedUpsells && setReturnTripDate(val)}
                         className={isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'}
                       />
                     </div>
@@ -1319,8 +1372,8 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       </label>
                       <input
                         type="time"
-                        disabled={!isPro}
-                        value={isPro ? returnTripTime : ''}
+                        disabled={showLockedUpsells}
+                        value={showLockedUpsells ? '' : returnTripTime}
                         onChange={(e) => setReturnTripTime(e.target.value)}
                         className={`w-full rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white ${
                           isExpanded ? 'h-11 px-3.5 text-sm' : 'h-10 px-3 text-xs'
@@ -1394,14 +1447,20 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     <span>Who is Traveling? ({familyMembers.length})</span>
                   </div>
                   {tier === 'FREE' ? (
-                    <button
-                      type="button"
-                      onClick={() => openPaywall(`Free plan allows 1 traveler. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
-                      className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-200 cursor-pointer"
-                    >
-                      <Crown className="w-3 h-3 fill-amber-500 text-amber-500" />
-                      <span>Free: 1 Traveler</span>
-                    </button>
+                    showPreValueFlow ? (
+                      <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
+                        Free: 1 Traveler
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openPaywall(`Free plan allows 1 traveler. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+                        className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-200 cursor-pointer"
+                      >
+                        <Crown className="w-3 h-3 fill-amber-500 text-amber-500" />
+                        <span>Free: 1 Traveler</span>
+                      </button>
+                    )
                   ) : (
                     <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Crown className="w-3 h-3 fill-purple-600 text-purple-600" />
@@ -1529,6 +1588,10 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                         <span className="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.2 rounded ml-auto">
                           Included (3 bags)
                         </span>
+                      ) : showPreValueFlow ? (
+                        <span className="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold px-1.5 py-0.2 rounded ml-auto">
+                          3 bags
+                        </span>
                       ) : (
                         <span className="text-[9px] bg-amber-400 text-purple-950 font-black px-1.5 py-0.2 rounded flex items-center gap-0.5 ml-auto">
                           <Lock className="w-2.5 h-2.5" /> Silver+ (3 bags)
@@ -1567,10 +1630,16 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                       Configured Bags ({bags.length})
                     </span>
                     {!isPro ? (
-                      <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
-                        <span>Free Limit: 2 Bags Max (3+ Requires Silver+)</span>
-                      </span>
+                      showPreValueFlow ? (
+                        <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
+                          Free: Up to 2 Bags
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+                          <span>Free Limit: 2 Bags Max (3+ Requires Silver+)</span>
+                        </span>
+                      )
                     ) : (
                       <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
                         {tier === 'PLATINUM' ? 'Platinum: Unlimited Bags' : tier === 'GOLD' ? 'Gold: Unlimited Bags' : 'Silver: Unlimited Bags'}
@@ -1587,6 +1656,13 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     <span>Add Custom Bag</span>
                   </button>
                 </div>
+
+                {bagError && (
+                  <p role="alert" className="text-[11px] text-rose-500 font-semibold flex items-center gap-1 mb-2">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{bagError}</span>
+                  </p>
+                )}
 
                 <div className="space-y-2">
                   {bags.map((bag, idx) => (

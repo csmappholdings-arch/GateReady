@@ -54,6 +54,7 @@ import { useTravelWallet } from '../context/TravelWalletContext';
 import { AccountSyncModal } from './AccountSyncModal';
 import { deleteUserAccountAndData } from '../lib/firebase';
 import { TRIAL_CTA_LABEL, TRIAL_TERMS_EXACT } from '../data/planEntitlements';
+import { hasReachedValueMoment } from '../utils/valueMoment';
 
 interface HeaderProps {
   onOpenAddTrip: () => void;
@@ -607,11 +608,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={() => {
-                let reached = false;
-                try {
-                  reached = Boolean(typeof window !== 'undefined' && sessionStorage.getItem('gateready_value_moment_v1'));
-                } catch {}
-                if (!reached && typeof window !== 'undefined') {
+                if (!hasReachedValueMoment() && typeof window !== 'undefined') {
                   window.location.href = '/pricing';
                   return;
                 }
@@ -869,6 +866,10 @@ export const Header: React.FC<HeaderProps> = ({
                       <button
                         onClick={() => {
                           setUserMenuOpen(false);
+                          if (!hasReachedValueMoment() && typeof window !== 'undefined') {
+                            window.location.href = '/pricing';
+                            return;
+                          }
                           openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Or compare Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo).`);
                         }}
                         className="w-full h-8 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:from-purple-700 cursor-pointer"
@@ -2012,6 +2013,10 @@ export const Header: React.FC<HeaderProps> = ({
                         type="button"
                         onClick={() => {
                           setMobileMenuOpen(false);
+                          if (!hasReachedValueMoment() && typeof window !== 'undefined') {
+                            window.location.href = '/pricing';
+                            return;
+                          }
                           openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`);
                         }}
                         className="w-full h-8.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98 transition-all cursor-pointer"
@@ -2060,6 +2065,10 @@ export const Header: React.FC<HeaderProps> = ({
                       type="button"
                       onClick={() => {
                         setMobileMenuOpen(false);
+                        if (!hasReachedValueMoment() && typeof window !== 'undefined') {
+                          window.location.href = '/pricing';
+                          return;
+                        }
                         openPaywall();
                       }}
                       className="w-full h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"

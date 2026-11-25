@@ -41,6 +41,7 @@ import { OnboardingModal, isOnboardingCompleted, setOnboardingCompleted, saveUse
 import { InAppNotification, LuggageProfile } from './types/travel';
 import { generateTripNotifications } from './utils/notifications';
 import { trackEvent } from './utils/analytics';
+import { VALUE_MOMENT_EVENT } from './utils/valueMoment';
 import { AppFooter } from './components/AppFooter';
 import { TrialNudgeBanner } from './components/TrialNudgeBanner';
 import { TrialExpiredModal } from './components/TrialExpiredModal';
@@ -223,9 +224,20 @@ function PackingAppContent() {
         setSoftLimitNotice(detail.message);
       }
     };
+    const handleClearSoftNotice = () => setSoftLimitNotice(null);
     window.addEventListener('gateready:soft-limit-notice', handleSoftNotice);
-    return () => window.removeEventListener('gateready:soft-limit-notice', handleSoftNotice);
+    window.addEventListener(VALUE_MOMENT_EVENT, handleClearSoftNotice);
+    return () => {
+      window.removeEventListener('gateready:soft-limit-notice', handleSoftNotice);
+      window.removeEventListener(VALUE_MOMENT_EVENT, handleClearSoftNotice);
+    };
   }, []);
+
+  useEffect(() => {
+    if (isPro) {
+      setSoftLimitNotice(null);
+    }
+  }, [isPro]);
 
   // Auto-launch guided onboarding for first-time visitors on home/dashboard
   useEffect(() => {
@@ -452,6 +464,33 @@ function PackingAppContent() {
     setAccountModalMode('signup');
     setShowAccountModal(true);
   };
+
+  const handleRegistrationSuccess = () => {
+    setOnboardingCompleted(true);
+    try {
+      sessionStorage.setItem('gateready_onboarding_shown_session', 'true');
+    } catch {}
+    setShowOnboardingModal(false);
+    setShowSaveGateModal(false);
+    setEditingTripId(undefined);
+    setAddTripPreFill(null);
+    setSelectedTravelTypeForAdd(undefined);
+    setSelectedDestinationForAdd(undefined);
+    setAppView('dashboard');
+    if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
+      try {
+        window.history.pushState({}, '', '/dashboard');
+      } catch {}
+    }
+    setAddTripKey((prev) => prev + 1);
+    setShowAddTripModal(true);
+  };
+
+  useEffect(() => {
+    const onRegSuccessEvent = () => handleRegistrationSuccess();
+    window.addEventListener('gateready:registration-success', onRegSuccessEvent);
+    return () => window.removeEventListener('gateready:registration-success', onRegSuccessEvent);
+  }, []);
 
   const handleOpenAddTrip = (
     travelType?: TravelType, 
@@ -701,7 +740,7 @@ function PackingAppContent() {
 
       {/* C4: Non-blocking inline soft limit notice before first value moment */}
       {softLimitNotice && (
-        <div className="bg-slate-900 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs border-b border-purple-700/60 relative z-30">
+        <div role="status" className="bg-slate-900 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs border-b border-purple-700/60 relative z-30">
           <div className="flex items-center gap-2.5 min-w-0">
             <Info className="w-4 h-4 text-amber-400 shrink-0" />
             <p className="text-slate-100 leading-snug">
@@ -1035,23 +1074,7 @@ function PackingAppContent() {
         }}
         origin={accountModalOrigin}
         initialMode={accountModalMode}
-        onRegistrationSuccess={() => {
-          setOnboardingCompleted(true);
-          try {
-            sessionStorage.setItem('gateready_onboarding_shown_session', 'true');
-          } catch {}
-          setShowOnboardingModal(false);
-          setAppView('dashboard');
-          if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
-            try {
-              window.history.pushState({}, '', '/dashboard');
-            } catch {}
-          }
-          if (trips.length === 0) {
-            setAddTripKey((prev) => prev + 1);
-            setShowAddTripModal(true);
-          }
-        }}
+        onRegistrationSuccess={handleRegistrationSuccess}
       />
 
       {/* Feature 1: First-run & 3rd Visit Save Gate Modal */}

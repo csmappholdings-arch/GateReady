@@ -35,6 +35,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useSubscription } from '../context/SubscriptionContext';
+import { hasReachedValueMoment } from '../utils/valueMoment';
 
 interface WalkthroughStep {
   id: string;
@@ -441,7 +442,14 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                 </div>
                 <button
                   type="button"
-                  onClick={() => openPaywall('tour_prompt')}
+                  onClick={() => {
+                    if (!hasReachedValueMoment() && typeof window !== 'undefined') {
+                      onClose();
+                      window.location.href = '/pricing';
+                      return;
+                    }
+                    openPaywall('tour_prompt');
+                  }}
                   className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-purple-950 text-[10px] font-black uppercase tracking-wider cursor-pointer shrink-0 transition-colors"
                 >
                   Upgrade
@@ -781,7 +789,14 @@ export const WalkthroughVideoModal: React.FC<WalkthroughVideoModalProps> = ({
                     <div className="pt-1 flex items-center justify-between gap-2">
                       <button
                         type="button"
-                        onClick={() => openPaywall('tour_footer')}
+                        onClick={() => {
+                          if (!hasReachedValueMoment() && typeof window !== 'undefined') {
+                            onClose();
+                            window.location.href = '/pricing';
+                            return;
+                          }
+                          openPaywall('tour_footer');
+                        }}
                         className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-fuchsia-500 hover:from-amber-300 hover:to-fuchsia-400 text-purple-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
                       >
                         <Crown className="w-3.5 h-3.5 fill-purple-950" />

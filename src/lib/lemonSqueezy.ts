@@ -22,15 +22,15 @@ const envVar = (key: string): string | undefined => {
 export const TIER_CHECKOUT_SLUGS: Record<PaidTier, { monthly: string; yearly: string }> = {
   SILVER: {
     monthly: envVar('VITE_LEMON_SILVER_MONTHLY') || 'ced3b062-e600-470d-a4aa-7c59dfdbd798',
-    yearly: envVar('VITE_LEMON_SILVER_YEARLY') || 'ced3b062-e600-470d-a4aa-7c59dfdbd798'
+    yearly: envVar('VITE_LEMON_SILVER_YEARLY') || 'c3c81858-42f7-4bdc-aa5a-a04b455f6499'
   },
   GOLD: {
     monthly: envVar('VITE_LEMON_GOLD_MONTHLY') || '319af1da-b267-4650-a2cc-8b551227d6b6',
-    yearly: envVar('VITE_LEMON_GOLD_YEARLY') || '319af1da-b267-4650-a2cc-8b551227d6b6'
+    yearly: envVar('VITE_LEMON_GOLD_YEARLY') || '99e6f4ed-dd53-4337-ae49-1368d14b25b3'
   },
   PLATINUM: {
     monthly: envVar('VITE_LEMON_PLATINUM_MONTHLY') || '89bfc2fa-082e-4a8f-b05b-0836cd1908d0',
-    yearly: envVar('VITE_LEMON_PLATINUM_YEARLY') || '89bfc2fa-082e-4a8f-b05b-0836cd1908d0'
+    yearly: envVar('VITE_LEMON_PLATINUM_YEARLY') || '883b4d49-1b9e-4a84-a53a-8c3eeb2738b0'
   }
 };
 
@@ -38,6 +38,7 @@ export const TIER_CHECKOUT_SLUGS: Record<PaidTier, { monthly: string; yearly: st
 export function mapSlugToTier(slugOrUrl: string): PaidTier {
   if (
     slugOrUrl.includes('ced3b062-e600-470d-a4aa-7c59dfdbd798') ||
+    slugOrUrl.includes('c3c81858-42f7-4bdc-aa5a-a04b455f6499') ||
     slugOrUrl.includes(TIER_CHECKOUT_SLUGS.SILVER.monthly) ||
     slugOrUrl.includes(TIER_CHECKOUT_SLUGS.SILVER.yearly)
   ) {
@@ -45,6 +46,7 @@ export function mapSlugToTier(slugOrUrl: string): PaidTier {
   }
   if (
     slugOrUrl.includes('319af1da-b267-4650-a2cc-8b551227d6b6') ||
+    slugOrUrl.includes('99e6f4ed-dd53-4337-ae49-1368d14b25b3') ||
     slugOrUrl.includes(TIER_CHECKOUT_SLUGS.GOLD.monthly) ||
     slugOrUrl.includes(TIER_CHECKOUT_SLUGS.GOLD.yearly)
   ) {
@@ -52,6 +54,7 @@ export function mapSlugToTier(slugOrUrl: string): PaidTier {
   }
   if (
     slugOrUrl.includes('89bfc2fa-082e-4a8f-b05b-0836cd1908d0') ||
+    slugOrUrl.includes('883b4d49-1b9e-4a84-a53a-8c3eeb2738b0') ||
     slugOrUrl.includes(TIER_CHECKOUT_SLUGS.PLATINUM.monthly) ||
     slugOrUrl.includes(TIER_CHECKOUT_SLUGS.PLATINUM.yearly)
   ) {

@@ -662,7 +662,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [tier, billingCycle]);
 
   const openPaywall = (reason?: string, options?: { defaultShowPlans?: boolean; userInitiated?: boolean }) => {
-    if (!options?.userInitiated && !hasReachedValueMoment()) {
+    if (!hasReachedValueMoment()) {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
           new CustomEvent('gateready:soft-limit-notice', {

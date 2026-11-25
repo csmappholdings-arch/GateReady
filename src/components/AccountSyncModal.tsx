@@ -117,6 +117,8 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
         trackEvent('registration_completed', { method: 'google', origin: getEffectiveOrigin() });
         if (onRegistrationSuccess) {
           onRegistrationSuccess();
+        } else if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('gateready:registration-success'));
         }
       }
       onClose();
@@ -192,6 +194,8 @@ export const AccountSyncModal: React.FC<AccountSyncModalProps> = ({
         trackEvent('registration_completed', { method: 'email', origin: getEffectiveOrigin() });
         if (onRegistrationSuccess) {
           onRegistrationSuccess();
+        } else if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('gateready:registration-success'));
         }
       } else {
         await signInWithEmail(email, password);

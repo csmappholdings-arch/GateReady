@@ -32,8 +32,9 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
       moveId: string;
       sourceBagId: string;
       destBagId: string;
+      originalItemId: string;
       movedItemId: string;
-      originalQuantity: number;
+      movedQuantity: number;
       description: string;
     }>
   >([]);
@@ -102,25 +103,41 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
   };
 
   const handleApplySuggestion = (move: SuggestedMove) => {
-    const movedItemId = `${move.itemId}-moved-${Date.now()}`;
+    const movedItemId = `${move.itemId}-moved-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    let actualMoveQty = move.quantity;
+
     setTrip((prev) => {
       const sourceBag = prev.bags.find((b) => b.id === move.sourceBagId);
       const sourceItem = sourceBag?.items.find((i) => i.id === move.itemId);
       if (!sourceItem) return prev;
 
+      const sourceQty = typeof sourceItem.quantity === 'number' ? sourceItem.quantity : 1;
+      const moveQty = Math.max(1, Math.min(sourceQty, move.quantity));
+      const remainingQty = sourceQty - moveQty;
+      actualMoveQty = moveQty;
+
       return {
         ...prev,
         bags: prev.bags.map((bag) => {
           if (bag.id === move.sourceBagId) {
+            if (remainingQty <= 0) {
+              return {
+                ...bag,
+                items: bag.items.filter((i) => i.id !== move.itemId)
+              };
+            }
             return {
               ...bag,
-              items: bag.items.filter((i) => i.id !== move.itemId)
+              items: bag.items.map((i) =>
+                i.id === move.itemId ? { ...i, quantity: remainingQty } : i
+              )
             };
           }
           if (bag.id === move.destBagId) {
             const relocated: PackingItem = {
               ...sourceItem,
-              id: movedItemId
+              id: movedItemId,
+              quantity: moveQty
             };
             return {
               ...bag,
@@ -138,8 +155,9 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
         moveId: move.id,
         sourceBagId: move.sourceBagId,
         destBagId: move.destBagId,
+        originalItemId: move.itemId,
         movedItemId,
-        originalQuantity: move.quantity,
+        movedQuantity: actualMoveQty,
         description: `Moved ${move.itemName} (${move.itemWeightLbs.toFixed(1)} lbs) → ${move.destBagLabel}`
       }
     ]);
@@ -155,19 +173,42 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
       const movedItem = destBag?.items.find((i) => i.id === last.movedItemId);
       if (!movedItem) return prev;
 
+      const destQty = typeof movedItem.quantity === 'number' ? movedItem.quantity : 1;
+      const qtyToRestore = destQty > 0 ? Math.min(destQty, last.movedQuantity) : 0;
+      const remainingDestQty = destQty - qtyToRestore;
+
       return {
         ...prev,
         bags: prev.bags.map((bag) => {
           if (bag.id === last.destBagId) {
+            if (remainingDestQty <= 0) {
+              return {
+                ...bag,
+                items: bag.items.filter((i) => i.id !== last.movedItemId)
+              };
+            }
             return {
               ...bag,
-              items: bag.items.filter((i) => i.id !== last.movedItemId)
+              items: bag.items.map((i) =>
+                i.id === last.movedItemId ? { ...i, quantity: remainingDestQty } : i
+              )
             };
           }
           if (bag.id === last.sourceBagId) {
+            if (qtyToRestore <= 0) return bag;
+            const existingOriginal = bag.items.find((i) => i.id === last.originalItemId);
+            if (existingOriginal) {
+              const origQty = typeof existingOriginal.quantity === 'number' ? existingOriginal.quantity : 1;
+              return {
+                ...bag,
+                items: bag.items.map((i) =>
+                  i.id === last.originalItemId ? { ...i, quantity: origQty + qtyToRestore } : i
+                )
+              };
+            }
             return {
               ...bag,
-              items: [...bag.items, movedItem]
+              items: [...bag.items, { ...movedItem, id: last.originalItemId, quantity: qtyToRestore }]
             };
           }
           return bag;
@@ -226,6 +267,23 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
         </div>
 
         {/* Suggest-First Rebalance Strip */}
+        {appliedHistory.length > 0 && primarySuggestion && (
+          <div className="px-5 sm:px-7 py-2.5 border-b bg-emerald-50/90 dark:bg-emerald-950/35 border-emerald-200 dark:border-emerald-800/70 text-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-200 font-bold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{appliedHistory[appliedHistory.length - 1]?.description}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleUndoLast}
+              className="h-8 px-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-emerald-800 dark:text-emerald-200 font-bold text-xs inline-flex items-center gap-1 hover:bg-emerald-100/50 transition-colors cursor-pointer shrink-0"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+              <span>Undo</span>
+            </button>
+          </div>
+        )}
+
         {(primarySuggestion || appliedHistory.length > 0) && (
           <div
             className={`px-5 sm:px-7 py-3.5 border-b text-xs flex flex-col md:flex-row md:items-center justify-between gap-3 ${
