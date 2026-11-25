@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-import { getPageHtmlContent } from './src/pages/serverPagesHtml';
+import { getPageHtmlContent, getNotFoundPageHtml } from './src/pages/serverPagesHtml';
 import { getAirlineGuideByAnySlug } from './src/data/airlineGuidesData';
 import { buildStructuredDataGraph, getCanonicalUrl } from './src/pages/structuredData';
 
@@ -256,11 +256,125 @@ async function startServer() {
     res.status(404).send('Not Found');
   });
 
-  // Pre-rendered HTML routes for all 12 informational pages, 42 airline guides, and intent hubs
+  async function sendTemplatedPage(
+    req: Request,
+    res: Response,
+    meta: ReturnType<typeof getNotFoundPageHtml>['meta'],
+    bodyHtml: string,
+    statusCode: number,
+    robotsDirective?: string
+  ): Promise<boolean> {
+    const indexPath = isProduction
+      ? path.resolve(__dirname, 'dist', 'index.html')
+      : path.resolve(__dirname, 'index.html');
+
+    if (!fs.existsSync(indexPath)) {
+      return false;
+    }
+
+    let template = fs.readFileSync(indexPath, 'utf-8');
+
+    template = template.replace(/<title>.*?<\/title>/, `<title>${meta.title}</title>`);
+    template = template.replace(
+      /<meta\s+name="description"\s+content=".*?"\s*\/?>/,
+      `<meta name="description" content="${meta.description}" />`
+    );
+    template = template.replace(
+      /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/,
+      `<meta name="keywords" content="${meta.keywords}" />`
+    );
+    if (robotsDirective) {
+      if (/<meta\s+name="robots"\s+content=".*?"\s*\/?>/i.test(template)) {
+        template = template.replace(
+          /<meta\s+name="robots"\s+content=".*?"\s*\/?>/i,
+          `<meta name="robots" content="${robotsDirective}" />`
+        );
+      } else {
+        template = template.replace('</head>', `<meta name="robots" content="${robotsDirective}" />\n  </head>`);
+      }
+    }
+    template = template.replace(
+      /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/,
+      `<meta property="og:title" content="${meta.title}" />`
+    );
+    template = template.replace(
+      /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
+      `<meta property="og:description" content="${meta.description}" />`
+    );
+    const canonicalUrl = getCanonicalUrl(meta.path);
+    template = template.replace(
+      /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/,
+      `<meta property="og:url" content="${canonicalUrl}" />`
+    );
+    template = template.replace(
+      /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/,
+      `<meta property="og:image" content="https://gateready.ca/thumbnail.jpg" />`
+    );
+    template = template.replace(
+      /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/,
+      `<meta name="twitter:title" content="${meta.title}" />`
+    );
+    template = template.replace(
+      /<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/,
+      `<meta name="twitter:description" content="${meta.description}" />`
+    );
+    template = template.replace(
+      /<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/,
+      `<meta name="twitter:image" content="https://gateready.ca/thumbnail.jpg" />`
+    );
+    template = template.replace(
+      /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
+      `<link rel="canonical" href="${canonicalUrl}" />`
+    );
+
+    const jsonLdScript = `<script id="gateready-jsonld" type="application/ld+json">${JSON.stringify(
+      buildStructuredDataGraph(meta)
+    )}</script>`;
+    if (/<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/.test(template)) {
+      template = template.replace(
+        /<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/,
+        `<!-- JSONLD_START -->\n    ${jsonLdScript}\n    <!-- JSONLD_END -->`
+      );
+    } else {
+      template = template.replace('</head>', `${jsonLdScript}\n  </head>`);
+    }
+
+    if (/<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/.test(template)) {
+      template = template.replace(
+        /<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/,
+        `<!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END -->`
+      );
+    } else {
+      template = template.replace(
+        /<div id="root">[\s\S]*?<\/div>/,
+        `<div id="root"><!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END --></div>`
+      );
+    }
+
+    if (!isProduction && viteDevServer) {
+      template = await viteDevServer.transformIndexHtml(req.originalUrl, template);
+    }
+
+    res.status(statusCode).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(template);
+    return true;
+  }
+
+  // Pre-rendered HTML routes for all informational pages, 42 airline guides, intent hubs, and true HTTP 404
   app.get('*', async (req: Request, res: Response, next) => {
-    // Only intercept GET requests that might be pre-rendered HTML (not /api or static assets like .js, .css, .jpg, etc.)
     const pathname = req.path.replace(/\/+$/, '') || '/';
-    if (pathname.startsWith('/api') || pathname.includes('.')) {
+    if (
+      pathname.startsWith('/api') ||
+      pathname.startsWith('/@') ||
+      pathname.startsWith('/src/') ||
+      pathname.startsWith('/node_modules/') ||
+      pathname.startsWith('/assets/') ||
+      pathname.includes('.')
+    ) {
+      return next();
+    }
+
+    // Known app workspace route (/dashboard): serve SPA shell cleanly (200 OK)
+    if (pathname === '/dashboard') {
       return next();
     }
 
@@ -276,99 +390,25 @@ async function startServer() {
     }
 
     const pageData = getPageHtmlContent(pathname);
-    if (!pageData) {
-      return next();
-    }
-
     try {
-      const { meta, bodyHtml } = pageData;
-      const indexPath = isProduction
-        ? path.resolve(__dirname, 'dist', 'index.html')
-        : path.resolve(__dirname, 'index.html');
-
-      if (!fs.existsSync(indexPath)) {
+      if (pageData) {
+        const sent = await sendTemplatedPage(req, res, pageData.meta, pageData.bodyHtml, 200);
+        if (sent) return;
         return next();
       }
 
-      let template = fs.readFileSync(indexPath, 'utf-8');
-
-      // Inject page metadata
-      template = template.replace(
-        /<title>.*?<\/title>/,
-        `<title>${meta.title}</title>`
+      // Unrecognized path (including invalid /airlines/<unknown> slugs): return true HTTP 404 + noindex, nofollow
+      const notFound = getNotFoundPageHtml(req.path);
+      const sent = await sendTemplatedPage(
+        req,
+        res,
+        notFound.meta,
+        notFound.bodyHtml,
+        404,
+        'noindex, nofollow'
       );
-      template = template.replace(
-        /<meta\s+name="description"\s+content=".*?"\s*\/?>/,
-        `<meta name="description" content="${meta.description}" />`
-      );
-      template = template.replace(
-        /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/,
-        `<meta name="keywords" content="${meta.keywords}" />`
-      );
-      template = template.replace(
-        /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/,
-        `<meta property="og:title" content="${meta.title}" />`
-      );
-      template = template.replace(
-        /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/,
-        `<meta property="og:description" content="${meta.description}" />`
-      );
-      const canonicalUrl = getCanonicalUrl(meta.path);
-      template = template.replace(
-        /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/,
-        `<meta property="og:url" content="${canonicalUrl}" />`
-      );
-      template = template.replace(
-        /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/,
-        `<meta property="og:image" content="https://gateready.ca/thumbnail.jpg" />`
-      );
-      template = template.replace(
-        /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/,
-        `<meta name="twitter:title" content="${meta.title}" />`
-      );
-      template = template.replace(
-        /<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/,
-        `<meta name="twitter:description" content="${meta.description}" />`
-      );
-      template = template.replace(
-        /<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/,
-        `<meta name="twitter:image" content="https://gateready.ca/thumbnail.jpg" />`
-      );
-      template = template.replace(
-        /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/,
-        `<link rel="canonical" href="${canonicalUrl}" />`
-      );
-
-      const jsonLdScript = `<script id="gateready-jsonld" type="application/ld+json">${JSON.stringify(
-        buildStructuredDataGraph(meta)
-      )}</script>`;
-      if (/<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/.test(template)) {
-        template = template.replace(
-          /<!-- JSONLD_START -->[\s\S]*?<!-- JSONLD_END -->/,
-          `<!-- JSONLD_START -->\n    ${jsonLdScript}\n    <!-- JSONLD_END -->`
-        );
-      } else {
-        template = template.replace('</head>', `${jsonLdScript}\n  </head>`);
-      }
-
-      // Inject pre-rendered semantic HTML inside #root while preserving markers
-      if (/<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/.test(template)) {
-        template = template.replace(
-          /<!-- ROOT_CONTENT_START -->[\s\S]*?<!-- ROOT_CONTENT_END -->/,
-          `<!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END -->`
-        );
-      } else {
-        template = template.replace(
-          /<div id="root">[\s\S]*?<\/div>/,
-          `<div id="root"><!-- ROOT_CONTENT_START -->${bodyHtml}<!-- ROOT_CONTENT_END --></div>`
-        );
-      }
-
-      if (!isProduction && viteDevServer) {
-        template = await viteDevServer.transformIndexHtml(req.originalUrl, template);
-      }
-
-      res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(template);
+      if (sent) return;
+      return res.status(404).type('text/html').send('<h1>Page not found</h1>');
     } catch (e) {
       next(e);
     }
@@ -378,8 +418,23 @@ async function startServer() {
     app.use(viteDevServer.middlewares);
   } else {
     app.use(express.static(path.resolve(__dirname, 'dist')));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+    app.get('*', async (req: Request, res: Response) => {
+      const pathname = req.path.replace(/\/+$/, '') || '/';
+      if (pathname === '/' || pathname === '/dashboard') {
+        return res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      }
+      const notFound = getNotFoundPageHtml(req.path);
+      const sent = await sendTemplatedPage(
+        req,
+        res,
+        notFound.meta,
+        notFound.bodyHtml,
+        404,
+        'noindex, nofollow'
+      );
+      if (!sent) {
+        res.status(404).sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      }
     });
   }
 

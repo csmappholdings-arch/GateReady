@@ -49,6 +49,7 @@ interface AddTripDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onTripCreated?: () => void;
+  onSampleTripLoaded?: () => void;
   editingTripId?: string;
   initialTripTitle?: string;
   initialTravelType?: TravelType;
@@ -78,6 +79,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   isOpen, 
   onClose, 
   onTripCreated,
+  onSampleTripLoaded,
   editingTripId,
   initialTripTitle,
   initialTravelType, 
@@ -96,7 +98,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
   isOnboarding,
   initialBags
 }) => {
-  const { addTrip, updateTripDetails } = usePacking();
+  const { addTrip, updateTripDetails, loadDemoTrip, selectTrip } = usePacking();
   const { isPro, tier, canAddTraveler, canAddBag, canAddTrip, openPaywall } = useSubscription();
   const { user } = useAuth();
 
@@ -874,6 +876,29 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
           {/* ======================================================== */}
           {activeTab === 'destination' && (
             <div className={`animate-in fade-in duration-150 ${isExpanded ? 'space-y-6' : 'space-y-4'}`}>
+              {!editingTripId && (
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-xs text-slate-600 dark:text-slate-300">
+                    Prefer to test luggage scales, tare math, and TSA 3-1-1 checks before entering your own details?
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      if (onSampleTripLoaded) {
+                        onSampleTripLoaded();
+                      } else {
+                        const demo = loadDemoTrip();
+                        if (demo) selectTrip(demo);
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-purple-700 dark:text-purple-300 font-bold text-xs cursor-pointer transition-colors shrink-0"
+                  >
+                    Start with a sample trip
+                  </button>
+                </div>
+              )}
+
               {/* Trip Name & Preset Chips */}
               <div>
                 <div className="flex items-center justify-between mb-1">

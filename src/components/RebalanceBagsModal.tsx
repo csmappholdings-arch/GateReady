@@ -7,6 +7,7 @@ import {
   BagWeightSnapshot
 } from '../utils/rebalanceAlgorithm';
 import { usePacking } from '../context/PackingContext';
+import { markValueMomentReached } from '../utils/valueMoment';
 import {
   Scale,
   X,
@@ -109,6 +110,7 @@ export const RebalanceBagsModal: React.FC<RebalanceBagsModalProps> = ({
   const handleApplyMove = (move: SuggestedMove) => {
     const rec = executeSuggestedMove(move);
     setAppliedMoves((prev) => [...prev, rec]);
+    markValueMomentReached('REBALANCE_APPLIED');
   };
 
   // Handle undoing a specific applied move
@@ -132,6 +134,9 @@ export const RebalanceBagsModal: React.FC<RebalanceBagsModalProps> = ({
       executeSuggestedMove(move, idx)
     );
     setAppliedMoves((prev) => [...prev, ...newRecords]);
+    if (newRecords.length > 0) {
+      markValueMomentReached('REBALANCE_APPLIED');
+    }
   };
 
   // Handle undoing all moves applied in this modal session

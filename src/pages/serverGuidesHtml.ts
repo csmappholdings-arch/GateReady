@@ -879,7 +879,7 @@ export function getCarryOnCheckerHtml(): string {
         <td class="py-3 px-4">${g.limits.carryOnLimit.split('(')[0].trim()}</td>
         <td class="py-3 px-4 font-semibold">${g.limits.carryOnWeightLimit ? g.limits.carryOnWeightLimit.split(';')[0].trim() : 'No limit'}</td>
         <td class="py-3 px-4 text-slate-600">${g.limits.personalLimit.split('(')[0].trim()}</td>
-        <td class="py-3 px-4 font-bold">${g.fees.carryOnFee === 0 ? 'Free ($0)*' : `${g.fees.currencySymbol}${g.fees.carryOnFee} ${g.fees.currency}`}</td>
+        <td class="py-3 px-4 font-bold">${g.fees.carryOnFee === 0 ? 'Free ($0)*' : formatAirlineFee(g.fees.carryOnFee, g.fees.currencySymbol, g.fees.currency)}</td>
       </tr>
     `)
     .join('');
@@ -950,6 +950,8 @@ export function getPackingList7DayHtml(): string {
   const itemsTotalLbs = Math.round(
     PACKING_7_DAY_CAPSULE.reduce((acc, row) => acc + row.quantity * row.unitWeightLbs, 0) * 10
   ) / 10;
+  const wornTravelDayLbs = 3.5;
+  const packedContentsLbs = Math.round((itemsTotalLbs - wornTravelDayLbs) * 10) / 10;
 
   const rows = PACKING_7_DAY_CAPSULE.map((row) => `
     <tr>
@@ -974,7 +976,7 @@ export function getPackingList7DayHtml(): string {
       <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
         <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — The 5-4-3-2-1 7-Day Carry-On Formula</div>
         <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">
-          To pack 7 days cleanly inside one carry-on suitcase, GateReady recommends the <strong>5-4-3-2-1 capsule matrix</strong>: <strong>5 tops, 4 bottoms, 3 layers, 2 pairs of shoes, 1 swimwear/dressy set</strong> (plus 7 pairs of underwear and socks, a compliant 3-1-1 quart liquids bag, and carry-on tech). The packed contents total roughly <strong>${itemsTotalLbs.toFixed(1)} lbs</strong> — leaving you at <strong>17.7 lbs gross</strong> in a 5.5 lb fabric carry-on or <strong>19.2 lbs gross</strong> in a 7.0 lb hard-shell spinner, safely under 20–22 lb airline carry-on limits.
+          To pack 7 days cleanly inside one carry-on suitcase, GateReady recommends the <strong>5-4-3-2-1 capsule matrix</strong>: <strong>5 tops, 4 bottoms, 3 layers, 2 pairs of shoes, 1 swimwear/dressy set</strong> (plus 7 pairs of underwear and socks, a compliant 3-1-1 quart liquids bag, and carry-on tech). The full capsule table weighs <strong>${itemsTotalLbs.toFixed(1)} lbs</strong>; wearing your heaviest sneakers, jeans, and outerwear on travel day saves <strong>~${wornTravelDayLbs.toFixed(1)} lbs</strong>, leaving <strong>~${packedContentsLbs.toFixed(1)} lbs</strong> packed inside the bag — <strong>17.2 lbs gross</strong> in a 5.5 lb fabric carry-on or <strong>18.7 lbs gross</strong> in a 7.0 lb hard-shell spinner, safely under 20–22 lb airline carry-on limits.
         </p>
       </section>
 

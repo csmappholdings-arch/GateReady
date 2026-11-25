@@ -176,7 +176,7 @@ export const PACKING_LIST_7_DAY_FAQS: PlainFaqItem[] = [
   },
   {
     question: 'How much does a 7-day carry-on capsule weigh with suitcase tare included?',
-    answer: 'The 5-4-3-2-1 capsule contents total roughly 12.2 lbs (before wearing your heaviest jeans, sneakers, and jacket on board). Combined with a 5.5 lb soft-shell carry-on (17.7 lbs total) or 7.0 lb hard-shell spinner (19.2 lbs total), it stays under 20 to 22 lb airline cabin caps.'
+    answer: 'The 5-4-3-2-1 capsule table totals 15.2 lbs before travel-day worn items. Wearing your heaviest sneakers, jeans, and outerwear on the plane removes ~3.5 lbs, leaving ~11.7 lbs packed inside the bag. Combined with a 5.5 lb fabric carry-on (17.2 lbs gross) or 7.0 lb hard-shell spinner (18.7 lbs gross), it stays well under 20 to 22 lb airline cabin caps.'
   },
   {
     question: 'What if my airline limits carry-ons to 15.4 lbs (7 kg)?',
@@ -184,6 +184,6 @@ export const PACKING_LIST_7_DAY_FAQS: PlainFaqItem[] = [
   },
   {
     question: 'Can I customize the 5-4-3-2-1 capsule inside GateReady?',
-    answer: 'Yes. Inside any GateReady trip checklist, steppers let you adjust Tops, Bottoms, Layers, and Shoes dynamically and pack the generated capsule straight into your selected carry-on or checked bag with live tare weight headroom updates.'
+    answer: 'Yes. Inside any GateReady trip checklist, steppers let you adjust Tops, Bottoms, Layers, and Shoes dynamically and pack the generated capsule straight into your selected carry-on or checked bag with tare weight headroom updates as you pack.'
   }
 ];

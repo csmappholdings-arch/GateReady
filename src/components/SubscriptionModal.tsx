@@ -8,6 +8,7 @@ import {
   PLAN_DEFINITIONS,
   TRIAL_CTA_LABEL,
   TRIAL_SECONDARY_CTA_LABEL,
+  TRIAL_DROP_NOTE,
   TRIAL_TERMS_EXACT,
   FEE_MATH_STATEMENT,
   FEE_MATH_YEARLY_FRAME
@@ -93,14 +94,15 @@ export const SubscriptionModal: React.FC = () => {
     }, 60);
   };
 
-  const handleChooseTier = (chosenTier: PaidTier) => {
-    trackEvent('upgrade_button_clicked', { tier: chosenTier, billing_cycle: selectedCycle, source: 'modal' });
-    trackEvent('subscription_started', { tier: chosenTier, billing_cycle: selectedCycle, gateway: 'lemonsqueezy' });
+  const handleChooseTier = (chosenTier: PaidTier, cycleOverride?: BillingCycle) => {
+    const effectiveCycle = cycleOverride ?? selectedCycle;
+    trackEvent('upgrade_button_clicked', { tier: chosenTier, billing_cycle: effectiveCycle, source: 'modal' });
+    trackEvent('subscription_started', { tier: chosenTier, billing_cycle: effectiveCycle, gateway: 'lemonsqueezy' });
     setProcessingTier(chosenTier);
 
     openLemonCheckout({
       tier: chosenTier,
-      cycle: selectedCycle,
+      cycle: effectiveCycle,
       user: user,
       onSuccess: async (purchasedTier, cycle) => {
         await upgradeToTier(purchasedTier, cycle);
@@ -121,9 +123,13 @@ export const SubscriptionModal: React.FC = () => {
     }, 4000);
   };
 
+  const alternateCycle: BillingCycle = selectedCycle === 'monthly' ? 'yearly' : 'monthly';
   const silverCheckoutUrl = buildLemonCheckoutUrl('SILVER', selectedCycle, user);
+  const silverAltUrl = buildLemonCheckoutUrl('SILVER', alternateCycle, user);
   const goldCheckoutUrl = buildLemonCheckoutUrl('GOLD', selectedCycle, user);
+  const goldAltUrl = buildLemonCheckoutUrl('GOLD', alternateCycle, user);
   const platinumCheckoutUrl = buildLemonCheckoutUrl('PLATINUM', selectedCycle, user);
+  const platinumAltUrl = buildLemonCheckoutUrl('PLATINUM', alternateCycle, user);
 
   return createPortal(
     <div className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 min-h-screen">
@@ -225,7 +231,7 @@ export const SubscriptionModal: React.FC = () => {
                     {TRIAL_TERMS_EXACT}
                   </p>
                   <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Unlocks every tier feature for 7 days — unlimited trips, unlimited bags, empty suitcase tare deduction, smart bag rebalance optimizer, terminal maps, emergency QR tags, printable PDF manifests, and companion sync.
+                    Unlocks every tier feature for 7 days — unlimited trips, unlimited bags, empty suitcase tare deduction, smart bag rebalance optimizer, terminal maps, emergency QR tags, printable PDF manifests, and companion sync. {TRIAL_DROP_NOTE}
                   </p>
                 </div>
               </div>
@@ -255,6 +261,9 @@ export const SubscriptionModal: React.FC = () => {
                   {TRIAL_SECONDARY_CTA_LABEL}
                 </button>
               </div>
+              <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 text-center sm:text-left">
+                {TRIAL_DROP_NOTE}
+              </p>
             </div>
           )}
 
@@ -379,25 +388,38 @@ export const SubscriptionModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800">
+              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-1.5">
                 <a
                   href={silverCheckoutUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => {
-                    if (typeof window !== 'undefined' && window.LemonSqueezy?.Url?.Open) {
-                      e.preventDefault();
-                      handleChooseTier('SILVER');
-                    }
+                    e.preventDefault();
+                    handleChooseTier('SILVER', selectedCycle);
                   }}
                   className="lemonsqueezy-button w-full h-10 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-purple-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer text-center no-underline"
                 >
                   {processingTier === 'SILVER' ? (
                     <span className="animate-pulse">Opening Checkout...</span>
                   ) : (
-                    <span>Choose Silver</span>
+                    <span>{selectedCycle === 'yearly' ? 'Choose Silver ($19.99/yr)' : 'Choose Silver ($1.99/mo)'}</span>
                   )}
                 </a>
+                <a
+                  href={silverAltUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleChooseTier('SILVER', alternateCycle);
+                  }}
+                  className="w-full py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-[10px] flex items-center justify-center no-underline"
+                >
+                  {alternateCycle === 'yearly' ? 'Or buy Annual ($19.99/yr)' : 'Or buy Monthly ($1.99/mo)'}
+                </a>
+                <p className="text-[10px] text-center text-slate-500 dark:text-slate-400">
+                  14-day money-back guarantee via Lemon Squeezy.
+                </p>
               </div>
             </div>
 
@@ -469,16 +491,14 @@ export const SubscriptionModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800">
+              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-1.5">
                 <a
                   href={goldCheckoutUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => {
-                    if (typeof window !== 'undefined' && window.LemonSqueezy?.Url?.Open) {
-                      e.preventDefault();
-                      handleChooseTier('GOLD');
-                    }
+                    e.preventDefault();
+                    handleChooseTier('GOLD', selectedCycle);
                   }}
                   className="lemonsqueezy-button w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/25 transition-all cursor-pointer text-center no-underline active:scale-95"
                 >
@@ -487,10 +507,25 @@ export const SubscriptionModal: React.FC = () => {
                   ) : (
                     <>
                       <Crown className="w-3.5 h-3.5 fill-white" />
-                      <span>Choose Gold</span>
+                      <span>{selectedCycle === 'yearly' ? 'Choose Gold ($29.99/yr)' : 'Choose Gold ($3.99/mo)'}</span>
                     </>
                   )}
                 </a>
+                <a
+                  href={goldAltUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleChooseTier('GOLD', alternateCycle);
+                  }}
+                  className="w-full py-1.5 rounded-lg border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-950/40 font-semibold text-[10px] flex items-center justify-center no-underline"
+                >
+                  {alternateCycle === 'yearly' ? 'Or buy Annual ($29.99/yr)' : 'Or buy Monthly ($3.99/mo)'}
+                </a>
+                <p className="text-[10px] text-center text-slate-500 dark:text-slate-400">
+                  14-day money-back guarantee via Lemon Squeezy.
+                </p>
               </div>
             </div>
 
@@ -555,25 +590,38 @@ export const SubscriptionModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800">
+              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-1.5">
                 <a
                   href={platinumCheckoutUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => {
-                    if (typeof window !== 'undefined' && window.LemonSqueezy?.Url?.Open) {
-                      e.preventDefault();
-                      handleChooseTier('PLATINUM');
-                    }
+                    e.preventDefault();
+                    handleChooseTier('PLATINUM', selectedCycle);
                   }}
                   className="lemonsqueezy-button w-full h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer text-center no-underline"
                 >
                   {processingTier === 'PLATINUM' ? (
                     <span className="animate-pulse">Opening Checkout...</span>
                   ) : (
-                    <span>Choose Platinum</span>
+                    <span>{selectedCycle === 'yearly' ? 'Choose Platinum ($39.99/yr)' : 'Choose Platinum ($4.99/mo)'}</span>
                   )}
                 </a>
+                <a
+                  href={platinumAltUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleChooseTier('PLATINUM', alternateCycle);
+                  }}
+                  className="w-full py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 font-semibold text-[10px] flex items-center justify-center no-underline"
+                >
+                  {alternateCycle === 'yearly' ? 'Or buy Annual ($39.99/yr)' : 'Or buy Monthly ($4.99/mo)'}
+                </a>
+                <p className="text-[10px] text-center text-slate-500 dark:text-slate-400">
+                  14-day money-back guarantee via Lemon Squeezy.
+                </p>
               </div>
             </div>
           </div>

@@ -12,7 +12,15 @@ import {
   getCarryOnCheckerHtml,
   getPackingList7DayHtml
 } from './serverGuidesHtml';
-import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT, FEE_MATH_YEARLY_FRAME } from '../data/planEntitlements';
+import {
+  PLAN_DEFINITIONS,
+  TRIAL_CTA_LABEL,
+  TRIAL_DROP_NOTE,
+  TRIAL_TERMS_EXACT,
+  FEE_MATH_STATEMENT,
+  FEE_MATH_YEARLY_FRAME
+} from '../data/planEntitlements';
+import { buildLemonCheckoutUrl } from '../lib/lemonSqueezy';
 import { OFFICIAL_SOCIAL_LINKS, FACEBOOK_SVG_ICON, INSTAGRAM_SVG_ICON } from '../data/socialLinks';
 import { MAIN_FAQS } from '../data/faqData';
 
@@ -297,33 +305,67 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
       </section>
     `;
   } else if (normalizedPath === '/pricing') {
+    const silverMonthlyUrl = buildLemonCheckoutUrl('SILVER', 'monthly', null);
+    const silverYearlyUrl = buildLemonCheckoutUrl('SILVER', 'yearly', null);
+    const goldMonthlyUrl = buildLemonCheckoutUrl('GOLD', 'monthly', null);
+    const goldYearlyUrl = buildLemonCheckoutUrl('GOLD', 'yearly', null);
+    const platinumMonthlyUrl = buildLemonCheckoutUrl('PLATINUM', 'monthly', null);
+    const platinumYearlyUrl = buildLemonCheckoutUrl('PLATINUM', 'yearly', null);
     innerContentHtml = `
       <section class="space-y-6">
-        <div class="space-y-2">
-          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Transparent Plans for Every Type of Traveler</h2>
-          <p class="text-slate-700 leading-relaxed">Start 100% free with no credit card required. ${TRIAL_TERMS_EXACT}</p>
+        <div class="space-y-3 text-center max-w-3xl mx-auto">
+          <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Transparent Plans for Every Type of Traveler</h2>
+          <p class="text-slate-700 leading-relaxed">${TRIAL_TERMS_EXACT}</p>
+          <div class="pt-1 space-y-1">
+            <a href="/?action=new_trip" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-purple-600 text-white font-black text-xs">${TRIAL_CTA_LABEL}</a>
+            <div class="text-xs font-semibold text-slate-600">${TRIAL_DROP_NOTE}</div>
+          </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <h3 class="font-bold text-slate-900">Free (${PLAN_DEFINITIONS.FREE.formattedMonthly})</h3>
-            <p class="text-[11px] font-semibold text-slate-500">${PLAN_DEFINITIONS.FREE.tagline}</p>
-            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.FREE.features.join(', ')}.</p>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <h3 class="font-bold text-slate-900">Free (${PLAN_DEFINITIONS.FREE.formattedMonthly})</h3>
+              <p class="text-[11px] font-semibold text-slate-500">${PLAN_DEFINITIONS.FREE.tagline} ${TRIAL_DROP_NOTE}</p>
+              <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.FREE.features.join(', ')}.</p>
+            </div>
+            <a href="/" class="block text-center py-2 rounded-xl border border-slate-300 text-slate-900 font-bold text-xs">${TRIAL_CTA_LABEL}</a>
           </div>
-          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
-            <h3 class="font-bold text-purple-900">Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo · ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr)</h3>
-            <p class="text-[11px] font-semibold text-purple-700">${PLAN_DEFINITIONS.SILVER.tagline}</p>
-            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.SILVER.features.join(', ')}.</p>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <h3 class="font-bold text-purple-900">Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo · ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr)</h3>
+              <p class="text-[11px] font-semibold text-purple-700">${PLAN_DEFINITIONS.SILVER.tagline}</p>
+              <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.SILVER.features.join(', ')}.</p>
+            </div>
+            <div class="space-y-1.5 pt-2">
+              <a href="${silverMonthlyUrl}" class="block text-center py-2 rounded-xl bg-purple-600 text-white font-bold text-xs">Choose Silver Monthly ($1.99/mo)</a>
+              <a href="${silverYearlyUrl}" class="block text-center py-1.5 rounded-xl border border-purple-300 text-purple-800 font-semibold text-[11px]">Or buy Annual ($19.99/yr)</a>
+              <div class="text-[10px] text-center text-slate-500">14-day money-back guarantee via Lemon Squeezy.</div>
+            </div>
           </div>
-          <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2">
-            <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
-            <h3 class="font-bold text-slate-900 mt-0.5">Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo · ${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr)</h3>
-            <p class="text-[11px] font-semibold text-amber-800">${PLAN_DEFINITIONS.GOLD.tagline}</p>
-            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.GOLD.features.join(', ')}.</p>
+          <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 space-y-2 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">MOST POPULAR</div>
+              <h3 class="font-bold text-slate-900 mt-0.5">Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo · ${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr)</h3>
+              <p class="text-[11px] font-semibold text-amber-800">${PLAN_DEFINITIONS.GOLD.tagline}</p>
+              <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.GOLD.features.join(', ')}.</p>
+            </div>
+            <div class="space-y-1.5 pt-2">
+              <a href="${goldMonthlyUrl}" class="block text-center py-2 rounded-xl bg-amber-500 text-white font-black text-xs">Choose Gold Monthly ($3.99/mo)</a>
+              <a href="${goldYearlyUrl}" class="block text-center py-1.5 rounded-xl border border-amber-300 text-amber-900 font-semibold text-[11px]">Or buy Annual ($29.99/yr)</a>
+              <div class="text-[10px] text-center text-slate-500">14-day money-back guarantee via Lemon Squeezy.</div>
+            </div>
           </div>
-          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2">
-            <h3 class="font-bold text-indigo-900">Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo · ${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr)</h3>
-            <p class="text-[11px] font-semibold text-indigo-700">${PLAN_DEFINITIONS.PLATINUM.tagline}</p>
-            <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.PLATINUM.features.join(', ')}.</p>
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <h3 class="font-bold text-indigo-900">Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo · ${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr)</h3>
+              <p class="text-[11px] font-semibold text-indigo-700">${PLAN_DEFINITIONS.PLATINUM.tagline}</p>
+              <p class="text-xs text-slate-600 mt-1">${PLAN_DEFINITIONS.PLATINUM.features.join(', ')}.</p>
+            </div>
+            <div class="space-y-1.5 pt-2">
+              <a href="${platinumMonthlyUrl}" class="block text-center py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">Choose Platinum Monthly ($4.99/mo)</a>
+              <a href="${platinumYearlyUrl}" class="block text-center py-1.5 rounded-xl border border-indigo-300 text-indigo-800 font-semibold text-[11px]">Or buy Annual ($39.99/yr)</a>
+              <div class="text-[10px] text-center text-slate-500">14-day money-back guarantee via Lemon Squeezy.</div>
+            </div>
           </div>
         </div>
         <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 space-y-1">
@@ -331,9 +373,22 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
           <div class="font-bold text-sm text-slate-900">${FEE_MATH_STATEMENT}</div>
           <div>${FEE_MATH_YEARLY_FRAME}</div>
         </div>
-        <div class="p-4 rounded-2xl bg-slate-100 text-xs text-slate-600 space-y-1">
-          <div><strong>7-Day Free Platinum Trial:</strong> ${TRIAL_TERMS_EXACT} All trips stay safely preserved.</div>
-          <div><strong>14-Day Guarantee:</strong> 100% money-back guarantee on paid plans via Lemon Squeezy. Contact csmappholdings@gmail.com.</div>
+        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <h3 class="text-base font-black text-slate-900">Trial, Refund &amp; Cancellation Facts</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-700">
+            <div class="p-3 rounded-xl bg-white border border-slate-200 space-y-1">
+              <div class="font-bold text-slate-900">What happens on day 7 of the free trial?</div>
+              <p><strong>${TRIAL_DROP_NOTE}</strong> No credit card is required to sign up, and all created trips and lists remain saved on Free.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white border border-slate-200 space-y-1">
+              <div class="font-bold text-slate-900">How do 14-day refunds work?</div>
+              <p>Email csmappholdings@gmail.com with your account email or Lemon Squeezy receipt within 14 days for a full refund in 3–5 business days.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white border border-slate-200 space-y-1">
+              <div class="font-bold text-slate-900">How does cancellation work?</div>
+              <p>Cancel anytime in one click from your Account menu inside GateReady or from your Lemon Squeezy receipt.</p>
+            </div>
+          </div>
         </div>
       </section>
     `;
@@ -418,7 +473,15 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">November 24, 2026 — AI Search Discoverability, Structured Data, Answer-Ready Carrier Summaries &amp; Intent Guides</div>
+            <div class="font-bold text-purple-900 text-sm">November 25, 2026 — Real-UI Interactive Demo, Weight &amp; 404 Accuracy, Conversion Flow Updates</div>
+            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+              <li><strong>Interactive Real-UI Product Demo &amp; Guide Embedded Panels:</strong> Added a live interactive product demo on the homepage backed by real bag weight analysis, suggest-first Rebalance Bags with Apply/Undo, and TSA 3-1-1 checks — plus real-UI showcase panels on /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.</li>
+              <li><strong>Packed Item Labels, Trip Card Names, 7-Day Math Consistency &amp; True HTTP 404:</strong> Fixed per-bag labels to display packed vs total counts, displayed user trip names prominently on dashboard cards, unified 7-day capsule weights (15.2 lbs table / ~11.7 lbs packed / 17.2–18.7 lbs gross), fixed currency duplication on CAD fee badges, removed overstated real-time copy, and served HTTP 404 with noindex on unknown routes.</li>
+              <li><strong>All 6 Lemon Squeezy Checkout Variants, Direct Signup Flow &amp; Value-Moment Gating:</strong> Wired monthly and annual checkout options for Silver, Gold, and Platinum with 14-day money-back guarantee copy beside every checkout button, added factual trial/refund/cancellation details below /pricing comparison tables, routed post-signup directly to trip creation with a sample trip option, and gated upsell popups behind first value reached.</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-slate-900 text-sm">November 24, 2026 — AI Search Discoverability, Structured Data, Answer-Ready Carrier Summaries &amp; Intent Guides</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
               <li><strong>Machine-Readable /llms.txt, AI Crawler Allowance &amp; Unified JSON-LD:</strong> Published a plain markdown index at /llms.txt, opened /robots.txt explicitly to major AI search crawlers, standardized unified Organization/WebSite/SoftwareApplication/FAQPage/BreadcrumbList JSON-LD graphs, synchronized trailing-slash canonical URLs with sitemap.xml, and deduplicated the /pricing Silver callout.</li>
               <li><strong>Direct-Answer Airline Summaries &amp; Full 42-Airline Calculator Table:</strong> Added concise plain-text direct-answer summaries directly beneath H1 headings on all 42 airline baggage guides, /airlines/, and /baggage-fee-calculator/, expanded the pre-rendered calculator fee table to include all 42 airlines verified November 4, 2026, and standardized airline meta descriptions.</li>
@@ -721,3 +784,49 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
     ${footerLinksHtml}
   `;
 }
+
+function escapeHtml(raw: string): string {
+  return raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function getNotFoundPageHtml(requestPath = '/'): { meta: StaticPageMeta; bodyHtml: string } {
+  const safePath = escapeHtml(requestPath || '/');
+  const meta: StaticPageMeta = {
+    path: '/404',
+    title: 'Page Not Found (404) – GateReady',
+    description: 'The requested GateReady page or airline guide could not be found.',
+    keywords: 'GateReady, page not found, 404',
+    heading: 'Page not found',
+    subheading: 'We could not find the page or airline baggage guide you requested.',
+    schemaType: 'WebPage'
+  };
+
+  const innerContentHtml = `
+    <section class="text-center py-6 space-y-5 max-w-lg mx-auto">
+      <div class="text-xs font-black uppercase tracking-widest text-purple-600">Error 404</div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Page not found</h2>
+      <p class="text-sm text-slate-600 leading-relaxed">
+        The address <code class="px-2 py-0.5 rounded bg-slate-100 text-slate-800 text-xs">${safePath}</code> does not match an active GateReady page or airline baggage guide.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <a href="/" class="w-full sm:w-auto h-10 px-5 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center justify-center">
+          Back to GateReady Home
+        </a>
+        <a href="/airlines/" class="w-full sm:w-auto h-10 px-5 rounded-xl border border-slate-300 bg-white text-slate-800 font-bold text-xs inline-flex items-center justify-center">
+          Browse 42 Airline Guides
+        </a>
+      </div>
+    </section>
+  `;
+
+  return {
+    meta,
+    bodyHtml: renderPageShell(meta, innerContentHtml)
+  };
+}
+

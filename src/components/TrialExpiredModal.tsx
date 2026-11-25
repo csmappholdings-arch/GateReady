@@ -1,6 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useSubscription } from '../context/SubscriptionContext';
+import { hasReachedValueMoment } from '../utils/valueMoment';
 import { 
   Lock, 
   Crown, 
@@ -23,7 +24,7 @@ export const TrialExpiredModal: React.FC = () => {
     tier 
   } = useSubscription();
 
-  if (!isTrialExpired || hasDismissedTrialExpiredNotice || tier !== 'FREE') {
+  if (!isTrialExpired || hasDismissedTrialExpiredNotice || tier !== 'FREE' || !hasReachedValueMoment()) {
     return null;
   }
 

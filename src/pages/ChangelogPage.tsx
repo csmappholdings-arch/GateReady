@@ -14,6 +14,48 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
+      {/* Release Nov 25, 2026 */}
+      <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
+            November 25, 2026
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Real-UI Interactive Demo, Weight &amp; 404 Accuracy, Conversion Flow Updates</span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Scale className="w-4 h-4 text-purple-600" />
+              <span>Interactive Real-UI Product Demo &amp; Live Guide Embedded Panels</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Added a live interactive product demonstration on the homepage backed by real bag weight math, suggest-first Rebalance Bags with Apply/Undo, and TSA 3-1-1 checks — plus embedded real-UI panels across /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Packed Item Labels, Trip Card Names, 7-Day Math Consistency &amp; True HTTP 404</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Fixed per-bag labels to show packed vs total counts, elevated user trip names on dashboard cards, unified 7-day capsule weight math (15.2 lbs table / ~11.7 lbs packed / 17.2–18.7 lbs gross), fixed currency duplication on CAD fee badges, removed overstated real-time copy, and served HTTP 404 with noindex on unknown routes.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Tag className="w-4 h-4 text-amber-500" />
+              <span>All 6 Lemon Squeezy Checkout Variants, Direct Signup Flow &amp; Value-Moment Gating</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Wired dedicated monthly and annual checkout triggers for Silver, Gold, and Platinum with 14-day money-back guarantee notes beside every checkout button, added a factual trial/refund/cancellation block below /pricing comparison tables, routed post-signup straight to trip creation with a sample trip option, and gated upsell popups behind first packing or readiness value.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Release Nov 24, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">

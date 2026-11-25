@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePacking } from '../context/PackingContext';
 import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
@@ -6,6 +6,7 @@ import { computeBagWeightStatus, computeTripWeightStatus, getCarrierCarryOnPolic
 import { scanItemForLiquids } from '../utils/liquidScanner';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { airlineLimits } from '../data/allowances';
+import { markValueMomentReached } from '../utils/valueMoment';
 import { 
   CheckCircle2, 
   AlertCircle, 
@@ -39,6 +40,10 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
   const [expandedBagIds, setExpandedBagIds] = useState<Record<string, boolean>>(() => 
     Object.fromEntries(trip.bags.map(b => [b.id, true]))
   );
+
+  useEffect(() => {
+    markValueMomentReached('READINESS_VIEWED');
+  }, []);
 
   const toggleBagExpanded = (bagId: string) => {
     setExpandedBagIds(prev => ({
@@ -377,7 +382,15 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                     onClick={() => toggleBagExpanded(bag.id)}
                     className="text-purple-700 dark:text-purple-300 font-bold text-xs flex items-center gap-1 hover:underline cursor-pointer"
                   >
-                    <span>{bag.items.length === 1 ? '1 item packed' : `${bag.items.length} items packed in this bag`}</span>
+                    {(() => {
+                      const packedCount = bag.items.filter((i) => i.isPacked).length;
+                      const totalCount = bag.items.length;
+                      return (
+                        <span>
+                          {packedCount} of {totalCount} {totalCount === 1 ? 'item' : 'items'} packed in this bag
+                        </span>
+                      );
+                    })()}
                     {expandedBagIds[bag.id] ? (
                       <ChevronUp className="w-3.5 h-3.5" />
                     ) : (

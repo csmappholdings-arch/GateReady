@@ -1,7 +1,8 @@
-export const TRIAL_CTA_LABEL = 'Try everything free for 7 days';
+export const TRIAL_CTA_LABEL = 'Start free — 7 days of Platinum, no card';
 export const TRIAL_SECONDARY_CTA_LABEL = 'See plans';
+export const TRIAL_DROP_NOTE = 'After day 7 you drop to Free — nothing is charged.';
 export const TRIAL_TERMS_EXACT =
-  'The 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.';
+  '7-day full Platinum trial auto-activates on free signup, no card. After day 7 you drop to Free — nothing is charged.';
 export const FEE_MATH_STATEMENT =
   'One overweight bag fee is $100–$150. Silver is $19.99/year — one avoided fee pays for 5+ years of Silver.';
 export const FEE_MATH_YEARLY_FRAME =
@@ -88,7 +89,7 @@ export const PLAN_DEFINITIONS: Record<'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM', P
       '2 travelers (couples & companions)',
       'Unlimited active trips',
       'Unlimited bags & luggage scales',
-      'Companion real-time sync (2 travelers)',
+      'Companion sync (2 travelers)',
       'Everything in Silver included'
     ]
   },

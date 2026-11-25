@@ -176,7 +176,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Live ticking countdown to travel time and critical day-of reminders (foreign cash pickup, passports &amp; home security).
+              Departure countdown timer to travel time and day-of reminders (foreign cash pickup, passports &amp; home security).
             </p>
           </div>
         </div>
@@ -440,7 +440,7 @@ export const DepartureCountdownCard: React.FC<DepartureCountdownCardProps> = ({ 
                   </span>
                 </div>
                 <button
-                  onClick={() => openPaywall(`Live departure countdown timers and day-of packing reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+                  onClick={() => openPaywall(`Departure countdown timers and day-of packing reminders are unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
                   className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-all cursor-pointer shrink-0"
                 >
                   Unlock

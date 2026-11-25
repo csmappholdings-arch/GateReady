@@ -127,7 +127,7 @@ export const TripCountdownBanner: React.FC<TripCountdownBannerProps> = ({
             </span>
           ) : (
             <span className="inline-flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 rounded border border-emerald-400/30">
-              Live Ticking
+              Departure Timer
             </span>
           )}
           {validOrigin && validDest && (

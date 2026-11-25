@@ -765,7 +765,7 @@ export const PrintPackingListModal: React.FC<PrintPackingListModalProps> = ({
                     {bag.filteredItems.length === 0 ? (
                       <div className="py-4 text-center text-xs text-slate-400 italic">
                         {bag.items.length === 0 
-                          ? 'No items packed into this bag yet.' 
+                          ? 'No items in this bag yet.' 
                           : 'No items match the current filter in this bag.'}
                       </div>
                     ) : (

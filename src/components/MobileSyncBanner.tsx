@@ -61,7 +61,7 @@ export const MobileSyncBanner: React.FC<MobileSyncBannerProps> = ({ onOpenAccoun
               </span>
             </p>
             <p className="text-[11px] text-purple-200/90 leading-tight">
-              Sign in to back up packing checklists, baggage weights, and airline limits in real-time.
+              Sign in to back up packing checklists, baggage weights, and airline limits securely across your devices.
             </p>
           </div>
         </div>

@@ -54,7 +54,7 @@ export const STATIC_PAGES: Record<string, StaticPageMeta> = {
   '/demo': {
     path: '/demo',
     title: 'Interactive Product Demo – GateReady',
-    description: 'Explore GateReady inside before signing up: live travel dashboard, bag weight meters, suitcase tare deduction, TSA 3-1-1 checklist audit, and privacy-safe QR bag tags.',
+    description: 'Explore GateReady inside before signing up: interactive trip dashboard, bag weight meters, suitcase tare deduction, TSA 3-1-1 checklist audit, and privacy-safe QR bag tags.',
     keywords: 'GateReady demo, product walkthrough, luggage weight meter demo, tare weight deduction, TSA 3-1-1 checklist, emergency QR luggage tag',
     heading: 'See GateReady Inside Before You Sign Up',
     subheading: 'Explore the travel dashboard, bag weight meters, smart packing checklist, emergency QR tags, and departure readiness tools.',

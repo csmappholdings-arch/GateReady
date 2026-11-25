@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { PageLayout } from './PageLayout';
-import { AIRLINE_GUIDES } from '../data/airlineGuidesData';
+import { AIRLINE_GUIDES, formatAirlineFee } from '../data/airlineGuidesData';
 import { CARRY_ON_FAQS } from '../data/faqData';
 import { Luggage, Scale, AlertTriangle, CheckCircle2, HelpCircle, ArrowRight } from 'lucide-react';
+import { SmartLuggageScalesPanel } from '../components/RealUiShowcases';
 
 const COMPARISON_IDS = [
   'aircanada',
@@ -181,6 +182,16 @@ export const CarryOnCheckerPage: React.FC = () => {
         )}
       </section>
 
+      {/* B3: Real App Smart Luggage Scales Preview (22 lb cap) */}
+      <section className="space-y-2.5">
+        <SmartLuggageScalesPanel
+          carryOnCapLbs={weightCapLbs ?? 22}
+          airlineName={weightCapLbs ? activeGuide.name : 'Air Transat'}
+          linkHref="/?action=new_trip&mode=PLANE"
+          linkLabel="Model your own carry-on weight free"
+        />
+      </section>
+
       {/* Carrier Comparison Table */}
       <section className="space-y-3">
         <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -217,7 +228,7 @@ export const CarryOnCheckerPage: React.FC = () => {
                   <td className="py-3 px-4 font-bold">
                     {g.fees.carryOnFee === 0
                       ? 'Free ($0)*'
-                      : `${g.fees.currencySymbol}${g.fees.carryOnFee} ${g.fees.currency}`}
+                      : formatAirlineFee(g.fees.carryOnFee, g.fees.currencySymbol, g.fees.currency)}
                   </td>
                 </tr>
               ))}

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
 import { applySeoHead } from './PageLayout';
+import { NotFoundPage } from './NotFoundPage';
 
 interface AirlineGuidePageProps {
   guide?: AirlineGuideItem;
@@ -40,9 +41,10 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
     }
   }, [slugMatch]);
 
-  const guide = propGuide || (slugMatch ? slugMatch.guide : getAirlineGuideBySlug(currentSlug)) || AIRLINE_GUIDES[0];
+  const guide = propGuide || (slugMatch ? slugMatch.guide : getAirlineGuideBySlug(currentSlug)) || null;
 
   useEffect(() => {
+    if (!guide) return;
     applySeoHead({
       path: guide.canonicalPath,
       title: guide.title,
@@ -56,6 +58,10 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
       window.scrollTo(0, 0);
     }
   }, [guide]);
+
+  if (!guide) {
+    return <NotFoundPage />;
+  }
 
   const handleStartTrip = () => {
     if (onOpenTripBuilder) {

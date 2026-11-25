@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc, onSnapshot, updateDoc, increment } from 'firebase/
 import { db, getOrCreateAccountReferralCode } from '../lib/firebase';
 import { Bag, BagType } from '../types/travel';
 import { checkLemonRedirectSuccess } from '../lib/lemonSqueezy';
+import { hasReachedValueMoment } from '../utils/valueMoment';
 
 export type SubscriptionTier = 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
 export type PaidTier = 'SILVER' | 'GOLD' | 'PLATINUM';
@@ -60,7 +61,7 @@ interface SubscriptionContextType {
   isPaywallOpen: boolean;
   paywallReason: string | null;
   paywallDefaultShowPlans: boolean;
-  openPaywall: (reason?: string, options?: { defaultShowPlans?: boolean }) => void;
+  openPaywall: (reason?: string, options?: { defaultShowPlans?: boolean; userInitiated?: boolean }) => void;
   closePaywall: () => void;
   upgradeToTier: (tier: PaidTier, cycle: BillingCycle) => Promise<void>;
   upgradeToPro: (cycle: BillingCycle) => Promise<void>;
@@ -660,7 +661,21 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [tier, billingCycle]);
 
-  const openPaywall = (reason?: string, options?: { defaultShowPlans?: boolean }) => {
+  const openPaywall = (reason?: string, options?: { defaultShowPlans?: boolean; userInitiated?: boolean }) => {
+    if (!options?.userInitiated && !hasReachedValueMoment()) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('gateready:soft-limit-notice', {
+            detail: {
+              message:
+                reason ||
+                'Free Starter supports 1 active trip, 1 traveler, and up to 2 bags. Pack an item or check your readiness score first, or compare all plans anytime.'
+            }
+          })
+        );
+      }
+      return;
+    }
     const showPlans = options?.defaultShowPlans ?? !reason;
     setPaywallReason(reason || null);
     setPaywallDefaultShowPlans(showPlans);

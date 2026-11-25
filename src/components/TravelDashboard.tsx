@@ -631,7 +631,7 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                   onClick={onLoadDemoTrip}
                   className="h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs cursor-pointer"
                 >
-                  or load sample trip →
+                  Start with a sample trip
                 </button>
               )}
             </div>
@@ -669,21 +669,38 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                           {getModeIcon(trip.travelType)}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-black text-base text-slate-900 dark:text-white truncate">
-                              {cleanDuplicateCitySuffix(trip.originCity) || 'Origin'} → {cleanDuplicateCitySuffix(trip.destinationCity) || trip.name}
-                            </h3>
-                            {trip.isDemo && (
-                              <span className="px-1.5 py-0.2 rounded bg-amber-400 text-purple-950 font-black text-[9px] shrink-0">
-                                DEMO
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                            <span className="font-semibold text-purple-700 dark:text-purple-400">{trip.companyName}</span>
-                            {(!trip.travelType || trip.travelType === 'PLANE') && trip.flightNumber && <span>· {trip.flightNumber}</span>}
-                            {(!trip.travelType || trip.travelType === 'PLANE') && trip.fareFamily && <span>· {trip.fareFamily}</span>}
-                          </div>
+                          {(() => {
+                            const originLabel = cleanDuplicateCitySuffix(trip.originCity);
+                            const destLabel = cleanDuplicateCitySuffix(trip.destinationCity);
+                            const routeText =
+                              originLabel && destLabel
+                                ? `${originLabel} → ${destLabel}`
+                                : destLabel || originLabel || '';
+                            const cardTitle = trip.name?.trim() || routeText || 'Untitled Trip';
+                            return (
+                              <>
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-black text-base text-slate-900 dark:text-white truncate">
+                                    {cardTitle}
+                                  </h3>
+                                  {trip.isDemo && (
+                                    <span className="px-1.5 py-0.2 rounded bg-amber-400 text-purple-950 font-black text-[9px] shrink-0">
+                                      Sample trip
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
+                                  {routeText && trip.name?.trim() && (
+                                    <span className="font-medium text-slate-600 dark:text-slate-300">{routeText}</span>
+                                  )}
+                                  {routeText && trip.name?.trim() && trip.companyName && <span>·</span>}
+                                  <span className="font-semibold text-purple-700 dark:text-purple-400">{trip.companyName}</span>
+                                  {(!trip.travelType || trip.travelType === 'PLANE') && trip.flightNumber && <span>· {trip.flightNumber}</span>}
+                                  {(!trip.travelType || trip.travelType === 'PLANE') && trip.fareFamily && <span>· {trip.fareFamily}</span>}
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
 

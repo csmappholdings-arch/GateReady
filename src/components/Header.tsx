@@ -606,7 +606,17 @@ export const Header: React.FC<HeaderProps> = ({
           {!isPro && (
             <button
               type="button"
-              onClick={() => openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`)}
+              onClick={() => {
+                let reached = false;
+                try {
+                  reached = Boolean(typeof window !== 'undefined' && sessionStorage.getItem('gateready_value_moment_v1'));
+                } catch {}
+                if (!reached && typeof window !== 'undefined') {
+                  window.location.href = '/pricing';
+                  return;
+                }
+                openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`);
+              }}
               className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
               title="Upgrade GateReady Plan"
             >
@@ -882,7 +892,7 @@ export const Header: React.FC<HeaderProps> = ({
                       cloudSyncStatus === 'syncing' ? 'text-purple-600 dark:text-purple-400' :
                       'text-rose-600 dark:text-rose-400'
                     }`}>
-                      {cloudSyncStatus === 'synced' && 'Real-Time Connected'}
+                      {cloudSyncStatus === 'synced' && 'Cloud Connected'}
                       {cloudSyncStatus === 'syncing' && 'Syncing...'}
                       {cloudSyncStatus === 'offline' && 'Offline / Check Rules'}
                       {cloudSyncStatus === 'guest' && 'Local Only'}
@@ -892,7 +902,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="rounded-xl bg-purple-50/60 dark:bg-purple-950/30 p-2 flex items-start gap-2 border border-purple-100 dark:border-purple-900/40">
                     <Smartphone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                      Synced in real-time across your phone and laptop when traveling.
+                      Synced across your phone and laptop when traveling.
                     </p>
                   </div>
 

@@ -4,7 +4,11 @@ import { AppFooter } from '../components/AppFooter';
 import { STATIC_PAGES, StaticPageMeta } from './pageMetadata';
 import { buildStructuredDataGraph, getCanonicalUrl } from './structuredData';
 
-export function applySeoHead(meta: Pick<StaticPageMeta, 'path' | 'title' | 'description' | 'keywords' | 'heading' | 'subheading' | 'schemaType'>) {
+export function applySeoHead(
+  meta: Pick<StaticPageMeta, 'path' | 'title' | 'description' | 'keywords' | 'heading' | 'subheading' | 'schemaType'> & {
+    robots?: string;
+  }
+) {
   if (typeof document === 'undefined') return;
   const canonicalUrl = getCanonicalUrl(meta.path);
 
@@ -20,6 +24,7 @@ export function applySeoHead(meta: Pick<StaticPageMeta, 'path' | 'title' | 'desc
     el.setAttribute('content', content);
   };
 
+  setMetaTag('name', 'robots', meta.robots || 'index, follow');
   setMetaTag('name', 'description', meta.description);
   setMetaTag('name', 'keywords', meta.keywords || 'GateReady, baggage fees, travel packing');
   setMetaTag('property', 'og:title', meta.title);

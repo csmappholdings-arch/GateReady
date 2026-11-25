@@ -140,6 +140,23 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
 
   const handleOpenRebalance = () => {
     if (!isPro) {
+      let reached = false;
+      try {
+        reached = Boolean(typeof window !== 'undefined' && sessionStorage.getItem('gateready_value_moment_v1'));
+      } catch {}
+      if (!reached) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('gateready:soft-limit-notice', {
+              detail: {
+                message:
+                  'Pack an item or check your readiness score first. Suggest-first Rebalance Bags is included on Silver ($1.99/mo or $19.99/yr) and 7-day trial accounts.'
+              }
+            })
+          );
+        }
+        return;
+      }
       setShowRebalanceUpgradeModal(true);
       return;
     }
@@ -743,7 +760,8 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length} {activeBag.items.length === 1 ? 'item packed' : 'items packed'} into this bag
+                  {activeBag.items.filter((i) => i.isPacked).length} of {activeBag.items.length}{' '}
+                  {activeBag.items.length === 1 ? 'item' : 'items'} packed in this bag
                 </p>
               </div>
             </div>

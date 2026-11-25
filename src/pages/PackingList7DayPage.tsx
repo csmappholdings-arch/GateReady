@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { PageLayout } from './PageLayout';
 import { PACKING_7_DAY_CAPSULE, PACKING_LIST_7_DAY_FAQS } from '../data/faqData';
 import { Scale, CheckCircle2, HelpCircle, ArrowRight } from 'lucide-react';
+import { Capsule7DayScaleShowcase } from '../components/RealUiShowcases';
 
 export const PackingList7DayPage: React.FC = () => {
   const [bagShell, setBagShell] = useState<'FABRIC' | 'HARDSHELL'>('FABRIC');
@@ -12,7 +13,9 @@ export const PackingList7DayPage: React.FC = () => {
     return Math.round(raw * 10) / 10;
   }, []);
 
-  const grossTotalLbs = Math.round((tareLbs + itemsTotalLbs) * 10) / 10;
+  const wornTravelDayLbs = 3.5;
+  const packedContentsLbs = Math.round((itemsTotalLbs - wornTravelDayLbs) * 10) / 10;
+  const grossTotalLbs = Math.round((tareLbs + packedContentsLbs) * 10) / 10;
 
   return (
     <PageLayout pathname="/packing-list-7-day">
@@ -23,7 +26,7 @@ export const PackingList7DayPage: React.FC = () => {
           <span>Direct Answer — The 5-4-3-2-1 7-Day Carry-On Formula</span>
         </div>
         <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
-          To pack 7 days cleanly inside one carry-on suitcase, GateReady recommends the <strong>5-4-3-2-1 capsule matrix</strong>: <strong>5 tops, 4 bottoms, 3 layers, 2 pairs of shoes, 1 swimwear/dressy set</strong> (plus 7 pairs of underwear and socks, a compliant 3-1-1 quart liquids bag, and carry-on tech). The packed contents total roughly <strong>{itemsTotalLbs.toFixed(1)} lbs</strong> — leaving you at <strong>17.7 lbs gross</strong> in a 5.5 lb fabric carry-on or <strong>19.2 lbs gross</strong> in a 7.0 lb hard-shell spinner, safely under 20–22 lb airline carry-on limits.
+          To pack 7 days cleanly inside one carry-on suitcase, GateReady recommends the <strong>5-4-3-2-1 capsule matrix</strong>: <strong>5 tops, 4 bottoms, 3 layers, 2 pairs of shoes, 1 swimwear/dressy set</strong> (plus 7 pairs of underwear and socks, a compliant 3-1-1 quart liquids bag, and carry-on tech). The full capsule table weighs <strong>{itemsTotalLbs.toFixed(1)} lbs</strong>; wearing your heaviest sneakers, jeans, and outerwear on travel day saves <strong>~{wornTravelDayLbs.toFixed(1)} lbs</strong>, leaving <strong>~{packedContentsLbs.toFixed(1)} lbs</strong> packed inside the bag — <strong>17.2 lbs gross</strong> in a 5.5 lb fabric carry-on or <strong>18.7 lbs gross</strong> in a 7.0 lb hard-shell spinner, safely under 20–22 lb airline carry-on limits.
         </p>
       </section>
 
@@ -63,17 +66,19 @@ export const PackingList7DayPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
             <span className="text-[10px] font-bold uppercase text-slate-400 block">Empty Bag Tare</span>
-            <span className="text-xl font-black text-purple-600">{tareLbs.toFixed(1)} lbs</span>
+            <span className="text-xl font-black text-purple-600 tabular-nums">{tareLbs.toFixed(1)} lbs</span>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] font-bold uppercase text-slate-400 block">Capsule Packed Items</span>
-            <span className="text-xl font-black text-slate-900 dark:text-white">{itemsTotalLbs.toFixed(1)} lbs</span>
+            <span className="text-[10px] font-bold uppercase text-slate-400 block">Packed Inside Bag ({itemsTotalLbs.toFixed(1)} − ~{wornTravelDayLbs.toFixed(1)} worn)</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white tabular-nums">~{packedContentsLbs.toFixed(1)} lbs</span>
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
             <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-300 block">Estimated Airport Scale Weight</span>
-            <span className="text-xl font-black text-emerald-700 dark:text-emerald-300">{grossTotalLbs.toFixed(1)} lbs gross</span>
+            <span className="text-xl font-black text-emerald-700 dark:text-emerald-300 tabular-nums">{grossTotalLbs.toFixed(1)} lbs gross</span>
           </div>
         </div>
+
+        <Capsule7DayScaleShowcase bagShell={bagShell} />
       </section>
 
       {/* Full 5-4-3-2-1 Capsule Table */}

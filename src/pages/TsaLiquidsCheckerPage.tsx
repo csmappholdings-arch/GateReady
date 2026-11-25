@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { PageLayout } from './PageLayout';
 import { TSA_LIQUIDS_TABLE, TSA_LIQUIDS_FAQS } from '../data/faqData';
 import { Droplets, ShieldCheck, CheckCircle2, AlertTriangle, HelpCircle, ArrowRight } from 'lucide-react';
+import { TsaCheckerShowcasePanel } from '../components/RealUiShowcases';
 
 export const TsaLiquidsCheckerPage: React.FC = () => {
   const [containerOz, setContainerOz] = useState<string>('3.0');
@@ -145,6 +146,11 @@ export const TsaLiquidsCheckerPage: React.FC = () => {
           </div>
           <p className="leading-relaxed opacity-90">{ruleVerdict.detail}</p>
         </div>
+      </section>
+
+      {/* B3: Real App Rule Audit Preview */}
+      <section className="space-y-2.5">
+        <TsaCheckerShowcasePanel linkHref="/?action=new_trip&mode=PLANE" linkLabel="Audit your own carry-on list free" />
       </section>
 
       {/* Common Liquids & Aerosols Comparison Table */}

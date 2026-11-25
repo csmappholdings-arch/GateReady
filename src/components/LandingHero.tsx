@@ -27,7 +27,13 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
-import { PLAN_DEFINITIONS, TRIAL_TERMS_EXACT, FEE_MATH_STATEMENT } from '../data/planEntitlements';
+import {
+  PLAN_DEFINITIONS,
+  TRIAL_CTA_LABEL,
+  TRIAL_DROP_NOTE,
+  TRIAL_TERMS_EXACT,
+  FEE_MATH_STATEMENT
+} from '../data/planEntitlements';
 
 interface LandingHeroProps {
   onOpenAddTrip: () => void;
@@ -192,32 +198,32 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             </div>
 
             {/* Clear value assurance & trial notice */}
-            <div className="flex items-center justify-center gap-3 text-xs text-slate-500 dark:text-slate-400 pt-1 flex-wrap">
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Create your first trip free. No credit card required.</span>
+            <div className="flex items-center justify-center gap-x-3 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400 pt-1 flex-wrap max-w-4xl mx-auto">
+              {onOpenAccountSync && !isPro ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent('registration_started', { origin: 'hero_trial_link' });
+                    onOpenAccountSync('signup');
+                  }}
+                  className="text-purple-800 dark:text-purple-200 font-black hover:underline cursor-pointer inline-flex items-center gap-1"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>{TRIAL_CTA_LABEL}</span>
+                </button>
+              ) : (
+                <span className="font-semibold text-slate-700 dark:text-slate-200">Create your first trip free. No credit card required.</span>
+              )}
+              <span className="text-slate-300 dark:text-slate-700">·</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-200">{TRIAL_DROP_NOTE}</span>
               <span className="text-slate-300 dark:text-slate-700">·</span>
               <button
                 type="button"
                 onClick={onLoadDemo}
                 className="text-purple-700 dark:text-purple-300 font-bold hover:underline cursor-pointer inline-flex items-center gap-0.5 transition-colors"
               >
-                <span>or view sample trip →</span>
+                <span>Start with a sample trip →</span>
               </button>
-              {onOpenAccountSync && !isPro && (
-                <>
-                  <span className="text-slate-300 dark:text-slate-700">·</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackEvent('registration_started', { origin: 'hero_link' });
-                      onOpenAccountSync('signup');
-                    }}
-                    className="text-slate-600 dark:text-slate-300 hover:text-purple-600 font-semibold cursor-pointer underline decoration-dotted"
-                    title={TRIAL_TERMS_EXACT}
-                  >
-                    {TRIAL_TERMS_EXACT}
-                  </button>
-                </>
-              )}
             </div>
           </div>
 
@@ -1033,7 +1039,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Real-time companion cloud sync on Gold and Platinum tiers</span>
+                    <span>Companion cloud sync on Gold and Platinum tiers</span>
                   </li>
                 </ul>
               </div>

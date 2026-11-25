@@ -21,8 +21,18 @@ import { WalkthroughVideoModal } from './components/WalkthroughVideoModal';
 import { AccountSyncModal } from './components/AccountSyncModal';
 import { TransitNetworkHub } from './components/TransitNetworkHub';
 import { LandingHero } from './components/LandingHero';
-import { ProductShowcase } from './components/ProductShowcase';
+import {
+  SmartLuggageScalesPanel,
+  TsaCheckerShowcasePanel,
+  DepartureReadinessShowcasePanel
+} from './components/RealUiShowcases';
 import { InteractiveTripPreview, TripPreviewConfig } from './components/InteractiveTripPreview';
+
+const HomepageInteractiveDemo = React.lazy(() =>
+  import('./components/HomepageInteractiveDemo').then((m) => ({
+    default: m.HomepageInteractiveDemo
+  }))
+);
 import { TravelDashboard } from './components/TravelDashboard';
 import { TripWorkspace, WorkspaceTab } from './components/TripWorkspace';
 import { NotificationsModal } from './components/NotificationsModal';
@@ -61,6 +71,7 @@ import { DemoPage } from './pages/DemoPage';
 import { TsaLiquidsCheckerPage } from './pages/TsaLiquidsCheckerPage';
 import { CarryOnCheckerPage } from './pages/CarryOnCheckerPage';
 import { PackingList7DayPage } from './pages/PackingList7DayPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { 
   CheckCircle2, 
   Info, 
@@ -202,7 +213,19 @@ function PackingAppContent() {
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showLuggageLibraryModal, setShowLuggageLibraryModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
+  const [softLimitNotice, setSoftLimitNotice] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<InAppNotification[]>(() => generateTripNotifications(trips));
+
+  useEffect(() => {
+    const handleSoftNotice = (evt: Event) => {
+      const detail = (evt as CustomEvent<{ message?: string }>).detail;
+      if (detail?.message) {
+        setSoftLimitNotice(detail.message);
+      }
+    };
+    window.addEventListener('gateready:soft-limit-notice', handleSoftNotice);
+    return () => window.removeEventListener('gateready:soft-limit-notice', handleSoftNotice);
+  }, []);
 
   // Auto-launch guided onboarding for first-time visitors on home/dashboard
   useEffect(() => {
@@ -676,6 +699,29 @@ function PackingAppContent() {
         onOpenOnboarding={() => setShowOnboardingModal(true)}
       />
 
+      {/* C4: Non-blocking inline soft limit notice before first value moment */}
+      {softLimitNotice && (
+        <div className="bg-slate-900 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs border-b border-purple-700/60 relative z-30">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Info className="w-4 h-4 text-amber-400 shrink-0" />
+            <p className="text-slate-100 leading-snug">
+              {softLimitNotice}{' '}
+              <a href="/pricing" className="font-bold text-amber-300 hover:underline whitespace-nowrap">
+                See plans →
+              </a>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSoftLimitNotice(null)}
+            className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+            aria-label="Dismiss notice"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Free Plan Bag Limit Trip Notice (strictly scoped to currentTrip and Free/guest tier; never on landing or other trips) */}
       {!isPro && tripNotice && currentTrip && tripNotice.tripId === currentTrip.id && !dismissedNoticeTripIds.has(tripNotice.tripId) && (
         <div className="bg-purple-950 text-white px-4 py-3 shadow-lg flex items-center justify-between gap-3 text-xs border-b border-purple-800 relative z-30 animate-in fade-in duration-200">
@@ -850,7 +896,17 @@ function PackingAppContent() {
               isPro={isPro}
               onOpenAddTrip={() => handleOpenAddTrip()}
               onLoadDemo={handleLoadDemo}
-              onOpenPricing={() => openPaywall()}
+              onOpenPricing={() => {
+                let reached = false;
+                try {
+                  reached = Boolean(typeof window !== 'undefined' && sessionStorage.getItem('gateready_value_moment_v1'));
+                } catch {}
+                if (!reached && typeof window !== 'undefined') {
+                  window.location.href = '/pricing';
+                  return;
+                }
+                openPaywall(undefined, { userInitiated: true });
+              }}
               onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
               onOpenAccountSync={(mode) => {
                 setAccountModalOrigin('header');
@@ -863,17 +919,44 @@ function PackingAppContent() {
               }}
             />
 
-            {/* Visual Product Demonstration Showcase (Visible immediately on public homepage) */}
-            <ProductShowcase
-              onStartTrip={() => handleOpenAddTrip()}
-              onExploreBaggage={() => {
-                const el = document.getElementById('interactive-trip-preview');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-                else window.location.href = '/baggage-fee-calculator';
-              }}
-              onExplorePacking={handleLoadDemo}
-              onOpenPricing={() => openPaywall()}
-            />
+            {/* B1: Interactive Real-UI Product Demo (Signed-out & Signed-in) */}
+            <React.Suspense
+              fallback={
+                <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
+                  <div className="h-96 rounded-3xl bg-slate-100 dark:bg-slate-900 animate-pulse border border-slate-200 dark:border-slate-800" />
+                </section>
+              }
+            >
+              <HomepageInteractiveDemo onCreateOwnTrip={() => handleOpenAddTrip()} />
+            </React.Suspense>
+
+            {/* B2: Three Real-UI Component Showcases (Scales, TSA 3-1-1, Readiness) */}
+            <section className="w-full max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                <div>
+                  <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                    Real GateReady Calculators
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Weights, Liquids &amp; Readiness — Computed From Published Rules
+                  </h2>
+                </div>
+                <a
+                  href="/airlines/"
+                  className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline shrink-0"
+                >
+                  Browse 42 Airline Baggage Guides →
+                </a>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <SmartLuggageScalesPanel linkHref="/carry-on-checker" linkLabel="Explore Carry-On Size Checker" />
+                <TsaCheckerShowcasePanel linkHref="/tsa-liquids-checker" linkLabel="Try the TSA 3-1-1 Checker" />
+                <DepartureReadinessShowcasePanel
+                  onAction={() => handleOpenAddTrip()}
+                  actionLabel="Create your free trip"
+                />
+              </div>
+            </section>
 
             {/* Interactive Trip Preview Tool (Prominent on homepage) */}
             <InteractiveTripPreview
@@ -900,6 +983,7 @@ function PackingAppContent() {
           setEditingTripId(undefined);
         }}
         onTripCreated={handleOpenDashboard}
+        onSampleTripLoaded={handleLoadDemo}
         editingTripId={editingTripId}
         initialTripTitle={editingTripId && currentTrip ? currentTrip.name : undefined}
         initialTravelType={selectedTravelTypeForAdd}
@@ -952,21 +1036,20 @@ function PackingAppContent() {
         origin={accountModalOrigin}
         initialMode={accountModalMode}
         onRegistrationSuccess={() => {
+          setOnboardingCompleted(true);
+          try {
+            sessionStorage.setItem('gateready_onboarding_shown_session', 'true');
+          } catch {}
+          setShowOnboardingModal(false);
           setAppView('dashboard');
           if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
             try {
               window.history.pushState({}, '', '/dashboard');
             } catch {}
           }
-          if (trips.length === 0 && !isOnboardingCompleted()) {
-            let shownSession = false;
-            try {
-              shownSession = sessionStorage.getItem('gateready_onboarding_shown_session') === 'true';
-              sessionStorage.setItem('gateready_onboarding_shown_session', 'true');
-            } catch {}
-            if (!shownSession) {
-              setShowOnboardingModal(true);
-            }
+          if (trips.length === 0) {
+            setAddTripKey((prev) => prev + 1);
+            setShowAddTripModal(true);
           }
         }}
       />
@@ -1070,7 +1153,17 @@ function PackingAppContent() {
 
       {/* Conversion Marketing & Navigation Footer */}
       <AppFooter
-        onOpenPricing={() => openPaywall()}
+        onOpenPricing={() => {
+          let reached = false;
+          try {
+            reached = Boolean(typeof window !== 'undefined' && sessionStorage.getItem('gateready_value_moment_v1'));
+          } catch {}
+          if (!reached && typeof window !== 'undefined') {
+            window.location.href = '/pricing';
+            return;
+          }
+          openPaywall(undefined, { userInitiated: true });
+        }}
         onOpenReferral={() => setShowReferralModal(true)}
         onOpenAirlineGuides={() => setShowAirlineGuidesModal(true)}
       />
@@ -1141,17 +1234,21 @@ export default function App() {
     return <ContactPage />;
   }
 
-  return (
-    <AuthProvider>
-      <SubscriptionProvider>
-        <TravelWalletProvider>
-          <PackingProvider>
-            <PackingAppContent />
-            <SubscriptionModal />
-            <TravelWalletModal />
-          </PackingProvider>
-        </TravelWalletProvider>
-      </SubscriptionProvider>
-    </AuthProvider>
-  );
+  if (pathname === '/' || pathname === '/dashboard') {
+    return (
+      <AuthProvider>
+        <SubscriptionProvider>
+          <TravelWalletProvider>
+            <PackingProvider>
+              <PackingAppContent />
+              <SubscriptionModal />
+              <TravelWalletModal />
+            </PackingProvider>
+          </TravelWalletProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
+    );
+  }
+
+  return <NotFoundPage />;
 }

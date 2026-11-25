@@ -5,30 +5,58 @@ import { User } from 'firebase/auth';
 export const DEFAULT_STORE_SLUG = 'csmappholdings';
 export const LEMON_STORE_KEY = 'gateready_lemon_store_slug';
 
-// Lemon Squeezy 6 Variant Buy URLs:
+const envVar = (key: string): string | undefined => {
+  try {
+    const meta = (import.meta as unknown as { env?: Record<string, string | undefined> })?.env;
+    const val = meta?.[key];
+    return val && val.trim() ? val.trim() : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+// Lemon Squeezy 6 Variant Buy URLs / Slugs:
 // SILVER — $1.99/mo or $19.99/yr
 // GOLD — $3.99/mo or $29.99/yr (MOST POPULAR)
 // PLATINUM — $4.99/mo or $39.99/yr
 export const TIER_CHECKOUT_SLUGS: Record<PaidTier, { monthly: string; yearly: string }> = {
   SILVER: {
-    monthly: 'ced3b062-e600-470d-a4aa-7c59dfdbd798',
-    yearly: 'ced3b062-e600-470d-a4aa-7c59dfdbd798'
+    monthly: envVar('VITE_LEMON_SILVER_MONTHLY') || 'ced3b062-e600-470d-a4aa-7c59dfdbd798',
+    yearly: envVar('VITE_LEMON_SILVER_YEARLY') || 'ced3b062-e600-470d-a4aa-7c59dfdbd798'
   },
   GOLD: {
-    monthly: '319af1da-b267-4650-a2cc-8b551227d6b6',
-    yearly: '319af1da-b267-4650-a2cc-8b551227d6b6'
+    monthly: envVar('VITE_LEMON_GOLD_MONTHLY') || '319af1da-b267-4650-a2cc-8b551227d6b6',
+    yearly: envVar('VITE_LEMON_GOLD_YEARLY') || '319af1da-b267-4650-a2cc-8b551227d6b6'
   },
   PLATINUM: {
-    monthly: '89bfc2fa-082e-4a8f-b05b-0836cd1908d0',
-    yearly: '89bfc2fa-082e-4a8f-b05b-0836cd1908d0'
+    monthly: envVar('VITE_LEMON_PLATINUM_MONTHLY') || '89bfc2fa-082e-4a8f-b05b-0836cd1908d0',
+    yearly: envVar('VITE_LEMON_PLATINUM_YEARLY') || '89bfc2fa-082e-4a8f-b05b-0836cd1908d0'
   }
 };
 
 // Map slug back to tier
 export function mapSlugToTier(slugOrUrl: string): PaidTier {
-  if (slugOrUrl.includes('ced3b062-e600-470d-a4aa-7c59dfdbd798')) return 'SILVER';
-  if (slugOrUrl.includes('319af1da-b267-4650-a2cc-8b551227d6b6')) return 'GOLD';
-  if (slugOrUrl.includes('89bfc2fa-082e-4a8f-b05b-0836cd1908d0')) return 'PLATINUM';
+  if (
+    slugOrUrl.includes('ced3b062-e600-470d-a4aa-7c59dfdbd798') ||
+    slugOrUrl.includes(TIER_CHECKOUT_SLUGS.SILVER.monthly) ||
+    slugOrUrl.includes(TIER_CHECKOUT_SLUGS.SILVER.yearly)
+  ) {
+    return 'SILVER';
+  }
+  if (
+    slugOrUrl.includes('319af1da-b267-4650-a2cc-8b551227d6b6') ||
+    slugOrUrl.includes(TIER_CHECKOUT_SLUGS.GOLD.monthly) ||
+    slugOrUrl.includes(TIER_CHECKOUT_SLUGS.GOLD.yearly)
+  ) {
+    return 'GOLD';
+  }
+  if (
+    slugOrUrl.includes('89bfc2fa-082e-4a8f-b05b-0836cd1908d0') ||
+    slugOrUrl.includes(TIER_CHECKOUT_SLUGS.PLATINUM.monthly) ||
+    slugOrUrl.includes(TIER_CHECKOUT_SLUGS.PLATINUM.yearly)
+  ) {
+    return 'PLATINUM';
+  }
   return 'GOLD';
 }
 
@@ -96,6 +124,9 @@ export function buildLemonCheckoutUrl(
     urlObj.searchParams.set('embed', '1');
     urlObj.searchParams.set('media', '0');
     urlObj.searchParams.set('logo', '1');
+    urlObj.searchParams.set('interval', cycle);
+    urlObj.searchParams.set('checkout[custom][tier]', tier);
+    urlObj.searchParams.set('checkout[custom][cycle]', cycle);
 
     if (typeof window !== 'undefined') {
       const returnUrl = new URL(window.location.href);
@@ -103,8 +134,6 @@ export function buildLemonCheckoutUrl(
       returnUrl.searchParams.set('tier', tier);
       returnUrl.searchParams.set('cycle', cycle);
       urlObj.searchParams.set('checkout[custom][return_url]', returnUrl.toString());
-      urlObj.searchParams.set('checkout[custom][tier]', tier);
-      urlObj.searchParams.set('checkout[custom][cycle]', cycle);
     }
 
     if (user) {
