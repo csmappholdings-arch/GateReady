@@ -6,6 +6,7 @@ import {
   Plane
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { PublicHeader } from '../components/PublicHeader';
 import { applySeoHead } from './PageLayout';
 
 export const RequirementsPage: React.FC = () => {
@@ -26,45 +27,17 @@ export const RequirementsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      {/* Top Header Navigation */}
-      <header className="w-full bg-white border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5 sticky top-0 z-40">
-        <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <a href="/" className="text-xs font-bold text-slate-600 hover:text-purple-600 transition-colors">
-              ← Back to App
-            </a>
-            <span className="text-slate-300">|</span>
-            <a
-              href="/"
-              aria-label="GateReady – Return to homepage"
-              title="GateReady – Return to homepage"
-              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-            >
-              Gate<span className="text-purple-600">Ready</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-2">
-            <a 
-              href="/airlines/" 
-              className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
-            >
-              Airline Guides
-            </a>
-            <a 
-              href="/baggage-fee-calculator/" 
-              className="text-xs font-bold text-slate-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 transition-colors"
-            >
-              Fee Calculator
-            </a>
-            <a 
-              href="/entry-requirements" 
-              className="text-xs font-bold text-slate-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 transition-colors"
-            >
-              Entry Requirements
-            </a>
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        activePath="/requirements"
+        rightAction={
+          <a
+            href="/airlines/"
+            className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
+          >
+            Airline Guides
+          </a>
+        }
+      />
 
       {/* Main Hub Content: Short 2-Card Hub */}
       <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 flex-1 flex flex-col justify-center">

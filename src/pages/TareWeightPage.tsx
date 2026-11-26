@@ -13,6 +13,7 @@ import {
   Plane
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { PublicHeader } from '../components/PublicHeader';
 import { applySeoHead } from './PageLayout';
 
 export const TareWeightPage: React.FC = () => {
@@ -33,40 +34,17 @@ export const TareWeightPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      {/* Top Header Navigation */}
-      <header className="w-full bg-white border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5 sticky top-0 z-40">
-        <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <a href="/" className="text-xs font-bold text-slate-600 hover:text-purple-600 transition-colors">
-              ← Back to App
-            </a>
-            <span className="text-slate-300">|</span>
-            <a
-              href="/"
-              aria-label="GateReady – Return to homepage"
-              title="GateReady – Return to homepage"
-              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-            >
-              Gate<span className="text-purple-600">Ready</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-2">
-            <a 
-              href="/baggage-fee-calculator/" 
-              className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
-            >
-              Fee Calculator
-            </a>
-            <a 
-              href="/" 
-              className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm shadow-purple-600/20"
-            >
-              <Plane className="w-3.5 h-3.5" />
-              <span>Create Free Trip</span>
-            </a>
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        activePath="/tare-weight"
+        rightAction={
+          <a
+            href="/baggage-fee-calculator/"
+            className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
+          >
+            Fee Calculator
+          </a>
+        }
+      />
 
       {/* Hero Section */}
       <section className="w-full bg-gradient-to-b from-purple-50 via-white to-slate-50 border-b border-purple-100 py-10 px-4 sm:px-6 lg:px-8 text-center">

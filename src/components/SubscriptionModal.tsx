@@ -36,6 +36,7 @@ export const SubscriptionModal: React.FC = () => {
     closePaywall, 
     upgradeToTier, 
     paywallReason,
+    paywallContext,
     paywallDefaultShowPlans,
     tier,
     isTrialExpired,
@@ -131,6 +132,84 @@ export const SubscriptionModal: React.FC = () => {
   const platinumCheckoutUrl = buildLemonCheckoutUrl('PLATINUM', selectedCycle, user);
   const platinumAltUrl = buildLemonCheckoutUrl('PLATINUM', alternateCycle, user);
 
+  const contextualCopy = (() => {
+    switch (paywallContext) {
+      case 'second_trip':
+        return tier === 'SILVER'
+          ? {
+              badge: 'Unlimited Trips Unlock',
+              heading: 'Add More Active Trips',
+              subtitle:
+                'Your Silver plan includes 2 active trips. Upgrade to Gold ($3.99/mo or $29.99/yr) or Platinum ($4.99/mo or $39.99/yr) to track unlimited active trips side by side.',
+              reasonTitle: 'Unlock Unlimited Active Trips',
+              reasonCopy:
+                paywallReason ||
+                'Track three or more active trips simultaneously with separate airline allowances, bag tare weights, and departure checklists.'
+            }
+          : {
+              badge: 'Second Trip Unlock',
+              heading: 'Unlock Your Second Active Trip',
+              subtitle:
+                'Your Free plan includes 1 active trip. Unlock a second active trip on Silver ($1.99/mo or $19.99/yr), unlimited trips on Gold ($3.99/mo or $29.99/yr) and Platinum ($4.99/mo or $39.99/yr), or start your 7-day full Platinum trial.',
+              reasonTitle: 'What Adding a Second Trip Unlocks',
+              reasonCopy:
+                'Manage your second active trip alongside your first — with its own airline baggage limits, empty suitcase tare math, TSA 3-1-1 checks, and packing readiness score. Silver unlocks 2 active trips & unlimited bags; Gold and Platinum unlock unlimited trips.'
+            };
+      case 'bag_limit':
+        return {
+          badge: 'Multi-Bag Packing',
+          heading: 'Unlock Unlimited Bags Per Trip',
+          subtitle:
+            'Your Free plan includes up to 2 bags per trip (max 1 checked bag). Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo) unlock unlimited bags.',
+          reasonTitle: 'Add 3+ Bags & Extra Checked Luggage',
+          reasonCopy:
+            paywallReason ||
+            'Pack multiple checked suitcases, carry-ons, and personal items with per-bag tare deduction and overweight balance suggestions.'
+        };
+      case 'traveler_limit':
+        return {
+          badge: 'Multi-Traveler Packing',
+          heading: 'Add Companions & Family Travelers',
+          subtitle:
+            'Your Free plan supports 1 traveler. Gold unlocks 2 travelers and Platinum unlocks unlimited travelers with per-person bag assignment.',
+          reasonTitle: 'Pack for Multiple Travelers',
+          reasonCopy:
+            paywallReason ||
+            'Assign suitcases and packing checklists per traveler across couples or family trips.'
+        };
+      case 'return_tracking':
+        return {
+          badge: 'Round-Trip Tracking',
+          heading: 'Unlock Return Trip & Countdown Tracking',
+          subtitle:
+            'Track return departure dates, two-way baggage allowances, and return-day checklists on Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo).',
+          reasonTitle: 'Track Outbound & Return Journeys Together',
+          reasonCopy:
+            paywallReason ||
+            'Keep return flight schedules, allowances, and return packing lists inside one trip workspace.'
+        };
+      case 'feature_unlock':
+        return {
+          badge: 'Feature Unlock',
+          heading: 'Unlock Full Packing & Departure Tools',
+          subtitle:
+            'Start your 7-day full Platinum trial (no card required) or choose a plan backed by our 14-day money-back guarantee.',
+          reasonTitle: 'What This Unlocks',
+          reasonCopy: paywallReason || ''
+        };
+      case 'plans':
+      default:
+        return {
+          badge: 'GateReady Plans & Upgrades',
+          heading: 'Pack Smarter with GateReady',
+          subtitle:
+            'Choose the perfect plan for your travel style. Every paid plan includes our 14-day money-back guarantee.',
+          reasonTitle: 'Unlock Full Access Free for 7 Days',
+          reasonCopy: paywallReason || ''
+        };
+    }
+  })();
+
   return createPortal(
     <div className="fixed inset-0 z-[99999] overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 min-h-screen">
       <div 
@@ -153,14 +232,14 @@ export const SubscriptionModal: React.FC = () => {
           </div>
 
           <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-amber-400/25 text-amber-200 border border-amber-300/30 px-3 py-0.5 rounded-full mb-1">
-            <Sparkles className="w-3 h-3" /> GateReady Plans & Upgrades
+            <Sparkles className="w-3 h-3" /> {contextualCopy.badge}
           </span>
 
           <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
-            Pack Smarter with GateReady
+            {contextualCopy.heading}
           </h3>
-          <p className="text-xs text-purple-100/90 mt-1 max-w-md mx-auto">
-            Choose the perfect plan for your travel style. Every paid plan includes our 14-day money-back guarantee.
+          <p className="text-xs text-purple-100/90 mt-1 max-w-xl mx-auto leading-relaxed">
+            {contextualCopy.subtitle}
           </p>
 
           {/* Monthly / Annual Billing Toggle */}
@@ -198,17 +277,17 @@ export const SubscriptionModal: React.FC = () => {
           {/* Primary Trial Unlock Card for Free Plan / Guests */}
           {tier === 'FREE' && (
             <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-50 via-indigo-50 to-amber-50/70 dark:from-purple-950/60 dark:via-indigo-950/40 dark:to-slate-900 border-2 border-purple-300 dark:border-purple-700 shadow-md space-y-4">
-              {paywallReason && (
+              {(paywallReason || paywallContext !== 'plans') && contextualCopy.reasonCopy && (
                 <div className="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/70 flex items-start gap-3">
                   <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
                     <Zap className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-black text-purple-950 dark:text-purple-100">
-                      Unlock Full Access Free for 7 Days
+                      {contextualCopy.reasonTitle}
                     </p>
                     <p className="text-[11px] text-purple-900/85 dark:text-purple-200/85 mt-0.5 leading-snug">
-                      {paywallReason}
+                      {contextualCopy.reasonCopy}
                     </p>
                   </div>
                 </div>

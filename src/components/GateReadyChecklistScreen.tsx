@@ -3,7 +3,7 @@ import { usePacking } from '../context/PackingContext';
 import { Trip, getBagEmptyWeightLbs } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
 import { computeBagWeightStatus, computeTripWeightStatus, getCarrierCarryOnPolicy } from '../utils/bagWeightAnalysis';
-import { scanItemForLiquids } from '../utils/liquidScanner';
+import { scanItemForLiquids, inferDepartureLiquidRegion } from '../utils/liquidScanner';
 import { PrintPackingListModal } from './PrintPackingListModal';
 import { airlineLimits } from '../data/allowances';
 import { markValueMomentReached } from '../utils/valueMoment';
@@ -312,8 +312,9 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
             const pct = weightStatus.pct;
             const isBagOverweight = weightStatus.isOverweight;
 
+            const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
             const nonCompliantCount = isFlight && bag.type !== 'CHECKED'
-              ? bag.items.filter((it) => scanItemForLiquids(it.name, bag.type).status === 'NON_COMPLIANT').length
+              ? bag.items.filter((it) => scanItemForLiquids(it.name, bag.type, liquidRegion).status === 'NON_COMPLIANT').length
               : 0;
 
             return (
@@ -437,13 +438,13 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                                   </span>
                                 )}
                                 {isFlight && (() => {
-                                  const lq = scanItemForLiquids(item.name, bag.type);
+                                  const lq = scanItemForLiquids(item.name, bag.type, liquidRegion);
                                   if (!lq.isLiquid) return null;
                                   if (lq.status === 'NON_COMPLIANT') {
                                     return (
                                       <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 inline-flex items-center gap-1 shrink-0" title={lq.alertMessage}>
                                         <AlertTriangle className="w-2.5 h-2.5" />
-                                        <span>Exceeds 100 ml — checked bags only</span>
+                                        <span>{lq.badgeLabel || 'Exceeds 100 mL — checked bags only'}</span>
                                       </span>
                                     );
                                   }
@@ -451,7 +452,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                                     return (
                                       <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 inline-flex items-center gap-0.5 shrink-0">
                                         <Check className="w-2.5 h-2.5 stroke-[3]" />
-                                        <span>TSA Pass</span>
+                                        <span>{lq.badgeLabel || '≤100 mL Pass'}</span>
                                       </span>
                                     );
                                   }
@@ -466,7 +467,7 @@ export const GateReadyChecklistScreen: React.FC<GateReadyChecklistScreenProps> =
                                   return (
                                     <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 inline-flex items-center gap-0.5 shrink-0">
                                       <Droplets className="w-2.5 h-2.5" />
-                                      <span>TSA 3-1-1 (≤100 ml)</span>
+                                      <span>{lq.badgeLabel || '≤100 mL / 3.4 fl oz'}</span>
                                     </span>
                                   );
                                 })()}

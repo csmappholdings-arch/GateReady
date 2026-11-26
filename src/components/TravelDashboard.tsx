@@ -401,7 +401,11 @@ export const TravelDashboard: React.FC<TravelDashboardProps> = ({
                     openPaywall(
                       tier === 'FREE'
                         ? `Free plan includes 1 active trip and 2 bags. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`
-                        : `Upgrade to ${planLimits.nextUpgrade} for more active trips and companion luggage sharing.`
+                        : `Upgrade to ${planLimits.nextUpgrade} for more active trips and companion luggage sharing.`,
+                      {
+                        context: 'plans',
+                        preValueNotice: 'Finish packing this trip first — or view all plans on the Pricing page.'
+                      }
                     );
                   }}
                   className="h-9 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/20 active:scale-95 transition-all cursor-pointer"

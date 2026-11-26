@@ -91,12 +91,12 @@ export const airlineLimits: BaggageLimitInfo[] = [
     company: 'Spirit Airlines',
     type: 'PLANE',
     region: 'USA',
-    personalLimit: '18 x 14 x 8 in (45 x 35 x 20 cm) - INCLUDED FREE',
-    carryOnLimit: '22 x 18 x 10 in (56 x 46 x 25 cm) - EXTRA FEE REQUIRED',
-    checkedLimit: '62 linear in (158 cm), STRICT 40 lbs (18.1 kg) max!',
-    carryOnWeightLimit: 'Must fit safely in overhead bin',
-    checkedWeightLimit: '40 lbs (18.1 kg) - Overweight charges apply from 41 lbs!',
-    notes: 'Warning: Checked bag weight limit is 40 lbs, not 50 lbs! Carry-on incurs a charge. Sizers enforced.'
+    personalLimit: '18 x 14 x 8 in (45 x 35 x 20 cm) - ARCHIVED POLICY',
+    carryOnLimit: '22 x 18 x 10 in (56 x 46 x 25 cm) - ARCHIVED POLICY',
+    checkedLimit: '62 linear in (158 cm), STRICT 40 lbs (18.1 kg) max (archived)',
+    carryOnWeightLimit: 'Must fit safely in overhead bin (carrier ceased May 2, 2026)',
+    checkedWeightLimit: '40 lbs (18.1 kg) - Historical policy (operations ceased May 2, 2026)',
+    notes: 'ARCHIVED POLICY: Spirit Airlines ceased flight operations on May 2, 2026. Retained only for historical reference.'
   },
   {
     id: 'frontier',
@@ -116,11 +116,11 @@ export const airlineLimits: BaggageLimitInfo[] = [
     type: 'PLANE',
     region: 'USA',
     personalLimit: '16 x 15 x 7 in (40.6 x 38.1 x 17.8 cm) - INCLUDED FREE under seat',
-    carryOnLimit: '22 x 16 x 10 in (55.9 x 40.6 x 25.4 cm) - max 25 lbs (11.3 kg), PAID FEE',
-    checkedLimit: '80 linear in (203 cm), max 40 lbs (18 kg)',
-    carryOnWeightLimit: 'Strict 25 lbs (11.3 kg) weight cap',
-    checkedWeightLimit: '40 lbs (18 kg) - Extra fees if over 40 lbs',
-    notes: 'Ultra low-cost carrier. Sizers enforced at boarding gate. Checked bag limit is 40 lbs.'
+    carryOnLimit: '22 x 16 x 10 in (55.9 x 40.6 x 25.4 cm) - PAID FEE',
+    checkedLimit: '80 linear in (203 cm), max 50 lbs (23 kg)',
+    carryOnWeightLimit: 'No strict numeric limit (must be lifted overhead unassisted)',
+    checkedWeightLimit: '50 lbs (23 kg) standard limit - Overweight fees apply over 50 lbs',
+    notes: 'Ultra low-cost carrier. Sizers enforced at boarding gate. Standard checked bag allowance is 50 lbs (23 kg) and 80 linear in.'
   },
   {
     id: 'suncountry',
@@ -154,11 +154,11 @@ export const airlineLimits: BaggageLimitInfo[] = [
     type: 'PLANE',
     region: 'Canada',
     personalLimit: '16 x 13 x 6 in (41 x 33 x 15 cm) - fits under front seat',
-    carryOnLimit: '21 x 15 x 9 in (53 x 38 x 23 cm) including wheels/handles',
+    carryOnLimit: '22 x 14 x 9 in (56 x 36 x 23 cm) including wheels/handles',
     checkedLimit: '62 linear in (157 cm), max 50 lbs (23 kg)',
-    carryOnWeightLimit: 'No maximum weight limit',
-    checkedWeightLimit: '50 lbs (23 kg) Economy ($40–$55 CAD prepaid 1st bag on Econo/UltraBasic; EconoFlex includes 1st); 70 lbs Business/Premium',
-    notes: 'Standard Econo fares include a free overhead carry-on; 1st checked bag starts around $40 CAD prepaid ($35–$45 prepaid, $50–$59 check-in), included on EconoFlex. UltraBasic fares exclude overhead carry-ons on Canada/US flights.'
+    carryOnWeightLimit: 'No maximum weight limit (must fit sizer & lift overhead unassisted)',
+    checkedWeightLimit: '50 lbs (23 kg) Economy ($40–$55+ CAD prepaid 1st bag on Econo/UltraBasic; EconoFlex includes 1st); 70 lbs Business/Premium',
+    notes: 'Standard Econo fares include a free overhead carry-on; 1st checked bag starts around $35–$45 CAD prepaid ($50–$65+ check-in), included on EconoFlex. UltraBasic excludes overhead carry-ons on Canada/US/Sun flights.'
   },
   {
     id: 'porter',
@@ -166,7 +166,7 @@ export const airlineLimits: BaggageLimitInfo[] = [
     type: 'PLANE',
     region: 'Canada',
     personalLimit: '17 x 13 x 6 in (43 x 33 x 16 cm) - Included in all fares',
-    carryOnLimit: '21.5 x 15.5 x 9 in (55 x 40 x 23 cm), max 20 lbs (9 kg)',
+    carryOnLimit: '21.5 x 15.5 x 9 in (55 x 40 x 23 cm), approx 20 lbs (9 kg)',
     checkedLimit: '62 linear in (158 cm), max 50 lbs (23 kg)',
     carryOnWeightLimit: '20 lbs (9 kg) on PorterReserve & Standard',
     checkedWeightLimit: '50 lbs (23 kg)',
@@ -177,12 +177,12 @@ export const airlineLimits: BaggageLimitInfo[] = [
     company: 'Air Transat',
     type: 'PLANE',
     region: 'Canada',
-    personalLimit: '17 x 12 x 5 in (43 x 30.5 x 12.7 cm) - free under seat',
-    carryOnLimit: '21 x 16 x 9 in (53 x 40 x 23 cm), max 22 lbs (10 kg)',
+    personalLimit: '17 x 12 x 5 in (43 x 31 x 13 cm) - free under seat',
+    carryOnLimit: '20 x 15.7 x 9 in (51 x 40 x 23 cm) including wheels and handles',
     checkedLimit: '62 linear in (158 cm), 50 lbs (23 kg)',
-    carryOnWeightLimit: '22 lbs (10 kg) strictly weighed',
-    checkedWeightLimit: '50 lbs (23 kg) Club Class allows 2x 70 lbs (32 kg)',
-    notes: 'Very popular leisure airline connecting Canada to Europe, Florida, and the Caribbean.'
+    carryOnWeightLimit: 'No strict numeric carry-on weight limit (must lift into overhead bin unassisted)',
+    checkedWeightLimit: '50 lbs (23 kg); Club Class allows 2x 70 lbs (32 kg)',
+    notes: 'Leisure carrier connecting Canada to Europe, US, and the Caribbean. Carry-on sizer dimensions are strictly 51 x 40 x 23 cm.'
   },
   {
     id: 'flair',
@@ -227,12 +227,12 @@ export const airlineLimits: BaggageLimitInfo[] = [
     company: 'Lufthansa Group (SWISS / Austrian)',
     type: 'PLANE',
     region: 'Europe',
-    personalLimit: '15.7 x 11.8 x 3.9 in (40 x 30 x 10 cm)',
+    personalLimit: '15.7 x 11.8 x 5.9 in (40 x 30 x 15 cm)',
     carryOnLimit: '21.6 x 15.7 x 9 in (55 x 40 x 23 cm), max 17.6 lbs (8 kg)',
     checkedLimit: '62 linear in (158 cm), max 50 lbs (23 kg)',
     carryOnWeightLimit: 'Strict 17.6 lbs (8 kg) maximum',
     checkedWeightLimit: '50 lbs (23 kg) Economy; 70.5 lbs (32 kg) Business',
-    notes: 'Carry-on bags are frequently weighed at Frankfurt, Munich, and Zurich gates. Ensure under 8 kg.'
+    notes: 'Carry-on bags are frequently weighed at Frankfurt, Munich, and Zurich gates. Keep under 8 kg.'
   },
   {
     id: 'ryanair',
@@ -287,12 +287,12 @@ export const airlineLimits: BaggageLimitInfo[] = [
     company: 'Scandinavian Airlines (SAS)',
     type: 'PLANE',
     region: 'Europe',
-    personalLimit: '15.7 x 11.8 x 5.9 in (40 x 30 x 15 cm) - under seat',
+    personalLimit: '15.7 x 11.8 x 5.9 in (40 x 30 x 15 cm) - under seat (max 18L)',
     carryOnLimit: '21.6 x 15.7 x 9 in (55 x 40 x 23 cm), max 17.6 lbs (8 kg)',
     checkedLimit: '62 linear in (158 cm), 50 lbs (23 kg)',
-    carryOnWeightLimit: '17.6 lbs (8 kg) maximum',
+    carryOnWeightLimit: '17.6 lbs (8 kg) maximum (excluded on Go Light unless added)',
     checkedWeightLimit: '50 lbs (23 kg) SAS Go; 70 lbs (32 kg) SAS Business',
-    notes: 'SAS Go Light fares only include personal under-seat bag; standard carry-on requires SAS Go Smart.'
+    notes: 'SAS Go Light fares exclude overhead carry-on bags (under-seat personal item only unless paid add-on purchased); SAS Go Standard+ includes overhead bag.'
   },
   {
     id: 'virginatlantic',
@@ -323,10 +323,10 @@ export const airlineLimits: BaggageLimitInfo[] = [
     company: 'TAP Air Portugal',
     type: 'PLANE',
     region: 'Europe',
-    personalLimit: '15.7 x 11.8 x 4.7 in (40 x 30 x 12 cm) up to 4.4 lbs (2 kg)',
-    carryOnLimit: '21.6 x 15.7 x 7.8 in (55 x 40 x 20 cm), max 17.6 lbs (8 kg)',
+    personalLimit: '15.7 x 11.8 x 5.9 in (40 x 30 x 15 cm) up to 4.4 lbs (2 kg)',
+    carryOnLimit: '21.6 x 15.7 x 9.8 in (55 x 40 x 25 cm), max 22 lbs (10 kg)',
     checkedLimit: '62 linear in (158 cm), 50 lbs (23 kg)',
-    carryOnWeightLimit: '17.6 lbs (8 kg) Economy; 2x 8 kg in Executive Class',
+    carryOnWeightLimit: '22 lbs (10 kg) Economy; 2x up to 16 kg total in Executive Class',
     checkedWeightLimit: '50 lbs (23 kg) Economy; 70 lbs (32 kg) Executive',
     notes: 'Major transatlantic gateway to Europe and Brazil via Lisbon hub.'
   },

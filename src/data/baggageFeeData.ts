@@ -31,13 +31,13 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     aliases: ['delta', 'delta air lines', 'delta airlines', 'dl'],
     currency: 'USD',
     currencySymbol: '$',
-    firstCheckedFee: 35,
-    secondCheckedFee: 45,
+    firstCheckedFee: 45,
+    secondCheckedFee: 55,
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 200,
-    feeNotes: 'Standard domestic Main Cabin fees ($35 first, $45 second). First/Delta One includes 2 free checked bags up to 70 lbs.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Standard domestic US Main Cabin & Basic Economy fees ($45 first, $55 second). First / Delta One includes 2 free checked bags up to 70 lbs. Confirm route/Medallion waivers at booking.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.delta.com/us/en/baggage/overview'
   },
   {
@@ -46,13 +46,13 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     aliases: ['american', 'american airlines', 'aa'],
     currency: 'USD',
     currencySymbol: '$',
-    firstCheckedFee: 35,
-    secondCheckedFee: 45,
+    firstCheckedFee: 45,
+    secondCheckedFee: 55,
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
-    feeNotes: '$35 first bag online ($40 at airport), $45 second bag for domestic Main Cabin. Business & First include 2-3 free bags up to 70 lbs.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Domestic Main Cabin: $45 online ($50 airport) 1st bag, $55 online ($60 airport) 2nd bag; Basic Economy is $50 online / $55 airport for 1st bag. Business & First include 2–3 free bags up to 70 lbs.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.aa.com/i18n/travel-info/baggage/checked-baggage-policy.jsp'
   },
   {
@@ -61,13 +61,13 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     aliases: ['united', 'united airlines', 'ua'],
     currency: 'USD',
     currencySymbol: '$',
-    firstCheckedFee: 35,
-    secondCheckedFee: 45,
+    firstCheckedFee: 45,
+    secondCheckedFee: 55,
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 200,
-    feeNotes: '$35 first bag prepaid ($40 airport), $45 second bag prepaid ($50 airport). Basic Economy does NOT include an overhead carry-on on domestic flights.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: '$45 first bag prepaid ($50 airport), $55 second bag prepaid ($60 airport) on domestic Main Cabin. Basic Economy excludes overhead carry-on on domestic US routes (personal item only; $75 gate-handling fee if brought).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.united.com/en/us/baggage-calculator'
   },
   {
@@ -81,8 +81,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 125,
-    feeNotes: 'Choice/Basic fares charge $45 1st checked bag and $55 2nd checked bag (3rd+ $150). Choice Extra, A-List Preferred, Rapid Rewards credit cardholders & active-duty military personnel receive checked-bag waivers. Carry-on + personal item stay free.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Basic/Choice/Choice Preferred fares charge $45 1st checked bag and $55 2nd checked bag (3rd+ $150). Choice Extra, A-List Preferred, Rapid Rewards credit cardholders & active-duty military receive checked-bag waivers. Carry-on + personal item stay free.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.southwest.com/html/customer-service/baggage/'
   },
   {
@@ -91,13 +91,13 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     aliases: ['jetblue', 'jetblue airways', 'b6'],
     currency: 'USD',
     currencySymbol: '$',
-    firstCheckedFee: 35,
-    secondCheckedFee: 50,
+    firstCheckedFee: 50,
+    secondCheckedFee: 70,
     carryOnFee: 0,
     overweightFee51to70lbs: 150,
     oversizeFee: 150,
-    feeNotes: '$35 first bag ($45 within 24h of departure), $50 second bag ($60 within 24h). Blue Plus includes 1 free bag; Mint includes 2 free bags (70 lbs).',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Dynamic off-peak/peak pricing on Blue & Blue Basic: ~$50–$55 1st bag prepaid online ($60–$70 within 24h/airport); 2nd bag ~$70–$85. Blue Plus includes 1 free bag; Mint includes 2 free bags (70 lbs). All fares include carry-on + personal item.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.jetblue.com/flying-with-us/baggage'
   },
   {
@@ -111,8 +111,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    feeNotes: '$35 first bag, $45 second bag. 20-minute baggage delivery guarantee at carousel. First Class includes 2 free bags up to 70 lbs.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'North America Saver/Main Cabin: typically $35 first bag, $45 second bag (route/season rates can range $35–$45 / $45–$55). 20-minute baggage delivery guarantee; First Class includes 2 free bags up to 70 lbs.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.alaskaair.com/content/travel-info/baggage'
   },
   {
@@ -121,13 +121,13 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     aliases: ['hawaiian', 'hawaiian airlines', 'ha'],
     currency: 'USD',
     currencySymbol: '$',
-    firstCheckedFee: 35,
-    secondCheckedFee: 40,
+    firstCheckedFee: 45,
+    secondCheckedFee: 55,
     carryOnFee: 0,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    feeNotes: '$35 first bag mainland, $40 second bag. HawaiianMiles members receive discounted $25 first / $35 second rates. First Class includes 2 free bags (70 lbs).',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'North America Mainland Main Cabin: $45 1st bag, $55 2nd bag (neighbor-island Hawaii flights $30 1st / $40 2nd; HawaiianMiles discounts available). Carry-on capped at 25 lbs (11.5 kg). First Class includes 2 free bags (70 lbs).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://hawaiianair.custhelp.com/app/answers/detail/a_id/2246'
   },
   {
@@ -141,8 +141,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 45,
     overweightFee51to70lbs: 125,
     oversizeFee: 150,
-    feeNotes: 'Historical ULCC table (Spirit Airlines ceased flight operations in May 2026): Standard carry-on ~$45-$60. Checked limit is STRICT 40 lbs (not 50 lbs). 41-50 lbs fee is $79; 51-70 lbs fee is $125.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'ARCHIVED POLICY — Spirit Airlines ceased all flight operations on May 2, 2026. Retained solely as historical reference: standard carry-on ~$45–$60; checked limit was strict 40 lbs (41–50 lbs +$79; 51–70 lbs +$125).',
+    lastVerified: 'Archived (Ceased May 2, 2026)',
     officialBaggagePageUrl: 'https://www.spirit.com/optional-services'
   },
   {
@@ -156,8 +156,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 49,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    feeNotes: 'Ultra-low cost: Carry-on bag requires a fee (~$49-$60). Checked limit is STRICT 40 lbs. Overweight 41-50 lbs is +$75; 51-100 lbs is +$100.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Ultra-low-cost dynamic pricing (varies by route & booking window): overhead carry-on ~$49–$60+; checked bag limit is STRICT 40 lbs (41–50 lbs +$75+; 51–100 lbs +$100). Personal item 18 x 14 x 8 in free.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.flyfrontier.com/travel/travel-info/bag-options/'
   },
   {
@@ -171,8 +171,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 35,
     overweightFee51to70lbs: 75,
     oversizeFee: 75,
-    feeNotes: 'Ultra-low cost: Carry-on and checked bags incur fees. Standard checked limit is 40 lbs; 41-70 lbs is +$75. Airport desk bag charges are substantially higher.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Ultra-low-cost dynamic pricing: carry-on (~$35+ online) and checked bags incur fees. Standard checked bag weight limit is 50 lbs (23 kg) / 80 linear in; overweight fees apply above 50 lbs. Airport desk charges are substantially higher.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.allegiantair.com/baggage-info'
   },
   {
@@ -186,8 +186,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 30,
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
-    feeNotes: 'Low-cost model: Carry-on ~$30-$40 online. 1st checked bag ~$35-$45. 51-60 lbs overweight fee is $60; 61-70 lbs is $100.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Low-cost dynamic pricing: overhead carry-on (max 35 lbs) ~$30–$40+ online; 1st checked bag (max 50 lbs) ~$35–$45+ online. Overweight 51–60 lbs +$60; 61–70 lbs +$100.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.suncountry.com/bags-optional-services'
   },
 
@@ -206,8 +206,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     usdEquivalentNote: 'approx ~$33 USD (1st bag Standard/Basic) / ~$44 USD (2nd bag)',
     firstCheckedUsdNote: 'approx ~$33 USD ($45 CAD Basic/Standard; $0 Flex+)',
     secondCheckedUsdNote: 'approx ~$44 USD ($60 CAD)',
-    feeNotes: 'North America & Sun routes: Basic and Standard Economy charge $45 CAD 1st bag / $60 CAD 2nd bag (Flex includes 1st bag free; Comfort/Latitude/Business include 2). Basic Economy NA/Sun tickets allow personal item only ($65 gate-check for oversized bags).',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'North America & Sun routes: Basic & Standard Economy typically charge $35–$55 CAD (~$45 CAD representative) 1st bag / $50–$72 CAD (~$60 CAD) 2nd bag; Flex includes 1st bag free; Comfort/Latitude/Business include 2. Basic NA/Sun allows personal item only ($65 CAD gate check).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.aircanada.com/ca/en/aco/home/plan/baggage/checked.html'
   },
   {
@@ -224,8 +224,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     usdEquivalentNote: 'approx ~$30 USD (1st bag Econo prepaid) / ~$44 USD (2nd bag)',
     firstCheckedUsdNote: 'approx ~$30 USD ($40 CAD Econo prepaid; $0 EconoFlex)',
     secondCheckedUsdNote: 'approx ~$44 USD ($60 CAD prepaid)',
-    feeNotes: 'Econo charges ~$40 CAD prepaid ($35–$45 prepaid / $50–$59 check-in) for 1st checked bag and ~$60 CAD for 2nd bag; EconoFlex includes 1st bag free. UltraBasic charges $45–$55+ prepaid and excludes overhead carry-on on Canada/US routes.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Econo prepaid checked bag starts ~$35–$45 CAD ($40 representative; $50–$65+ at check-in), 2nd bag ~$60 CAD; EconoFlex includes 1st bag free. UltraBasic excludes overhead carry-on on Canada/US/Sun routes ($45–$65+ prepaid 1st checked).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.westjet.com/en-ca/baggage/fees'
   },
   {
@@ -240,8 +240,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
     usdEquivalentNote: 'approx ~$26 USD (1st bag) / ~$37 USD (2nd bag)',
-    feeNotes: 'PorterClassic Standard includes free carry-on. PorterClassic Basic excludes carry-on ($35 CAD fee to check). 1st checked bag $35-$40 CAD online.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'PorterClassic Standard includes free carry-on (approx. 20 lbs / 9 kg liftable overhead). PorterClassic Basic excludes overhead carry-on (personal item only). 1st checked bag ~$35 CAD online ($50 2nd).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.flyporter.com/en-ca/travel-information/baggage'
   },
   {
@@ -256,8 +256,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 100,
     usdEquivalentNote: 'approx ~$30 USD (1st bag) / ~$41 USD (2nd bag)',
-    feeNotes: 'Standard Eco Budget fares exclude checked baggage ($40 CAD online). Standard carry-on roller (22 lbs) is free on all fares.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Eco Budget fares exclude checked baggage (~$30–$40+ CAD online, $62–$78+ CAD at airport). Standard carry-on (51 x 40 x 23 cm; must fit overhead unassisted) is included.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.airtransat.com/en-CA/travel-information/baggage'
   },
   {
@@ -272,8 +272,8 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 99,
     oversizeFee: 99,
     usdEquivalentNote: 'approx ~$29 USD carry-on / ~$36 USD 1st bag',
-    feeNotes: 'Canadian Ultra-Low Cost Carrier: Basic fare only includes small personal item. Overhead carry-on costs $39-$49 CAD; checked bag costs $49-$69 CAD online.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Canadian Ultra-Low-Cost Carrier dynamic pricing: Bare fare includes personal item only (7 kg). Overhead carry-on (10 kg) starts around $29–$49 CAD online (higher at airport); checked bags ~$49–$69+ CAD online depending on route/timing.',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://flyflair.com/travel-info/baggage'
   },
 
@@ -292,7 +292,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     firstCheckedUsdNote: 'Included in Economy Standard (Basic Hand Baggage Only charges £35 / ~$45 USD)',
     secondCheckedUsdNote: 'approx ~$85 USD (2nd bag)',
     feeNotes: 'Economy Standard / Club Europe includes 1-2 checked bags free (51 lbs / 23 kg). Hand Baggage Only (Basic) fares charge £35 first checked bag.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.britishairways.com/en-gb/information/baggage-essentials'
   },
   {
@@ -309,7 +309,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     firstCheckedUsdNote: 'Included in Standard / Classic (Light unbundled charges €30 / ~$33 USD)',
     secondCheckedUsdNote: 'approx ~$82 USD (2nd bag)',
     feeNotes: 'Standard economy includes 1 free checked bag (23 kg). "Light" unbundled fares charge €30 online for the 1st checked bag (€70 at airport).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://wwws.airfrance.us/information/bagages'
   },
   {
@@ -326,7 +326,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     firstCheckedUsdNote: 'Included in Classic / Flex (Economy Light charges €30 / ~$33 USD)',
     secondCheckedUsdNote: 'approx ~$87 USD (2nd bag)',
     feeNotes: 'Economy Classic & Flex include 1 checked bag (23 kg) free. Economy Light charges €30 online for the 1st bag (€60 at airport). Overweight up to 32 kg is €65.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.lufthansa.com/us/en/free-baggage-rules'
   },
   {
@@ -342,7 +342,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     oversizeFee: 50,
     usdEquivalentNote: 'approx ~$16 USD carry-on / ~$27 USD 1st check',
     feeNotes: 'Ultra-low cost: Standard fare includes ONLY personal small bag. "Priority & 2 Cabin Bags" (adds 10kg overhead roller) is €15-€25. 10kg checked is €20-€25; 20kg checked is €30-€45.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.ryanair.com/gb/en/useful-info/help-centre/fees'
   },
   {
@@ -358,7 +358,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     oversizeFee: 50,
     usdEquivalentNote: 'approx ~$20 USD carry-on / ~$39 USD 1st check',
     feeNotes: 'Basic fare includes small underseat bag only. Large overhead cabin bag costs £15-£25. 15kg checked bag is £20-£30; 23kg checked bag is £30-£40 online.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.easyjet.com/en/help/baggage/cabin-bag-and-hold-luggage'
   },
   {
@@ -373,7 +373,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 80,
     oversizeFee: 80,
     feeNotes: 'International routes to/from Americas include 2 free checked bags up to 23 kg each. EcoFly regional fares charge ~$30-$50 depending on route.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.turkishairlines.com/en-us/any-questions/free-baggage/'
   },
   {
@@ -390,7 +390,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     firstCheckedUsdNote: 'Included in Standard / Optimal (Basic unbundled charges €25 / ~$27 USD)',
     secondCheckedUsdNote: 'approx ~$49 USD (2nd bag)',
     feeNotes: 'Standard fares include 1 free checked bag (23 kg). "Basic" unbundled fares charge €25-€35 online for the 1st checked bag. Carry-on + personal item free.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.iberia.com/us/baggage/'
   },
   {
@@ -404,10 +404,10 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 55,
     oversizeFee: 75,
-    firstCheckedUsdNote: 'Included in SAS Go (SAS Go Light charges €30 / ~$33 USD)',
+    firstCheckedUsdNote: 'Included in SAS Go / Standard (SAS Go Light charges €30+ / ~$33 USD)',
     secondCheckedUsdNote: 'approx ~$65 USD (2nd bag)',
-    feeNotes: 'SAS Go includes 1 free checked bag (23 kg). SAS Go Light unbundled fare charges €30 online for 1st bag (€60 at gate). SAS Plus/Business includes 2 bags (32 kg).',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'SAS Go / Standard includes 1 free checked bag (23 kg) + 8 kg overhead cabin bag. SAS Go Light unbundled tickets include only an under-seat bag unless overhead cabin/checked bags are added online (~€12–€35+ / €30+ checked).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.flysas.com/en/travel-info/baggage/'
   },
   {
@@ -421,10 +421,10 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 65,
     oversizeFee: 65,
-    firstCheckedUsdNote: 'Included in Economy Classic / Delight (Economy Light charges £50 / ~$65 USD)',
+    firstCheckedUsdNote: 'Included in Economy Classic / Delight (Economy Light charges ~£80 / ~$100 USD)',
     secondCheckedUsdNote: 'approx ~$85 USD (2nd bag)',
-    feeNotes: 'Economy Classic & Delight include 1 free checked bag (23 kg / 50 lbs). Economy Light unbundled charges £50 online for 1st checked bag.',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Economy Classic & Delight include 1 free checked bag (23 kg / 50 lbs). Economy Light hand-baggage-only fares charge ~£80 / $100 USD for adding a 1st checked bag (route dependent).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.virginatlantic.com/us/en/travel-information/baggage.html'
   },
   {
@@ -438,10 +438,10 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 60,
     oversizeFee: 75,
-    firstCheckedUsdNote: 'Included in Classic Economy (Light fare charges €30 / ~$33 USD)',
+    firstCheckedUsdNote: 'Included in Classic Economy (Light fare charges €30–€60+ depending on route)',
     secondCheckedUsdNote: 'approx ~$65 USD (2nd bag)',
-    feeNotes: 'Classic economy includes 1 free 23 kg bag. Light unbundled fare charges €30 online for the 1st checked bag (€60 airport). Business includes 2 bags (32 kg).',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Classic economy includes 1 free 23 kg bag. Light unbundled fares exclude checked baggage (€30–€60+ short-haul/long-haul online, higher at airport). Business includes 2 bags (32 kg).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.ita-airways.com/en_us/fly-ita/baggage.html'
   },
   {
@@ -455,10 +455,10 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     carryOnFee: 0,
     overweightFee51to70lbs: 60,
     oversizeFee: 75,
-    firstCheckedUsdNote: 'Included in Classic / Plus (Discount unbundled charges €30 / ~$33 USD)',
+    firstCheckedUsdNote: 'Included in Classic / Plus (Discount unbundled charges €30+ / ~$33 USD)',
     secondCheckedUsdNote: 'approx ~$60 USD (2nd bag)',
-    feeNotes: 'Basic / Classic includes 1 free checked bag. "Discount" unbundled fare charges €30 online for 1st checked bag. Executive includes 2 bags (32 kg).',
-    lastVerified: 'November 4, 2026',
+    feeNotes: 'Basic/Classic includes 1 free checked bag; Discount fare charges €30+ online for 1st checked bag. Economy cabin bag up to 10 kg (22 lbs) + personal item 2 kg. Executive includes 2 bags (32 kg).',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.flytap.com/en-us/baggage'
   },
   {
@@ -475,7 +475,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     firstCheckedUsdNote: 'Included in Classic / Flex (Superlight / Light charges €30 / ~$33 USD)',
     secondCheckedUsdNote: 'approx ~$65 USD (2nd bag)',
     feeNotes: 'Classic/Flex includes 1 checked bag (23 kg). "Superlight" / "Light" charges €30 for checked bag and €9-€14 for overhead trolley. Business includes 1-2 bags.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.finnair.com/en/baggage-on-finnair-flights'
   },
   {
@@ -491,7 +491,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     oversizeFee: 50,
     usdEquivalentNote: 'approx ~$20 USD carry-on / ~$27 USD 1st check',
     feeNotes: 'Ultra-low cost: Free personal item only (40x30x20cm). WIZZ Priority (overhead roller) is €15-€25. 10kg checked bag is €20-€30; 20kg is €30-€50 online.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://wizzair.com/en-gb/information-and-services/booking-information/baggage'
   },
 
@@ -508,7 +508,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Generous full-service allowance: Flights to/from USA & Canada include 2 FREE checked bags up to 23 kg (50 lbs) each. 3rd bag is ~$150-$200.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.singaporeair.com/en_UK/us/flying-with-us/baggage/'
   },
   {
@@ -523,7 +523,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 200,
     feeNotes: 'International Economy includes 2 FREE checked bags up to 23 kg (50 lbs) each. Premium Economy includes 2 free bags; Business includes 2 bags up to 32 kg (70 lbs).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.ana.co.jp/en/us/travel-information/baggage-information/'
   },
   {
@@ -538,7 +538,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 200,
     feeNotes: 'International Economy and Premium Economy include 2 FREE checked bags up to 23 kg (50 lbs) each. Business Class includes 3 free bags (32 kg each).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.jal.co.jp/ar/en/inter/baggage/'
   },
   {
@@ -553,7 +553,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Americas routes include 2 FREE checked bags up to 23 kg (50 lbs) each. Non-Americas routes operate on weight concept (30 kg total in Economy).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.cathaypacific.com/cx/en_US/baggage.html'
   },
   {
@@ -568,7 +568,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 200,
     feeNotes: 'Transpacific routes to/from Americas include 2 FREE checked bags up to 23 kg each. Prestige Class includes 2 bags up to 32 kg (70 lbs).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.koreanair.com/contents/plan-your-travel/baggage'
   },
   {
@@ -583,7 +583,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Long-haul flights to/from North America include 2 FREE checked bags up to 23 kg each. Premium Economy includes 2 bags up to 28 kg; Royal Laurel includes 2 bags up to 32 kg.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.evaair.com/en-us/fly-prepare/baggage/'
   },
   {
@@ -598,7 +598,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Piece-concept routes (to/from Americas) include 2 FREE checked bags up to 23 kg each. Weight-concept routes allow 25-35 kg total free checked baggage.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.emirates.com/us/english/before-you-fly/baggage/'
   },
   {
@@ -614,7 +614,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     oversizeFee: 100,
     usdEquivalentNote: 'Americas routes include 2 free bags',
     feeNotes: 'Transpacific flights to USA/Canada include 2 FREE checked bags up to 23 kg (50 lbs) each. Domestic Australian flights include 1 free checked bag (23 kg).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.qantas.com/us/en/travel-info/baggage.html'
   },
   {
@@ -629,7 +629,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Flights to/from Americas include 2 FREE checked bags up to 23 kg (50 lbs) each. Other international routes operate on generous 25-35 kg weight concept.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.qatarairways.com/en-us/baggage/allowance.html'
   },
   {
@@ -644,7 +644,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Flights to/from USA and Canada include 2 FREE checked bags up to 23 kg each. Business Class includes 2 bags up to 32 kg (70 lbs).',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.etihad.com/en-us/fly-etihad/baggage'
   },
   {
@@ -659,7 +659,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Non-stop and international flights between USA/Canada and India include 2 FREE checked bags up to 23 kg each. Business includes 2 bags up to 32 kg.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.airindia.com/in/en/travel-information/baggage-guidelines.html'
   },
   {
@@ -674,7 +674,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 200,
     feeNotes: 'Economy flights to/from Americas include 2 FREE checked bags up to 23 kg each. Business Class includes 2 free bags up to 32 kg.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://flyasiana.com/C/US/EN/contents/checked-baggage'
   },
   {
@@ -689,7 +689,7 @@ export const AIRLINE_BAGGAGE_FEES: AirlineFeeData[] = [
     overweightFee51to70lbs: 100,
     oversizeFee: 150,
     feeNotes: 'Economy Standard on long-haul/Americas routes includes 2 free checked bags (23 kg each). Economy Lite domestic and short-haul fares charge $25–$50.',
-    lastVerified: 'November 4, 2026',
+    lastVerified: 'November 26, 2026',
     officialBaggagePageUrl: 'https://www.vietnamairlines.com/us/en/travel-information/baggage'
   }
 ];
@@ -855,8 +855,8 @@ export function calculateTripBaggageFees(
     let isOverweight = false;
     let overweightReason: string | undefined;
 
-    // Weight cap: 70 lbs (32 kg) for Business/First; 40 lbs for ULCCs Spirit/Frontier/Allegiant; standard 50 lbs (23 kg) otherwise
-    const defaultCheckedCapLbs = /spirit|frontier|allegiant/i.test(feeRecord.airlineId) ? 40 : 50;
+    // Weight cap: 70 lbs (32 kg) for Business/First; 40 lbs for ULCCs Spirit (archived) / Frontier; standard 50 lbs (23 kg) otherwise (including Allegiant)
+    const defaultCheckedCapLbs = /spirit|frontier/i.test(feeRecord.airlineId) ? 40 : 50;
     const weightCap = bag.maxWeightLimitLbs || (bag.type === 'CHECKED' ? (isBusinessOrFirst ? 70 : defaultCheckedCapLbs) : bag.type === 'CARRY_ON' ? 22 : 15);
     const weightLbs = bag.currentWeightLbs || 0;
 
@@ -930,7 +930,7 @@ export function calculateTripBaggageFees(
     }
   }
 
-  const disclaimer = 'Estimate from published airline fee tables. Airlines change fees — confirm at booking.';
+  const disclaimer = 'Estimate from published airline fee tables. Fees vary by route, fare family, loyalty/card tier, and booking timing — confirm with your operating carrier at booking.';
 
   return {
     hasFeeData: true,

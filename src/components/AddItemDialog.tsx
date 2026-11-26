@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePacking } from '../context/PackingContext';
 import { Bag, Trip } from '../types/travel';
 import { DefaultSuggestions } from '../data/suggestions';
-import { scanItemForLiquids } from '../utils/liquidScanner';
+import { scanItemForLiquids, inferDepartureLiquidRegion } from '../utils/liquidScanner';
 import { X, Plus, Sparkles, Scale, MapPin, User, Users, Droplets, AlertTriangle } from 'lucide-react';
 
 interface AddItemDialogProps {
@@ -57,7 +57,8 @@ export const AddItemDialog: React.FC<AddItemDialogProps> = ({
   const estimatedSingleWeight = DefaultSuggestions.getEstimatedWeightLbs(itemName || 'Item');
   const estimatedTotalWeight = estimatedSingleWeight * quantity;
   const formattedWeight = DefaultSuggestions.formatWeight(estimatedTotalWeight, weightUnit);
-  const liquidScan = scanItemForLiquids(itemName, bag.type);
+  const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
+  const liquidScan = scanItemForLiquids(itemName, bag.type, liquidRegion);
 
   return createPortal(
     <div 

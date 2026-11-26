@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 
 import { BaggageFeeEstimatorCard } from './BaggageFeeEstimatorCard';
+import { inferDepartureLiquidRegion } from '../utils/liquidScanner';
 
 interface AllowancesScreenProps {
   trip: Trip;
@@ -106,83 +107,132 @@ export const AllowancesScreen: React.FC<AllowancesScreenProps> = ({ trip }) => {
       {/* ============================================================== */}
       {/* TOP DEDICATED SECTION: MODE-AWARE ALLOWANCES HERO */}
       {/* ============================================================== */}
-      {isFlight && (
-        <section className="rounded-3xl bg-gradient-to-br from-purple-900 via-purple-950 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-purple-500/20 relative overflow-hidden">
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none flex items-center justify-end pr-6">
-            <Droplets className="w-56 h-56 text-purple-300" />
-          </div>
-
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 text-purple-300 font-bold text-xs uppercase tracking-wider mb-2">
-              <Droplets className="w-4 h-4 text-purple-400 stroke-[2.5]" />
-              <span>Carry-On Aviation Security Requirement</span>
+      {isFlight && (() => {
+        const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
+        const isCanada = liquidRegion === 'CA';
+        const isUS = liquidRegion === 'US';
+        return (
+          <section className="rounded-3xl bg-gradient-to-br from-purple-900 via-purple-950 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-purple-500/20 relative overflow-hidden">
+            <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none flex items-center justify-end pr-6">
+              <Droplets className="w-56 h-56 text-purple-300" />
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              Carry-On Liquid Allowance: The TSA 3-1-1 Rule
-            </h2>
-            <p className="text-xs sm:text-sm text-purple-200/90 mt-1 max-w-2xl leading-relaxed">
-              All commercial airline flights enforce strict limitations on liquids, gels, aerosols, creams, and pastes brought through the security checkpoint in carry-on baggage.
-            </p>
-
-            {/* 3-1-1 Formula Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-5">
-              <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
-                <span className="text-2xl sm:text-3xl font-black text-amber-300">
-                  3.4 oz
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 text-purple-300 font-bold text-xs uppercase tracking-wider mb-2">
+                <Droplets className="w-4 h-4 text-purple-400 stroke-[2.5]" />
+                <span>
+                  {isCanada
+                    ? 'Canadian Departure Security Guidance (CATSA)'
+                    : isUS
+                      ? 'U.S. Departure Security Guidance (TSA 3-1-1)'
+                      : 'Carry-On Aviation Security Guidance (TSA 3-1-1 & CATSA)'}
                 </span>
-                <p className="text-xs font-bold text-white mt-1">100ml Container Limit</p>
-                <p className="text-[11px] text-purple-200 mt-1 leading-snug">
-                  Every liquid container must hold 3.4 ounces (100ml) or less. Larger bottles that are half-full are strictly prohibited.
-                </p>
               </div>
 
-              <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
-                <span className="text-2xl sm:text-3xl font-black text-purple-300">
-                  1 Quart
-                </span>
-                <p className="text-xs font-bold text-white mt-1">Clear Zip-Top Bag</p>
-                <p className="text-[11px] text-purple-200 mt-1 leading-snug">
-                  All 3.4 oz containers must comfortably fit inside a single, transparent, quart-sized resealable plastic bag.
-                </p>
-              </div>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                {isCanada
+                  ? 'Carry-On Liquids & Non-Solid Food: CATSA 100 mL Rule'
+                  : isUS
+                    ? 'Carry-On Liquid Allowance: The TSA 3-1-1 Rule'
+                    : 'Carry-On Liquids: US TSA 3-1-1 & Canada CATSA'}
+              </h2>
+              <p className="text-xs sm:text-sm text-purple-200/90 mt-1 max-w-3xl leading-relaxed">
+                {isCanada
+                  ? 'Departures from Canada follow CATSA rules for liquids, aerosols, gels, and non-solid food (such as yogurt, spreads, and syrup). Planning guidance only — screening officers hold final checkpoint authority.'
+                  : isUS
+                    ? 'Departures from the United States follow the TSA 3-1-1 rule for liquids, gels, aerosols, creams, and pastes. Planning guidance only — TSA officers hold final checkpoint authority.'
+                    : 'Commercial flights enforce container caps on liquids, gels, aerosols, creams, pastes, and non-solid food at checkpoint screening. Planning guidance only — check your departure country authority.'}
+              </p>
 
-              <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
-                <span className="text-2xl sm:text-3xl font-black text-fuchsia-300">
-                  1 Bag
-                </span>
-                <p className="text-xs font-bold text-white mt-1">Per Traveler</p>
-                <p className="text-[11px] text-purple-200 mt-1 leading-snug">
-                  Only one liquids bag is permitted per passenger. Keep it at the top of your carry-on for quick inspection at the x-ray conveyor.
-                </p>
-              </div>
-            </div>
+              {/* Rule Formula Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-5">
+                <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
+                  <span className="text-2xl sm:text-3xl font-black text-amber-300">
+                    {isCanada ? '100 mL' : '3.4 fl oz'}
+                  </span>
+                  <p className="text-xs font-bold text-white mt-1">
+                    {isCanada ? '100 mL / 100 g Container Cap' : '100 mL Container Cap'}
+                  </p>
+                  <p className="text-[11px] text-purple-200 mt-1 leading-snug">
+                    {isCanada
+                      ? 'Containers must be 100 mL (or 100 g for gels/non-solid foods) or less. Half-empty larger containers do not qualify.'
+                      : 'Every liquid container must hold 3.4 fl oz (100 mL) or less. Half-empty larger bottles are evaluated by printed capacity.'}
+                  </p>
+                </div>
 
-            {/* Exemptions & Family Liquids */}
-            <div className="mt-4 pt-4 border-t border-white/15 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="bg-white/5 rounded-xl p-3 border border-white/10 flex items-start gap-2.5">
-                <Baby className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-white">Exemption: Infant & Toddler Care</p>
-                  <p className="text-[11px] text-purple-200 mt-0.5">
-                    Breast milk, infant formula, juice, and baby food are exempt from the 3.4 oz limit in reasonable quantities for children traveling. Declare them to the TSA officer.
+                <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
+                  <span className="text-2xl sm:text-3xl font-black text-purple-300">
+                    {isCanada ? '1 Liter' : isUS ? '1 Quart' : '1 Qt / 1 L'}
+                  </span>
+                  <p className="text-xs font-bold text-white mt-1">
+                    {isCanada ? 'Clear Closed Resealable Bag' : 'Clear Resealable Bag'}
+                  </p>
+                  <p className="text-[11px] text-purple-200 mt-1 leading-snug">
+                    {isCanada
+                      ? 'Items must fit comfortably in 1 clear, closed, resealable plastic bag no larger than 1 liter (1 L).'
+                      : isUS
+                        ? 'All ≤ 3.4 fl oz containers must fit inside a single clear, quart-sized zip-top plastic bag.'
+                        : 'Pack inside 1 clear quart-sized zip-top bag (US TSA) or 1 clear, closed, resealable 1 L bag (Canada CATSA).'}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
+                  <span className="text-2xl sm:text-3xl font-black text-fuchsia-300">
+                    1 Bag
+                  </span>
+                  <p className="text-xs font-bold text-white mt-1">Per Passenger</p>
+                  <p className="text-[11px] text-purple-200 mt-1 leading-snug">
+                    One liquids bag per passenger. Keep it accessible at the top of your carry-on for screening inspection.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white/5 rounded-xl p-3 border border-white/10 flex items-start gap-2.5">
-                <Pill className="w-4 h-4 text-emerald-300 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-white">Exemption: Essential Medications</p>
-                  <p className="text-[11px] text-purple-200 mt-0.5">
-                    Liquid prescription and over-the-counter medications (cough syrup, saline solution, eye drops) may exceed 3.4 oz when declared at security screening.
-                  </p>
+              {/* Official Authority Links */}
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-[11px] text-purple-200">
+                <a
+                  href="https://www.tsa.gov/travel/security-screening/liquids-aerosols-gels-rule"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-white font-semibold"
+                >
+                  Official US TSA 3-1-1 Rule ↗
+                </a>
+                <a
+                  href="https://www.catsa-acsta.gc.ca/en/what-can-bring/liquids-non-solid-food-personal-items"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-white font-semibold"
+                >
+                  Official Canadian CATSA Liquids &amp; Non-Solid Food Rule ↗
+                </a>
+              </div>
+
+              {/* Exemptions & Family Liquids */}
+              <div className="mt-4 pt-4 border-t border-white/15 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="bg-white/5 rounded-xl p-3 border border-white/10 flex items-start gap-2.5">
+                  <Baby className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-white">Exemption: Infant &amp; Toddler Care</p>
+                    <p className="text-[11px] text-purple-200 mt-0.5">
+                      Breast milk, infant formula, and baby food/purées over 100 mL (3.4 fl oz) are exempt in reasonable quantities under TSA and CATSA rules. Declare them separately at screening.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 rounded-xl p-3 border border-white/10 flex items-start gap-2.5">
+                  <Pill className="w-4 h-4 text-emerald-300 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-white">Exemption: Essential Medications</p>
+                    <p className="text-[11px] text-purple-200 mt-0.5">
+                      Liquid prescription and essential over-the-counter medications (saline solution, eye drops, cough syrup) may exceed 100 mL (3.4 fl oz) when declared at screening.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {isTrain && (
         <section className="rounded-3xl bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-purple-500/20 relative overflow-hidden">

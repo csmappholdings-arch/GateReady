@@ -253,23 +253,34 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
     `;
   } else if (normalizedPath === '/terms') {
     innerContentHtml = `
-      <div class="text-xs text-slate-500 font-medium">Last updated: October 24, 2026</div>
+      <div class="flex items-center justify-between flex-wrap gap-2 text-xs text-slate-500 font-medium">
+        <span>Last updated: November 26, 2026</span>
+        <span class="font-semibold text-purple-700">CSM App Holdings</span>
+      </div>
       <section class="space-y-3 mt-3">
-        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Terms of Service</h2>
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight">1. Agreement to Terms</h2>
         <p class="text-slate-700 leading-relaxed">
-          These Terms of Service govern your use of GateReady (gateready.ca), operated by <strong>CSM App Holdings</strong>. By using the app, you agree to these terms.
+          These Terms of Service govern your use of <strong>GateReady</strong> (gateready.ca), operated by <strong>CSM App Holdings</strong>. By accessing or using the app, you agree to be bound by these Terms.
         </p>
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
-        <h3 class="text-xl font-bold text-slate-900">1. Trip Planning & Allowance Estimates</h3>
-        <p class="text-xs text-slate-600 leading-relaxed">GateReady is provided strictly as a planning assistant. Baggage fee estimates, weight limits, and luggage dimensions are calculated from published airline tables. Airlines change policies and pricing frequently; travelers are solely responsible for confirming rules with their carrier prior to travel. GateReady is not liable for airline fees, denied boarding, or confiscated items.</p>
+        <h3 class="text-xl font-bold text-slate-900">2. Planning Estimates &amp; Official Carrier Authority</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">GateReady is a self-service personal packing and planning assistant. Baggage fees, carry-on dimensions, weight caps, tare deductions, passport notices, and TSA/CATSA liquid rule checks are planning estimates derived from published airline tables and official agency guidance. Airlines change allowances, route/fare rules, and codeshare operating-carrier terms without notice, and security screening officers exercise sole checkpoint authority. GateReady does not guarantee carrier fee totals, boarding acceptance, or screening clearance. You remain solely responsible for confirming current rules directly with your carrier prior to departure.</p>
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
-        <h3 class="text-xl font-bold text-slate-900">2. Plans, Billing & 7-Day Free Platinum Trial</h3>
-        <p class="text-xs text-slate-600">GateReady offers: Free (${PLAN_DEFINITIONS.FREE.formattedMonthly}; ${PLAN_DEFINITIONS.FREE.features.join(', ').toLowerCase()}); Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo or ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr; ${PLAN_DEFINITIONS.SILVER.features.join(', ').toLowerCase()}); Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo or ${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr); Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo or ${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr). ${TRIAL_TERMS_EXACT} All paid subscriptions are billed via Lemon Squeezy with a 14-day money-back guarantee.</p>
+        <h3 class="text-xl font-bold text-slate-900">3. Plans, Subscriptions, 7-Day Free Trial &amp; 14-Day Refunds</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">GateReady offers: Free (${PLAN_DEFINITIONS.FREE.formattedMonthly}; ${PLAN_DEFINITIONS.FREE.features.join(', ').toLowerCase()}); Silver (${PLAN_DEFINITIONS.SILVER.formattedMonthly}/mo or ${PLAN_DEFINITIONS.SILVER.formattedYearly}/yr; ${PLAN_DEFINITIONS.SILVER.features.join(', ').toLowerCase()}); Gold (${PLAN_DEFINITIONS.GOLD.formattedMonthly}/mo or ${PLAN_DEFINITIONS.GOLD.formattedYearly}/yr); Platinum (${PLAN_DEFINITIONS.PLATINUM.formattedMonthly}/mo or ${PLAN_DEFINITIONS.PLATINUM.formattedYearly}/yr). ${TRIAL_TERMS_EXACT} Paid plans bill monthly or annually through Lemon Squeezy as Merchant of Record, renew automatically until canceled via account settings or your Lemon Squeezy receipt, and include a 14-day money-back guarantee (email csmappholdings@gmail.com for a full refund in 3–5 business days).</p>
       </section>
       <section class="space-y-3 pt-4 border-t border-slate-200">
-        <h3 class="text-xl font-bold text-slate-900">3. Contact</h3>
+        <h3 class="text-xl font-bold text-slate-900">4. Guest Browser Storage vs. Cloud Account Sync</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">Guest trip lists are stored exclusively in your browser's localStorage and are not backed up to cloud servers; clearing browser storage or switching devices permanently erases guest data. Registered accounts sync trips via Google Firebase Cloud Firestore and support instant in-app deletion under Settings &rarr; Preferences &rarr; Delete Account &amp; Erase Cloud Data.</p>
+      </section>
+      <section class="space-y-3 pt-4 border-t border-slate-200">
+        <h3 class="text-xl font-bold text-slate-900">5. Emergency QR Recovery Tags &amp; Limitation of Liability</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">Privacy-safe Emergency QR luggage tags omit home street addresses; watermarked preview limitations apply on Free, while Silver, Gold, and Platinum unlock unwatermarked printable tags. You are responsible for contact details printed on luggage tags. GateReady is provided "as is" without warranties; CSM App Holdings is not liable for baggage fees, denied boarding, confiscated items, lost luggage, or locally stored browser data loss.</p>
+      </section>
+      <section class="space-y-3 pt-4 border-t border-slate-200">
+        <h3 class="text-xl font-bold text-slate-900">6. Contact</h3>
         <p class="text-xs text-slate-600">Contact CSM App Holdings at <a href="mailto:csmappholdings@gmail.com" class="text-purple-600 underline">csmappholdings@gmail.com</a>.</p>
       </section>
     `;
@@ -473,11 +484,12 @@ export function getPageHtmlContent(pathname: string): { meta: StaticPageMeta; bo
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">GateReady Product Changelog</h2>
         <div class="space-y-4 pt-2">
           <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300">
-            <div class="font-bold text-purple-900 text-sm">November 25, 2026 — Real-UI Interactive Demo, Weight &amp; 404 Accuracy, Conversion Flow Updates</div>
+            <div class="font-bold text-purple-900 text-sm">November 26, 2026 — Production Consistency Pass: Unified Public Header, Live App Screenshots, TSA vs. CATSA Rules &amp; 42-Airline Verification</div>
             <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
-              <li><strong>Interactive Real-UI Product Demo &amp; Guide Embedded Panels:</strong> Added a live interactive product demo on the homepage backed by real bag weight analysis, suggest-first Rebalance Bags with Apply/Undo, and TSA 3-1-1 checks — plus real-UI showcase panels on /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.</li>
-              <li><strong>Packed Item Labels, Trip Card Names, 7-Day Math Consistency &amp; True HTTP 404:</strong> Fixed per-bag labels to display packed vs total counts, displayed user trip names prominently on dashboard cards, unified 7-day capsule weights (15.2 lbs table / ~11.7 lbs packed / 17.2–18.7 lbs gross), fixed currency duplication on CAD fee badges, removed overstated real-time copy, and served HTTP 404 with noindex on unknown routes.</li>
-              <li><strong>All 6 Lemon Squeezy Checkout Variants, Direct Signup Flow &amp; Value-Moment Gating:</strong> Wired monthly and annual checkout options for Silver, Gold, and Platinum with 14-day money-back guarantee copy beside every checkout button, added factual trial/refund/cancellation details below /pricing comparison tables, routed post-signup directly to trip creation with a sample trip option, and gated upsell popups behind first value reached.</li>
+              <li><strong>Unified Public Navigation &amp; Brand Home Routing:</strong> Replaced legacy "Back to App" public headers across all React and pre-rendered pages with unified navigation (Home, How It Works, Interactive Demo, Pricing, Help / FAQ, Log In / Open App), where clicking GateReady always returns to the public homepage (/).</li>
+              <li><strong>Genuine UI Screenshots, TSA vs. CATSA Guidance &amp; Terms Update:</strong> Captured 7 real GateReady interface screenshots for the Interactive Demo &amp; showcase, added explicit departure-aware US TSA 3-1-1 vs. Canadian CATSA 100 mL / 1 L resealable bag guidance with official agency links, synced Terminal Maps tier copy (Silver+), and updated Terms of Service to November 26, 2026.</li>
+              <li><strong>42-Airline Baggage Data &amp; Spirit Shutdown Verification:</strong> Updated all 42 carrier fee and allowance records to November 26, 2026 (including Delta/American/United $45/$55 bag tiers, Allegiant 50 lb cap, SAS Go Light carry-on restriction, and Spirit's archived May 2, 2026 shutdown status), and reinforced route, fare-family, and operating-carrier disclaimers.</li>
+              <li><strong>Interactive Real-UI Demo, 6 Checkout Variants &amp; Value-Moment Gating:</strong> Live homepage interactive demo with exact partial-quantity Rebalance Apply/Undo, all 6 Lemon Squeezy monthly/annual checkout URLs, direct post-signup trip creation, and value-moment Add Trip gating.</li>
             </ul>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
@@ -754,18 +766,27 @@ export function renderPageShell(meta: StaticPageMeta, innerContentHtml: string):
   `;
 
   return `
-    <header class="w-full bg-white border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5">
-      <div class="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <a href="/" class="text-xs font-bold text-slate-600 hover:text-purple-600">← Back to App</a>
-          <span class="text-slate-300">|</span>
-          <a href="/" class="font-black text-base tracking-tight text-slate-900">Gate<span class="text-purple-600">Ready</span></a>
+    <header class="sticky top-0 z-40 w-full bg-white/95 border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1550px] mx-auto h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-6 min-w-0">
+          <a href="/" aria-label="GateReady – Public homepage" class="flex items-center gap-2.5 shrink-0">
+            <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-700 via-purple-600 to-indigo-600 inline-flex items-center justify-center text-white font-black text-xs shadow-xs">GR</span>
+            <span class="flex items-baseline tracking-tight">
+              <span class="font-black text-base sm:text-lg text-slate-900">Gate<span class="text-purple-600">Ready</span></span>
+              <span class="font-extrabold text-xs text-purple-600 ml-0.5">.ca</span>
+            </span>
+          </a>
+          <nav class="hidden lg:flex items-center gap-1" aria-label="Public site navigation">
+            <a href="/" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-purple-700 hover:bg-purple-50 whitespace-nowrap">Home</a>
+            <a href="/how-it-works" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-purple-700 hover:bg-purple-50 whitespace-nowrap">How It Works</a>
+            <a href="/demo" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-purple-700 hover:bg-purple-50 whitespace-nowrap">Interactive Demo</a>
+            <a href="/pricing" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-purple-700 hover:bg-purple-50 whitespace-nowrap">Pricing</a>
+            <a href="/faq" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-purple-700 hover:bg-purple-50 whitespace-nowrap">Help / FAQ</a>
+          </nav>
         </div>
-        <div class="flex items-center gap-2">
-          <a href="/airlines/" class="hidden md:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">42 Airline Guides</a>
-          <a href="/baggage-fee-calculator/" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Fee Calculator</a>
-          <a href="/pricing" class="hidden sm:inline-block text-xs font-bold text-slate-600 hover:text-purple-600 px-3 py-1.5 rounded-xl">Plans from $1.99</a>
-          <a href="/" class="h-9 px-4 rounded-xl bg-purple-600 text-white font-bold text-xs inline-flex items-center justify-center">Create Your Trip (Free)</a>
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="/?action=login" class="hidden sm:inline-flex h-9 px-3.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:text-purple-700 font-bold text-xs items-center whitespace-nowrap">Log In</a>
+          <a href="/?action=new_trip&mode=PLANE" class="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center justify-center whitespace-nowrap">Open App →</a>
         </div>
       </div>
     </header>

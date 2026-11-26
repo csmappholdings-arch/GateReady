@@ -9,6 +9,13 @@ import { hasReachedValueMoment } from '../utils/valueMoment';
 export type SubscriptionTier = 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
 export type PaidTier = 'SILVER' | 'GOLD' | 'PLATINUM';
 export type BillingCycle = 'monthly' | 'yearly';
+export type PaywallContext =
+  | 'plans'
+  | 'second_trip'
+  | 'bag_limit'
+  | 'traveler_limit'
+  | 'return_tracking'
+  | 'feature_unlock';
 
 // Standard 10 hardcoded licenses providing exactly 1 month of access per use
 export const HARDCODED_TEST_LICENSES = [
@@ -60,8 +67,17 @@ interface SubscriptionContextType {
   isMasterKey: boolean;
   isPaywallOpen: boolean;
   paywallReason: string | null;
+  paywallContext: PaywallContext;
   paywallDefaultShowPlans: boolean;
-  openPaywall: (reason?: string, options?: { defaultShowPlans?: boolean; userInitiated?: boolean }) => void;
+  openPaywall: (
+    reason?: string,
+    options?: {
+      defaultShowPlans?: boolean;
+      userInitiated?: boolean;
+      context?: PaywallContext;
+      preValueNotice?: string;
+    }
+  ) => void;
   closePaywall: () => void;
   upgradeToTier: (tier: PaidTier, cycle: BillingCycle) => Promise<void>;
   upgradeToPro: (cycle: BillingCycle) => Promise<void>;
@@ -661,22 +677,38 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [tier, billingCycle]);
 
-  const openPaywall = (reason?: string, options?: { defaultShowPlans?: boolean; userInitiated?: boolean }) => {
+  const [paywallContext, setPaywallContext] = useState<PaywallContext>('plans');
+
+  const openPaywall = (
+    reason?: string,
+    options?: {
+      defaultShowPlans?: boolean;
+      userInitiated?: boolean;
+      context?: PaywallContext;
+      preValueNotice?: string;
+    }
+  ) => {
     if (!hasReachedValueMoment()) {
       if (typeof window !== 'undefined') {
+        const neutralNotice =
+          options?.preValueNotice ||
+          (options?.context === 'second_trip'
+            ? 'Finish packing this trip first — your second trip unlocks with a plan.'
+            : 'Finish packing your current trip first — plan upgrades unlock after your first packed item or readiness check.');
         window.dispatchEvent(
           new CustomEvent('gateready:soft-limit-notice', {
-            detail: {
-              message:
-                reason ||
-                'Free Starter supports 1 active trip, 1 traveler, and up to 2 bags. Pack an item or check your readiness score first, or compare all plans anytime.'
-            }
+            detail: { message: neutralNotice }
           })
         );
       }
       return;
     }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('gateready:clear-soft-limit-notice'));
+    }
+    const resolvedContext: PaywallContext = options?.context || (reason ? 'feature_unlock' : 'plans');
     const showPlans = options?.defaultShowPlans ?? !reason;
+    setPaywallContext(resolvedContext);
     setPaywallReason(reason || null);
     setPaywallDefaultShowPlans(showPlans);
     setIsPaywallOpen(true);
@@ -685,6 +717,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const closePaywall = () => {
     setIsPaywallOpen(false);
     setPaywallReason(null);
+    setPaywallContext('plans');
     setPaywallDefaultShowPlans(false);
   };
 
@@ -1027,6 +1060,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isMasterKey,
         isPaywallOpen,
         paywallReason,
+        paywallContext,
         paywallDefaultShowPlans,
         openPaywall,
         closePaywall,

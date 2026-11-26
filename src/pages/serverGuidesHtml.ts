@@ -217,7 +217,7 @@ export function getAirlinePageHtml(guide: AirlineGuideItem): string {
           <span class="text-emerald-700 font-bold">Verified ${guide.fees.lastVerified}</span>
         </div>
         <p class="leading-relaxed">
-          Estimate from published airline fee tables. Airlines change fees and conditions frequently — always confirm at booking or on the carrier's official website.
+          Estimate from published airline fee tables. Dynamic pricing, fare families, route/seasonal rules, loyalty status, and codeshare operating-carrier terms vary — always confirm at booking or on the carrier's official website.
         </p>
         <div class="pt-1 flex items-center justify-between flex-wrap gap-3">
           <a href="${guide.fees.officialBaggagePageUrl}" target="_blank" rel="noopener noreferrer" class="text-purple-700 hover:text-purple-900 font-bold underline">
@@ -319,8 +319,8 @@ export function getAirlineIndexPageHtml(): string {
   return `
     <div class="space-y-6">
       <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs sm:text-sm text-purple-950 leading-relaxed space-y-1">
-        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">42-Airline Allowance Overview · Verified November 4, 2026</div>
-        <p>GateReady indexes published carry-on sizer dimensions, weight limits, and checked bag fees for <strong>42 global airlines</strong> across Canada (5 carriers), the United States (11 carriers), Europe (13 carriers), and Asia-Pacific &amp; the Middle East (13 carriers). Most US and Canadian legacy carriers allow carry-on bags with no fixed weight cap (provided you can lift them overhead unassisted), whereas European and Asia-Pacific carriers enforce 15.4 to 22 lb (7–10 kg) limits and Basic or UltraBasic fares permit an under-seat personal item only. Verified November 4, 2026 — always confirm fare rules at booking.</p>
+        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">42-Airline Allowance Overview · Verified November 26, 2026</div>
+        <p>GateReady indexes published carry-on sizer dimensions, weight limits, and checked bag fees for <strong>42 global entries</strong> across Canada (5 carriers), the United States (11 entries including Spirit archived May 2, 2026), Europe (13 carriers), and Asia-Pacific &amp; the Middle East (13 carriers). Most US and Canadian legacy carriers allow carry-on bags with no fixed weight cap (provided you can lift them overhead unassisted), whereas European and Asia-Pacific carriers enforce 15.4 to 22 lb (7–10 kg) limits and Basic, UltraBasic, or Light fares often permit an under-seat personal item only. Verified November 26, 2026 — always confirm route, fare family, and operating carrier rules at booking.</p>
       </div>
 
       ${sectionsHtml}
@@ -352,14 +352,14 @@ export function getBaggageFeeCalculatorHtml(): string {
   return `
     <div class="space-y-6">
       <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs sm:text-sm text-purple-950 leading-relaxed space-y-1">
-        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">Published Airline Fee Summary · Verified November 4, 2026</div>
-        <p><strong>Standalone Baggage Fee Calculator:</strong> Most legacy North American airlines charge $35–$45 for a 1st checked bag (with $5–$15 online prepaid discounts vs. airport counters), cap standard Economy bags at 50 lbs (23 kg) with $100–$150 overweight surcharges for 51–70 lbs, and apply extra overhead carry-on fees on ultra-low-cost carriers or 40 lb ULCC tiers. All figures below reflect static published carrier fee tables verified November 4, 2026—confirm at booking.</p>
+        <div class="text-[11px] font-black uppercase tracking-wider text-purple-700">Published Airline Fee Summary · Verified November 26, 2026</div>
+        <p><strong>Standalone Baggage Fee Calculator:</strong> Many legacy North American airlines charge $35–$45 prepaid ($40–$55 airport counter) for a 1st checked bag, cap standard Economy bags at 50 lbs (23 kg) with $100–$150 overweight surcharges for 51–70 lbs, and apply extra overhead carry-on fees on ultra-low-cost carriers or restricted Light/Basic fares. All figures below reflect static published carrier fee tables verified November 26, 2026 — fees vary dynamically by route, fare family, booking channel, loyalty status, and operating carrier; confirm at booking.</p>
       </div>
 
       <section class="space-y-3">
         <h2 class="text-xl font-black text-slate-900 tracking-tight">How Airline Baggage Fees Work</h2>
         <p class="text-xs text-slate-600 leading-relaxed">
-          Most commercial airlines charge for checked bags on a tiered scale: 1st checked bag ($35–$45), 2nd checked bag ($45–$60), and 3rd+ bag ($100–$150). Ultra-low-cost carriers also charge for overhead carry-on bags, and Basic or UltraBasic fares limit you to an under-seat personal item.
+          Most commercial airlines charge for checked bags on a tiered scale: 1st checked bag ($35–$55 depending on prepaid vs. airport check-in), 2nd checked bag ($45–$65), and 3rd+ bag ($100–$150). Ultra-low-cost carriers also charge for overhead carry-on bags, and Basic, UltraBasic, or Light fares limit you to an under-seat personal item.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-2">
@@ -369,18 +369,18 @@ export function getBaggageFeeCalculatorHtml(): string {
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <strong class="block text-slate-900 font-bold">Overweight Risk (50 lbs / 40 lbs ULCC):</strong>
-            <p class="text-slate-600">Standard Economy checked bags are capped at 50 lbs (23 kg), or 40 lbs (18 kg) on US ultra-low-cost carriers. Bags from 51 to 70 lbs incur a flat $100–$150 surcharge.</p>
+            <p class="text-slate-600">Standard Economy checked bags are capped at 50 lbs (23 kg) across most North American carriers (including Allegiant), or 40 lbs (18 kg) on Frontier. Bags from 51 to 70 lbs incur a flat $100–$150 surcharge.</p>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <strong class="block text-slate-900 font-bold">Basic Economy Limits:</strong>
-            <p class="text-slate-600">United Basic Economy, Air Canada Basic (NA/Sun), and WestJet UltraBasic exclude overhead carry-ons, permitting an under-seat bag only.</p>
+            <p class="text-slate-600">United Basic Economy (with a $75 gate handling fee for unpermitted carry-ons), Air Canada Basic (NA/Sun), and WestJet UltraBasic exclude overhead carry-ons, permitting an under-seat bag only.</p>
           </div>
         </div>
       </section>
 
       <section class="space-y-3 pt-4 border-t border-slate-100">
         <h2 class="text-xl font-black text-slate-900 tracking-tight">All 42 Airlines Published Baggage Fee Reference Table</h2>
-        <p class="text-xs text-slate-600">Complete static published standard economy fee table across all 42 carriers tracked by GateReady (verified November 4, 2026):</p>
+        <p class="text-xs text-slate-600">Complete static published standard economy fee table across all 42 entries tracked by GateReady (verified November 26, 2026):</p>
 
         <div class="overflow-x-auto rounded-2xl border border-slate-200">
           <table class="w-full text-left text-xs">
@@ -556,9 +556,9 @@ export function getEntryRequirementsHtml(): string {
       </section>
 
       <section class="space-y-3 pt-4 border-t border-slate-100">
-        <h2 class="text-xl font-black text-slate-900 tracking-tight">TSA 3-1-1 Liquids Security Rule</h2>
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">US TSA 3-1-1 &amp; Canadian CATSA Carry-On Liquids Rules</h2>
         <p class="text-xs text-slate-600 leading-relaxed">
-          Containers in carry-on luggage must be 3.4 oz (100 ml) or less, and all bottles must fit into one clear quart-sized zip-top plastic bag (one bag per passenger). Larger containers must be checked.
+          Departures from the United States follow the <strong>TSA 3-1-1 rule</strong> (containers ≤ 3.4 fl oz / 100 mL inside 1 clear quart-sized zip-top bag per passenger). Departures from Canada follow <strong>CATSA rules</strong> (liquids, aerosols, gels, and non-solid foods ≤ 100 mL / 100 g inside 1 clear, closed, resealable plastic bag up to 1 liter per passenger). Larger non-exempt bottles must be packed in checked luggage.
         </p>
       </section>
 
@@ -794,16 +794,34 @@ export function getTsaLiquidsCheckerHtml(): string {
 
   return `
     <div class="space-y-6">
-      <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
-        <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — TSA 3-1-1 &amp; Canadian CATSA Liquids Rule</div>
+      <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-3">
+        <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — US TSA 3-1-1 vs. Canadian CATSA Liquids Rules</div>
         <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">
-          Under the <strong>TSA 3-1-1 liquids rule</strong>, every liquid, gel, aerosol, cream, or paste packed inside carry-on luggage must be in a container of <strong>3.4 fl oz (100 mL) or less</strong>, fit inside <strong>1 clear quart-sized zip-top bag</strong> (or <strong>1 clear 1-liter resealable plastic bag</strong> on Canadian CATSA flights), with <strong>1 bag permitted per passenger</strong>. GateReady performs a rule- and list-based catalog audit against this 3.4 oz threshold before departure — it is not a camera or barcode scanner.
+          Carry-on liquid security rules depend on your departure airport authority. GateReady performs a rule- and list-based catalog audit against the <strong>3.4 fl oz (100 mL)</strong> threshold before departure — it is not a camera scanner and provides planning guidance only without guaranteeing airport security clearance.
         </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-1">
+          <div class="p-4 rounded-2xl bg-white border border-purple-200 space-y-1.5">
+            <div class="font-black text-slate-900">🇺🇸 United States — TSA 3-1-1 Rule</div>
+            <ul class="list-disc list-inside space-y-1 text-slate-700">
+              <li><strong>Container limit:</strong> ≤ 3.4 fl oz (100 mL) per liquid, gel, aerosol, cream, or paste</li>
+              <li><strong>Bag limit:</strong> 1 clear, quart-sized zip-top plastic bag per passenger</li>
+              <li><strong>Official source:</strong> <a href="https://www.tsa.gov/travel/security-screening/liquids-aerosols-gels-rule" target="_blank" rel="noopener noreferrer" class="text-purple-700 underline font-semibold">TSA Liquids, Aerosols &amp; Gels Rule ↗</a></li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-2xl bg-white border border-purple-200 space-y-1.5">
+            <div class="font-black text-slate-900">🇨🇦 Canada — CATSA 100 mL / 1 L Rule</div>
+            <ul class="list-disc list-inside space-y-1 text-slate-700">
+              <li><strong>Container limit:</strong> ≤ 100 mL (or 100 g) for liquids, aerosols, gels, and non-solid food (e.g., yogurt, spreads, syrup)</li>
+              <li><strong>Bag limit:</strong> 1 clear, closed, resealable plastic bag with maximum capacity of 1 liter (1 L) per passenger</li>
+              <li><strong>Official source:</strong> <a href="https://www.catsa-acsta.gc.ca/en/what-can-bring/liquids-non-solid-food-personal-items" target="_blank" rel="noopener noreferrer" class="text-purple-700 underline font-semibold">CATSA Liquids &amp; Non-Solid Food Guide ↗</a></li>
+            </ul>
+          </div>
+        </div>
       </section>
 
       <section class="space-y-3">
-        <h2 class="text-xl font-black text-slate-900 tracking-tight">Common Carry-On Liquid, Gel &amp; Aerosol Rules Table</h2>
-        <p class="text-xs text-slate-600">Side-by-side container size audit across TSA (US) and CATSA (Canada) airport security rules.</p>
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Common Carry-On Liquid, Gel, Aerosol &amp; Non-Solid Food Rules Table</h2>
+        <p class="text-xs text-slate-600">Side-by-side container size audit across TSA (United States) and CATSA (Canada) airport security rules. Always follow screening officer direction at the checkpoint.</p>
         <div class="overflow-x-auto rounded-2xl border border-slate-200">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
@@ -824,7 +842,7 @@ export function getTsaLiquidsCheckerHtml(): string {
       <section class="p-5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2 text-xs">
         <div class="font-bold text-amber-900">Medical &amp; Infant Liquid Exemptions</div>
         <p class="text-amber-950 leading-relaxed">
-          Prescription liquid medications, insulin/ice packs, saline contact solution, and baby formula, breast milk, or toddler purées over 3.4 oz (100 mL) are permitted in carry-on luggage in reasonable trip quantities. Separate them from your 1-quart/1-liter bag and declare them to the screening officer at the belt.
+          Prescription liquid medications, insulin/ice packs, saline contact solution, and baby formula, breast milk, or toddler purées over 3.4 fl oz (100 mL) are permitted in carry-on luggage in reasonable quantities under both TSA and CATSA rules. Separate them from your 1-quart (TSA) or 1-liter (CATSA) bag and declare them to the screening officer at the checkpoint.
         </p>
       </section>
 
@@ -896,13 +914,13 @@ export function getCarryOnCheckerHtml(): string {
       <section class="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
         <div class="text-xs font-black uppercase tracking-wider text-purple-800">Direct Answer — Carry-On Gate Sizers, Weight Caps &amp; Tare</div>
         <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">
-          Airline carry-on size limits always include <strong>wheels, handles, and exterior pockets</strong> and must drop smoothly inside the departure gate metal sizer box. Major US and Canadian carriers (Air Canada, WestJet, Delta, United, American) set <strong>no fixed carry-on weight cap</strong> as long as you can lift the bag unassisted, whereas carriers such as Porter (20 lbs), Air Transat (22 lbs), Lufthansa (17.6 lbs), and Qantas/Singapore (15.4 lbs / 7 kg) enforce strict weight caps where an empty <strong>5.5 to 7.0 lb roller</strong> already uses 25%–45% of your weight limit.
+          Airline carry-on size limits always include <strong>wheels, handles, and exterior pockets</strong> and must drop smoothly inside the departure gate metal sizer box. Major US and Canadian carriers (Air Canada, WestJet, Delta, United, American, Air Transat) set <strong>no strict numeric carry-on weight cap</strong> as long as you can lift the bag unassisted, whereas carriers such as Porter (20 lbs), Lufthansa (17.6 lbs), and Qantas/Singapore (15.4 lbs / 7 kg) enforce strict weight caps where an empty <strong>5.5 to 7.0 lb roller</strong> already uses 25%–45% of your weight limit.
         </p>
       </section>
 
       <section class="space-y-3">
         <h2 class="text-xl font-black text-slate-900 tracking-tight">Carry-On Size &amp; Weight Limit Comparison (Major US, Canadian &amp; Global Airlines)</h2>
-        <p class="text-xs text-slate-600">Published carry-on dimensions, cabin weight caps, and personal-item limits verified November 4, 2026.</p>
+        <p class="text-xs text-slate-600">Published carry-on dimensions, cabin weight caps, and personal-item limits verified November 26, 2026.</p>
         <div class="overflow-x-auto rounded-2xl border border-slate-200">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[10px]">
@@ -920,7 +938,7 @@ export function getCarryOnCheckerHtml(): string {
           </table>
         </div>
         <p class="text-[11px] text-slate-500">
-          *Air Canada Basic (NA/Sun), WestJet UltraBasic (Canada/US), and United Basic Economy (most domestic) allow an under-seat personal item only and exclude overhead carry-on bins. Static published estimates verified November 4, 2026; confirm with your operating carrier before departure.
+          *Air Canada Basic (NA/Sun), WestJet UltraBasic (Canada/US), United Basic Economy (most domestic), and SAS Go Light allow an under-seat personal item only and exclude overhead carry-on bins. Static published estimates verified November 26, 2026; route, fare family, loyalty status, and operating carrier rules apply — always confirm before departure.
         </p>
       </section>
 

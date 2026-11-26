@@ -165,7 +165,7 @@ export const TsaCheckerShowcasePanel: React.FC<{
   linkLabel?: string;
 }> = ({
   linkHref = '/tsa-liquids-checker',
-  linkLabel = 'Open TSA 3-1-1 liquids checker'
+  linkLabel = 'Open TSA / CATSA liquids checker'
 }) => {
   const sampleItems = useMemo(
     () => [
@@ -185,7 +185,7 @@ export const TsaCheckerShowcasePanel: React.FC<{
               <Droplets className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
-              TSA 3-1-1 Checker
+              TSA 3-1-1 &amp; CATSA Liquids Checker
             </h3>
           </div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -195,7 +195,7 @@ export const TsaCheckerShowcasePanel: React.FC<{
 
         <div className="space-y-2">
           {sampleItems.map((item) => {
-            const scan = scanItemForLiquids(item.name, item.bagType);
+            const scan = scanItemForLiquids(item.name, item.bagType, 'INTL');
             const isWarning = scan.status === 'NON_COMPLIANT';
             const isPass = scan.status === 'COMPLIANT';
             return (
@@ -238,7 +238,7 @@ export const TsaCheckerShowcasePanel: React.FC<{
 
       <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
         <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-          Flags carry-on liquids over 3.4 fl oz (100 ml) by item name and volume before security screening.
+          Flags carry-on liquids &amp; non-solid foods over 3.4 fl oz / 100 mL (1-quart TSA or 1-liter CATSA bag). Medical/infant liquids exempt; guidance only.
         </p>
         {linkHref && (
           <a

@@ -14,23 +14,43 @@ export const ChangelogPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Release Nov 25, 2026 */}
+      {/* Release Nov 26, 2026 */}
       <section className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="px-2.5 py-1 rounded-full bg-purple-600 text-white font-mono text-xs font-bold shadow-xs">
-            November 25, 2026
+            November 26, 2026
           </span>
-          <span className="text-xs text-slate-500 font-medium">Real-UI Interactive Demo, Weight &amp; 404 Accuracy, Conversion Flow Updates</span>
+          <span className="text-xs text-slate-500 font-medium">Production Consistency Pass: Unified Public Header, Live App Screenshots, TSA vs. CATSA Rules &amp; 42-Airline Verification</span>
         </div>
 
         <div className="space-y-3">
+          <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 space-y-2">
+            <div className="font-bold text-purple-950 dark:text-purple-200 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-purple-600" />
+              <span>Unified Public Navigation, Genuine UI Screenshots, TSA vs. CATSA Rules &amp; Terms Update</span>
+            </div>
+            <p className="text-xs text-slate-700 dark:text-slate-300">
+              Replaced legacy &ldquo;Back to App&rdquo; headers across all React and pre-rendered public pages with unified navigation (Home, How It Works, Interactive Demo, Pricing, Help / FAQ, Log In / Open App) where clicking GateReady always returns to the public homepage (/). Captured 7 genuine GateReady workspace screenshots for the Interactive Demo, synced Terminal Maps tier copy (Silver+), added departure-aware US TSA 3-1-1 vs. Canadian CATSA (100 mL / 100 g in a 1 L resealable bag) guidance with official agency links, and updated Terms of Service to November 26, 2026.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
+              <Droplets className="w-4 h-4 text-sky-600" />
+              <span>42-Airline Baggage Verification &amp; Spirit Shutdown Status (November 26, 2026)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Updated all 42 airline baggage records to November 26, 2026 (including Delta/American/United $45/$55 bag tiers, Allegiant&apos;s 50 lb checked cap, Air Transat&apos;s lift-unassisted cabin allowance, SAS Go Light carry-on exclusion, and Spirit Airlines&apos; May 2, 2026 cessation archive notice), and reinforced dynamic route, fare-family, loyalty, and operating-carrier disclaimers.
+            </p>
+          </div>
+
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
             <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
               <Scale className="w-4 h-4 text-purple-600" />
               <span>Interactive Real-UI Product Demo &amp; Live Guide Embedded Panels</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Added a live interactive product demonstration on the homepage backed by real bag weight math, suggest-first Rebalance Bags with exact partial-quantity Apply/Undo, and TSA 3-1-1 checks — plus embedded real-UI panels across /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.
+              Added a live interactive product demonstration on the homepage backed by real bag weight math, suggest-first Rebalance Bags with exact partial-quantity Apply/Undo (moving only the proposed unit count and updating meters to match), and liquid rule checks — plus embedded real-UI panels across /tsa-liquids-checker, /carry-on-checker, /packing-list-7-day, and /pricing.
             </p>
           </div>
 
@@ -47,10 +67,10 @@ export const ChangelogPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
             <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-2">
               <Tag className="w-4 h-4 text-amber-500" />
-              <span>All 6 Lemon Squeezy Checkout Variants, Direct Signup Flow &amp; Value-Moment Gating</span>
+              <span>6 Lemon Squeezy Checkout Variants, Direct Signup Flow &amp; Value-Moment Gating</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Wired dedicated monthly and annual checkout variants for Silver ($1.99/mo, $19.99/yr), Gold ($3.99/mo, $29.99/yr), and Platinum ($4.99/mo, $39.99/yr) with 14-day money-back guarantee notes, added a factual trial/refund/cancellation block on /pricing, routed post-signup straight to trip creation with a sample trip option, and gated upsell popups and locks behind first packing or readiness value.
+              Wired dedicated monthly and annual Lemon Squeezy checkout variants for Silver ($1.99/mo, $19.99/yr), Gold ($3.99/mo, $29.99/yr), and Platinum ($4.99/mo, $39.99/yr) with 14-day money-back guarantee notes, added factual trial/refund/cancellation details on /pricing, and routed post-signup straight into trip creation with a sample trip option. Before a user packs an item, applies Rebalance, or views readiness, clicking Add Trip shows a brief neutral note rather than an upgrade modal and trip creation Step 2 omits the locked SILVER+ return-tracking panel; after that first value moment, Add Trip opens a contextual second-trip unlock prompt.
             </p>
           </div>
         </div>

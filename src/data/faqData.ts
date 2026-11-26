@@ -26,8 +26,8 @@ export const MAIN_FAQS: PlainFaqItem[] = [
     answer: `If you use GateReady as a guest without creating an account, your packing lists and weight settings are saved strictly in your current browser's localStorage. They never touch our cloud servers. However, this means if you clear your browser cache, switch devices, or switch from private browsing mode, guest data cannot be recovered. Creating a free account syncs your lists safely to Firebase so you can open them on any device.`
   },
   {
-    question: 'How does the TSA 3-1-1 liquids checker work?',
-    answer: `The TSA 3-1-1 checker is a catalog and item-level rule verification tool, not a camera scanner or physical sensor. When you add toiletries or liquid items to a carry-on bag, GateReady compares the volume against the TSA 3.4 fl oz (100 ml) standard. If a bottle exceeds 3.4 oz, the app flags it and recommends packing it into your checked luggage or transferring it to a travel-sized bottle.`
+    question: 'How does the TSA 3-1-1 & CATSA liquids checker work?',
+    answer: `The GateReady liquids checker is a catalog and item-level rule reference tool, not a camera scanner or physical sensor. When you add toiletries or non-solid foods to a carry-on bag, GateReady compares printed container sizes against the 3.4 fl oz / 100 mL standard (US TSA 3-1-1 inside 1 clear quart-sized zip-top bag; Canadian CATSA 100 mL / 100 g inside 1 clear, closed, resealable 1-liter plastic bag). It provides planning guidance only and does not guarantee security screening clearance.`
   },
   {
     question: 'How does the referral program work?',
@@ -59,72 +59,78 @@ export const TSA_LIQUIDS_TABLE: TsaLiquidRuleRow[] = [
     item: 'Travel Shampoo / Conditioner Bottle',
     size: '3.0 fl oz (89 mL)',
     carryOnAllowed: 'Yes',
-    notes: 'Under the 3.4 oz (100 mL) container cap; must fit inside your single 1-quart / 1-liter clear zip-top bag.'
+    notes: 'At or below 3.4 fl oz (100 mL); pack in 1 clear quart-sized zip-top bag (US TSA) or 1 clear, closed, resealable 1 L bag (Canada CATSA).'
   },
   {
     item: 'Full-Size Sunscreen Lotion',
     size: '6.7 fl oz (200 mL)',
     carryOnAllowed: 'No (Checked Only)',
-    notes: 'Container exceeds 3.4 oz (100 mL), even if partially empty. Pack in checked luggage.'
+    notes: 'Container exceeds 3.4 fl oz (100 mL), even if partially empty. Pack in checked luggage.'
+  },
+  {
+    item: 'Yogurt, Peanut Butter or Maple Syrup',
+    size: '150 g / 150 mL',
+    carryOnAllowed: 'No (Checked Only)',
+    notes: 'Under both CATSA (100 mL / 100 g non-solid food cap) and TSA rules, spreadable or liquid foods over 100 mL / 3.4 fl oz must be checked.'
   },
   {
     item: 'Contact Lens Solution / Eyedrops',
     size: '4.0 fl oz (118 mL) Medical',
     carryOnAllowed: 'Exempt with Declaration',
-    notes: 'Medically necessary liquids over 3.4 oz are permitted in reasonable quantities when declared at security.'
+    notes: 'Medically necessary liquids over 3.4 fl oz (100 mL) are exempt in reasonable quantities when declared separately at security.'
   },
   {
     item: 'Aerosol Deodorant / Dry Shampoo',
     size: '5.0 oz (148 mL)',
     carryOnAllowed: 'No (Checked Only)',
-    notes: 'Aerosols over 3.4 oz / 100 mL must go in checked baggage under FAA/TSA/CATSA toiletry caps.'
+    notes: 'Aerosols over 3.4 fl oz / 100 mL must go in checked baggage under TSA, CATSA, and airline toiletry limits.'
   },
   {
     item: 'Hand Sanitizer Travel Bottle',
     size: '2.0 fl oz (59 mL)',
     carryOnAllowed: 'Yes',
-    notes: 'Permitted inside your clear 1-quart (US TSA) or 1-liter (Canadian CATSA) resealable liquids bag.'
+    notes: 'Permitted inside your clear 1-quart zip-top bag (US TSA) or 1-liter resealable plastic bag (Canada CATSA).'
   },
   {
     item: 'Prescription Liquid Medication',
     size: 'Any prescribed size',
     carryOnAllowed: 'Exempt with Declaration',
-    notes: 'Keep in carry-on with pharmacy label; declare to the TSA or CATSA screening officer before X-ray.'
+    notes: 'Keep in carry-on with pharmacy label; separate from your liquids bag and declare to the TSA or CATSA screening officer.'
   },
   {
     item: 'Baby Formula / Breast Milk',
-    size: 'Over 3.4 oz (100 mL)',
+    size: 'Over 3.4 fl oz (100 mL)',
     carryOnAllowed: 'Exempt with Declaration',
-    notes: 'Allowed in reasonable quantities for travel with or without a child present; subject to separate screening.'
+    notes: 'Exempt in reasonable trip quantities under both TSA and CATSA rules; present separately for checkpoint screening.'
   },
   {
     item: 'Lip Balm / Solid Stick Deodorant',
     size: 'Solid',
     carryOnAllowed: 'Yes',
-    notes: 'Non-gel solids are excluded from the 3-1-1 liquids bag rule; spreadable gels, creams, and pastes are counted.'
+    notes: 'Non-gel solids are excluded from the 3-1-1 / 1 L liquids bag rule; spreadable gels, creams, and pastes are counted.'
   }
 ];
 
 export const TSA_LIQUIDS_FAQS: PlainFaqItem[] = [
   {
-    question: 'What does the TSA 3-1-1 rule mean?',
-    answer: '3-1-1 stands for containers of 3.4 ounces (100 milliliters) or less per item, packed inside 1 clear quart-sized zip-top bag, with 1 bag permitted per traveler in carry-on luggage.'
+    question: 'What does the US TSA 3-1-1 rule mean?',
+    answer: 'For flights departing the United States, TSA 3-1-1 allows containers of 3.4 fl oz (100 mL) or less per item, packed inside 1 clear quart-sized zip-top plastic bag, with 1 bag permitted per passenger. Official rules: tsa.gov/travel/security-screening/liquids-aerosols-gels-rule.'
   },
   {
     question: 'What is the Canadian CATSA equivalent to TSA 3-1-1?',
-    answer: 'CATSA applies the 100 mL (3.4 oz) per-container limit in Canada and requires all carry-on liquids, aerosols, and gels to fit comfortably inside one clear, closed, resealable plastic bag no larger than 1 liter.'
+    answer: 'For flights departing Canada, CATSA allows liquids, aerosols, gels, and non-solid foods (such as yogurt, spreads, or syrup) in containers of 100 mL or 100 g or less, fitting comfortably inside 1 clear, closed, resealable plastic bag with a maximum capacity of 1 liter (1 L) per passenger. Official rules: catsa-acsta.gc.ca/en/what-can-bring/liquids-non-solid-food-personal-items.'
   },
   {
     question: 'Does container size or remaining liquid amount count?',
-    answer: 'Screeners enforce the printed volume on the container itself. A half-empty 6.7 oz (200 mL) bottle is still rejected at security because the container capacity exceeds 3.4 oz (100 mL).'
+    answer: 'Screeners enforce the printed volume on the container itself. A half-empty 6.7 fl oz (200 mL) bottle can be rejected at security because the container capacity exceeds 3.4 fl oz (100 mL).'
   },
   {
-    question: 'Is the GateReady TSA liquids checker a camera scanner?',
-    answer: 'No. GateReady is a list-based rule checker that inspects container volumes and keywords on items you add to a carry-on bag and flags any bottle over 3.4 oz (100 mL) before you pack it for the airport.'
+    question: 'Does GateReady guarantee checkpoint clearance?',
+    answer: 'No. GateReady is a list-based rule reference tool (not a camera scanner) that helps flag bottles over 3.4 fl oz (100 mL) before departure. Final security clearance decisions rest solely with TSA, CATSA, or local screening officers.'
   },
   {
-    question: 'Which liquids are exempt from the 3.4 oz (100 mL) limit?',
-    answer: 'Prescription liquid medications, essential medical liquids such as saline contact solution, and baby formula or breast milk are exempt from the 3.4 oz limit when declared separately at the checkpoint.'
+    question: 'Which liquids are exempt from the 3.4 fl oz (100 mL) limit?',
+    answer: 'Prescription liquid medications, essential medical liquids such as saline contact solution, and baby formula, breast milk, or toddler purées are exempt from the 3.4 fl oz (100 mL) limit in reasonable quantities under both TSA and CATSA when declared separately at the checkpoint.'
   }
 ];
 

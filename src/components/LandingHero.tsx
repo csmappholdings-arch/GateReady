@@ -929,7 +929,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published</span>
                   </div>
                   <div className="text-[11px] text-slate-500">Basic Economy: No overhead roller</div>
-                  <div className="text-[11px] font-semibold text-purple-600">Gate-check fee: $25 service fee + $35–$40 bag fee</div>
+                  <div className="text-[11px] font-semibold text-purple-600">Gate-handling fee: $75 · Checked $45 prepaid</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
@@ -938,7 +938,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                     <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">Published</span>
                   </div>
                   <div className="text-[11px] text-slate-500">Carry-on: Free (22 x 14 x 9 in, no weight limit)</div>
-                  <div className="text-[11px] font-semibold text-purple-600">Checked: $35 1st bag · $45 2nd bag</div>
+                  <div className="text-[11px] font-semibold text-purple-600">Checked: $45 1st bag · $55 2nd bag</div>
                 </div>
               </div>
             </div>

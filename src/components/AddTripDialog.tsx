@@ -386,7 +386,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         );
         return;
       }
-      openPaywall(travelerCheck.reason);
+      openPaywall(travelerCheck.reason, { context: 'traveler_limit' });
       return;
     }
 
@@ -441,7 +441,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
           setBagError('Free Starter supports up to 2 bags per trip (max 1 checked bag).');
           return;
         }
-        openPaywall(`Packing 3 or more bags (Checked + Carry-On + Personal Item) requires unlocking beyond the 2-bag Free limit. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
+        openPaywall(`Packing 3 or more bags (Checked + Carry-On + Personal Item) requires unlocking beyond the 2-bag Free limit. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`, { context: 'bag_limit' });
         return;
       }
       setBags([
@@ -488,7 +488,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         setBagError('Free Starter supports up to 2 bags per trip (max 1 checked bag).');
         return;
       }
-      openPaywall(bagCheck.reason);
+      openPaywall(bagCheck.reason, { context: 'bag_limit' });
       return;
     }
 
@@ -528,7 +528,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
         setBagError('Free Starter supports up to 2 bags per trip (max 1 checked bag).');
         return;
       }
-      openPaywall(bagCheck.reason);
+      openPaywall(bagCheck.reason, { context: 'bag_limit' });
       return;
     }
 
@@ -620,7 +620,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
           setActiveTab('baggage');
           return;
         }
-        openPaywall(`Free plan allows 1 Checked Bag per trip (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
+        openPaywall(`Free plan allows 1 Checked Bag per trip (up to 2 bags total). ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`, { context: 'bag_limit' });
         return;
       }
       if (finalBags.length > 2) {
@@ -629,7 +629,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
           setActiveTab('baggage');
           return;
         }
-        openPaywall(`Free plan is limited to 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`);
+        openPaywall(`Free plan is limited to 2 bags total. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`, { context: 'bag_limit' });
         return;
       }
     }
@@ -1269,31 +1269,22 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 </div>
               </div>
 
-              {/* Return Trip Schedule (Round-Trip Tracking) */}
+              {/* Return Trip Schedule (Round-Trip Tracking — shown for paid plans, edits, or post-value-moment) */}
+              {(isPro || valueMomentReached || Boolean(editingTripId)) && (
               <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-indigo-50/70 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 border border-indigo-200/90 dark:border-indigo-800/60 shadow-2xs space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-indigo-100 dark:border-indigo-900/60">
                   <div className="flex items-center gap-2">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
-                      showPreValueFlow
-                        ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
-                        : 'bg-amber-400/20 text-amber-600 dark:text-amber-400 border-amber-300/40'
-                    }`}>
-                      {showPreValueFlow ? (
-                        <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-300" />
-                      ) : (
-                        <Crown className="w-4 h-4 fill-amber-500 text-amber-500" />
-                      )}
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border bg-amber-400/20 text-amber-600 dark:text-amber-400 border-amber-300/40">
+                      <Crown className="w-4 h-4 fill-amber-500 text-amber-500" />
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-black text-indigo-950 dark:text-indigo-200">
                           Round-Trip & Return Tracking
                         </span>
-                        {!showPreValueFlow && (
-                          <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
-                            {showLockedUpsells && <Lock className="w-2.5 h-2.5" />} SILVER+
-                          </span>
-                        )}
+                        <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-purple-950 px-1.5 py-0.2 rounded-md flex items-center gap-0.5 shadow-2xs">
+                          {showLockedUpsells && <Lock className="w-2.5 h-2.5" />} SILVER+
+                        </span>
                       </div>
                       <p className="text-[10px] text-indigo-700/80 dark:text-indigo-300/80">
                         {travelType === 'PLANE'
@@ -1306,7 +1297,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   {showLockedUpsells ? (
                     <button
                       type="button"
-                      onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+                      onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`, { context: 'return_tracking' })}
                       className="h-7 px-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-[10px] flex items-center justify-center gap-1 shadow-xs cursor-pointer active:scale-95 transition-all shrink-0 self-start sm:self-auto"
                     >
                       <Lock className="w-3 h-3" />
@@ -1341,7 +1332,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                 <div className="relative">
                   {showLockedUpsells && (
                     <div 
-                      onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+                      onClick={() => openPaywall(`Round-Trip & Return Date tracking is unlocked on Silver+ plans. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`, { context: 'return_tracking' })}
                       className="absolute inset-0 z-10 bg-slate-900/5 dark:bg-slate-950/20 backdrop-blur-[1px] rounded-xl flex items-center justify-center cursor-pointer group"
                       title="Click to unlock with your free 7-day Platinum trial"
                     >
@@ -1383,6 +1374,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Optional Passport Expiration Date & 6-Month Rule Check */}
               <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 space-y-3">
@@ -1454,7 +1446,7 @@ export const AddTripDialog: React.FC<AddTripDialogProps> = ({
                     ) : (
                       <button
                         type="button"
-                        onClick={() => openPaywall(`Free plan allows 1 traveler. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`)}
+                        onClick={() => openPaywall(`Free plan allows 1 traveler. ${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT}`, { context: 'traveler_limit' })}
                         className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-amber-200 cursor-pointer"
                       >
                         <Crown className="w-3 h-3 fill-amber-500 text-amber-500" />

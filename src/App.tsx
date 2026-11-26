@@ -226,9 +226,11 @@ function PackingAppContent() {
     };
     const handleClearSoftNotice = () => setSoftLimitNotice(null);
     window.addEventListener('gateready:soft-limit-notice', handleSoftNotice);
+    window.addEventListener('gateready:clear-soft-limit-notice', handleClearSoftNotice);
     window.addEventListener(VALUE_MOMENT_EVENT, handleClearSoftNotice);
     return () => {
       window.removeEventListener('gateready:soft-limit-notice', handleSoftNotice);
+      window.removeEventListener('gateready:clear-soft-limit-notice', handleClearSoftNotice);
       window.removeEventListener(VALUE_MOMENT_EVENT, handleClearSoftNotice);
     };
   }, []);
@@ -348,6 +350,11 @@ function PackingAppContent() {
         setAddTripKey((prev) => prev + 1);
         setShowAddTripModal(true);
         // Clean query parameters so modal dismissal doesn't re-trigger
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (params.get('action') === 'login') {
+        setAccountModalOrigin('header');
+        setAccountModalMode('signin');
+        setShowAccountModal(true);
         window.history.replaceState({}, '', window.location.pathname);
       }
     } catch {}
@@ -503,7 +510,10 @@ function PackingAppContent() {
     const safeDest = typeof destinationCity === 'string' ? destinationCity : undefined;
     const tripCheck = canAddTrip(trips.length);
     if (!tripCheck.allowed) {
-      openPaywall(tripCheck.reason);
+      openPaywall(tripCheck.reason, {
+        context: 'second_trip',
+        preValueNotice: 'Finish packing this trip first — your second trip unlocks with a plan.'
+      });
       return;
     }
     setSelectedTravelTypeForAdd(safeTravelType);
@@ -525,7 +535,10 @@ function PackingAppContent() {
     refreshActiveTrip();
     const tripCheck = canAddTrip(trips.length);
     if (!tripCheck.allowed) {
-      openPaywall(tripCheck.reason);
+      openPaywall(tripCheck.reason, {
+        context: 'second_trip',
+        preValueNotice: 'Finish packing this trip first — your second trip unlocks with a plan.'
+      });
       return;
     }
 
@@ -602,7 +615,10 @@ function PackingAppContent() {
   }) => {
     const tripCheck = canAddTrip(trips.length);
     if (!tripCheck.allowed) {
-      openPaywall(tripCheck.reason);
+      openPaywall(tripCheck.reason, {
+        context: 'second_trip',
+        preValueNotice: 'Finish packing this trip first — your second trip unlocks with a plan.'
+      });
       return;
     }
 
@@ -697,7 +713,10 @@ function PackingAppContent() {
   const handlePlanTripFromChecker = (destinationCity: string) => {
     const tripCheck = canAddTrip(trips.length);
     if (!tripCheck.allowed) {
-      openPaywall(tripCheck.reason);
+      openPaywall(tripCheck.reason, {
+        context: 'second_trip',
+        preValueNotice: 'Finish packing this trip first — your second trip unlocks with a plan.'
+      });
       return;
     }
     setSelectedTravelTypeForAdd('PLANE');
@@ -738,16 +757,13 @@ function PackingAppContent() {
         onOpenOnboarding={() => setShowOnboardingModal(true)}
       />
 
-      {/* C4: Non-blocking inline soft limit notice before first value moment */}
+      {/* C4: Non-blocking neutral inline note before first value moment */}
       {softLimitNotice && (
-        <div role="status" className="bg-slate-900 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs border-b border-purple-700/60 relative z-30">
+        <div role="status" className="bg-slate-900 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs border-b border-slate-700/80 relative z-30">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Info className="w-4 h-4 text-amber-400 shrink-0" />
+            <Info className="w-4 h-4 text-slate-300 shrink-0" />
             <p className="text-slate-100 leading-snug">
-              {softLimitNotice}{' '}
-              <a href="/pricing" className="font-bold text-amber-300 hover:underline whitespace-nowrap">
-                See plans →
-              </a>
+              {softLimitNotice}
             </p>
           </div>
           <button
@@ -1115,7 +1131,7 @@ function PackingAppContent() {
           setPendingCheckerConfig(null);
           openPaywall(
             'Free plan allows 1 Checked Bag per trip (up to 2 bags total). Try everything free for 7 days — the 7-day full Platinum trial auto-activates on free signup, no card, drops back to Free at day 7.',
-            { defaultShowPlans: true }
+            { defaultShowPlans: true, context: 'bag_limit' }
           );
         }}
       />

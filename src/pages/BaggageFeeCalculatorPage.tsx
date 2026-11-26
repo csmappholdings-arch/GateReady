@@ -7,6 +7,7 @@ import {
 import { getAirlineFareFamilies } from '../data/airlineFareFamilies';
 import { AIRLINE_GUIDES, formatAirlineFee } from '../data/airlineGuidesData';
 import { SocialLinks } from '../components/SocialLinks';
+import { PublicHeader } from '../components/PublicHeader';
 import { applySeoHead } from './PageLayout';
 import { 
   Receipt, 
@@ -161,46 +162,27 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      {/* Top Header Navigation */}
-      <header className="w-full bg-white border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5 sticky top-0 z-40">
-        <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <a href="/" className="text-xs font-bold text-slate-600 hover:text-purple-600 transition-colors">
-              ← Back to App
-            </a>
-            <span className="text-slate-300">|</span>
-            <a
-              href="/"
-              aria-label="GateReady – Return to homepage"
-              title="GateReady – Return to homepage"
-              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-            >
-              Gate<span className="text-purple-600">Ready</span>
-            </a>
-          </div>
+      <PublicHeader
+        activePath="/baggage-fee-calculator/"
+        rightAction={
           <div className="flex items-center gap-2">
-            <a 
-              href="/airlines/" 
+            <a
+              href="/airlines/"
               className="text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
             >
               Airline Guides
             </a>
-            <a 
-              href="/entry-requirements" 
-              className="text-xs font-bold text-slate-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 transition-colors"
-            >
-              Entry Requirements
-            </a>
             <button
+              type="button"
               onClick={handleStartTripWithBags}
-              className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm shadow-purple-600/20 cursor-pointer"
+              className="h-9 px-3.5 rounded-xl bg-purple-50 border border-purple-200 hover:bg-purple-100 text-purple-800 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
             >
               <Plane className="w-3.5 h-3.5" />
               <span>Pack with These Bags</span>
             </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Hero Header */}
       <section className="w-full bg-gradient-to-b from-purple-50 via-white to-slate-50 border-b border-purple-100 py-10 px-4 sm:px-6 lg:px-8 text-center">
@@ -232,10 +214,10 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
         {/* Direct-Answer Summary */}
         <section className="p-5 sm:p-6 rounded-3xl bg-white border border-purple-200 shadow-xs space-y-2">
           <div className="text-[11px] font-black uppercase tracking-wider text-purple-700">
-            Published Airline Fee Summary · Verified November 4, 2026
+            Published Airline Fee Summary · Verified November 26, 2026
           </div>
           <p className="text-sm text-slate-700 leading-relaxed">
-            Most legacy North American airlines charge $35–$45 for a 1st checked bag (prepaid savings of $5–$15 online vs. airport counter), enforce a 50 lb (23 kg) weight threshold on Economy tickets with $100–$150 flat overweight surcharges for 51–70 lbs, and require ultra-low-cost carriers (such as Spirit, Frontier, and Allegiant) or 40 lb ULCC tiers to pay extra for overhead carry-on bags. Figures below come from static published airline fee tables verified November 4, 2026—always confirm exact itinerary fees with your carrier at booking.
+            Most legacy North American airlines charge $35–$55 for a 1st checked bag (with Delta, American, United, and Southwest Main/Basic at $45 prepaid/online; prepaid savings of $5–$15 online vs. airport counter), enforce a 50 lb (23 kg) weight threshold on Economy tickets with $100–$150 flat overweight surcharges for 51–70 lbs, and require ultra-low-cost carriers (such as Frontier, Allegiant, Flair, and Ryanair, with 40 lb limits on Frontier) to pay extra for overhead carry-on bags. Figures below come from static published airline fee tables verified November 26, 2026—dynamic pricing, routes, fare families, loyalty status, and operating carrier rules apply, so always confirm exact itinerary fees with your airline at booking.
           </p>
         </section>
 
@@ -537,7 +519,7 @@ export const BaggageFeeCalculatorPage: React.FC<BaggageFeeCalculatorPageProps> =
               All 42 Airlines Published Baggage Fee Reference Table
             </h2>
             <p className="text-xs text-slate-600">
-              Estimates from published airline tables verified November 4, 2026. Basic Economy, UltraBasic, and regional exceptions may change fees—confirm at booking.
+              Estimates from published airline tables verified November 26, 2026. Dynamic pricing, Basic/UltraBasic fares, codeshare operating carriers, and route rules may change fees—confirm at booking.
             </p>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-slate-200">

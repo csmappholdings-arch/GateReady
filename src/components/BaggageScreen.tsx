@@ -4,7 +4,7 @@ import { usePacking } from '../context/PackingContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { useAuth } from '../context/AuthContext';
 import { DefaultSuggestions } from '../data/suggestions';
-import { scanItemForLiquids } from '../utils/liquidScanner';
+import { scanItemForLiquids, inferDepartureLiquidRegion } from '../utils/liquidScanner';
 import { 
   Luggage, 
   Briefcase, 
@@ -381,7 +381,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                 </span>
                 <span className="text-slate-300 dark:text-slate-700">·</span>
                 <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                  {isFlight ? 'TSA 3-1-1 & Tare Verified' : 'Tare & Weight Verified'}
+                  {isFlight ? 'TSA / CATSA & Tare Ready' : 'Tare & Weight Verified'}
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -906,12 +906,21 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
               </p>
             )}
 
-            {activeBag.type === 'CARRY_ON' && isFlight && (
-              <p className="text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1 pt-0.5 font-medium">
-                <Droplets className="w-3.5 h-3.5 text-purple-600" />
-                <span>TSA 3-1-1 Rule: Liquids, gels, and aerosols must be 3.4oz (100ml) or less in a clear quart-sized bag.</span>
-              </p>
-            )}
+            {activeBag.type === 'CARRY_ON' && isFlight && (() => {
+              const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
+              return (
+                <p className="text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1 pt-0.5 font-medium">
+                  <Droplets className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  <span>
+                    {liquidRegion === 'CA'
+                      ? 'Canada CATSA Rule: Liquids, aerosols, gels & non-solid foods must be ≤ 100 mL (100 g) inside 1 clear, closed, resealable 1 L bag (medications/baby formula exempt; officers have final authority).'
+                      : liquidRegion === 'US'
+                        ? 'US TSA 3-1-1 Rule: Liquids, gels & aerosols must be ≤ 3.4 fl oz (100 mL) inside 1 clear quart-sized zip-top bag (medications/baby formula exempt; officers have final authority).'
+                        : 'Carry-On Liquids: ≤ 3.4 fl oz / 100 mL in 1 clear quart zip-top bag (US TSA) or 1 clear resealable 1 L bag (Canada CATSA). Medical & infant liquids exempt; screening officers decide.'}
+                  </span>
+                </p>
+              );
+            })()}
           </div>
 
           {/* Quick Add Item Bar */}
@@ -1064,13 +1073,14 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                           {item.name}
                         </p>
                         {isFlight && (() => {
-                          const lq = scanItemForLiquids(item.name, activeBag.type);
+                          const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
+                          const lq = scanItemForLiquids(item.name, activeBag.type, liquidRegion);
                           if (!lq.isLiquid) return null;
                           if (lq.status === 'NON_COMPLIANT') {
                             return (
                               <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 flex items-center gap-1 shrink-0" title={lq.alertMessage}>
                                 <AlertTriangle className="w-2.5 h-2.5" />
-                                <span>Exceeds 100 ml — checked bags only</span>
+                                <span>{lq.badgeLabel || 'Exceeds 100 mL — checked bags only'}</span>
                               </span>
                             );
                           }
@@ -1078,7 +1088,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                             return (
                               <span className="px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-0.5 shrink-0">
                                 <Check className="w-2.5 h-2.5 stroke-[3]" />
-                                <span>TSA Pass ({lq.capacityOz ? `${lq.capacityOz}oz` : `${lq.capacityMl}ml`})</span>
+                                <span>{lq.badgeLabel || '≤100 mL Pass'}</span>
                               </span>
                             );
                           }
@@ -1093,7 +1103,7 @@ export const BaggageScreen: React.FC<BaggageScreenProps> = ({
                           return (
                             <span className="px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-0.5 shrink-0">
                               <Droplets className="w-2.5 h-2.5" />
-                              <span>TSA 3-1-1 (≤3.4oz)</span>
+                              <span>{lq.badgeLabel || '≤100 mL / 3.4 fl oz'}</span>
                             </span>
                           );
                         })()}

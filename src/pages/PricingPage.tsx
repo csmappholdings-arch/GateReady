@@ -448,7 +448,7 @@ export const PricingPage: React.FC = () => {
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
               </tr>
               <tr>
-                <td className="p-4 font-semibold">TSA 3-1-1 Liquids Compliance</td>
+                <td className="p-4 font-semibold">TSA 3-1-1 &amp; CATSA Liquids Compliance</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>
                 <td className="p-4 text-emerald-600 font-bold">✓ Included</td>

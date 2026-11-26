@@ -17,7 +17,7 @@ import { Bag, PackingItem, Trip } from '../types/travel';
 import { createAirCanadaSampleTrip } from '../data/sampleTrip';
 import { computeBagWeightStatus } from '../utils/bagWeightAnalysis';
 import { computeRebalanceSuggestions, SuggestedMove } from '../utils/rebalanceAlgorithm';
-import { scanItemForLiquids } from '../utils/liquidScanner';
+import { inferDepartureLiquidRegion, scanItemForLiquids } from '../utils/liquidScanner';
 import { calculateTravelReadinessScore } from '../utils/readinessScore';
 import { markValueMomentReached } from '../utils/valueMoment';
 
@@ -442,7 +442,11 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
                       const qty = typeof item.quantity === 'number' ? item.quantity : 1;
                       const unitWt = item.customWeightLbs ?? 0.5;
                       const lineWt = (qty * unitWt).toFixed(1);
-                      const liquidScan = scanItemForLiquids(item.name, bag.type);
+                      const liquidScan = scanItemForLiquids(
+                        item.name,
+                        bag.type,
+                        inferDepartureLiquidRegion(trip.originCity)
+                      );
                       const showTsaWarn = liquidScan.status === 'NON_COMPLIANT' && qty > 0;
                       const showTsaPass = liquidScan.status === 'COMPLIANT' && qty > 0;
 
@@ -539,7 +543,7 @@ export const HomepageInteractiveDemo: React.FC<HomepageInteractiveDemoProps> = (
         {/* Footer CTA inside interactive demo */}
         <div className="px-5 sm:px-7 py-4 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-slate-600 dark:text-slate-300">
-            Powered by GateReady&apos;s published 42-airline tables, suitcase tare deduction, TSA 3-1-1 rules, and suggest-first bag balancing.
+            Powered by GateReady&apos;s published 42-airline tables, suitcase tare deduction, TSA 3-1-1 &amp; CATSA liquid rules, and suggest-first bag balancing.
           </p>
           <button
             type="button"

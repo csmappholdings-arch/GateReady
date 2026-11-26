@@ -198,7 +198,7 @@ export const CarryOnCheckerPage: React.FC = () => {
           Carry-On Size &amp; Weight Limit Comparison (Major US, Canadian &amp; Global Airlines)
         </h2>
         <p className="text-xs text-slate-600 dark:text-slate-400">
-          Published carry-on dimensions, cabin weight caps, and personal-item limits verified November 4, 2026.
+          Published carry-on dimensions, cabin weight caps, and personal-item limits verified November 26, 2026.
         </p>
 
         <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
@@ -236,7 +236,7 @@ export const CarryOnCheckerPage: React.FC = () => {
           </table>
         </div>
         <p className="text-[11px] text-slate-500">
-          *Air Canada Basic (NA/Sun), WestJet UltraBasic (Canada/US), and United Basic Economy (most domestic) allow an under-seat personal item only and exclude overhead carry-on bins. Static published estimates verified November 4, 2026; confirm with your operating carrier before departure.
+          *Air Canada Basic (NA/Sun), WestJet UltraBasic (Canada/US), United Basic Economy (most domestic), and SAS Go Light allow an under-seat personal item only and exclude overhead carry-on bins. Static published estimates verified November 26, 2026; fees and dimensions vary by route, fare family, and operating carrier—always confirm with your airline before departure.
         </p>
       </section>
 

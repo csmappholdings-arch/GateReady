@@ -7,7 +7,7 @@ import { DepartureCountdownCard } from './DepartureCountdownCard';
 import { exportTripToPDF } from '../utils/pdfExport';
 import { EditBagDialog } from './EditBagDialog';
 import { computeBagWeightStatus } from '../utils/bagWeightAnalysis';
-import { scanItemForLiquids } from '../utils/liquidScanner';
+import { scanItemForLiquids, inferDepartureLiquidRegion } from '../utils/liquidScanner';
 import { 
   Plus, 
   Trash2, 
@@ -777,38 +777,61 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
       {/* ============================================================== */}
       {/* CARRY-ON LIQUID DISCLAIMER (Only shown for flight carry-on luggage) */}
       {/* ============================================================== */}
-      {currentBag && currentBag.type === 'CARRY_ON' && isFlight && (
-        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 w-full">
-          <div className="rounded-2xl border border-purple-300 dark:border-purple-800 bg-linear-to-r from-purple-50 via-fuchsia-50/40 to-white dark:from-purple-950/50 dark:via-purple-900/30 dark:to-slate-900 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
-                <Droplets className="w-4 h-4" />
+      {currentBag && currentBag.type === 'CARRY_ON' && isFlight && (() => {
+        const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
+        return (
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 w-full">
+            <div className="rounded-2xl border border-purple-300 dark:border-purple-800 bg-linear-to-r from-purple-50 via-fuchsia-50/40 to-white dark:from-purple-950/50 dark:via-purple-900/30 dark:to-slate-900 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <Droplets className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-purple-950 dark:text-purple-100 flex items-center gap-1.5 flex-wrap">
+                    <span>
+                      {liquidRegion === 'CA'
+                        ? 'Carry-On Liquid & Non-Solid Food Notice (Canadian CATSA)'
+                        : liquidRegion === 'US'
+                          ? 'Carry-On Liquid Allowance Notice (US TSA 3-1-1 Rule)'
+                          : 'Carry-On Liquid Allowance Notice (US TSA 3-1-1 & Canada CATSA)'}
+                    </span>
+                    <span className="text-[10px] bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.2 rounded-full font-extrabold uppercase">
+                      Security Guide
+                    </span>
+                  </p>
+                  <p className="text-[11px] text-purple-900/80 dark:text-purple-200/80 mt-0.5 leading-snug">
+                    {liquidRegion === 'CA' ? (
+                      <>
+                        For Canadian departures, liquids, aerosols, gels, and non-solid foods (yogurt, spreads, syrup) must be in containers of{' '}
+                        <strong className="text-purple-950 dark:text-white">100 mL / 100 g or less</strong> inside ONE clear, closed, resealable plastic bag (max 1 L) per passenger. Baby formula, breast milk, and medications are exempt when declared.
+                      </>
+                    ) : liquidRegion === 'US' ? (
+                      <>
+                        For US departures, liquids, gels, and aerosols must be in containers of{' '}
+                        <strong className="text-purple-950 dark:text-white">3.4 fl oz (100 mL) or less</strong> inside ONE clear quart-sized zip-top bag per passenger. Baby formula, breast milk, and medications are exempt when declared.
+                      </>
+                    ) : (
+                      <>
+                        Containers must be <strong className="text-purple-950 dark:text-white">3.4 fl oz (100 mL) or less</strong> inside ONE clear 1-quart zip-top bag (US TSA) or 1 clear, closed, resealable 1-liter bag (Canada CATSA). Medical &amp; infant liquids are exempt when declared; checkpoint officers make final decisions.
+                      </>
+                    )}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-bold text-purple-950 dark:text-purple-100 flex items-center gap-1.5">
-                  <span>Carry-On Liquid Allowance Notice (TSA 3-1-1 Rule)</span>
-                  <span className="text-[10px] bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.2 rounded-full font-extrabold uppercase">
-                    Mandatory
-                  </span>
-                </p>
-                <p className="text-[11px] text-purple-900/80 dark:text-purple-200/80 mt-0.5 leading-snug">
-                  Liquids, gels, and aerosols must be in containers of <strong className="text-purple-950 dark:text-white">3.4 oz (100ml) or less</strong> and packed in ONE clear quart-sized zip bag per passenger. Baby formula, breast milk, and medications are exempt.
-                </p>
-              </div>
-            </div>
 
-            {onNavigateToAllowances && (
-              <button
-                onClick={onNavigateToAllowances}
-                className="shrink-0 text-xs font-bold text-purple-700 dark:text-purple-300 hover:text-purple-900 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 shadow-2xs transition-colors cursor-pointer"
-              >
-                <span>View Full Allowance Guide</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            )}
+              {onNavigateToAllowances && (
+                <button
+                  onClick={onNavigateToAllowances}
+                  className="shrink-0 text-xs font-bold text-purple-700 dark:text-purple-300 hover:text-purple-900 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 shadow-2xs transition-colors cursor-pointer"
+                >
+                  <span>View Full Allowance Guide</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Main Checklist Body */}
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 space-y-4 w-full">
@@ -1290,13 +1313,14 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                         </span>
 
                         {isFlight && (() => {
-                          const lq = scanItemForLiquids(item.name, currentBag.type);
+                          const liquidRegion = inferDepartureLiquidRegion(trip.originCity);
+                          const lq = scanItemForLiquids(item.name, currentBag.type, liquidRegion);
                           if (!lq.isLiquid) return null;
                           if (lq.status === 'NON_COMPLIANT') {
                             return (
                               <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-900 flex items-center gap-1 shrink-0" title={lq.alertMessage}>
                                 <AlertTriangle className="w-2.5 h-2.5" />
-                                <span>Exceeds 100 ml — checked bags only</span>
+                                <span>{lq.badgeLabel || 'Exceeds 100 mL — checked bags only'}</span>
                               </span>
                             );
                           }
@@ -1304,7 +1328,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                             return (
                               <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-0.5 shrink-0">
                                 <Check className="w-2.5 h-2.5 stroke-[3]" />
-                                <span>TSA Pass ({lq.capacityOz ? `${lq.capacityOz}oz` : lq.capacityMl ? `${lq.capacityMl}ml` : '≤100ml'})</span>
+                                <span>{lq.badgeLabel || '≤100 mL Pass'}</span>
                               </span>
                             );
                           }
@@ -1319,7 +1343,7 @@ export const PackingChecklistScreen: React.FC<PackingChecklistScreenProps> = ({
                           return (
                             <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-0.5 shrink-0">
                               <Droplets className="w-2.5 h-2.5" />
-                              <span>TSA 3-1-1 (≤100 ml / 3.4 oz)</span>
+                              <span>{lq.badgeLabel || '≤100 mL / 3.4 fl oz'}</span>
                             </span>
                           );
                         })()}

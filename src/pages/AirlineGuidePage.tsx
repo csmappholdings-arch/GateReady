@@ -18,6 +18,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { SocialLinks } from '../components/SocialLinks';
+import { PublicHeader } from '../components/PublicHeader';
 import { applySeoHead } from './PageLayout';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -80,44 +81,27 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      {/* Top Header Navigation */}
-      <header className="w-full bg-white border-b border-purple-100 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5 sticky top-0 z-40">
-        <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <a 
-              href="/airlines/" 
-              className="text-xs font-bold text-slate-600 hover:text-purple-600 flex items-center gap-1.5 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>All 42 Airlines</span>
-            </a>
-            <span className="text-slate-300">|</span>
-            <a
-              href="/"
-              aria-label="GateReady – Return to homepage"
-              title="GateReady – Return to homepage"
-              className="font-black text-base tracking-tight text-slate-900 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-            >
-              Gate<span className="text-purple-600">Ready</span>
-            </a>
-          </div>
+      <PublicHeader
+        activePath="/airlines/"
+        rightAction={
           <div className="flex items-center gap-2">
-            <a 
-              href="/baggage-fee-calculator/" 
-              className="hidden md:inline-flex text-xs font-bold text-purple-700 hover:text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200 hover:bg-purple-50 transition-colors"
+            <a
+              href="/airlines/"
+              className="text-xs font-bold text-slate-600 hover:text-purple-700 px-2.5 py-1.5 rounded-xl hover:bg-purple-50 transition-colors"
             >
-              Fee Calculator
+              ← All 42 Airlines
             </a>
             <button
+              type="button"
               onClick={handleStartTrip}
-              className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm shadow-purple-600/20 cursor-pointer transition-all active:scale-95"
+              className="h-9 px-3.5 rounded-xl bg-purple-50 border border-purple-200 hover:bg-purple-100 text-purple-800 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
             >
               <Plane className="w-3.5 h-3.5" />
               <span>Pack for {guide.name}</span>
             </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Hero Banner with Airline Identity */}
       <section className="w-full bg-gradient-to-b from-purple-50 via-white to-slate-50 border-b border-purple-100 py-10 px-4 sm:px-6 lg:px-8">
@@ -138,7 +122,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-500">
             <span className="flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Verified {guide.fees.lastVerified} · Published Carrier Rules · Confirm at booking</span>
+              <span>Verified {guide.fees.lastVerified} · Published Carrier Rules · Varies by route/fare/operating carrier</span>
             </span>
           </div>
         </div>
@@ -537,7 +521,7 @@ export const AirlineGuidePage: React.FC<AirlineGuidePageProps> = ({
                 How does GateReady help with {guide.name} packing?
               </h3>
               <p className="text-slate-600 leading-relaxed">
-                GateReady pre-calibrates {guide.name}'s carry-on sizer dimensions, checks TSA 3-1-1 liquids compliance, accounts for empty luggage tare weight, and calculates overweight fee risk before you leave home.
+                GateReady pre-calibrates {guide.name}&apos;s carry-on sizer dimensions, checks TSA 3-1-1 / Canadian CATSA liquids rules, accounts for empty luggage tare weight, and estimates baggage fees before you leave home. Always verify route, fare family, and codeshare operating-carrier terms directly with {guide.name}.
               </p>
             </div>
           </div>

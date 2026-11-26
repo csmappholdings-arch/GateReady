@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Plane, Luggage } from 'lucide-react';
+import { Plane } from 'lucide-react';
 import { AppFooter } from '../components/AppFooter';
+import { PublicHeader } from '../components/PublicHeader';
 import { STATIC_PAGES, StaticPageMeta } from './pageMetadata';
 import { buildStructuredDataGraph, getCanonicalUrl } from './structuredData';
 
@@ -92,50 +93,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ pathname, children, full
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <a 
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to App</span>
-            </a>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <a
-              href="/"
-              aria-label="GateReady – Return to homepage"
-              title="GateReady – Return to homepage"
-              className="flex items-center gap-2 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-            >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-700 via-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
-                <Luggage className="w-4 h-4" />
-              </div>
-              <span className="font-black text-base tracking-tight text-slate-900 dark:text-white">
-                Gate<span className="text-purple-600 dark:text-purple-400">Ready</span>
-              </span>
-            </a>
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            <a
-              href="/pricing"
-              className="hidden sm:inline-flex text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-1.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors"
-            >
-              Plans from $1.99
-            </a>
-            <a
-              href="/"
-              className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-md shadow-purple-600/25 active:scale-95 transition-all"
-            >
-              <span>Create Your Trip (Free)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
-        </div>
-      </header>
+      <PublicHeader activePath={pathname} />
 
       {/* Hero Header for Document */}
       <section className="w-full bg-gradient-to-b from-purple-950/15 via-purple-900/5 to-transparent border-b border-purple-100/60 dark:border-purple-950/60 py-10 sm:py-14 px-4 sm:px-6 lg:px-8">

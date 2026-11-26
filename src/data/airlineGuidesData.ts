@@ -82,7 +82,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'westjet')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'westjet')!,
     title: 'WestJet Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Published WestJet baggage rules: carry-on dimensions (21 x 15 x 9 in), no carry-on weight limit (must lift unassisted), $40–$55 CAD prepaid 1st bag on Econo/UltraBasic (EconoFlex includes 1st free).',
+    metaDescription: 'Published WestJet baggage rules: carry-on dimensions (22 x 14 x 9 in / 56 x 36 x 23 cm), no carry-on weight limit (must lift unassisted), ~$40 CAD prepaid 1st bag on Econo (EconoFlex includes 1st free).',
     keywords: 'WestJet baggage allowance, WestJet carry on size, WestJet baggage fees, WestJet carry on weight limit, WestJet checked bag cost, UltraBasic baggage',
     h1: 'WestJet Baggage Allowance & Fee Guide'
   },
@@ -114,7 +114,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'airtransat')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'airtransat')!,
     title: 'Air Transat Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Air Transat baggage limits: carry-on dimensions (21 x 16 x 9 in, 22 lbs / 10 kg max), checked bag allowance (50 lbs / 23 kg, $40 CAD), and Club Class baggage perks.',
+    metaDescription: 'Air Transat baggage limits: carry-on dimensions (51 x 40 x 23 cm / 20 x 15.7 x 9 in, lift unassisted), checked bag allowance (50 lbs / 23 kg, ~$40 CAD online), and Club Class baggage perks.',
     keywords: 'Air Transat baggage allowance, Air Transat carry on weight, Air Transat baggage fees, Air Transat checked bag weight limit, Air Transat sizer',
     h1: 'Air Transat Baggage Allowance & Fee Guide'
   },
@@ -148,7 +148,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'delta')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'delta')!,
     title: 'Delta Air Lines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Delta Air Lines baggage limits: carry-on dimensions (22 x 14 x 9 in), no maximum carry-on weight on domestic routes, $35 first checked bag fee, and Delta One allowances.',
+    metaDescription: 'Delta Air Lines baggage limits: carry-on dimensions (22 x 14 x 9 in), no maximum carry-on weight on most routes, $45 first / $55 second domestic checked bag fees, and Delta One allowances.',
     keywords: 'Delta Air Lines baggage allowance, Delta carry on size, Delta baggage fees, Delta carry on weight limit, Delta checked bag weight, Delta First Class bags',
     h1: 'Delta Air Lines Baggage Allowance & Fee Guide'
   },
@@ -164,7 +164,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'american')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'american')!,
     title: 'American Airlines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'American Airlines baggage policies: carry-on sizer rules (22 x 14 x 9 in, no weight limit), Basic Economy carry-on rules, $35 domestic checked bag fee, and oversize fees.',
+    metaDescription: 'American Airlines baggage policies: carry-on sizer rules (22 x 14 x 9 in, no weight limit), Basic Economy carry-on rules, $45 online domestic checked bag fee ($50 Basic Economy), and oversize fees.',
     keywords: 'American Airlines baggage allowance, American Airlines carry on dimensions, American Airlines baggage fees, AA carry on weight limit, AA checked bag cost',
     h1: 'American Airlines Baggage Allowance & Fee Guide'
   },
@@ -180,7 +180,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'united')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'united')!,
     title: 'United Airlines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'United Airlines baggage rules: carry-on sizer size (22 x 14 x 9 in), Basic Economy personal item restrictions, domestic checked baggage fees ($35 prepaid), and Premier waivers.',
+    metaDescription: 'United Airlines baggage rules: carry-on sizer size (22 x 14 x 9 in), Basic Economy personal item restrictions ($75 gate-handling fee), domestic checked baggage fees ($45 prepaid), and Premier waivers.',
     keywords: 'United Airlines baggage allowance, United carry on size, United baggage fees, United Basic Economy carry on, United checked bag weight limit, United Polaris bags',
     h1: 'United Airlines Baggage Allowance & Fee Guide'
   },
@@ -212,7 +212,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'jetblue')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'jetblue')!,
     title: 'JetBlue Airways Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'JetBlue baggage allowance: carry-on roller bag (22 x 14 x 9 in) included on all fares including Blue Basic, checked bag fees ($35 first bag, $50 second bag), and Mint class perks.',
+    metaDescription: 'JetBlue baggage allowance: carry-on roller bag (22 x 14 x 9 in) included on all fares including Blue Basic, dynamic checked bag fees (~$50–$55 prepaid 1st bag, $70–$85 2nd bag), and Mint class perks.',
     keywords: 'JetBlue baggage allowance, JetBlue carry on dimensions, JetBlue baggage fees, Blue Basic carry on, JetBlue checked bag cost, JetBlue Mint luggage',
     h1: 'JetBlue Airways Baggage Allowance & Fee Guide'
   },
@@ -244,7 +244,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'hawaiian')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'hawaiian')!,
     title: 'Hawaiian Airlines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Hawaiian Airlines baggage rules: strictly enforced 25 lbs (11.5 kg) carry-on weight limit (22 x 14 x 9 in), mainland and inter-island checked bag fees ($35 first bag).',
+    metaDescription: 'Hawaiian Airlines baggage rules: strictly enforced 25 lbs (11.5 kg) carry-on weight limit (22 x 14 x 9 in), North America mainland ($45 1st / $55 2nd) and inter-island ($30 / $40) checked bag fees.',
     keywords: 'Hawaiian Airlines baggage allowance, Hawaiian Airlines carry on weight limit, Hawaiian baggage fees, interisland baggage cost, Hawaiian checked bag size',
     h1: 'Hawaiian Airlines Baggage Allowance & Fee Guide'
   },
@@ -259,8 +259,8 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     flag: '🇺🇸',
     limits: airlineLimits.find((l) => l.id === 'spirit')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'spirit')!,
-    title: 'Spirit Airlines Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Spirit Airlines baggage guidelines: free personal item size (18 x 14 x 8 in), strict 40 lbs checked luggage weight cap (not 50 lbs), paid carry-on fees, and overweight penalties.',
+    title: 'Spirit Airlines Baggage Allowance & Fees (Archived) – GateReady Guide',
+    metaDescription: 'Archived Spirit Airlines baggage guidelines (carrier ceased flight operations May 2, 2026): historical personal item size (18 x 14 x 8 in) and 40 lbs checked luggage weight cap.',
     keywords: 'Spirit Airlines baggage allowance, Spirit carry on fee, Spirit personal item dimensions, Spirit checked bag 40 lbs limit, Spirit overweight baggage fees',
     h1: 'Spirit Airlines Baggage Allowance & Fee Guide'
   },
@@ -292,8 +292,8 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'allegiant')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'allegiant')!,
     title: 'Allegiant Air Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Allegiant Air baggage rules: free underseat personal item (16 x 15 x 7 in), paid carry-on fee (25 lbs max), strict 40 lbs checked bag weight limit, and overweight fees.',
-    keywords: 'Allegiant Air baggage allowance, Allegiant carry on weight limit, Allegiant checked bag 40 lbs, Allegiant baggage fees, Allegiant personal item size',
+    metaDescription: 'Allegiant Air baggage rules: free underseat personal item (16 x 15 x 7 in), paid carry-on fee (22 x 16 x 10 in), 50 lbs (23 kg) / 80 linear in checked bag weight limit, and overweight fees.',
+    keywords: 'Allegiant Air baggage allowance, Allegiant carry on dimensions, Allegiant checked bag 50 lbs, Allegiant baggage fees, Allegiant personal item size',
     h1: 'Allegiant Air Baggage Allowance & Fee Guide'
   },
   {
@@ -454,7 +454,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'virginatlantic')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'virgin')!,
     title: 'Virgin Atlantic Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'Virgin Atlantic baggage policy: 22 lbs (10 kg) carry-on allowance (22 x 14 x 9 in), Economy Classic free 23 kg bag, Economy Light fees (£50), and Upper Class allowances.',
+    metaDescription: 'Virgin Atlantic baggage policy: 22 lbs (10 kg) carry-on allowance (22 x 14 x 9 in), Economy Classic free 23 kg bag, Economy Light fees (~£80 / $100), and Upper Class allowances.',
     keywords: 'Virgin Atlantic baggage allowance, Virgin Atlantic carry on weight limit, Virgin Atlantic baggage fees, Virgin Atlantic Economy Light, Virgin Upper Class luggage',
     h1: 'Virgin Atlantic Baggage Allowance & Fee Guide'
   },
@@ -470,7 +470,7 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'itaairways')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'ita')!,
     title: 'ITA Airways Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'ITA Airways (formerly Alitalia) baggage rules: strict 17.6 lbs (8 kg) carry-on weight limit (21.6 x 13.7 x 9.8 in), Light fare checked baggage fees (€30), and Business perks.',
+    metaDescription: 'ITA Airways (formerly Alitalia) baggage rules: strict 17.6 lbs (8 kg) carry-on weight limit (21.6 x 13.7 x 9.8 in), Light fare checked baggage fees (€30–€60+), and Business perks.',
     keywords: 'ITA Airways baggage allowance, ITA Airways carry on weight 8kg, ITA Airways baggage fees, Alitalia baggage rules, ITA checked bag size',
     h1: 'ITA Airways Baggage Allowance & Fee Guide'
   },
@@ -486,8 +486,8 @@ const RAW_AIRLINE_GUIDES: AirlineGuideItem[] = [
     limits: airlineLimits.find((l) => l.id === 'tap')!,
     fees: AIRLINE_BAGGAGE_FEES.find((f) => f.airlineId === 'tap')!,
     title: 'TAP Air Portugal Baggage Allowance & Fees – GateReady Guide',
-    metaDescription: 'TAP Air Portugal baggage rules: 17.6 lbs (8 kg) carry-on limit, Discount fare checked baggage fees (€30 online), and transatlantic Lisbon hub checked bag allowances.',
-    keywords: 'TAP Air Portugal baggage allowance, TAP carry on weight limit 8kg, TAP baggage fees, TAP Discount fare baggage, TAP Portugal checked bag weight',
+    metaDescription: 'TAP Air Portugal baggage rules: 22 lbs (10 kg) Economy carry-on limit (55 x 40 x 25 cm), Discount fare checked baggage fees (€30+ online), and transatlantic Lisbon hub checked bag allowances.',
+    keywords: 'TAP Air Portugal baggage allowance, TAP carry on weight limit 10kg, TAP baggage fees, TAP Discount fare baggage, TAP Portugal checked bag weight',
     h1: 'TAP Air Portugal Baggage Allowance & Fee Guide'
   },
   {

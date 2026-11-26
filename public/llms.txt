@@ -4,14 +4,15 @@
 
 ## Key Pages
 
-- [Home](https://gateready.ca/): Create a trip, preview baggage allowances, launch smart luggage scales, and browse all 42 airline guides.
-- [Airline Baggage Allowance Guides](https://gateready.ca/airlines/): Carry-on dimensions, cabin weight caps, personal-item limits, and checked bag fees across 42 global airlines.
-- [Baggage Fee Calculator](https://gateready.ca/baggage-fee-calculator/): Interactive checked bag, carry-on, and fare-family fee estimator across all 42 airlines.
-- [TSA 3-1-1 Liquids Checker Guide](https://gateready.ca/tsa-liquids-checker): Rule-based guide and item-by-item table covering TSA 3.4 oz (100 mL) and Canadian CATSA carry-on liquid rules.
+- [Home](https://gateready.ca/): Create a trip, preview baggage allowances, try the interactive demo, and browse all 42 airline guides.
+- [Interactive Product Demo](https://gateready.ca/demo): Walkthrough of GateReady's travel dashboard, tare-deducted bag meters, packing checklists, QR recovery tags, and departure readiness screen.
+- [Airline Baggage Allowance Guides](https://gateready.ca/airlines/): Carry-on dimensions, cabin weight caps, personal-item limits, and checked bag fees across 42 global airline policies.
+- [Baggage Fee Calculator](https://gateready.ca/baggage-fee-calculator/): Interactive checked bag, carry-on, and fare-family fee estimator across all 42 carriers.
+- [TSA 3-1-1 & CATSA Liquids Checker](https://gateready.ca/tsa-liquids-checker): Rule-based guide distinguishing US TSA (≤ 3.4 fl oz / 100 mL, 1 quart-sized zip bag) and Canadian CATSA (≤ 100 mL / 100 g, 1 clear resealable bag ≤ 1 L) carry-on rules with official tsa.gov and catsa-acsta.gc.ca references.
 - [Carry-On Size & Weight Checker](https://gateready.ca/carry-on-checker): How airline sizers, carry-on weight caps, Basic/UltraBasic restrictions, and tare weight determine gate pass/fail.
 - [7-Day Carry-On Packing List](https://gateready.ca/packing-list-7-day): Capsule 5-4-3-2-1 packing list for 7-day carry-on travel with item weights and tare deduction math.
 - [Pricing & Plans](https://gateready.ca/pricing): Free ($0), Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo) tiers, personal cloud sync, and 14-day guarantee.
-- [Frequently Asked Questions](https://gateready.ca/faq): Direct answers on trials, free accounts, baggage fee estimates, TSA 3-1-1 rules, referrals, and refunds.
+- [Frequently Asked Questions](https://gateready.ca/faq): Direct answers on trials, free accounts, baggage fee estimates, TSA 3-1-1 / CATSA rules, referrals, and refunds.
 - [About GateReady](https://gateready.ca/about): Product overview, operating company (CSM App Holdings), and honesty policy.
 - [How It Works](https://gateready.ca/how-it-works): Step-by-step tour from trip setup and tare weight calibration to departure readiness.
 - [Entry Requirements Quick-Check](https://gateready.ca/entry-requirements): Passport validity standards, 6-month rules, eTA/ESTA summaries, and official government links.
@@ -19,9 +20,9 @@
 
 ## Coverage Facts & Honesty Policy
 
-- Airline Coverage: 42 global airlines across Canada, the United States, Europe, and Asia-Pacific.
-- Fee & Limit Data: Verified November 4, 2026 from published carrier baggage tables (estimates only; confirm at booking).
+- Airline Coverage: 42 global airline baggage policy entries across Canada, the United States, Europe, and Asia-Pacific (retaining Spirit Airlines as an archived historical policy after operations ceased May 2, 2026).
+- Fee & Limit Data: Verified November 26, 2026 from published carrier baggage tables (estimates only; route, fare family, loyalty status, and operating carrier rules apply — confirm at booking).
 - Travel Modes: Five travel modes — flight, rail, bus, cruise, and road trip.
-- TSA 3-1-1 Liquids Checker: Rule/list-based catalog check against the 3.4 oz (100 mL) threshold (not a camera or hardware scanner).
+- TSA & CATSA Liquids Checker: Rule/list-based catalog check against US TSA 3-1-1 (3.4 fl oz / 100 mL, 1-quart zip bag) and Canadian CATSA (100 mL / 100 g, 1-liter resealable bag) rules — planning guidance only, never a guarantee of security checkpoint clearance.
 - Weights & Alerts: Modeled using published tare presets and packed item benchmarks; no live flight/gate telemetry, GPS bag tracking, or hardware scales.
 - Support Contact: csmappholdings@gmail.com

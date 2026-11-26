@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { ArrowLeft, Compass, Luggage, Plane, Search } from 'lucide-react';
+import { ArrowLeft, Compass, Plane, Search } from 'lucide-react';
 import { AppFooter } from '../components/AppFooter';
+import { PublicHeader } from '../components/PublicHeader';
 import { applySeoHead } from './PageLayout';
 
 export const NotFoundPage: React.FC = () => {
@@ -29,40 +30,7 @@ export const NotFoundPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
-      {/* Header matching GateReady branding */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-purple-100 dark:border-purple-950/80 shadow-2xs px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-3">
-          <a
-            href="/"
-            aria-label="GateReady – Return to homepage"
-            title="GateReady – Return to homepage"
-            className="flex items-center gap-2 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-          >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-700 via-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
-              <Luggage className="w-4 h-4" />
-            </div>
-            <span className="font-black text-base tracking-tight text-slate-900 dark:text-white">
-              Gate<span className="text-purple-600 dark:text-purple-400">Ready</span>
-            </span>
-          </a>
-
-          <div className="flex items-center gap-2.5">
-            <a
-              href="/airlines/"
-              className="hidden sm:inline-flex text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-1.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors"
-            >
-              42 Airline Guides
-            </a>
-            <a
-              href="/"
-              className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm transition-all"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>GateReady Home</span>
-            </a>
-          </div>
-        </div>
-      </header>
+      <PublicHeader activePath={pathname} />
 
       {/* Main 404 Content */}
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-24 flex items-center justify-center">
@@ -106,7 +74,7 @@ export const NotFoundPage: React.FC = () => {
               <Search className="w-3.5 h-3.5" />
               <span>Baggage Fee Calculator</span>
             </a>
-            <a href="/tsa-liquids-checker" className="hover:underline">TSA 3-1-1 Checker</a>
+            <a href="/tsa-liquids-checker" className="hover:underline">TSA &amp; CATSA Liquids Checker</a>
             <a href="/carry-on-checker" className="hover:underline">Carry-On Checker</a>
             <a href="/pricing" className="hover:underline">Plans &amp; Pricing</a>
           </div>

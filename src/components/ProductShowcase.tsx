@@ -93,19 +93,19 @@ const SHOWCASE_FEATURES: ShowcaseFeatureSpec[] = [
   {
     id: 'packing',
     tabLabel: 'Packing',
-    badge: '3. Smart Packing & TSA 3-1-1 Rule Check',
+    badge: '3. Smart Packing & TSA / CATSA Liquids Check',
     headline: 'Pack With Confidence. Forget Less.',
     summary:
-      'Organize items by suitcase and traveler with rule-based carry-on compliance checks that flag oversized liquids (> 3.4 oz / 100 ml) and cabin-only electronics before airport screening.',
+      'Organize items by suitcase and traveler with rule-based carry-on compliance checks that flag oversized liquids (> 3.4 fl oz / 100 mL) and cabin-only electronics before airport screening.',
     highlights: [
       'Per-bag categorized packing lists with packed vs remaining item counts',
-      'List and rule-based TSA 3-1-1 audit for cabin toiletries (≤ 3.4 oz / 100 ml) — no camera scan required',
+      'Rule-based TSA 3-1-1 (1-quart bag) & Canadian CATSA (1-liter resealable bag, 100 mL / 100 g) audit — no camera scan required',
       'Essential safety prompts keeping keys, medications, and lithium power banks out of checked bags'
     ],
     ctaLabel: 'Explore Smart Packing',
     screenshotSrc: '/screenshots/demo-packing-checklist.png',
     screenshotAlt:
-      'GateReady Smart Packing Checklist showing categorized items, completion checkboxes, and rule-based TSA 3-1-1 liquid checks',
+      'GateReady Smart Packing Checklist showing categorized items, completion checkboxes, and rule-based TSA 3-1-1 and CATSA liquid checks',
     icon: CheckSquare
   },
   {
@@ -135,7 +135,7 @@ const SHOWCASE_FEATURES: ShowcaseFeatureSpec[] = [
       'Verify passport validity guidelines, 42-airline published fee tables, Travel Wallet PNR records, and terminal concourse layouts in a single pre-departure review.',
     highlights: [
       '0–100 Departure Readiness score tracking bags, documents, liquids, and essential items',
-      'Reference terminal concourse maps (Gold/Platinum) and Travel Wallet loyalty & PNR storage',
+      'Reference terminal concourse maps (Silver+) and Travel Wallet loyalty & PNR storage',
       'Baggage fees and allowances are estimates from published airline tables — always confirm at check-in'
     ],
     ctaLabel: 'Explore Travel Readiness',
@@ -406,8 +406,8 @@ const ShowcaseArchitecturalFallback: React.FC<{
                 <MapPin className="w-4 h-4 text-amber-400" />
                 Reference Concourse Guide — Major Hubs
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">
-                Gold / Platinum
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/25 text-purple-200">
+                Silver+ (Silver, Gold &amp; Platinum)
               </span>
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed">
@@ -436,6 +436,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
   const [activeTab, setActiveTab] = useState<ShowcaseTabId>('dashboard');
   const [subView, setSubView] = useState<'primary' | 'secondary'>('primary');
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const activeFeature = SHOWCASE_FEATURES.find((f) => f.id === activeTab) || SHOWCASE_FEATURES[0];
@@ -514,9 +515,14 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
       : activeFeature.screenshotAlt;
 
   const isImageMissing = !!failedImages[currentImageSrc];
+  const isImageLoaded = !!loadedImages[currentImageSrc];
 
   const handleImageError = (src: string) => {
     setFailedImages((prev) => (prev[src] ? prev : { ...prev, [src]: true }));
+  };
+
+  const handleImageLoad = (src: string) => {
+    setLoadedImages((prev) => (prev[src] ? prev : { ...prev, [src]: true }));
   };
 
   const ActiveIcon = activeFeature.icon;
@@ -681,13 +687,26 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
               <figure className="rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-slate-950 shadow-lg overflow-hidden">
                 <div className="aspect-[16/10] w-full relative overflow-hidden">
                   {!isImageMissing ? (
-                    <img
-                      src={currentImageSrc}
-                      alt={currentImageAlt}
-                      loading={activeTab === 'dashboard' && subView === 'primary' ? 'eager' : 'lazy'}
-                      onError={() => handleImageError(currentImageSrc)}
-                      className="w-full h-full object-contain bg-slate-950"
-                    />
+                    <>
+                      {!isImageLoaded && (
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-0 bg-slate-900 animate-pulse flex items-center justify-center text-xs font-semibold text-slate-400"
+                        >
+                          Loading {activeFeature.tabLabel} preview…
+                        </div>
+                      )}
+                      <img
+                        src={currentImageSrc}
+                        alt={currentImageAlt}
+                        loading={activeTab === 'dashboard' && subView === 'primary' ? 'eager' : 'lazy'}
+                        onLoad={() => handleImageLoad(currentImageSrc)}
+                        onError={() => handleImageError(currentImageSrc)}
+                        className={`w-full h-full object-contain bg-slate-950 transition-opacity duration-200 ${
+                          isImageLoaded ? 'opacity-100' : 'opacity-0'
+                        }`}
+                      />
+                    </>
                   ) : (
                     <ShowcaseArchitecturalFallback
                       tabId={activeFeature.id}

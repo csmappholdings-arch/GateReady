@@ -163,7 +163,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Eco Standard: $40 CAD 1st checked bag, $55 CAD 2nd checked bag. Free carry-on roller included.'
+      fareNote: 'Eco Budget / Standard: ~$30–$40+ CAD online 1st checked bag ($40 representative), ~$55 CAD 2nd bag ($62–$78+ at airport). Free carry-on (51 x 40 x 23 cm) included.'
     },
     {
       id: 'club',
@@ -209,21 +209,21 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Main Cabin',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 45,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Main Cabin: $35 USD 1st checked bag, $45 USD 2nd checked bag. Free carry-on included.'
+      fareNote: 'Main Cabin (domestic US): $45 USD 1st checked bag, $55 USD 2nd checked bag. Free carry-on included.'
     },
     {
       id: 'basic',
       name: 'Basic Economy',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 45,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Delta Basic Economy includes a free overhead carry-on roller + personal item. Checked bags: $35 USD 1st, $45 USD 2nd.'
+      fareNote: 'Delta Basic Economy includes a free overhead carry-on roller + personal item. Domestic checked bags: $45 USD 1st, $55 USD 2nd.'
     },
     {
       id: 'first',
@@ -243,21 +243,21 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Main Cabin',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 45,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Main Cabin: $35 USD 1st bag online ($40 at airport), $45 USD 2nd bag. Free carry-on included.'
+      fareNote: 'Main Cabin: $45 USD 1st bag online ($50 airport), $55 USD 2nd bag online ($60 airport). Free carry-on included.'
     },
     {
       id: 'basic',
       name: 'Basic Economy',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 45,
+      firstCheckedFee: 50,
+      secondCheckedFee: 60,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'American Airlines Basic Economy includes 1 free carry-on bag plus personal item. Checked bags $35 USD 1st, $45 USD 2nd.'
+      fareNote: 'American Airlines Basic Economy includes 1 free carry-on bag plus personal item. Domestic checked bags: $50 USD 1st online ($55 airport), $60 USD 2nd.'
     },
     {
       id: 'business_first',
@@ -277,22 +277,22 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Economy / Main Cabin',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 45,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Economy / Main Cabin: $35 USD 1st bag ($40 at airport), $45 USD 2nd bag. Free overhead carry-on included.'
+      fareNote: 'Economy / Main Cabin: $45 USD 1st bag prepaid ($50 airport), $55 USD 2nd bag prepaid ($60 airport). Free overhead carry-on included.'
     },
     {
       id: 'basic',
       name: 'Basic Economy',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 45,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: false,
-      carryOnFee: 0,
-      carryOnRestrictionNotice: 'Overhead carry-on roller NOT permitted on domestic flights (personal under-seat item only).',
-      fareNote: 'United Basic Economy: NO overhead carry-on permitted on domestic US flights (under-seat item only, unless Premier/cardholder). $35 USD 1st checked bag.'
+      carryOnFee: 75,
+      carryOnRestrictionNotice: 'Overhead carry-on roller NOT permitted on domestic US flights (personal under-seat item only; $75 gate-handling fee if brought).',
+      fareNote: 'United Basic Economy: NO overhead carry-on permitted on domestic US flights (under-seat item only, unless Premier/cardholder). $45 USD 1st checked bag prepaid ($50 airport).'
     },
     {
       id: 'polaris',
@@ -336,21 +336,21 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Blue / Standard',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 50,
+      firstCheckedFee: 50,
+      secondCheckedFee: 70,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Blue: $35 USD 1st checked bag ($40 airport), $50 USD 2nd bag. Free carry-on roller included.'
+      fareNote: 'Blue (dynamic off-peak/peak pricing): ~$50–$55 USD 1st bag prepaid ($60–$70 within 24h), ~$70–$85 USD 2nd bag. Free carry-on roller included.'
     },
     {
       id: 'basic',
       name: 'Blue Basic',
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 50,
+      firstCheckedFee: 50,
+      secondCheckedFee: 70,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Blue Basic: Free carry-on roller bag now included on all routes. 1st checked bag $35 USD.'
+      fareNote: 'Blue Basic includes a free carry-on roller + personal item. Dynamic checked bag pricing: ~$50–$55 1st bag prepaid, ~$70–$85 2nd bag.'
     },
     {
       id: 'mint',
@@ -374,7 +374,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 45,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Main: $35 USD 1st checked bag, $45 USD 2nd bag. Free carry-on included.'
+      fareNote: 'Main: typically $35 USD 1st checked bag, $45 USD 2nd bag (may vary $35–$45 / $45–$55 by route). Free carry-on included.'
     },
     {
       id: 'saver',
@@ -384,7 +384,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 45,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Saver fare includes free carry-on + personal item. 1st checked bag $35 USD, 2nd $45 USD.'
+      fareNote: 'Saver fare includes free carry-on + personal item. 1st checked bag ~$35 USD, 2nd ~$45 USD.'
     },
     {
       id: 'first',
@@ -404,11 +404,11 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       name: 'Main Cabin',
       isDefault: true,
       includedCheckedBags: 0,
-      firstCheckedFee: 35,
-      secondCheckedFee: 40,
+      firstCheckedFee: 45,
+      secondCheckedFee: 55,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Main Cabin: $35 USD 1st checked bag ($30 inter-island), $40 USD 2nd bag. Free carry-on included.'
+      fareNote: 'Main Cabin (North America): $45 USD 1st checked bag ($30 neighbor island), $55 USD 2nd bag ($40 neighbor island). Free carry-on (max 25 lbs) included.'
     },
     {
       id: 'first',
@@ -763,7 +763,7 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       secondCheckedFee: 60,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'SAS Go includes 1 free checked bag (23 kg) + free carry-on (8 kg). Additional bag €60.'
+      fareNote: 'SAS Go / Standard includes 1 free checked bag (23 kg) + free overhead carry-on (8 kg). Additional bag €60.'
     },
     {
       id: 'light',
@@ -771,9 +771,10 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       includedCheckedBags: 0,
       firstCheckedFee: 30,
       secondCheckedFee: 60,
-      carryOnAllowed: true,
-      carryOnFee: 0,
-      fareNote: 'SAS Go Light: unbundled hand-baggage fare. 1st checked bag €30 online (€60 at gate). Free carry-on included.'
+      carryOnAllowed: false,
+      carryOnFee: 20,
+      carryOnRestrictionNotice: 'Under-seat personal item only (40 x 30 x 15 cm). Overhead cabin bag requires paid add-on (~€12–€35+) or SAS Go Standard+.',
+      fareNote: 'SAS Go Light: unbundled personal-item-only fare. Overhead cabin bag add-on ~€12–€35+ online; 1st checked bag €30+ online (€60 at gate).'
     },
     {
       id: 'plus',
@@ -803,11 +804,11 @@ export const AIRLINE_FARE_FAMILIES_DATA: Record<string, AirlineFareFamily[]> = {
       id: 'light',
       name: 'Economy Light',
       includedCheckedBags: 0,
-      firstCheckedFee: 50,
+      firstCheckedFee: 80,
       secondCheckedFee: 65,
       carryOnAllowed: true,
       carryOnFee: 0,
-      fareNote: 'Economy Light: unbundled fare. 1st checked bag is £50 online. Free carry-on (10 kg) included.'
+      fareNote: 'Economy Light: hand-baggage-only fare (~£80 / $100 USD for adding a 1st checked bag, route dependent). Free carry-on (10 kg) included.'
     },
     {
       id: 'upper',

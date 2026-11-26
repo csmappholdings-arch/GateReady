@@ -470,14 +470,14 @@ export const Header: React.FC<HeaderProps> = ({
                   </a>
 
                   <a
-                    href="/travel-preparation"
+                    href="/packing-list-7-day"
                     onClick={() => setToolsMenuOpen(false)}
                     className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
                   >
                     <Luggage className="w-4 h-4 text-amber-500" />
                     <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">Travel Preparation</div>
-                      <div className="text-[10px] text-slate-500">Departure checklist guides</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">7-Day Carry-On List</div>
+                      <div className="text-[10px] text-slate-500">Capsule packing &amp; weight matrix</div>
                     </div>
                   </a>
                 </div>
@@ -506,7 +506,7 @@ export const Header: React.FC<HeaderProps> = ({
               {whyMenuOpen && (
                 <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-purple-100 dark:border-purple-900/60 p-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-150">
                   <a
-                    href="/"
+                    href="/how-it-works"
                     onClick={() => setWhyMenuOpen(false)}
                     className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
                   >
@@ -518,14 +518,14 @@ export const Header: React.FC<HeaderProps> = ({
                   </a>
 
                   <a
-                    href="/"
+                    href="/demo"
                     onClick={() => setWhyMenuOpen(false)}
                     className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
                   >
                     <Sparkles className="w-4 h-4 text-amber-500" />
                     <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">Features</div>
-                      <div className="text-[10px] text-slate-500">Smart scale, tare & TSA 3-1-1</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Interactive Demo</div>
+                      <div className="text-[10px] text-slate-500">Smart scale, tare &amp; TSA/CATSA</div>
                     </div>
                   </a>
 
@@ -536,13 +536,13 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <CreditCard className="w-4 h-4 text-emerald-600" />
                     <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">Pricing & Plans</div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white">Pricing &amp; Plans</div>
                       <div className="text-[10px] text-slate-500">Free, Silver, Gold, Platinum</div>
                     </div>
                   </a>
 
                   <a
-                    href="/"
+                    href="/faq"
                     onClick={() => setWhyMenuOpen(false)}
                     className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block"
                   >
@@ -612,7 +612,7 @@ export const Header: React.FC<HeaderProps> = ({
                   window.location.href = '/pricing';
                   return;
                 }
-                openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`);
+                openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`, { context: 'plans' });
               }}
               className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-fuchsia-600/25 active:scale-95 transition-all cursor-pointer border border-fuchsia-400/40"
               title="Upgrade GateReady Plan"
@@ -708,7 +708,8 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Log in or create your free account (includes 7-day Platinum trial)"
               >
                 <Sparkles className="hidden sm:block w-3.5 h-3.5 text-purple-900 shrink-0" />
-                <span className="whitespace-nowrap">Log In / Create Account</span>
+                <span className="sm:hidden whitespace-nowrap">Log In</span>
+                <span className="hidden sm:inline whitespace-nowrap">Log In / Create Account</span>
               </button>
             )}
 
@@ -870,7 +871,7 @@ export const Header: React.FC<HeaderProps> = ({
                             window.location.href = '/pricing';
                             return;
                           }
-                          openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Or compare Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo).`);
+                          openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Or compare Silver ($1.99/mo), Gold ($3.99/mo), and Platinum ($4.99/mo).`, { context: 'plans' });
                         }}
                         className="w-full h-8 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:from-purple-700 cursor-pointer"
                       >
@@ -1181,7 +1182,11 @@ export const Header: React.FC<HeaderProps> = ({
                     <button
                       onClick={() => {
                         setSettingsOpen(false);
-                        openPaywall();
+                        if (!hasReachedValueMoment() && typeof window !== 'undefined') {
+                          window.location.href = '/pricing';
+                          return;
+                        }
+                        openPaywall(undefined, { userInitiated: true, context: 'plans' });
                       }}
                       className="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer bg-purple-600 hover:bg-purple-700 text-white"
                     >
@@ -2017,7 +2022,7 @@ export const Header: React.FC<HeaderProps> = ({
                             window.location.href = '/pricing';
                             return;
                           }
-                          openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`);
+                          openPaywall(`${TRIAL_CTA_LABEL} — ${TRIAL_TERMS_EXACT} Unlock unlimited bags, active trips, and multi-traveler packing.`, { context: 'plans' });
                         }}
                         className="w-full h-8.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98 transition-all cursor-pointer"
                       >
@@ -2069,7 +2074,7 @@ export const Header: React.FC<HeaderProps> = ({
                           window.location.href = '/pricing';
                           return;
                         }
-                        openPaywall();
+                        openPaywall(undefined, { userInitiated: true, context: 'plans' });
                       }}
                       className="w-full h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
                     >
@@ -2244,14 +2249,14 @@ export const Header: React.FC<HeaderProps> = ({
                     </a>
 
                     <a
-                      href="/travel-preparation"
+                      href="/packing-list-7-day"
                       onClick={() => setMobileMenuOpen(false)}
                       className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
                     >
                       <Luggage className="w-4 h-4 text-amber-500 shrink-0" />
                       <div>
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">Travel Preparation</div>
-                        <div className="text-[10px] text-slate-500">Departure checklist guides</div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">7-Day Carry-On List</div>
+                        <div className="text-[10px] text-slate-500">Capsule packing &amp; weight matrix</div>
                       </div>
                     </a>
 
@@ -2299,14 +2304,14 @@ export const Header: React.FC<HeaderProps> = ({
                     </a>
 
                     <a
-                      href="/"
+                      href="/demo"
                       onClick={() => setMobileMenuOpen(false)}
                       className="w-full text-left p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2.5 block pt-2"
                     >
                       <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
                       <div>
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">Features Overview</div>
-                        <div className="text-[10px] text-slate-500">Smart scale, tare &amp; TSA 3-1-1</div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Interactive Demo</div>
+                        <div className="text-[10px] text-slate-500">Smart scale, tare &amp; TSA/CATSA</div>
                       </div>
                     </a>
 
